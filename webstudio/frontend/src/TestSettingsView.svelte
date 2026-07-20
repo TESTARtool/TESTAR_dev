@@ -20,6 +20,7 @@
     export let selectedEditor = "";
     export let selectedSettingsGroupId = "";
     export let settingsDescription = "Main common TESTAR settings with grouped controls. Use the test.settings editor for advanced control.";
+    export let showSettingsSearch = true;
     export let restoreSettingDefault;
     export let validateRegexExpression;
     export let workspaceDocument = null;
@@ -196,17 +197,19 @@
                 </div>
             </div>
 
-            <section class="settings-toolbar top-gap">
-                <div class="settings-search">
-                    <label class="field-label" for="settings-search">Search in all settings</label>
-                    <input
-                        id="settings-search"
-                        type="search"
-                        bind:value={settingsSearch}
-                        placeholder="Search by key, value, type, or description"
-                    />
-                </div>
-            </section>
+            {#if showSettingsSearch}
+                <section class="settings-toolbar top-gap">
+                    <div class="settings-search">
+                        <label class="field-label" for="settings-search">Search in all settings</label>
+                        <input
+                            id="settings-search"
+                            type="search"
+                            bind:value={settingsSearch}
+                            placeholder="Search by key, value, type, or description"
+                        />
+                    </div>
+                </section>
+            {/if}
 
             <section class="settings-groups top-gap">
                 {#if visibleSettingsGroups.length > 0}

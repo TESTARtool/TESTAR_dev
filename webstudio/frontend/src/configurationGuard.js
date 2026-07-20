@@ -19,6 +19,10 @@ export function configurationEditorArea(editorId) {
         return "policies-flow";
     }
 
+    if (editorId === "oracle-source") {
+        return "oracle-source";
+    }
+
     return "other";
 }
 

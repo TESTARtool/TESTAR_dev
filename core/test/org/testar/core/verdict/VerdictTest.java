@@ -45,6 +45,15 @@ public class VerdictTest {
     }
 
     @Test
+    public void testDslInfractionVerdictCanBeConstructed() {
+        Verdict dslInfraction = new Verdict(Verdict.Severity.DSL_INFRACTION, "DSL oracle failed.");
+
+        assertEquals(0.7, dslInfraction.severity(), 0.0);
+        assertEquals("DSL_INFRACTION", dslInfraction.verdictSeverityTitle());
+        assertFalse(dslInfraction.isCritical());
+    }
+
+    @Test
     public void testEquals() {
         Verdict v1 = Verdict.OK;
         Verdict v2 = Verdict.FAIL;

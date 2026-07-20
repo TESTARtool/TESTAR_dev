@@ -346,16 +346,54 @@ Left panel order:
 - `Windows Process Oracles`
 - `WebDriver Console Oracles`
 - `Log Regex Oracles`
-- `Extended Oracles`
-- `Java Oracle Composition`
+- `Enable Extended Oracles`
+- `|- Java Oracle Files`
+- `|- DSL Oracle Files`
 
 `Active Oracles` is the default panel when opening `Test Oracles`.
 
 `Active Oracles` must be read-only and must summarize active or configured oracle mechanisms.
 
-`Java Oracle Composition` must reuse the `Custom Oracle Services` composition node editing behavior.
+The extended oracle panels must expose one workspace oracle inventory for the selected workspace.
 
-Future DSL oracle authoring may be added as an additional panel.
+The oracle inventory includes:
+
+- workspace Java oracles from `settings/<workspace>/oracles/java`
+- DSL source files from `settings/<workspace>/oracles/dsl`
+
+The active Java oracle class names are stored in `ExtendedOracles`.
+
+The extended oracle panels must provide these areas:
+
+- `Enable Extended Oracles`: enable or disable existing Java oracles with checkboxes
+- `Java Oracle Files`: create, edit, delete, save, and compile workspace Java oracles
+- `DSL Oracle Files`: create, edit, delete, save, validate, and generate DSL oracle files
+
+The `Enable Extended Oracles` checkbox state is derived from the saved `ExtendedOracles` setting.
+
+Changing a checkbox updates the visual settings state and uses the normal `Save Settings` flow.
+
+Workspace Java oracles are compiled into `settings/<workspace>/oracles/compiled`.
+
+Workspace Java oracle class names must be unique inside the selected workspace.
+
+Java oracle source edits must use `Save and Compile` to persist the selected file and report Java compilation feedback.
+
+DSL oracle authoring must create and edit `.testar` files under `settings/<workspace>/oracles/dsl`.
+
+DSL source edits must use `Save and Generate Java-DSL` to save the current `.testar` editor content, validate it, and generate Java oracle classes into `settings/<workspace>/oracles/java`.
+
+Generated Java files should use the DSL file name as the generated Java file name with the `.java` extension.
+
+Generated Java oracle classes use the same compile, enable, disable, and execution flow as manually written workspace Java oracles.
+
+New workspace Java oracle classes and generated DSL Java oracle classes are enabled by default by adding their class names to `ExtendedOracles`.
+
+Deleting Java or DSL oracle files must require a confirmation dialog that names the selected file.
+
+Individual oracle checks must be implemented as Java or DSL-generated `Oracle` classes and enabled through `ExtendedOracles`.
+
+Oracle composition customization belongs to the Composition Flow and is used for changing verdict aggregation behavior, not for individual test oracles.
 
 ## Test Configuration
 

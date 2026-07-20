@@ -209,7 +209,7 @@ str pred2java((Predicate)`<Widget w> <Cond c>`)
   = "<widget2java(w)>
     'boolean <condVar(c)> = <cond2java(c, widgetVar(w))>;
     'if (!<condVar(c)>) { 
-    '  verdicts.add(new Verdict(Verdict.Severity.FAIL, getMessage(), <offender(w)>)); 
+    '  verdicts.add(new Verdict(Verdict.Severity.DSL_INFRACTION, getMessage(), <offender(w)>)); 
     '}
     'markAsNonVacuous();";
 
@@ -221,7 +221,7 @@ str pred2java((Predicate)`<Widget w> <Cond c0> when it <Cond c>`)
     'if (<condVar(c)>) {
     '  boolean <condVar(c0)> = <cond2java(c0, widgetVar(w))>;
     '  if (!<condVar(c0)>) { 
-    '    verdicts.add(new Verdict(Verdict.Severity.FAIL, getMessage(), <offender(w)>)); 
+    '    verdicts.add(new Verdict(Verdict.Severity.DSL_INFRACTION, getMessage(), <offender(w)>)); 
     '  }
     ' markAsNonVacuous();
     '}";

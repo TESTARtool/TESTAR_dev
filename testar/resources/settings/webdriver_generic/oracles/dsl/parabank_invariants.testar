@@ -1,0 +1,20 @@
+package dsl_generated.parabank_invariants;
+
+
+pattern twoDecimals = "\\d+\\.\\d{2}$"
+
+context "Parabank | .*" "Account Services"
+
+assert static_text "Welcome John Demo" is visible
+"DSL: Welcome John Demo is visible".
+
+context "Parabank | Accounts Overview" "Accounts Overview"
+
+assert for all table_data
+  it.text matches twoDecimals when it.text contains "$" 
+  "DSL: Dollar values must have two decimals".
+
+context "Parabank | .*" "Customer Care" {
+  assert button "Send to Customer Care" is clickable
+  "DSL: Send to Customer Care button must be clickable".
+}

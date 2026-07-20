@@ -84,6 +84,7 @@ The new workspace copy includes configuration assets:
 - `composition.properties`
 - `policies.properties`
 - Java services, capabilities, and policies
+- workspace oracles under `oracles/`
 
 Copying Test Goals is optional and enabled by default.
 
@@ -102,6 +103,31 @@ This keeps configuration, Test Goals, generated reports, and state model related
 Workspace names must remain safe folder names and must be unique.
 
 After a create or rename operation, WebStudio should refresh the workspace list and select the affected workspace.
+
+## Workspace Oracles
+
+Workspace-specific oracles live under the workspace settings folder:
+
+```text
+settings/<workspace>/oracles/
+  dsl/
+  java/
+  compiled/
+```
+
+Oracle responsibilities:
+
+- `dsl/` contains `.testar` DSL oracle files
+- `java/` contains manually written Java oracles and Java files generated from DSL
+- `compiled/` contains compiled workspace oracle classes
+
+The `ExtendedOracles` setting is the active list of enabled Java oracle class names.
+
+Workspace Java oracles are exposed as the editable extended oracle inventory.
+
+Generated DSL Java oracles participate in the same inventory as manually written workspace Java oracles.
+
+Workspace Java oracle class names must be unique inside the selected workspace.
 
 ## CLI Startup Contracts
 

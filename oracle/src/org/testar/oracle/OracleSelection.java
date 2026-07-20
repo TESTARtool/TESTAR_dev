@@ -12,17 +12,22 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.tools.DiagnosticCollector;
 import javax.tools.JavaCompiler;
@@ -37,14 +42,15 @@ public class OracleSelection {
 
 	/** Extended Internal Oracles **/
 
+	private static final Pattern PACKAGE_PATTERN = Pattern.compile("(?m)^\\s*package\\s+([A-Za-z_$][\\w$]*(?:\\.[A-Za-z_$][\\w$]*)*)\\s*;");
+	private static final Pattern TOP_LEVEL_CLASS_PATTERN = Pattern.compile("(?m)^(?:public\\s+)?(?:abstract\\s+|final\\s+)?class\\s+([A-Za-z_$][\\w$]*)\\b");
+
 	private static String[] oraclePackages = {
-			"org.testar.oracle.generic.visual",
-			"org.testar.oracle.web.accessibility",
-			"org.testar.oracle.web.invariants",
+			"org.testar.oracle.generic.visual"
 	};
 
-	public static List<String> getAvailableExtendedOracles() {
-		List<String> oracleNames = new ArrayList<>();
+	public static List<String> getAvailableBuiltInOracles() {
+		Set<String> oracleNames = new LinkedHashSet<>();
 		for (String pkg : oraclePackages) {
 			try {
 				Reflections reflections = new Reflections(pkg);
@@ -57,79 +63,102 @@ public class OracleSelection {
 				System.out.println("Error loading package: " + pkg);
 			}
 		}
-		return oracleNames;
+		return new ArrayList<>(oracleNames);
+	}
+
+	public static List<String> getAvailableExtendedOracles() {
+		Set<String> oracleNames = new LinkedHashSet<>();
+		oracleNames.addAll(getAvailableBuiltInOracles());
+
+		// ExtendedOracles is the single active list. Names are resolved first from
+		// workspace Java oracles, then from built-in oracle packages.
+		for (List<String> workspaceOracleNames : getAvailableWorkspaceJavaOracles().values()) {
+			oracleNames.addAll(workspaceOracleNames);
+		}
+		return new ArrayList<>(oracleNames);
 	}
 
 	public static List<Oracle> loadExtendedOracles(String selectedOracles) {
 		List<Oracle> oraclesList = new ArrayList<>();
+		List<String> selectedNames = parseSelectedOracleNames(selectedOracles);
 
-		// Split the input string by commas to get individual oracle names
-		String[] oracleNames = selectedOracles.split(",");
+		if (selectedNames.isEmpty()) {
+			return oraclesList;
+		}
 
-		for (String oracleName : oracleNames) {
-			oracleName = oracleName.trim();
+		// Workspace oracles intentionally override built-ins with the same simple name.
+		Map<String, Oracle> workspaceOracles = loadWorkspaceOracleMap(new LinkedHashSet<>(selectedNames));
 
-			for (String pkg : oraclePackages) {
-				try {
-					// Construct the full class name dynamically
-					String fullClassName = pkg + "." + oracleName;
-
-					// Use reflection to dynamically load the class
-					Class<?> oracleClass = Class.forName(fullClassName);
-
-					// Check if the class implements the Oracle interface
-					if (Oracle.class.isAssignableFrom(oracleClass)) {
-						// Instantiate the oracle (assuming a default constructor)
-						Constructor<?> constructor = oracleClass.getDeclaredConstructor();
-						Oracle oracleInstance = (Oracle) constructor.newInstance();
-						oraclesList.add(oracleInstance);
-						break;
-					}
-				} catch (ClassNotFoundException e) {
-					// Continue trying other packages
-				} catch (Exception e) {
-					System.out.println("Error instantiating " + oracleName + ": " + e.getMessage());
-				}
+		for (String oracleName : selectedNames) {
+			Oracle workspaceOracle = workspaceOracles.get(oracleName);
+			if (workspaceOracle != null) {
+				oraclesList.add(workspaceOracle);
+				continue;
 			}
+
+			Optional<Oracle> builtInOracle = loadBuiltInOracle(oracleName);
+			builtInOracle.ifPresent(oraclesList::add);
 		}
 
 		return oraclesList;
 	}
 
-	/** External Oracles **/	
+	private static Optional<Oracle> loadBuiltInOracle(String oracleName) {
+		for (String pkg : oraclePackages) {
+			try {
+				String fullClassName = pkg + "." + oracleName;
+				Class<?> oracleClass = Class.forName(fullClassName);
 
-	public static Map<String, List<String>> getAvailableExternalOracles() {
+				if (Oracle.class.isAssignableFrom(oracleClass)) {
+					Constructor<?> constructor = oracleClass.getDeclaredConstructor();
+					return Optional.of((Oracle) constructor.newInstance());
+				}
+			} catch (ClassNotFoundException e) {
+				// Continue trying other packages
+			} catch (Exception e) {
+				System.out.println("Error instantiating " + oracleName + ": " + e.getMessage());
+			}
+		}
+
+		return Optional.empty();
+	}
+
+	/** Workspace Java Oracles **/
+
+	public static Map<String, List<String>> getAvailableWorkspaceJavaOracles() {
 		Map<String, List<String>> fileToOraclesMap = new LinkedHashMap<>();
 
-		File javaDir = new File(TestarDirectories.getOraclesDir());
-		File compiledDir = new File(TestarDirectories.getOraclesDir(), "compiled");
+		File javaDir = new File(TestarDirectories.getWorkspaceOracleJavaDir());
+		File compiledDir = new File(TestarDirectories.getWorkspaceOracleCompiledDir());
 
-		// Step 1: Find all .java files
 		List<File> javaFiles = findJavaFiles(javaDir);
 
 		if (javaFiles == null || javaFiles.size() == 0) {
-			System.err.println("No .java files found in: " + javaDir.getAbsolutePath());
 			return Map.of();
 		}
 
-		// Create or clean compiled directory
 		if (!compiledDir.exists()) {
 			compiledDir.mkdirs();
 		} else {
 			cleanObsoleteClassFiles(javaDir, compiledDir);
 		}
 
-		// Step 2: Compile .java files individually
 		Set<String> successfullyCompiled = compileJavaFiles(javaFiles, compiledDir);
 		if (successfullyCompiled.isEmpty()) {
 			System.err.println("No oracles compiled successfully.");
 			return Map.of();
 		}
 
-		// Step 3: Load all successfully compiled classes that implement Oracle
-		try (URLClassLoader classLoader = new URLClassLoader(new URL[]{compiledDir.toURI().toURL()})) {
+		try (URLClassLoader classLoader = new URLClassLoader(
+				new URL[]{compiledDir.toURI().toURL()},
+				OracleSelection.class.getClassLoader()
+		)) {
 			for (File javaFile : javaFiles) {
 				String fileName = javaFile.getName();
+				String sourcePath = javaDir.toPath()
+						.relativize(javaFile.toPath())
+						.toString()
+						.replace(File.separatorChar, '/');
 				List<String> oraclesInFile = new ArrayList<>();
 
 				Files.walk(compiledDir.toPath())
@@ -155,7 +184,7 @@ public class OracleSelection {
 				});
 
 				if (!oraclesInFile.isEmpty()) {
-					fileToOraclesMap.put(fileName, oraclesInFile);
+					fileToOraclesMap.put(sourcePath, oraclesInFile);
 				}
 			}
 		} catch (IOException e) {
@@ -165,68 +194,61 @@ public class OracleSelection {
 		return fileToOraclesMap;
 	}
 
-	public static List<Oracle> loadExternalJavaOracles(String selectedOracles) {
-		File javaDir = new File(TestarDirectories.getOraclesDir());
+	public static List<Oracle> loadWorkspaceJavaOracles(String selectedOracles) {
+		File javaDir = new File(TestarDirectories.getWorkspaceOracleJavaDir());
 		if (!javaDir.exists() || !javaDir.isDirectory()) {
-			System.out.println("Oracle directory not found: " + javaDir.getAbsolutePath());
 			return List.of();
 		}
 
-		Set<String> selectedNames = selectedOracles == null || selectedOracles.isBlank()
-				? Set.of()  // load all oracles
-						: Arrays.stream(selectedOracles.split(","))
-						.map(String::trim)
-						.collect(Collectors.toSet());
+		Set<String> selectedNames = new LinkedHashSet<>(parseSelectedOracleNames(selectedOracles));
+		return new ArrayList<>(loadWorkspaceOracleMap(selectedNames).values());
+	}
 
-				List<File> javaFiles = findJavaFiles(javaDir);
-				if (javaFiles == null || javaFiles.size() == 0) {
-					System.out.println("No Java files found in the oracles directory.");
-					return List.of();
-				}
+	private static Map<String, Oracle> loadWorkspaceOracleMap(Set<String> selectedNames) {
+		Map<String, Oracle> oracles = new LinkedHashMap<>();
+		File javaDir = new File(TestarDirectories.getWorkspaceOracleJavaDir());
+		if (!javaDir.exists() || !javaDir.isDirectory()) {
+			return oracles;
+		}
 
-				File outputDir = new File(javaDir, "compiled");
-				if (!outputDir.exists()) {
-					outputDir.mkdirs();
-				} else {
-					// Clean previous compiled .class files
-					cleanObsoleteClassFiles(javaDir, outputDir);
-				}
+		List<File> javaFiles = findJavaFiles(javaDir);
+		if (javaFiles == null || javaFiles.size() == 0) {
+			return oracles;
+		}
 
-				Set<String> compiledNames = compileJavaFiles(javaFiles, outputDir);
-				if (!compiledNames.isEmpty()) {
-					return loadCompiledOracles(outputDir, selectedNames.isEmpty() ? compiledNames : selectedNames);
-				}
-				return List.of();
+		File outputDir = new File(TestarDirectories.getWorkspaceOracleCompiledDir());
+		if (!outputDir.exists()) {
+			outputDir.mkdirs();
+		} else {
+			cleanObsoleteClassFiles(javaDir, outputDir);
+		}
+
+		Set<String> compiledNames = compileJavaFiles(javaFiles, outputDir);
+		if (!compiledNames.isEmpty()) {
+			Set<String> namesToLoad = selectedNames.isEmpty() ? compiledNames : selectedNames;
+			for (Oracle oracle : loadCompiledOracles(outputDir, namesToLoad)) {
+				oracles.put(oracle.getClass().getSimpleName(), oracle);
+			}
+		}
+		return oracles;
 	}
 
 	private static void cleanObsoleteClassFiles(File javaSourceRoot, File outputDir) {
 		try {
+			List<SourceClassInfo> sourceClassInfos = sourceClassInfos(findJavaFiles(javaSourceRoot), outputDir.toPath());
+
 			Files.walk(outputDir.toPath())
 			.filter(p -> p.toString().endsWith(".class"))
 			.forEach(classPath -> {
 				try {
-					// Determine package-relative class file path
-					Path relativeClassPath = outputDir.toPath().relativize(classPath);
-					String relativePathWithoutExtension = relativeClassPath.toString().replaceAll("\\.class$", "");
+					Optional<SourceClassInfo> sourceClassInfo = matchingSourceClassInfo(sourceClassInfos, classPath);
+					boolean isOrphan = sourceClassInfo.isEmpty();
+					boolean isStale = sourceClassInfo.isPresent()
+							&& Files.getLastModifiedTime(classPath).toMillis() < sourceClassInfo.get().lastModified;
 
-					// Only map the base name (before $ for inner classes)
-					String baseClassName = Paths.get(relativePathWithoutExtension).getFileName().toString().split("\\$")[0];
-
-					// Replace .class with .java and use path to find corresponding source
-					Path relativeJavaPath = relativeClassPath.getParent() != null
-							? relativeClassPath.getParent().resolve(baseClassName + ".java")
-									: Paths.get(baseClassName + ".java");
-
-							File sourceFile = new File(javaSourceRoot, relativeJavaPath.toString());
-
-							boolean isOrphan = !sourceFile.exists();
-							boolean isStale = sourceFile.exists()
-									&& classPath.toFile().lastModified() < sourceFile.lastModified();
-
-							if (isOrphan || isStale) {
-								System.out.println("Deleting stale or orphan .class: " + classPath);
-								classPath.toFile().delete();
-							}
+					if (isOrphan || isStale) {
+						classPath.toFile().delete();
+					}
 				} catch (Exception e) {
 					System.out.println("Error cleaning class file: " + classPath + " -> " + e.getMessage());
 				}
@@ -268,7 +290,8 @@ public class OracleSelection {
 			Iterable<? extends JavaFileObject> compilationUnits = fileManager.getJavaFileObjects(javaFile);
 			List<String> options = List.of(
 					"-d", outputDir.getAbsolutePath(),
-					"-sourcepath", TestarDirectories.getOraclesDir()
+					"-sourcepath", TestarDirectories.getWorkspaceOracleJavaDir(),
+					"-classpath", System.getProperty("java.class.path")
 					);
 
 			JavaCompiler.CompilationTask task = compiler.getTask(null, fileManager, diagnostics, options, null, compilationUnits);
@@ -288,27 +311,52 @@ public class OracleSelection {
 
 	public static List<Oracle> loadCompiledOracles(File outputDir, Set<String> selectedNames) {
 		List<Oracle> oracles = new ArrayList<>();
+		Map<String, Class<?>> oracleClassesBySimpleName = new LinkedHashMap<>();
+		Set<String> duplicateOracleNames = new LinkedHashSet<>();
 
-		try (URLClassLoader classLoader = new URLClassLoader(new URL[]{outputDir.toURI().toURL()})) {
-			Files.walk(outputDir.toPath())
-			.filter(p -> p.toString().endsWith(".class"))
-			.forEach(classPath -> {
+		try (URLClassLoader classLoader = new URLClassLoader(
+				new URL[]{outputDir.toURI().toURL()},
+				OracleSelection.class.getClassLoader()
+		)) {
+			List<Path> classFiles = Files.walk(outputDir.toPath())
+					.filter(p -> p.toString().endsWith(".class"))
+					.collect(Collectors.toList());
+
+			for (Path classPath : classFiles) {
 				try {
 					String className = getClassName(outputDir.toPath(), classPath);
 					Class<?> clazz = classLoader.loadClass(className);
 
 					if (Oracle.class.isAssignableFrom(clazz) && !java.lang.reflect.Modifier.isAbstract(clazz.getModifiers())) {
-						if (selectedNames.isEmpty() || selectedNames.contains(clazz.getSimpleName())) {
-							Oracle oracle = (Oracle) clazz.getDeclaredConstructor().newInstance();
-							oracles.add(oracle);
+						String simpleName = clazz.getSimpleName();
+						Class<?> existingClass = oracleClassesBySimpleName.putIfAbsent(simpleName, clazz);
+						if (existingClass != null && !existingClass.getName().equals(clazz.getName())) {
+							duplicateOracleNames.add(simpleName);
 						}
 					}
 				} catch (Exception e) {
 					System.out.println("Failed to load compiled oracle: " + e.getMessage());
 				}
-			});
+			}
+
+			if (!duplicateOracleNames.isEmpty()) {
+				throw new IllegalStateException(
+						"Duplicate workspace oracle class name(s): "
+						+ String.join(", ", duplicateOracleNames)
+						+ ". Oracle class names must be unique in the workspace."
+				);
+			}
+
+			for (Class<?> oracleClass : oracleClassesBySimpleName.values()) {
+				if (selectedNames.isEmpty() || selectedNames.contains(oracleClass.getSimpleName())) {
+					Oracle oracle = (Oracle) oracleClass.getDeclaredConstructor().newInstance();
+					oracles.add(oracle);
+				}
+			}
 		} catch (IOException e) {
 			System.out.println("Error loading compiled oracles: " + e.getMessage());
+		} catch (ReflectiveOperationException e) {
+			System.out.println("Error instantiating compiled oracle: " + e.getMessage());
 		}
 
 		return oracles;
@@ -332,38 +380,142 @@ public class OracleSelection {
 	}
 
 	private static boolean needsCompilation(File javaFile, File outputDir) {
-		String baseName = javaFile.getName().replace(".java", "");
-		Path outputPath = outputDir.toPath();
-
 		try {
-			// Check if *any* .class file that came from this source is outdated or missing
-			List<Path> classFiles = Files.walk(outputPath)
-					.filter(p -> {
-						String name = p.getFileName().toString();
-						return name.equals(baseName + ".class") || name.startsWith(baseName + "$");
-					})
-					.collect(Collectors.toList());
-
-			if (classFiles.isEmpty()) {
-				return true; // No .class files found for this .java
+			List<SourceClassInfo> sourceClassInfos = sourceClassInfos(List.of(javaFile), outputDir.toPath());
+			if (sourceClassInfos.isEmpty()) {
+				return true;
 			}
 
-			long javaLastModified = javaFile.lastModified();
+			for (SourceClassInfo sourceClassInfo : sourceClassInfos) {
+				if (!Files.exists(sourceClassInfo.outerClassPath)) {
+					return true;
+				}
 
-			for (Path classFile : classFiles) {
-				if (Files.getLastModifiedTime(classFile).toMillis() < javaLastModified) {
-					return true; // At least one .class is stale
+				Path classDirectory = sourceClassInfo.outerClassPath.getParent();
+				if (classDirectory == null || !Files.exists(classDirectory)) {
+					return true;
+				}
+
+				List<Path> classFiles = Files.walk(classDirectory)
+						.filter(sourceClassInfo::matchesClassFile)
+						.collect(Collectors.toList());
+
+				if (classFiles.isEmpty()) {
+					return true;
+				}
+
+				for (Path classFile : classFiles) {
+					if (Files.getLastModifiedTime(classFile).toMillis() < sourceClassInfo.lastModified) {
+						return true;
+					}
 				}
 			}
 
-			return false; // All .class files are up to date
+			return false;
 		} catch (IOException e) {
-			return true; // On error, assume recompilation needed
+			return true;
+		}
+	}
+
+	private static List<SourceClassInfo> sourceClassInfos(List<File> javaFiles, Path outputDir) {
+		List<SourceClassInfo> sourceClassInfos = new ArrayList<>();
+		for (File javaFile : javaFiles) {
+			sourceClassInfos.addAll(sourceClassInfos(javaFile, outputDir));
+		}
+
+		return sourceClassInfos;
+	}
+
+	private static List<SourceClassInfo> sourceClassInfos(File javaFile, Path outputDir) {
+		String source;
+		try {
+			source = Files.readString(javaFile.toPath(), StandardCharsets.UTF_8);
+		} catch (IOException e) {
+			return List.of();
+		}
+
+		List<String> topLevelClassNames = topLevelClassNames(source);
+		if (topLevelClassNames.isEmpty()) {
+			topLevelClassNames = List.of(javaFile.getName().replace(".java", ""));
+		}
+
+		Path packagePath = packagePath(source);
+		List<SourceClassInfo> sourceClassInfos = new ArrayList<>();
+		for (String topLevelClassName : topLevelClassNames) {
+			Path classPath = outputDir.resolve(packagePath).resolve(topLevelClassName + ".class");
+			sourceClassInfos.add(new SourceClassInfo(classPath, topLevelClassName, javaFile.lastModified()));
+		}
+
+		return sourceClassInfos;
+	}
+
+	private static Path packagePath(String source) {
+		Matcher matcher = PACKAGE_PATTERN.matcher(source);
+		if (!matcher.find()) {
+			return Paths.get("");
+		}
+
+		return Paths.get(matcher.group(1).replace('.', File.separatorChar));
+	}
+
+	private static List<String> topLevelClassNames(String source) {
+		List<String> classNames = new ArrayList<>();
+		Matcher matcher = TOP_LEVEL_CLASS_PATTERN.matcher(source);
+		while (matcher.find()) {
+			classNames.add(matcher.group(1));
+		}
+
+		return classNames;
+	}
+
+	private static Optional<SourceClassInfo> matchingSourceClassInfo(List<SourceClassInfo> sourceClassInfos, Path classPath) {
+		for (SourceClassInfo sourceClassInfo : sourceClassInfos) {
+			if (sourceClassInfo.matchesClassFile(classPath)) {
+				return Optional.of(sourceClassInfo);
+			}
+		}
+
+		return Optional.empty();
+	}
+
+	private static final class SourceClassInfo {
+
+		private final Path outerClassPath;
+		private final String topLevelClassName;
+		private final long lastModified;
+
+		private SourceClassInfo(Path outerClassPath, String topLevelClassName, long lastModified) {
+			this.outerClassPath = outerClassPath;
+			this.topLevelClassName = topLevelClassName;
+			this.lastModified = lastModified;
+		}
+
+		private boolean matchesClassFile(Path classPath) {
+			Path classParent = classPath.getParent();
+			Path expectedParent = outerClassPath.getParent();
+			if (classParent == null || expectedParent == null || !classParent.equals(expectedParent)) {
+				return false;
+			}
+
+			String classFileName = classPath.getFileName().toString();
+			return classFileName.equals(topLevelClassName + ".class")
+					|| classFileName.startsWith(topLevelClassName + "$");
 		}
 	}
 
 	private static String getClassName(Path base, Path classFile) {
 		String relative = base.relativize(classFile).toString();
 		return relative.replace(File.separator, ".").replaceAll("\\.class$", "");
+	}
+
+	private static List<String> parseSelectedOracleNames(String selectedOracles) {
+		if (selectedOracles == null || selectedOracles.isBlank()) {
+			return List.of();
+		}
+
+		return Arrays.stream(selectedOracles.split(","))
+				.map(String::trim)
+				.filter(name -> !name.isBlank())
+				.collect(Collectors.toList());
 	}
 }

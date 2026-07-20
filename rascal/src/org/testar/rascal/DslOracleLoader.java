@@ -1,3 +1,9 @@
+/*
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2025-2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2025-2026 Universitat Politecnica de Valencia - www.upv.es
+ */
+
 package org.testar.rascal;
 
 import org.rascalmpl.debug.IRascalMonitor;
@@ -44,8 +50,12 @@ public class DslOracleLoader {
         eval.addRascalSearchPath(URIUtil.rootLocation("std"));
 
         // 2) Resolve the dev path, if not, the installDist path
-        // "testar-oracle" is the dev directory (e.g., to run the dsl loader from the IDE)
-        Path resolved = Paths.get("").toAbsolutePath().resolve("testar-oracle").normalize();
+        // "rascal/testar-oracle" is the repository module path used by WebStudio.
+        Path resolved = resolveRepositoryRascalModuleDir();
+        if (!Files.isDirectory(resolved)) {
+            // "testar-oracle" is the legacy dev directory used by the standalone Swing tool.
+            resolved = Paths.get("").toAbsolutePath().resolve("testar-oracle").normalize();
+        }
         if (!Files.isDirectory(resolved)) {
             // Resolve the installDist path 
             resolved = resolveRascalModuleDir();
@@ -66,6 +76,20 @@ public class DslOracleLoader {
 
         // 5) Import the entry module
         eval.doImport(monitor, "lang::testar::Bridge");
+    }
+
+    private Path resolveRepositoryRascalModuleDir() {
+        Path current = Paths.get("").toAbsolutePath().normalize();
+        while (current != null) {
+            Path candidate = current.resolve("rascal").resolve("testar-oracle").normalize();
+            if (Files.isDirectory(candidate)) {
+                return candidate;
+            }
+
+            current = current.getParent();
+        }
+
+        return Paths.get("").toAbsolutePath().resolve("rascal").resolve("testar-oracle").normalize();
     }
 
     private Path resolveRascalModuleDir() {

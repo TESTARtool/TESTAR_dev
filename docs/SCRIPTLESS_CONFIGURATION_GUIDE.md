@@ -7,6 +7,7 @@ It focuses on the supported customization seams:
 - `test.settings`
 - `composition.properties`
 - `policies.properties`
+- workspace `oracles/`
 
 ## Purpose
 
@@ -14,7 +15,7 @@ Use this guide when you need to answer:
 
 - where should this customization go?
 - which file should I edit?
-- should I use a policy, a service wrapper, or an identifier-service wrapper?
+- should I use a policy, a service wrapper, an identifier-service wrapper, or a workspace oracle?
 
 ## Configuration files
 
@@ -80,6 +81,27 @@ Use additive mode when you want to extend built-in behavior.
 
 Use replacement mode when you want to discard the built-in policy family for that seam.
 
+### Workspace `oracles/`
+
+Use workspace `oracles/` when you need custom verdict checks.
+
+Workspace oracle layout:
+
+```text
+settings/<workspace>/oracles/
+  dsl/
+  java/
+  compiled/
+```
+
+Use `oracles/java` for manually written Java oracle classes.
+
+Use `oracles/dsl` for TESTAR DSL oracle files.
+
+Generated DSL Java classes are written into `oracles/java`.
+
+Enabled Java oracle class names are stored in the `ExtendedOracles` setting.
+
 ## Where a customization should go
 
 Use this decision guide:
@@ -92,6 +114,8 @@ Use this decision guide:
   - use a capability wrapper in `composition.properties`
 - new state or action identification adaptation for SUT-specific or domain-specific needs
   - use `stateIdentifierServiceClass` or `actionIdentifierServiceClass`
+- new verdict check for GUI, accessibility, visual, log, or domain-specific conditions
+  - use a Java oracle in `oracles/java` or a DSL oracle in `oracles/dsl`
 - new platform-native low-level behavior
   - this is internal development work in a platform module, not normal scriptless configuration
 
@@ -150,14 +174,34 @@ Concrete workspace examples:
 
 - `testar/resources/settings/webdriver_generic/composition.properties`
 - `testar/resources/settings/webdriver_generic/WebdriverParabankTestSequenceLoginCapability.java`
-- `testar/resources/settings/webdriver_generic/WebdriverWidgetLeafOverlapOracleComposer.java`
 
-Those two examples show:
+Those examples show:
 
 - a `testSequenceCapabilityClass` wrapper that performs a SUT-specific login sequence
-- an `oracleComposerClass` wrapper that adds a visual overlap oracle on top of the built-in verdict flow
 
-### 3. Adapt state or action identification
+### 3. Add a custom oracle
+
+Use this when the customization checks whether a state violates an expected condition.
+
+Examples:
+
+- detect visual overlap
+- detect missing image alternative text
+- detect domain-specific invariant violations
+- detect incorrect table or form structure
+
+Steps:
+
+1. Create a Java oracle class in `oracles/java`, or create a DSL oracle file in `oracles/dsl`.
+2. Compile or generate the Java oracle.
+3. Enable the Java oracle class through `ExtendedOracles`.
+
+Concrete workspace examples:
+
+- `testar/resources/settings/webdriver_generic/oracles/java/WebVisualLeafWidgetsOverlapOracle.java`
+- `testar/resources/settings/webdriver_generic/oracles/dsl/web_invariants.testar`
+
+### 4. Adapt state or action identification
 
 Use this when the built-in state or action identification mechanism needs SUT-specific or domain-specific adaptation.
 
@@ -193,6 +237,7 @@ The shipped `testar/resources/settings/webdriver_generic` workspace now demonstr
 - policy examples in `testar/resources/settings/webdriver_generic/policies.properties`
 - service-side identification adaptation in `testar/resources/settings/webdriver_generic/WebdriverParabankStateIdentifierService.java`
 - capability and oracle composition in `testar/resources/settings/webdriver_generic/composition.properties`
+- Java and DSL oracle examples in `testar/resources/settings/webdriver_generic/oracles/`
 
 ## What not to customize first
 
@@ -210,7 +255,8 @@ The preferred order is:
 1. settings
 2. external policy wrapper
 3. external service or capability wrapper
-4. internal module change only when the supported seams cannot express the need
+4. workspace Java or DSL oracle
+5. internal module change only when the supported seams cannot express the need
 
 ## Constructor expectations
 
@@ -261,6 +307,8 @@ If the change answers:
 
 - "is this widget considered X?"
   - use a policy
+- "does this observed state violate an expected condition?"
+  - use a workspace Java or DSL oracle
 - "how should runtime behavior be extended for this SUT?"
   - use a service or capability wrapper
 - "how should state or action identification be adapted for this SUT?"

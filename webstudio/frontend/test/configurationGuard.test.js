@@ -183,3 +183,17 @@ test("guards closing a dirty Java policy source editor", () => {
         true
     );
 });
+
+test("guards leaving dirty oracle source editor", () => {
+    assert.equal(
+        shouldGuardConfigurationTransition({
+            currentPage: "oracles",
+            currentEditor: "oracle-source",
+            nextEditor: "__leave__",
+            dirtyAreas: {
+                "oracle-source": true
+            }
+        }),
+        true
+    );
+});

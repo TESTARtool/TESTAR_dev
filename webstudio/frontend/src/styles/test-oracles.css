@@ -1,6 +1,33 @@
 .oracle-panel-section {
     display: grid;
-    gap: 16px;
+    gap: 24px;
+}
+
+.oracle-sidebar-tree {
+    display: grid;
+    gap: 6px;
+    margin-top: 12px;
+}
+
+.oracle-sidebar-nav {
+    display: grid;
+    gap: 6px;
+    margin: 6px 0 8px 12px;
+    padding-left: 12px;
+    border-left: 1px solid rgba(15, 91, 120, 0.12);
+}
+
+.oracle-nav-item {
+    justify-content: flex-start;
+    min-height: 34px;
+    padding-block: 6px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.58);
+    font-size: 0.84rem;
+}
+
+.oracle-bulk-actions {
+    justify-content: flex-end;
 }
 
 .oracle-summary-grid {
@@ -52,5 +79,163 @@
     margin: 0;
     color: var(--muted);
     line-height: 1.45;
+    word-break: break-word;
+}
+
+.oracle-workflow-grid {
+    display: grid;
+    gap: 16px;
+}
+
+.oracle-workflow-card {
+    display: grid;
+    gap: 12px;
+    min-width: 0;
+    padding: 16px;
+    border: 1px solid rgba(24, 38, 63, 0.1);
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.72);
+}
+
+.oracle-workflow-card > h3 {
+    margin: 0;
+    color: var(--text);
+}
+
+.oracle-workflow-card > p {
+    margin: 0;
+    color: var(--muted);
+    line-height: 1.45;
+}
+
+.oracle-workflow-card-muted {
+    background: rgba(255, 250, 244, 0.72);
+}
+
+.oracle-inventory-list {
+    display: grid;
+    gap: 10px;
+    min-height: 0;
+    overflow: auto;
+}
+
+.oracle-inventory-row,
+.oracle-file-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 12px 14px;
+    border: 1px solid rgba(24, 38, 63, 0.1);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.74);
+}
+
+.oracle-inventory-row {
+    justify-content: flex-start;
+    cursor: pointer;
+}
+
+.oracle-inventory-row input {
+    width: 18px;
+    height: 18px;
+    flex: 0 0 auto;
+}
+
+.oracle-inventory-row span,
+.oracle-file-row div {
+    display: grid;
+    gap: 4px;
+    min-width: 0;
+}
+
+.oracle-inventory-row strong,
+.oracle-file-row strong {
+    color: var(--text);
+}
+
+.oracle-inventory-row small,
+.oracle-file-row small {
+    color: var(--muted);
+    word-break: break-word;
+}
+
+.oracle-new-file-input {
+    min-width: 260px;
+}
+
+.oracle-file-layout {
+    display: grid;
+    grid-template-columns: minmax(220px, 0.34fr) minmax(0, 1fr);
+    gap: 16px;
+    min-height: 0;
+}
+
+.oracle-file-browser,
+.oracle-source-editor {
+    display: grid;
+    align-content: start;
+    gap: 10px;
+    min-height: 0;
+}
+
+.oracle-file-browser {
+    max-height: 560px;
+    overflow: auto;
+}
+
+.oracle-source-textarea {
+    min-height: 550px;
+    max-height: 550px;
+    resize: none;
+    font-family: "JetBrains Mono", "Cascadia Code", monospace;
+}
+
+.oracle-dsl-feedback-panel {
+    display: grid;
+    gap: 8px;
+    min-height: 126px;
+    max-height: 126px;
+    padding: 12px 14px;
+    overflow: auto;
+    border: 1px solid rgba(24, 38, 63, 0.12);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.72);
+}
+
+.oracle-dsl-feedback-success {
+    border-color: rgba(47, 158, 68, 0.28);
+    background: rgba(233, 250, 236, 0.78);
+}
+
+.oracle-dsl-feedback-failed {
+    border-color: rgba(165, 53, 52, 0.28);
+    background: rgba(255, 246, 246, 0.82);
+}
+
+.oracle-dsl-feedback-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.oracle-dsl-feedback-header strong {
+    color: var(--text);
+}
+
+.oracle-dsl-feedback-header span,
+.oracle-dsl-feedback-panel p {
+    margin: 0;
+    color: var(--muted);
+    line-height: 1.35;
+}
+
+.oracle-dsl-diagnostics {
+    display: grid;
+    gap: 6px;
+}
+
+.oracle-dsl-diagnostics p {
     word-break: break-word;
 }

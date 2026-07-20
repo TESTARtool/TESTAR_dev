@@ -12,7 +12,13 @@
     import TestGoalsView from "./TestGoalsView.svelte";
     import TestOraclesView from "./TestOraclesView.svelte";
     import { testGoalFolderSelectionState } from "./testGoalsModel.js";
-    import { ORACLE_COMPOSITION_NODE_ID, TEST_ORACLE_PANEL_IDS, oracleSettingsGroupId } from "./testOraclesModel.js";
+    import {
+        TEST_ORACLE_PANEL_IDS,
+        extendedOracleCheckboxItems,
+        extendedOracleItemsWithEnablement,
+        extendedOracleSettingValue,
+        oracleSettingsGroupId
+    } from "./testOraclesModel.js";
     import { shouldGuardConfigurationTransition } from "./configurationGuard.js";
     import { clearSelectedSourceState } from "./policyEditorState.js";
     import { stateModelWorkspaceDialog } from "./stateModelNavigation.js";
@@ -90,6 +96,11 @@
     let currentRole = WEB_STUDIO_ROLES.ADVANCED;
     let activeNavMenu = "";
     let selectedOraclePanelId = TEST_ORACLE_PANEL_IDS.ACTIVE;
+    let testOracleInventory = null;
+    let selectedOracleSourceFile = null;
+    let oracleSourceDraftContent = "";
+    let savedOracleSourceContent = "";
+    let oracleDslResult = null;
     let resultsData = null;
     let selectedResultGroup = null;
     let selectedResultFile = null;
@@ -138,6 +149,8 @@
 
     $: testGoalDirty = selectedTestGoalFile !== null
         && testGoalDraftContent !== savedTestGoalContent;
+    $: oracleSourceDirty = selectedOracleSourceFile !== null
+        && oracleSourceDraftContent !== savedOracleSourceContent;
 
     function reportClientError(context, clientError) {
         console.error(`[WebStudio] ${context}`, clientError);
@@ -273,6 +286,8 @@
             regexValidationResults = {};
             javaCompileResult = null;
             resetTestGoalSelection();
+            resetOracleSourceSelection();
+            testOracleInventory = null;
             testGoalTree = null;
             resultsData = null;
             selectedResultGroup = null;
@@ -302,8 +317,12 @@
             regexValidationResults = {};
             javaCompileResult = null;
             resetTestGoalSelection();
+            resetOracleSourceSelection();
+            testOracleInventory = null;
             if (currentPage === "test-goals") {
                 await loadTestGoalTree(workspaceName);
+            } else if (currentPage === "oracles") {
+                await loadTestOracleInventory(workspaceName);
             } else if (currentPage === "results") {
                 await loadResults(workspaceName);
             } else if (currentPage === "basic-settings") {
@@ -813,14 +832,6 @@
         openAllowedSettingsImmediate(TEST_SETTINGS_GROUP_IDS);
     }
 
-    function openOracleCompositionImmediate() {
-        openEditorImmediate("java-composition");
-        const oracleNode = compositionFlowNodes.find((flowNode) => flowNode.id === ORACLE_COMPOSITION_NODE_ID);
-        if (oracleNode) {
-            selectCompositionFlowNode(oracleNode);
-        }
-    }
-
     async function openOraclePanel(panelId) {
         await guardConfigurationTransition(async () => {
             selectedOraclePanelId = panelId;
@@ -828,8 +839,14 @@
                 return;
             }
 
-            if (panelId === TEST_ORACLE_PANEL_IDS.JAVA_COMPOSITION) {
-                openOracleCompositionImmediate();
+            if (panelId === TEST_ORACLE_PANEL_IDS.EXTENDED_ENABLEMENT) {
+                openEditorImmediate("settings-form");
+                selectedSettingsGroupId = oracleSettingsGroupId(panelId);
+                return;
+            }
+
+            if (panelId === TEST_ORACLE_PANEL_IDS.JAVA_FILES || panelId === TEST_ORACLE_PANEL_IDS.DSL_FILES) {
+                openEditorImmediate("oracle-source");
                 return;
             }
 
@@ -843,6 +860,7 @@
         if (page === "basic-settings") {
             openBasicSettingsImmediate();
         } else if (page === "oracles") {
+            await loadTestOracleInventory();
             await openOraclePanel(selectedOraclePanelId || TEST_ORACLE_PANEL_IDS.ACTIVE);
         } else if (page === "settings") {
             openTestSettingsImmediate();
@@ -1294,13 +1312,18 @@
         return hasSelectedSourceChanges([selectedSourceFile.category]);
     }
 
+    function hasOracleSourceChanges() {
+        return oracleSourceDirty;
+    }
+
     function configurationDirtyAreas() {
         return {
             settings: hasSettingsChanges(),
             "composition-file": hasCompositionPropertiesChanges(),
             "composition-flow": hasSelectedSourceChanges(["service", "capability"]),
             "policies-file": hasPoliciesPropertiesChanges(),
-            "policies-flow": hasSelectedSourceChanges(["policy"])
+            "policies-flow": hasSelectedSourceChanges(["policy"]),
+            "oracle-source": hasOracleSourceChanges()
         };
     }
 
@@ -1342,6 +1365,16 @@
                 title: "Unsaved and Uncompiled Policy Changes",
                 message: "Detected unsaved Java policy changes. Save and compile before continuing, discard them, or cancel this navigation.",
                 saveLabel: "Save and Compile"
+            };
+        }
+
+        if (selectedEditor === "oracle-source") {
+            return {
+                title: "Unsaved Oracle Source Changes",
+                message: "Detected unsaved oracle source changes. Save them before continuing, discard them, or cancel this navigation.",
+                saveLabel: selectedOracleSourceFile?.category === "dsl-oracle"
+                    ? "Save and Generate Java-DSL"
+                    : "Save"
             };
         }
 
@@ -1396,6 +1429,16 @@
                 ? await compileSelectedJavaSource()
                 : await compileWorkspaceProfile();
             return compileResult?.success === true;
+        }
+
+        if (selectedEditor === "oracle-source") {
+            if (selectedOracleSourceFile?.category === "java-oracle") {
+                return saveOracleJavaFile();
+            }
+
+            if (selectedOracleSourceFile?.category === "dsl-oracle") {
+                return generateJavaFromOracleDslFile();
+            }
         }
 
         return true;
@@ -1801,6 +1844,349 @@
         selectedTestGoalFolderPath = "";
         testGoalDraftContent = "";
         savedTestGoalContent = "";
+    }
+
+    function resetOracleSourceSelection() {
+        selectedOracleSourceFile = null;
+        oracleSourceDraftContent = "";
+        savedOracleSourceContent = "";
+        oracleDslResult = null;
+    }
+
+    function testOracleApiPath(workspaceName, suffix = "") {
+        const encodedWorkspaceName = encodeURIComponent(workspaceName || selectedWorkspaceName);
+        return `/api/workspaces/${encodedWorkspaceName}/test-oracles${suffix}`;
+    }
+
+    async function loadTestOracleInventory(workspaceName = selectedWorkspaceName) {
+        if (!workspaceName) {
+            testOracleInventory = null;
+            return;
+        }
+
+        try {
+            testOracleInventory = await loadJson(testOracleApiPath(workspaceName));
+        } catch (oracleError) {
+            reportClientError("Unable to load Test Oracles", oracleError);
+            testOracleInventory = null;
+        }
+    }
+
+    function updateExtendedOraclesSetting(nextValue) {
+        for (const settingsGroup of workspaceDocument?.settingsGroups || []) {
+            const setting = (settingsGroup.settings || []).find((item) => item.key === "ExtendedOracles");
+            if (setting) {
+                setSettingValue(setting, nextValue);
+                return;
+            }
+        }
+    }
+
+    function toggleExtendedOracle(oracleName, enabled) {
+        const oracleItems = extendedOracleCheckboxItems(testOracleInventory).map((item) => ({
+            ...item,
+            active: item.name === oracleName ? enabled : item.active
+        }));
+        const nextValue = extendedOracleSettingValue(oracleItems);
+        updateExtendedOraclesSetting(nextValue);
+        testOracleInventory = testOracleInventory
+            ? {
+                ...testOracleInventory,
+                activeOracles: nextValue ? nextValue.split(",") : [],
+                items: (testOracleInventory.items || []).map((item) => ({
+                    ...item,
+                    active: item.name === oracleName ? enabled : item.active
+                }))
+            }
+            : testOracleInventory;
+    }
+
+    function setAllExtendedOraclesEnabled(enabled) {
+        const oracleItems = extendedOracleItemsWithEnablement(
+            extendedOracleCheckboxItems(testOracleInventory),
+            enabled
+        );
+        const nextValue = extendedOracleSettingValue(oracleItems);
+        updateExtendedOraclesSetting(nextValue);
+        testOracleInventory = testOracleInventory
+            ? {
+                ...testOracleInventory,
+                activeOracles: nextValue ? nextValue.split(",") : [],
+                items: (testOracleInventory.items || []).map((item) => ({
+                    ...item,
+                    active: item.origin === "BUILT_IN" || item.origin === "WORKSPACE_JAVA"
+                        ? enabled
+                        : item.active
+                }))
+            }
+            : testOracleInventory;
+    }
+
+    async function loadOracleDslFile(oracleFile) {
+        if (!oracleFile?.path) {
+            await guardConfigurationTransition(async () => {
+                resetOracleSourceSelection();
+            }, "oracle-source:none");
+            return;
+        }
+
+        if (selectedOracleSourceFile?.category === "dsl-oracle" && selectedOracleSourceFile.location === oracleFile.path) {
+            return;
+        }
+
+        await guardConfigurationTransition(async () => {
+            try {
+                const oraclePath = encodeURIComponent(oracleFile.path);
+                selectedOracleSourceFile = await loadJson(`${testOracleApiPath(selectedWorkspaceName, "/dsl/file")}?path=${oraclePath}`);
+                oracleSourceDraftContent = selectedOracleSourceFile.content || "";
+                savedOracleSourceContent = selectedOracleSourceFile.content || "";
+                oracleDslResult = null;
+                javaCompileResult = null;
+            } catch (oracleError) {
+                reportClientError(`Unable to load DSL oracle ${oracleFile.path}`, oracleError);
+            }
+        }, `oracle-source:${oracleFile.path}`);
+    }
+
+    async function loadOracleJavaFile(oracleFile) {
+        if (!oracleFile?.path) {
+            await guardConfigurationTransition(async () => {
+                resetOracleSourceSelection();
+            }, "oracle-source:none");
+            return;
+        }
+
+        if (selectedOracleSourceFile?.category === "java-oracle" && selectedOracleSourceFile.location === oracleFile.path) {
+            return;
+        }
+
+        await guardConfigurationTransition(async () => {
+            try {
+                const oraclePath = encodeURIComponent(oracleFile.path);
+                selectedOracleSourceFile = await loadJson(`${testOracleApiPath(selectedWorkspaceName, "/java/file")}?path=${oraclePath}`);
+                oracleSourceDraftContent = selectedOracleSourceFile.content || "";
+                savedOracleSourceContent = selectedOracleSourceFile.content || "";
+                oracleDslResult = null;
+            } catch (oracleError) {
+                reportClientError(`Unable to load Java oracle ${oracleFile.path}`, oracleError);
+            }
+        }, `oracle-source:${oracleFile.path}`);
+    }
+
+    function setOracleSourceDraftContent(content) {
+        oracleSourceDraftContent = content;
+        oracleDslResult = null;
+    }
+
+    function discardOracleSourceChanges() {
+        oracleSourceDraftContent = savedOracleSourceContent;
+    }
+
+    async function saveOracleJavaFile() {
+        if (!selectedOracleSourceFile?.location) {
+            return false;
+        }
+
+        saving = true;
+        message = "";
+
+        try {
+            const oraclePath = encodeURIComponent(selectedOracleSourceFile.location);
+            selectedOracleSourceFile = await loadJson(`${testOracleApiPath(selectedWorkspaceName, "/java/file")}?path=${oraclePath}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ content: oracleSourceDraftContent })
+            });
+            oracleSourceDraftContent = selectedOracleSourceFile.content || "";
+            savedOracleSourceContent = selectedOracleSourceFile.content || "";
+            javaCompileResult = null;
+            await loadTestOracleInventory();
+            showTemporaryMessage("Java oracle saved.");
+            return true;
+        } catch (oracleError) {
+            reportClientError(`Unable to save Java oracle ${selectedOracleSourceFile.location}`, oracleError);
+            return false;
+        } finally {
+            saving = false;
+        }
+    }
+
+    async function compileOracleJavaFile() {
+        if (!selectedOracleSourceFile?.location) {
+            return false;
+        }
+
+        saving = true;
+        message = "";
+
+        try {
+            const oraclePath = encodeURIComponent(selectedOracleSourceFile.location);
+            javaCompileResult = await loadJson(`${testOracleApiPath(selectedWorkspaceName, "/java/file/compile")}?path=${oraclePath}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ content: oracleSourceDraftContent })
+            });
+            if (javaCompileResult?.success) {
+                savedOracleSourceContent = oracleSourceDraftContent;
+                await refreshWorkspaceDocument();
+                await loadTestOracleInventory();
+                showTemporaryMessage("Java oracle compiled.");
+            }
+
+            return javaCompileResult?.success === true;
+        } catch (oracleError) {
+            reportClientError(`Unable to compile Java oracle ${selectedOracleSourceFile.location}`, oracleError);
+            javaCompileResult = {
+                success: false,
+                scope: "oracle-source",
+                targetName: selectedOracleSourceFile.name,
+                message: oracleError?.message || "Java oracle compilation failed.",
+                diagnostics: []
+            };
+            return false;
+        } finally {
+            saving = false;
+        }
+    }
+
+    async function createOracleDslFile(path) {
+        if (!path) {
+            return;
+        }
+
+        saving = true;
+        message = "";
+
+        try {
+            const oraclePath = encodeURIComponent(path);
+            selectedOracleSourceFile = await loadJson(`${testOracleApiPath(selectedWorkspaceName, "/dsl/file")}?path=${oraclePath}`, {
+                method: "POST"
+            });
+            oracleSourceDraftContent = selectedOracleSourceFile.content || "";
+            savedOracleSourceContent = selectedOracleSourceFile.content || "";
+            oracleDslResult = null;
+            javaCompileResult = null;
+            await loadTestOracleInventory();
+            showTemporaryMessage("DSL oracle created.");
+        } catch (oracleError) {
+            reportClientError(`Unable to create DSL oracle ${path}`, oracleError);
+        } finally {
+            saving = false;
+        }
+    }
+
+    async function createOracleJavaFile(path) {
+        if (!path) {
+            return;
+        }
+
+        saving = true;
+        message = "";
+
+        try {
+            const oraclePath = encodeURIComponent(path);
+            selectedOracleSourceFile = await loadJson(`${testOracleApiPath(selectedWorkspaceName, "/java/file")}?path=${oraclePath}`, {
+                method: "POST"
+            });
+            oracleSourceDraftContent = selectedOracleSourceFile.content || "";
+            savedOracleSourceContent = selectedOracleSourceFile.content || "";
+            oracleDslResult = null;
+            await refreshWorkspaceDocument();
+            await loadTestOracleInventory();
+            showTemporaryMessage("Java oracle created.");
+        } catch (oracleError) {
+            reportClientError(`Unable to create Java oracle ${path}`, oracleError);
+        } finally {
+            saving = false;
+        }
+    }
+
+    async function deleteOracleDslFile(path) {
+        if (!path) {
+            return;
+        }
+
+        saving = true;
+        message = "";
+
+        try {
+            const oraclePath = encodeURIComponent(path);
+            testOracleInventory = await loadJson(`${testOracleApiPath(selectedWorkspaceName, "/dsl/file")}?path=${oraclePath}`, {
+                method: "DELETE"
+            });
+            if (selectedOracleSourceFile?.location === path) {
+                resetOracleSourceSelection();
+            }
+            showTemporaryMessage("DSL oracle deleted.");
+        } catch (oracleError) {
+            reportClientError(`Unable to delete DSL oracle ${path}`, oracleError);
+        } finally {
+            saving = false;
+        }
+    }
+
+    async function generateJavaFromOracleDslFile() {
+        if (!selectedOracleSourceFile?.location) {
+            return;
+        }
+
+        saving = true;
+        message = "";
+
+        try {
+            const oraclePath = encodeURIComponent(selectedOracleSourceFile.location);
+            oracleDslResult = await loadJson(`${testOracleApiPath(selectedWorkspaceName, "/dsl/generate-java")}?path=${oraclePath}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ content: oracleSourceDraftContent })
+            });
+            if (oracleDslResult?.success) {
+                savedOracleSourceContent = oracleSourceDraftContent;
+                await refreshWorkspaceDocument();
+                await loadTestOracleInventory();
+                showTemporaryMessage("DSL oracle saved and Java oracle generated.");
+            }
+        } catch (oracleError) {
+            reportClientError(`Unable to generate Java from DSL oracle ${selectedOracleSourceFile.location}`, oracleError);
+            oracleDslResult = {
+                success: false,
+                message: oracleError?.message || "DSL generation failed.",
+                generatedJavaPath: "",
+                diagnostics: []
+            };
+        } finally {
+            saving = false;
+        }
+    }
+
+    async function deleteOracleJavaFile(path) {
+        if (!path) {
+            return;
+        }
+
+        saving = true;
+        message = "";
+
+        try {
+            const oraclePath = encodeURIComponent(path);
+            testOracleInventory = await loadJson(`${testOracleApiPath(selectedWorkspaceName, "/java/file")}?path=${oraclePath}`, {
+                method: "DELETE"
+            });
+            if (selectedOracleSourceFile?.location === path) {
+                resetOracleSourceSelection();
+            }
+            showTemporaryMessage("Java oracle deleted.");
+        } catch (oracleError) {
+            reportClientError(`Unable to delete Java oracle ${path}`, oracleError);
+        } finally {
+            saving = false;
+        }
     }
 
     function testGoalApiPath(workspaceName, suffix = "") {
@@ -2625,13 +3011,7 @@
 
     {#if currentPage === "oracles"}
         <TestOraclesView
-            compositionFlowNodes={compositionFlowNodes}
             currentEditorDocument={currentEditorDocument}
-            compileSelectedJavaSource={compileSelectedJavaSource}
-            compileWorkspaceProfile={compileWorkspaceProfile}
-            createCompositionModuleSource={createCompositionModuleSource}
-            javaCompileResult={javaCompileResult}
-            closeCompositionSourceEditor={closeCompositionSourceEditor}
             loading={loading}
             openOraclePanel={openOraclePanel}
             openTestSettings={openTestSettings}
@@ -2641,13 +3021,27 @@
             savedTestSettingsContent={savedTestSettingsContent}
             saving={saving}
             selectedOraclePanelId={selectedOraclePanelId}
+            testOracleInventory={testOracleInventory}
             setSettingValue={setSettingValue}
-            selectCompositionFlowNode={selectCompositionFlowNode}
-            selectedCompositionFlowNode={selectedCompositionFlowNode}
             selectedEditor={selectedEditor}
             selectedSettingsGroupId={selectedSettingsGroupId}
-            selectedSourceFile={selectedSourceFile}
-            selectedSourceSavedContent={selectedSourceFile?.name ? savedSourceContents[selectedSourceFile.name] || "" : ""}
+            selectedOracleSourceFile={selectedOracleSourceFile}
+            oracleSourceDraftContent={oracleSourceDraftContent}
+            oracleSourceDirty={oracleSourceDirty}
+            oracleDslResult={oracleDslResult}
+            javaCompileResult={javaCompileResult}
+            compileOracleJavaFile={compileOracleJavaFile}
+            createOracleDslFile={createOracleDslFile}
+            createOracleJavaFile={createOracleJavaFile}
+            deleteOracleDslFile={deleteOracleDslFile}
+            deleteOracleJavaFile={deleteOracleJavaFile}
+            discardOracleSourceChanges={discardOracleSourceChanges}
+            generateJavaFromOracleDslFile={generateJavaFromOracleDslFile}
+            loadOracleDslFile={loadOracleDslFile}
+            loadOracleJavaFile={loadOracleJavaFile}
+            setOracleSourceDraftContent={setOracleSourceDraftContent}
+            toggleExtendedOracle={toggleExtendedOracle}
+            setAllExtendedOraclesEnabled={setAllExtendedOraclesEnabled}
             restoreSettingDefault={restoreSettingDefault}
             validateRegexExpression={validateRegexExpression}
             workspaceDocument={workspaceDocument}

@@ -1,0 +1,21 @@
+package dsl_generated.web_accessibility;
+
+
+assert for all menu_item, table_data, static_text, label
+  it.fontsize matches "\\b(1[2-9]|[2-9]\\d|[1-9]\\d{2,})px\\b" when it.fontsize contains "px"
+  "DSL: Text size must be bigger than 11 pixels".
+
+
+assert for all image 
+  it has nonempty alttext 
+  "DSL: Images must have alternative text".
+
+
+assert for all form 
+  it has nonempty title 
+  "DSL: Forms must have accessibility title".
+
+
+assert for all static_text
+  it.color not is equal to it.backgroundColor
+  "DSL: Color and BackgroundColor must be different".

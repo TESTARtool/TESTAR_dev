@@ -58,6 +58,7 @@ public class TestSequenceCapability {
         ));
 
         for (Oracle oracle : runtimeContext.extendedOraclesList()) {
+            oracle.resetApplicationStatus();
             oracle.initialize();
         }
 
@@ -100,6 +101,8 @@ public class TestSequenceCapability {
 
         runtimeContext.verdictProcessing().storeNewVerdicts(filteredVerdicts);
 
+        logVacuousPassOracles(runtimeContext.extendedOraclesList());
+
         runtimeContext.sessionReportingManager().finishReport();
 
         LogSerialiser.log("Releasing canvas...\n", LogSerialiser.LogLevel.Debug);
@@ -122,6 +125,36 @@ public class TestSequenceCapability {
         }
 
         return joiner.toString();
+    }
+
+    private void logVacuousPassOracles(List<Oracle> extendedOracles) {
+        if (extendedOracles == null || extendedOracles.isEmpty()) {
+            return;
+        }
+
+        StringJoiner joiner = new StringJoiner(", ");
+        for (Oracle oracle : extendedOracles) {
+            if (oracle.isVacuousPass()) {
+                String oracleName = oracle.getClass().getSimpleName();
+                String oracleMessage = oracle.getMessage();
+                joiner.add(oracleMessage == null || oracleMessage.isBlank()
+                        ? oracleName
+                        : oracleName + " (" + oracleMessage + ")");
+            }
+        }
+
+        String vacuousOracles = joiner.toString();
+        if (!vacuousOracles.isBlank()) {
+            logOracleApplicationStatus("Vacuous pass extended oracles: " + vacuousOracles);
+            return;
+        }
+
+        logOracleApplicationStatus("No vacuous pass extended oracles.");
+    }
+
+    private void logOracleApplicationStatus(String message) {
+        System.out.println(message);
+        LogSerialiser.log(message + "\n", LogSerialiser.LogLevel.Info);
     }
 
 }

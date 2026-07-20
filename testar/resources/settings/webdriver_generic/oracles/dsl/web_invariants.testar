@@ -1,0 +1,26 @@
+package dsl_generated.web_invariants;
+
+
+assert for all table_data
+  it.text matches "\\d+\\.\\d{2}$" when it.text contains "$" 
+  "DSL: Dollar values must have two decimals".
+
+
+assert for all menu
+  it.children are enabled
+  "DSL: Menu children must be enabled".
+
+
+assert button "Submit" is enabled when checkbox "Accept Terms" 
+    is checked
+    "DSL: Submit must be enabled when Accept Terms is checked". 
+
+
+assert for all dropdown
+  it not is empty
+  "DSL: Dropdown options must not be empty".
+
+
+assert for all dropdown
+  it.length not is equal to 1
+  "DSL: Dropdown options must not have a unique value".

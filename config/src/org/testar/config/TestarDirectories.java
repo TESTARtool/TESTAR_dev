@@ -87,4 +87,27 @@ public final class TestarDirectories {
     public static String getTestSettingsFile() {
         return settingsDir + selectedSse + File.separator + SETTINGS_FILE;
     }
+
+    public static String getSelectedSettingsDir() {
+        if (selectedSse == null || selectedSse.isBlank()) {
+            return settingsDir;
+        }
+        return settingsDir + selectedSse + File.separator;
+    }
+
+    public static String getWorkspaceOraclesDir() {
+        return getSelectedSettingsDir() + "oracles" + File.separator;
+    }
+
+    public static String getWorkspaceOracleJavaDir() {
+        return getWorkspaceOraclesDir() + "java" + File.separator;
+    }
+
+    public static String getWorkspaceOracleDslDir() {
+        return getWorkspaceOraclesDir() + "dsl" + File.separator;
+    }
+
+    public static String getWorkspaceOracleCompiledDir() {
+        return getWorkspaceOraclesDir() + "compiled" + File.separator;
+    }
 }

@@ -1,0 +1,6 @@
+package dsl_generated.web_spell_checker;
+
+
+assert for all table
+  it.headerText spell checks in en_GB
+  "DSL: Spell checking for English table headers".

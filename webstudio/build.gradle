@@ -32,6 +32,8 @@ dependencies {
     implementation project(':plugin')
     implementation project(':cli')
     implementation project(':statemodel')
+    implementation project(':oracle')
+    implementation project(':rascal')
     implementation project(':testar')
 }
 

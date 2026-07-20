@@ -19,6 +19,7 @@ import org.testar.webstudio.api.ExecutionController;
 import org.testar.webstudio.api.RemoteSpyController;
 import org.testar.webstudio.api.StateModelAnalysisController;
 import org.testar.webstudio.api.TestGoalController;
+import org.testar.webstudio.api.TestOracleController;
 import org.testar.webstudio.api.ValidationController;
 import org.testar.webstudio.api.WorkspaceController;
 import org.testar.webstudio.api.dto.CliManualCommandRequestDto;
@@ -35,6 +36,7 @@ import org.testar.webstudio.execution.RemoteExecutionAdapter;
 import org.testar.webstudio.execution.ScriptlessExecutionAdapter;
 import org.testar.webstudio.spy.RemoteSpyService;
 import org.testar.webstudio.testgoal.TestGoalService;
+import org.testar.webstudio.testoracle.TestOracleService;
 import org.testar.webstudio.validation.ValidationService;
 import org.testar.webstudio.workspace.WorkspaceService;
 
@@ -48,6 +50,7 @@ public final class WebStudioServer {
     private final RemoteSpyController remoteSpyController;
     private final StateModelAnalysisController stateModelAnalysisController;
     private final TestGoalController testGoalController;
+    private final TestOracleController testOracleController;
     private final Gson gson;
     private Javalin app;
 
@@ -63,6 +66,7 @@ public final class WebStudioServer {
         StateModelAnalysisService stateModelAnalysisService = new StateModelAnalysisService(workspaceService);
         RemoteSpyService remoteSpyService = new RemoteSpyService(workspaceService);
         TestGoalService testGoalService = new TestGoalService(workspaceService.testarHomeDirectory());
+        TestOracleService testOracleService = new TestOracleService(workspaceService);
 
         this.workspaceController = new WorkspaceController(workspaceService);
         this.validationController = new ValidationController(validationService);
@@ -70,6 +74,7 @@ public final class WebStudioServer {
         this.remoteSpyController = new RemoteSpyController(remoteSpyService);
         this.stateModelAnalysisController = new StateModelAnalysisController(stateModelAnalysisService);
         this.testGoalController = new TestGoalController(testGoalService);
+        this.testOracleController = new TestOracleController(testOracleService);
         this.gson = new Gson();
     }
 
@@ -202,6 +207,67 @@ public final class WebStudioServer {
         routes.delete("/api/workspaces/{workspace}/test-goals", context -> handle(context, () ->
             testGoalController.delete(context.pathParam("workspace"), context.queryParam("path"))
         ));
+        routes.get("/api/workspaces/{workspace}/test-oracles", context -> handle(context, () ->
+            testOracleController.inventory(context.pathParam("workspace"))
+        ));
+        routes.get("/api/workspaces/{workspace}/test-oracles/dsl/file", context -> handle(context, () ->
+            testOracleController.readDslFile(context.pathParam("workspace"), context.queryParam("path"))
+        ));
+        routes.put("/api/workspaces/{workspace}/test-oracles/dsl/file", context -> handle(context, () -> {
+            WorkspaceFileUpdateDto update = gson.fromJson(context.body(), WorkspaceFileUpdateDto.class);
+            return testOracleController.saveDslFile(
+                context.pathParam("workspace"),
+                context.queryParam("path"),
+                update == null ? "" : update.content()
+            );
+        }));
+        routes.post("/api/workspaces/{workspace}/test-oracles/dsl/file", context -> handle(context, () ->
+            testOracleController.createDslFile(context.pathParam("workspace"), context.queryParam("path"))
+        ));
+        routes.delete("/api/workspaces/{workspace}/test-oracles/dsl/file", context -> handle(context, () ->
+            testOracleController.deleteDslFile(context.pathParam("workspace"), context.queryParam("path"))
+        ));
+        routes.post("/api/workspaces/{workspace}/test-oracles/dsl/validate", context -> handle(context, () -> {
+            WorkspaceFileUpdateDto update = gson.fromJson(context.body(), WorkspaceFileUpdateDto.class);
+            return testOracleController.validateDslFile(
+                context.pathParam("workspace"),
+                context.queryParam("path"),
+                update == null ? "" : update.content()
+            );
+        }));
+        routes.post("/api/workspaces/{workspace}/test-oracles/dsl/generate-java", context -> handle(context, () -> {
+            WorkspaceFileUpdateDto update = gson.fromJson(context.body(), WorkspaceFileUpdateDto.class);
+            return testOracleController.generateJavaFromDslFile(
+                context.pathParam("workspace"),
+                context.queryParam("path"),
+                update == null ? "" : update.content()
+            );
+        }));
+        routes.get("/api/workspaces/{workspace}/test-oracles/java/file", context -> handle(context, () ->
+            testOracleController.readJavaFile(context.pathParam("workspace"), context.queryParam("path"))
+        ));
+        routes.put("/api/workspaces/{workspace}/test-oracles/java/file", context -> handle(context, () -> {
+            WorkspaceFileUpdateDto update = gson.fromJson(context.body(), WorkspaceFileUpdateDto.class);
+            return testOracleController.saveJavaFile(
+                context.pathParam("workspace"),
+                context.queryParam("path"),
+                update == null ? "" : update.content()
+            );
+        }));
+        routes.post("/api/workspaces/{workspace}/test-oracles/java/file", context -> handle(context, () ->
+            testOracleController.createJavaFile(context.pathParam("workspace"), context.queryParam("path"))
+        ));
+        routes.delete("/api/workspaces/{workspace}/test-oracles/java/file", context -> handle(context, () ->
+            testOracleController.deleteJavaFile(context.pathParam("workspace"), context.queryParam("path"))
+        ));
+        routes.post("/api/workspaces/{workspace}/test-oracles/java/file/compile", context -> handle(context, () -> {
+            WorkspaceFileUpdateDto update = gson.fromJson(context.body(), WorkspaceFileUpdateDto.class);
+            return testOracleController.compileJavaFile(
+                context.pathParam("workspace"),
+                context.queryParam("path"),
+                update == null ? "" : update.content()
+            );
+        }));
         routes.get("/api/execution/backends", context -> handle(context, executionController::availableBackends));
         routes.get("/api/execution/cli/profiles", context -> handle(context, executionController::cliProfiles));
         routes.get("/api/execution/status/{backend}", context -> handle(context, () -> {

@@ -367,7 +367,6 @@ public class SettingsFileStructure {
                 , "#################################################################"
                 , ""
                 , ConfigTags.ExtendedOracles.name() + " = "
-                , ConfigTags.ExternalOracles.name() + " = "
                 , ""
                 , "#################################################################"
                 , "# Settings to configure code coverage features"

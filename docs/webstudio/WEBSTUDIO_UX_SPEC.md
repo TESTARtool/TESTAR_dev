@@ -212,12 +212,50 @@ The `Test Oracles` view should provide a left-panel workflow in this order:
 - `Windows Process Oracles`
 - `WebDriver Console Oracles`
 - `Log Regex Oracles`
-- `Extended Oracles`
-- `Java Oracle Composition`
+- `Enable Extended Oracles`
+- `|- Java Oracle Files`
+- `|- DSL Oracle Files`
 
 `Active Oracles` should be the default panel and should be read-only.
 
 `Active Oracles` should show configured or inactive status without editing controls.
+
+The extended oracle panels should use a unified oracle inventory for the selected workspace.
+
+The inventory should be grouped by:
+
+- workspace Java oracles
+- DSL source files
+
+The extended oracle workflow should use stable page sections:
+
+- `Enable Extended Oracles` should show available Java oracles as checkbox rows.
+- `Java Oracle Files` should show workspace Java files with a file browser, editor, and `Save and Compile` action.
+- `DSL Oracle Files` should show workspace DSL files with a file browser and editor.
+
+Workspace Java oracles should show whether they are active and editable.
+
+DSL source files should be editable in the Test Oracles view.
+
+The DSL editor should expose a single `Save and Generate Java-DSL` action near the source editor controls.
+
+Generated Java files should be visible through the workspace Java oracle group after DSL generation.
+
+Enable and disable controls should operate on Java oracle class names and update `ExtendedOracles`.
+
+The `Enable Extended Oracles` panel should provide `Enable All` and `Disable All` actions for the visible Java oracle class list.
+
+The `Search in all settings` toolbar should appear in Test Settings and should stay hidden in Test Oracles panels.
+
+Validation, compilation, and generation feedback should appear in fixed-size panels near the related editor or inventory group.
+
+DSL feedback should show success, failure, generated Java path when available, and source diagnostics without resizing the page.
+
+Java oracle compile feedback should use the same fixed-size style as other Java editor compile feedback.
+
+Java and DSL oracle delete actions should open a confirmation dialog before deleting files.
+
+The Test Oracles view should guide users toward Java and DSL-generated `Oracle` classes for individual oracle checks.
 
 ## Workspace Selector UX Contract
 
