@@ -14,13 +14,14 @@ const WORKSPACES = [
     { name: "windows_generic" }
 ];
 
-test("defaults workspace creation to the selected workspace and copies test goals", () => {
+test("defaults workspace creation to the selected workspace and copies optional workspace assets", () => {
     assert.deepEqual(
         defaultWorkspaceCreateDraft(WORKSPACES, "windows_generic"),
         {
             name: "",
             baseWorkspace: "windows_generic",
-            copyTestGoals: true
+            copyTestGoals: true,
+            copyOracles: true
         }
     );
 });
@@ -40,7 +41,8 @@ test("validates safe unique workspace names and existing base workspace", () => 
             {
                 name: "webdriver_parabank",
                 baseWorkspace: "webdriver_generic",
-                copyTestGoals: true
+                copyTestGoals: true,
+                copyOracles: true
             },
             WORKSPACES
         ),
@@ -82,12 +84,14 @@ test("normalizes workspace management request values", () => {
         workspaceCreateRequest({
             name: "  webdriver_parabank  ",
             baseWorkspace: "  webdriver_generic  ",
-            copyTestGoals: false
+            copyTestGoals: false,
+            copyOracles: false
         }),
         {
             name: "webdriver_parabank",
             baseWorkspace: "webdriver_generic",
-            copyTestGoals: false
+            copyTestGoals: false,
+            copyOracles: false
         }
     );
     assert.deepEqual(

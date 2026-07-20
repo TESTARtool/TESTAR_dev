@@ -35,10 +35,10 @@ export const TEST_ORACLE_PANELS = [
         label: "Log Regex Oracles",
         description: "Configure log file and command output matching."
     },
-    {
-        id: TEST_ORACLE_PANEL_IDS.EXTENDED_ENABLEMENT,
-        label: "Enable Extended Oracles",
-        description: "Enable or disable built-in, workspace Java, and generated DSL Java oracles."
+        {
+            id: TEST_ORACLE_PANEL_IDS.EXTENDED_ENABLEMENT,
+            label: "Enable Extended Oracles",
+            description: "Enable or disable workspace Java and generated DSL Java oracles."
     },
     {
         id: TEST_ORACLE_PANEL_IDS.JAVA_FILES,
@@ -127,6 +127,16 @@ export function activeExtendedOracleNames(workspaceDocument) {
         .split(",")
         .map((item) => item.trim())
         .filter(Boolean);
+}
+
+export function balancedOracleNameColumns(oracleNames = []) {
+    const columnCount = 3;
+    const columnSize = Math.ceil(oracleNames.length / columnCount);
+    return [
+        oracleNames.slice(0, columnSize),
+        oracleNames.slice(columnSize, columnSize * 2),
+        oracleNames.slice(columnSize * 2)
+    ];
 }
 
 export function extendedOracleCheckboxItems(testOracleInventory = null) {
@@ -277,7 +287,9 @@ export function activeOracleSummaries(workspaceDocument) {
             active: extendedOracles.length > 0,
             detail: extendedOracles.length > 0
                 ? `${extendedOracles.length} enabled`
-                : "No extended oracles enabled."
+                : "No extended oracles enabled.",
+            classNames: extendedOracles,
+            classNameColumns: balancedOracleNameColumns(extendedOracles)
         }
     ];
 }

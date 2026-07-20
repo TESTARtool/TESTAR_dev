@@ -50,6 +50,10 @@ public final class WorkspaceService {
     private static final String COMPOSITION_FILE = "composition.properties";
     private static final String POLICIES_FILE = "policies.properties";
     private static final String TEST_GOALS_DIRECTORY = "test_goals";
+    private static final String ORACLES_DIRECTORY = "oracles";
+    private static final String ORACLE_DSL_DIRECTORY = "dsl";
+    private static final String ORACLE_JAVA_DIRECTORY = "java";
+    private static final String ORACLE_COMPILED_DIRECTORY = "compiled";
     private static final Pattern WORKSPACE_NAME_PATTERN = Pattern.compile("[A-Za-z0-9_-]+");
 
     private final Path settingsRoot;
@@ -110,6 +114,15 @@ public final class WorkspaceService {
     }
 
     public WorkspaceSummaryDto createWorkspace(String workspaceName, String baseWorkspaceName, boolean copyTestGoals) {
+        return createWorkspace(workspaceName, baseWorkspaceName, copyTestGoals, true);
+    }
+
+    public WorkspaceSummaryDto createWorkspace(
+        String workspaceName,
+        String baseWorkspaceName,
+        boolean copyTestGoals,
+        boolean copyOracles
+    ) {
         String normalizedWorkspaceName = normalizeNewWorkspaceName(workspaceName);
         String normalizedBaseWorkspaceName = normalizeExistingWorkspaceName(baseWorkspaceName, "Base workspace is required.");
         Path sourceDirectory = resolveWorkspaceDirectory(normalizedBaseWorkspaceName);
@@ -125,8 +138,8 @@ public final class WorkspaceService {
 
         try {
             Files.createDirectories(settingsRoot);
-            copyWorkspaceDirectory(sourceDirectory, targetDirectory, copyTestGoals);
-            Files.createDirectories(targetDirectory.resolve(TEST_GOALS_DIRECTORY));
+            copyWorkspaceDirectory(sourceDirectory, targetDirectory, copyTestGoals, copyOracles);
+            ensureWorkspaceAssetDirectories(targetDirectory);
             return listWorkspaces().stream()
                 .filter(workspace -> normalizedWorkspaceName.equals(workspace.name()))
                 .findFirst()
@@ -535,10 +548,15 @@ public final class WorkspaceService {
         return workspaceDirectory.startsWith(root) && Files.exists(workspaceDirectory);
     }
 
-    private void copyWorkspaceDirectory(Path sourceDirectory, Path targetDirectory, boolean copyTestGoals) throws IOException {
+    private void copyWorkspaceDirectory(
+        Path sourceDirectory,
+        Path targetDirectory,
+        boolean copyTestGoals,
+        boolean copyOracles
+    ) throws IOException {
         try (Stream<Path> sourcePaths = Files.walk(sourceDirectory)) {
             List<Path> paths = sourcePaths
-                .filter(path -> shouldCopyWorkspacePath(sourceDirectory, path, copyTestGoals))
+                .filter(path -> shouldCopyWorkspacePath(sourceDirectory, path, copyTestGoals, copyOracles))
                 .sorted(Comparator.comparingInt(path -> path.getNameCount()))
                 .collect(Collectors.toList());
 
@@ -559,13 +577,36 @@ public final class WorkspaceService {
         }
     }
 
-    private boolean shouldCopyWorkspacePath(Path sourceDirectory, Path sourcePath, boolean copyTestGoals) {
-        if (copyTestGoals) {
-            return true;
+    private boolean shouldCopyWorkspacePath(
+        Path sourceDirectory,
+        Path sourcePath,
+        boolean copyTestGoals,
+        boolean copyOracles
+    ) {
+        Path normalizedSourcePath = sourcePath.normalize();
+
+        if (!copyTestGoals) {
+            Path testGoalsDirectory = sourceDirectory.resolve(TEST_GOALS_DIRECTORY).normalize();
+            if (normalizedSourcePath.startsWith(testGoalsDirectory)) {
+                return false;
+            }
         }
 
-        Path testGoalsDirectory = sourceDirectory.resolve(TEST_GOALS_DIRECTORY).normalize();
-        return !sourcePath.normalize().startsWith(testGoalsDirectory);
+        if (!copyOracles) {
+            Path oraclesDirectory = sourceDirectory.resolve(ORACLES_DIRECTORY).normalize();
+            if (normalizedSourcePath.startsWith(oraclesDirectory)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private void ensureWorkspaceAssetDirectories(Path workspaceDirectory) throws IOException {
+        Files.createDirectories(workspaceDirectory.resolve(TEST_GOALS_DIRECTORY));
+        Files.createDirectories(workspaceDirectory.resolve(ORACLES_DIRECTORY).resolve(ORACLE_DSL_DIRECTORY));
+        Files.createDirectories(workspaceDirectory.resolve(ORACLES_DIRECTORY).resolve(ORACLE_JAVA_DIRECTORY));
+        Files.createDirectories(workspaceDirectory.resolve(ORACLES_DIRECTORY).resolve(ORACLE_COMPILED_DIRECTORY));
     }
 
     private Path resolveWorkspaceRuntimeHomeDirectory(String workspaceName) {

@@ -37,7 +37,8 @@
         TEST_SETTINGS_GROUP_IDS,
         WEB_STUDIO_ROLES,
         normalizeWebStudioRole,
-        pageForRole
+        pageForRole,
+        workspaceManagementLandingPageForRole
     } from "./webStudioRoles.js";
     import {
         menuHasActivePage,
@@ -97,6 +98,7 @@
     let activeNavMenu = "";
     let selectedOraclePanelId = TEST_ORACLE_PANEL_IDS.ACTIVE;
     let testOracleInventory = null;
+    let testOracleInventoryLoading = false;
     let selectedOracleSourceFile = null;
     let oracleSourceDraftContent = "";
     let savedOracleSourceContent = "";
@@ -288,6 +290,7 @@
             resetTestGoalSelection();
             resetOracleSourceSelection();
             testOracleInventory = null;
+            testOracleInventoryLoading = false;
             testGoalTree = null;
             resultsData = null;
             selectedResultGroup = null;
@@ -1089,7 +1092,7 @@
                 body: JSON.stringify(request)
             });
             await refreshInitialData();
-            currentPage = "settings";
+            currentPage = workspaceManagementLandingPageForRole(currentRole);
             await loadWorkspace(createdWorkspace?.name || request.name);
             workspaceManagementDialogOpen = false;
             showTemporaryMessage(`Workspace ${request.name} created.`);
@@ -1122,7 +1125,7 @@
                 body: JSON.stringify(request)
             });
             await refreshInitialData();
-            currentPage = "settings";
+            currentPage = workspaceManagementLandingPageForRole(currentRole);
             await loadWorkspace(renamedWorkspace?.name || request.name);
             workspaceManagementDialogOpen = false;
             showTemporaryMessage(`Workspace renamed to ${request.name}.`);
@@ -1861,14 +1864,18 @@
     async function loadTestOracleInventory(workspaceName = selectedWorkspaceName) {
         if (!workspaceName) {
             testOracleInventory = null;
+            testOracleInventoryLoading = false;
             return;
         }
 
+        testOracleInventoryLoading = true;
         try {
             testOracleInventory = await loadJson(testOracleApiPath(workspaceName));
         } catch (oracleError) {
             reportClientError("Unable to load Test Oracles", oracleError);
             testOracleInventory = null;
+        } finally {
+            testOracleInventoryLoading = false;
         }
     }
 
@@ -3022,6 +3029,7 @@
             saving={saving}
             selectedOraclePanelId={selectedOraclePanelId}
             testOracleInventory={testOracleInventory}
+            testOracleInventoryLoading={testOracleInventoryLoading}
             setSettingValue={setSettingValue}
             selectedEditor={selectedEditor}
             selectedSettingsGroupId={selectedSettingsGroupId}
@@ -3278,6 +3286,17 @@
                             />
                             <span>Copy Test Goals from base workspace</span>
                         </label>
+                        <label class="workspace-management-checkbox">
+                            <input
+                                type="checkbox"
+                                bind:checked={workspaceCreateDraft.copyOracles}
+                                disabled={saving}
+                            />
+                            <span>Copy Java and DSL Oracles from base workspace</span>
+                        </label>
+                        <p class="workspace-management-note">
+                            Java and DSL oracle files live in the workspace oracles directory. Uncheck this to create an empty oracle workspace.
+                        </p>
                         {#if workspaceManagementError || workspaceCreateValidationState.message}
                             <p class:settings-validation-invalid={workspaceManagementError || !workspaceCreateValidationState.valid}>
                                 {workspaceManagementError || workspaceCreateValidationState.message}

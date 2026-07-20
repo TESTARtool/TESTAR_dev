@@ -216,6 +216,8 @@ public class OracleSelection {
 			return oracles;
 		}
 
+		System.out.println("Loading workspace Java oracles from: " + javaDir.getAbsolutePath());
+
 		File outputDir = new File(TestarDirectories.getWorkspaceOracleCompiledDir());
 		if (!outputDir.exists()) {
 			outputDir.mkdirs();
@@ -230,6 +232,7 @@ public class OracleSelection {
 				oracles.put(oracle.getClass().getSimpleName(), oracle);
 			}
 		}
+		System.out.println("Loaded workspace Java oracles: " + oracles.size());
 		return oracles;
 	}
 

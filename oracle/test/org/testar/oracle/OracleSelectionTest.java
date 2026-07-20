@@ -110,6 +110,27 @@ public class OracleSelectionTest {
         assertFalse(output.toString(StandardCharsets.UTF_8).contains("Compiling added or modified external oracles"));
     }
 
+    @Test
+    public void loadExtendedOraclesPrintsWorkspaceLoadingProgressWhenSourcesAreCurrent() {
+        OracleSelection.loadExtendedOracles("WorkspaceJavaOracle");
+
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        PrintStream previousOut = System.out;
+
+        try {
+            System.setOut(new PrintStream(output, true, StandardCharsets.UTF_8));
+
+            OracleSelection.loadExtendedOracles("WorkspaceJavaOracle");
+        } finally {
+            System.setOut(previousOut);
+        }
+
+        String outputText = output.toString(StandardCharsets.UTF_8);
+        assertTrue(outputText.contains("Loading workspace Java oracles from:"));
+        assertTrue(outputText.contains("Loaded workspace Java oracles: 1"));
+        assertFalse(outputText.contains("Compiling added or modified external oracles"));
+    }
+
     private void writeWorkspaceOracle(File javaOraclesDir) throws Exception {
         writeWorkspaceOracle(javaOraclesDir, "WorkspaceJavaOracle");
     }

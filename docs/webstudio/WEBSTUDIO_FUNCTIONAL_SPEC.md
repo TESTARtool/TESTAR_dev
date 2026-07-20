@@ -248,13 +248,19 @@ The cloned workspace must copy:
 - `policies.properties`
 - Java services, capabilities, and policies
 
-The dialog must include an option to copy Test Goals.
+The dialog must include options to copy Test Goals and workspace Oracles.
 
 Copy Test Goals behavior:
 
 - enabled by default
 - if enabled, copy the base workspace `test_goals` folder
 - if disabled, create an empty `test_goals` folder for the new workspace
+
+Copy Oracles behavior:
+
+- enabled by default
+- if enabled, copy the base workspace `oracles` folder
+- if disabled, create empty `oracles/dsl`, `oracles/java`, and `oracles/compiled` folders for the new workspace
 
 After successful creation:
 

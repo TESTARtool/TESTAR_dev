@@ -27,6 +27,7 @@
     export let saving = false;
     export let selectedOraclePanelId = TEST_ORACLE_PANEL_IDS.ACTIVE;
     export let testOracleInventory = null;
+    export let testOracleInventoryLoading = false;
     export let setSettingValue;
     export let selectedEditor = "";
     export let selectedSettingsGroupId = "";
@@ -178,12 +179,24 @@
 
                 <section class="oracle-summary-grid top-gap">
                     {#each oracleSummaries as oracleSummary}
-                        <article class="oracle-summary-card" class:oracle-summary-active={oracleSummary.active}>
+                        <article class="oracle-summary-card" class:oracle-summary-active={oracleSummary.active} class:oracle-summary-wide={oracleSummary.classNames?.length > 0}>
                             <div>
                                 <strong>{oracleSummary.label}</strong>
                                 <span>{oracleSummary.active ? "Configured" : "Inactive"}</span>
                             </div>
-                            <p>{oracleSummary.detail}</p>
+                            {#if oracleSummary.classNames?.length > 0}
+                                <div class="oracle-summary-class-list" aria-label="Enabled Extended Oracle classes">
+                                    {#each oracleSummary.classNameColumns as classNameColumn}
+                                        <div class="oracle-summary-class-column">
+                                            {#each classNameColumn as className}
+                                                <code>{className}</code>
+                                            {/each}
+                                        </div>
+                                    {/each}
+                                </div>
+                            {:else}
+                                <p>{oracleSummary.detail}</p>
+                            {/if}
                         </article>
                     {/each}
                 </section>
@@ -242,7 +255,9 @@
                 {/if}
 
                 <section class="oracle-inventory-list top-gap">
-                    {#if extendedOracleItems.length === 0}
+                    {#if testOracleInventoryLoading}
+                        <div class="empty-state">Loading workspace Java and DSL oracles...</div>
+                    {:else if extendedOracleItems.length === 0}
                         <div class="empty-state">No Java oracles are available for this workspace.</div>
                     {:else}
                         {#each extendedOracleItems as oracleItem}
@@ -284,7 +299,9 @@
 
                 <section class="oracle-file-layout top-gap">
                     <div class="oracle-file-browser">
-                        {#if javaOracleFiles.length === 0}
+                        {#if testOracleInventoryLoading}
+                            <div class="empty-state">Loading workspace Java oracles...</div>
+                        {:else if javaOracleFiles.length === 0}
                             <div class="empty-state">No workspace Java oracle files are available yet.</div>
                         {:else}
                             {#each javaOracleFiles as oracleFile}
@@ -379,7 +396,9 @@
 
                 <section class="oracle-file-layout top-gap">
                     <div class="oracle-file-browser">
-                        {#if dslOracleFiles.length === 0}
+                        {#if testOracleInventoryLoading && dslOracleFiles.length === 0}
+                            <div class="empty-state">Loading workspace DSL oracles...</div>
+                        {:else if dslOracleFiles.length === 0}
                             <div class="empty-state">No DSL oracle files are available yet.</div>
                         {:else}
                             {#each dslOracleFiles as oracleFile}

@@ -51,6 +51,12 @@
     background: rgba(233, 250, 236, 0.78);
 }
 
+.oracle-summary-card.oracle-summary-wide {
+    min-height: 500px;
+    grid-column: 1 / -1;
+    align-content: start;
+}
+
 .oracle-summary-card > div {
     display: flex;
     justify-content: space-between;
@@ -80,6 +86,36 @@
     color: var(--muted);
     line-height: 1.45;
     word-break: break-word;
+}
+
+.oracle-summary-class-list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    max-height: 440px;
+    min-height: 0;
+    overflow: auto;
+}
+
+.oracle-summary-class-column {
+    display: grid;
+    align-content: start;
+    gap: 8px;
+    min-width: 0;
+}
+
+.oracle-summary-class-list code {
+    min-width: 0;
+    padding: 7px 9px;
+    border: 2px solid rgba(47, 158, 68, 0.18);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.74);
+    color: var(--text);
+    font-size: 0.85rem;
+    font-weight: 700;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .oracle-workflow-grid {
@@ -180,7 +216,7 @@
 }
 
 .oracle-file-browser {
-    max-height: 560px;
+    max-height: 760px;
     overflow: auto;
 }
 

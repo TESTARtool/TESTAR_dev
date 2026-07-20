@@ -4,7 +4,8 @@ export function defaultWorkspaceCreateDraft(workspaces, selectedWorkspaceName) {
     return {
         name: "",
         baseWorkspace: selectedWorkspaceName || workspaces?.[0]?.name || "",
-        copyTestGoals: true
+        copyTestGoals: true,
+        copyOracles: true
     };
 }
 
@@ -55,7 +56,8 @@ export function workspaceCreateRequest(draft) {
     return {
         name: (draft?.name || "").trim(),
         baseWorkspace: (draft?.baseWorkspace || "").trim(),
-        copyTestGoals: draft?.copyTestGoals !== false
+        copyTestGoals: draft?.copyTestGoals !== false,
+        copyOracles: draft?.copyOracles !== false
     };
 }
 

@@ -88,6 +88,8 @@ The new workspace copy includes configuration assets:
 
 Copying Test Goals is optional and enabled by default.
 
+Copying workspace oracles is optional and enabled by default.
+
 The objective is a cloned executable workspace while avoiding copied historical execution artifacts.
 
 WebStudio can rename an existing workspace by renaming the workspace folder under the shared settings root.

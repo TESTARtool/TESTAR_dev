@@ -11,6 +11,7 @@ public final class WorkspaceCreateRequestDto {
     private String name;
     private String baseWorkspace;
     private Boolean copyTestGoals;
+    private Boolean copyOracles;
 
     public String name() {
         return name == null ? "" : name;
@@ -22,5 +23,9 @@ public final class WorkspaceCreateRequestDto {
 
     public boolean copyTestGoals() {
         return copyTestGoals == null || copyTestGoals;
+    }
+
+    public boolean copyOracles() {
+        return copyOracles == null || copyOracles;
     }
 }

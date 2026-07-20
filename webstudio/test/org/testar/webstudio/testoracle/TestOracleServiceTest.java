@@ -7,10 +7,11 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.testar.oracle.web.accessibility.WebAccessibilityImagesAltOracle;
+import org.testar.oracle.OracleSelection;
 import org.testar.webstudio.api.dto.TestOracleInventoryDto;
 import org.testar.webstudio.api.dto.TestOracleItemDto;
 import org.testar.webstudio.api.dto.WorkspaceFileDto;
@@ -22,7 +23,7 @@ public class TestOracleServiceTest {
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
     @Test
-    public void inventoryExposesBuiltInWorkspaceJavaAndDslOracles() throws Exception {
+    public void inventoryExposesWorkspaceJavaAndDslOracles() throws Exception {
         TestOracleService testOracleService = createServiceWithWorkspace("webdriver_generic");
 
         TestOracleInventoryDto inventory = testOracleService.inventory("webdriver_generic");
@@ -31,12 +32,6 @@ public class TestOracleServiceTest {
 
         Assert.assertEquals("webdriver_generic", inventory.workspaceName());
         Assert.assertTrue(inventory.activeOracles().contains("WorkspaceJavaOracle"));
-        Assert.assertTrue(inventory.activeOracles().contains(WebAccessibilityImagesAltOracle.class.getSimpleName()));
-
-        TestOracleItemDto builtInOracle = itemsByKey.get("BUILT_IN:" + WebAccessibilityImagesAltOracle.class.getSimpleName());
-        Assert.assertNotNull(builtInOracle);
-        Assert.assertTrue(builtInOracle.active());
-        Assert.assertFalse(builtInOracle.editable());
 
         TestOracleItemDto workspaceOracle = itemsByKey.get("WORKSPACE_JAVA:WorkspaceJavaOracle");
         Assert.assertNotNull(workspaceOracle);
@@ -54,13 +49,18 @@ public class TestOracleServiceTest {
     @Test
     public void inventoryMarksWorkspaceJavaOracleThatOverridesBuiltInName() throws Exception {
         TestOracleService testOracleService = createServiceWithWorkspace("webdriver_generic");
+        String builtInOracleName = OracleSelection.getAvailableBuiltInOracles().stream()
+            .findFirst()
+            .orElse("");
+        Assume.assumeFalse("No built-in oracle classes are available for override detection.", builtInOracleName.isBlank());
+
         Path workspaceJavaDir = workspaceDirectory("webdriver_generic").resolve("oracles").resolve("java");
-        writeWorkspaceOracle(workspaceJavaDir, WebAccessibilityImagesAltOracle.class.getSimpleName());
+        writeWorkspaceOracle(workspaceJavaDir, builtInOracleName);
 
         TestOracleInventoryDto inventory = testOracleService.inventory("webdriver_generic");
         TestOracleItemDto overridingOracle = inventory.items().stream()
             .filter(item -> "WORKSPACE_JAVA".equals(item.origin()))
-            .filter(item -> WebAccessibilityImagesAltOracle.class.getSimpleName().equals(item.name()))
+            .filter(item -> builtInOracleName.equals(item.name()))
             .findFirst()
             .orElseThrow();
 
@@ -260,7 +260,7 @@ public class TestOracleServiceTest {
 
         Files.writeString(
             workspaceDirectory.resolve("test.settings"),
-            "ExtendedOracles = WorkspaceJavaOracle," + WebAccessibilityImagesAltOracle.class.getSimpleName() + "\n",
+            "ExtendedOracles = WorkspaceJavaOracle\n",
             StandardCharsets.UTF_8
         );
 

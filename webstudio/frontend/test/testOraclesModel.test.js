@@ -6,6 +6,7 @@ import {
     TEST_ORACLE_PANELS,
     TEST_ORACLE_SETTING_KEYS,
     activeOracleSummaries,
+    balancedOracleNameColumns,
     closedOracleDeleteDialog,
     dslDiagnosticText,
     dslFileNameForCreation,
@@ -81,7 +82,18 @@ test("summarizes active oracle mechanisms without policies", () => {
     assert.equal(summaries.find((item) => item.label === "WebDriver Console Oracles").detail, "error console");
     assert.equal(summaries.find((item) => item.label === "Log Regex Oracles").detail, ".*Exception.*");
     assert.equal(summaries.find((item) => item.label === "Extended Oracles").detail, "2 enabled");
+    assert.deepEqual(summaries.find((item) => item.label === "Extended Oracles").classNames, ["A", "B"]);
+    assert.deepEqual(summaries.find((item) => item.label === "Extended Oracles").classNameColumns, [["A"], ["B"], []]);
     assert.equal(summaries.length, 5);
+});
+
+test("splits enabled extended oracle names into three balanced vertical columns", () => {
+    assert.deepEqual(balancedOracleNameColumns(["A", "B", "C", "D", "E"]), [
+        ["A", "B"],
+        ["C", "D"],
+        ["E"]
+    ]);
+    assert.deepEqual(balancedOracleNameColumns([]), [[], [], []]);
 });
 
 test("uses dedicated Extended Java DSL oracle panels", () => {

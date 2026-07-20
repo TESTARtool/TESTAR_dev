@@ -42,7 +42,8 @@ public final class WorkspaceController {
         return workspaceService.createWorkspace(
             request.name(),
             request.baseWorkspace(),
-            request.copyTestGoals()
+            request.copyTestGoals(),
+            request.copyOracles()
         );
     }
 

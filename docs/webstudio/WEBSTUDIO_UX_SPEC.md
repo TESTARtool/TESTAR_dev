@@ -267,6 +267,8 @@ Expected behavior:
 - the modal exposes separate areas or tabs for `Create Workspace` and `Rename Workspace`
 - `Create Workspace` requires a new workspace name and an existing workspace as base
 - `Create Workspace` shows `Copy Test Goals`, checked by default, and allows unchecking it
+- `Create Workspace` shows `Copy Java and DSL Oracles`, checked by default, and allows unchecking it
+- `Create Workspace` explains that copied oracles are workspace Java and DSL oracle files
 - `Create` remains disabled until the workspace name and base workspace are valid
 - `Rename Workspace` shows the current workspace name and requires a new valid workspace name
 - `Rename Workspace` indicates that existing output results for the current workspace will move to the renamed workspace

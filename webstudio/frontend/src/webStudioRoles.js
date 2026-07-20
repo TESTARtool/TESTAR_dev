@@ -72,6 +72,10 @@ export function pageForRole(role, currentPage) {
     return ADVANCED_PAGES.has(currentPage) ? currentPage : "settings";
 }
 
+export function workspaceManagementLandingPageForRole(role) {
+    return pageForRole(role, "settings");
+}
+
 export function pageAvailableForRole(role, page) {
     return normalizeWebStudioRole(role) === WEB_STUDIO_ROLES.BASIC
         ? BASIC_PAGES.has(page)

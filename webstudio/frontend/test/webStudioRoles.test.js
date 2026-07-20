@@ -7,7 +7,8 @@ import {
     WEB_STUDIO_ROLES,
     normalizeWebStudioRole,
     pageAvailableForRole,
-    pageForRole
+    pageForRole,
+    workspaceManagementLandingPageForRole
 } from "../src/webStudioRoles.js";
 
 test("normalizes unknown roles to advanced", () => {
@@ -25,6 +26,11 @@ test("maps unavailable pages when switching to basic role", () => {
 test("maps basic-only settings page back to advanced settings page", () => {
     assert.equal(pageForRole(WEB_STUDIO_ROLES.ADVANCED, "basic-settings"), "settings");
     assert.equal(pageForRole(WEB_STUDIO_ROLES.ADVANCED, "results"), "results");
+});
+
+test("workspace management returns to the role-specific settings page", () => {
+    assert.equal(workspaceManagementLandingPageForRole(WEB_STUDIO_ROLES.BASIC), "basic-settings");
+    assert.equal(workspaceManagementLandingPageForRole(WEB_STUDIO_ROLES.ADVANCED), "settings");
 });
 
 test("exposes the initial basic settings group set", () => {

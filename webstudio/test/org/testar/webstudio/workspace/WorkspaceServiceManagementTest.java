@@ -21,7 +21,7 @@ public class WorkspaceServiceManagementTest {
         Path baseWorkspace = createBaseWorkspace(roots.testarSettingsRoot);
         WorkspaceService workspaceService = new WorkspaceService(roots.testarSettingsRoot, roots.cliSettingsRoot);
 
-        workspaceService.createWorkspace("webdriver_parabank", "webdriver_generic", true);
+        workspaceService.createWorkspace("webdriver_parabank", "webdriver_generic", true, true);
 
         Path clonedWorkspace = roots.testarSettingsRoot.resolve("webdriver_parabank");
         Assert.assertTrue(Files.isDirectory(clonedWorkspace));
@@ -34,6 +34,8 @@ public class WorkspaceServiceManagementTest {
             Files.readString(clonedWorkspace.resolve("WebdriverGenericSystemService.java"))
         );
         Assert.assertTrue(Files.isRegularFile(clonedWorkspace.resolve("test_goals").resolve("login.yaml")));
+        Assert.assertTrue(Files.isRegularFile(clonedWorkspace.resolve("oracles").resolve("java").resolve("WebOracle.java")));
+        Assert.assertTrue(Files.isRegularFile(clonedWorkspace.resolve("oracles").resolve("dsl").resolve("web_oracle.testar")));
     }
 
     @Test
@@ -48,6 +50,23 @@ public class WorkspaceServiceManagementTest {
         Assert.assertTrue(Files.isDirectory(clonedWorkspace.resolve("test_goals")));
         Assert.assertFalse(Files.exists(clonedWorkspace.resolve("test_goals").resolve("login.yaml")));
         Assert.assertTrue(Files.isRegularFile(clonedWorkspace.resolve("test.settings")));
+    }
+
+    @Test
+    public void createsEmptyOraclesDirectoryWhenCopyOraclesIsDisabled() throws IOException {
+        TestWorkspaceRoots roots = createWorkspaceRoots();
+        createBaseWorkspace(roots.testarSettingsRoot);
+        WorkspaceService workspaceService = new WorkspaceService(roots.testarSettingsRoot, roots.cliSettingsRoot);
+
+        workspaceService.createWorkspace("webdriver_no_oracles", "webdriver_generic", true, false);
+
+        Path clonedWorkspace = roots.testarSettingsRoot.resolve("webdriver_no_oracles");
+        Assert.assertTrue(Files.isDirectory(clonedWorkspace.resolve("oracles").resolve("java")));
+        Assert.assertTrue(Files.isDirectory(clonedWorkspace.resolve("oracles").resolve("dsl")));
+        Assert.assertTrue(Files.isDirectory(clonedWorkspace.resolve("oracles").resolve("compiled")));
+        Assert.assertFalse(Files.exists(clonedWorkspace.resolve("oracles").resolve("java").resolve("WebOracle.java")));
+        Assert.assertFalse(Files.exists(clonedWorkspace.resolve("oracles").resolve("dsl").resolve("web_oracle.testar")));
+        Assert.assertTrue(Files.isRegularFile(clonedWorkspace.resolve("test_goals").resolve("login.yaml")));
     }
 
     @Test
@@ -180,6 +199,8 @@ public class WorkspaceServiceManagementTest {
     private Path createBaseWorkspace(Path settingsRoot) throws IOException {
         Path baseWorkspace = settingsRoot.resolve("webdriver_generic");
         Files.createDirectories(baseWorkspace.resolve("test_goals"));
+        Files.createDirectories(baseWorkspace.resolve("oracles").resolve("java"));
+        Files.createDirectories(baseWorkspace.resolve("oracles").resolve("dsl"));
         Files.writeString(
             baseWorkspace.resolve("test.settings"),
             "SUTConnector = WEB_DRIVER\n",
@@ -203,6 +224,16 @@ public class WorkspaceServiceManagementTest {
         Files.writeString(
             baseWorkspace.resolve("test_goals").resolve("login.yaml"),
             "id: login\n",
+            StandardCharsets.UTF_8
+        );
+        Files.writeString(
+            baseWorkspace.resolve("oracles").resolve("java").resolve("WebOracle.java"),
+            "public final class WebOracle {}\n",
+            StandardCharsets.UTF_8
+        );
+        Files.writeString(
+            baseWorkspace.resolve("oracles").resolve("dsl").resolve("web_oracle.testar"),
+            "module web_oracle\n",
             StandardCharsets.UTF_8
         );
         return baseWorkspace;
