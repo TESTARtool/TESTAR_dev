@@ -7,7 +7,7 @@
 package org.testar.webstudio.api;
 
 import org.testar.webstudio.analysis.StateModelAnalysisService;
-import org.testar.webstudio.api.dto.StateModelLaunchDto;
+import org.testar.webstudio.api.dto.StateModelStatusDto;
 
 public final class StateModelAnalysisController {
 
@@ -17,7 +17,15 @@ public final class StateModelAnalysisController {
         this.service = service;
     }
 
-    public StateModelLaunchDto open(String workspaceName) {
+    public StateModelStatusDto open(String workspaceName) {
         return service.open(workspaceName);
+    }
+
+    public StateModelStatusDto status() {
+        return service.status();
+    }
+
+    public StateModelStatusDto stop() {
+        return service.stop();
     }
 }

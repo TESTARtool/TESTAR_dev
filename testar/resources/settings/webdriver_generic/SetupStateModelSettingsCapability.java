@@ -5,6 +5,8 @@
  */
 
 import org.testar.config.StateModelTags;
+import org.testar.config.ConfigTags;
+import org.testar.config.TestarMode;
 import org.testar.config.settings.Settings;
 import org.testar.core.Assert;
 import org.testar.scriptless.capability.SettingsCapability;
@@ -26,6 +28,10 @@ public final class SetupStateModelSettingsCapability extends SettingsCapability 
     }
 
     private void prepareStateModelOrientDB(Settings settings) {
+        if (settings.get(ConfigTags.Mode, TestarMode.Spy) == TestarMode.Spy) {
+            return;
+        }
+
         if (!settings.get(StateModelTags.StateModelInference, false)) {
             return;
         }

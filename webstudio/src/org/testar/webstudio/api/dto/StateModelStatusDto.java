@@ -6,14 +6,22 @@
 
 package org.testar.webstudio.api.dto;
 
-public final class StateModelLaunchDto {
+public final class StateModelStatusDto {
 
+    private final String status;
     private final String url;
     private final String message;
+    private final boolean running;
 
-    public StateModelLaunchDto(String url, String message) {
+    public StateModelStatusDto(String status, String url, String message, boolean running) {
+        this.status = status;
         this.url = url;
         this.message = message;
+        this.running = running;
+    }
+
+    public String status() {
+        return status;
     }
 
     public String url() {
@@ -22,5 +30,9 @@ public final class StateModelLaunchDto {
 
     public String message() {
         return message;
+    }
+
+    public boolean running() {
+        return running;
     }
 }

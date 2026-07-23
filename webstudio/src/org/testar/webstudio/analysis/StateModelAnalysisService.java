@@ -14,30 +14,46 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-import org.testar.config.ConfigTags;
 import org.testar.config.StateModelTags;
 import org.testar.config.settings.Settings;
 import org.testar.statemodel.analysis.AnalysisManager;
 import org.testar.statemodel.analysis.StateModelDebugLog;
 import org.testar.statemodel.analysis.webserver.JettyServer;
 import org.testar.statemodel.persistence.orientdb.entity.Config;
-import org.testar.webstudio.api.dto.StateModelLaunchDto;
+import org.testar.webstudio.api.dto.StateModelStatusDto;
 import org.testar.webstudio.workspace.WorkspaceService;
 
 public final class StateModelAnalysisService {
 
     private static final String ANALYSIS_URL = "http://localhost:8090/models";
+    private static final String STATUS_STOPPED = "STOPPED";
+    private static final String STATUS_STARTING = "STARTING";
+    private static final String STATUS_RUNNING = "RUNNING";
+    private static final String STATUS_FAILED = "FAILED";
 
     private final WorkspaceService workspaceService;
+    private final ExecutorService executorService = Executors.newSingleThreadExecutor(runnable -> {
+        Thread thread = new Thread(runnable, "webstudio-state-model-analysis");
+        thread.setDaemon(true);
+        return thread;
+    });
     private JettyServer jettyServer;
     private AnalysisManager analysisManager;
+    private String status = STATUS_STOPPED;
+    private String message = "State model analysis is not running.";
 
     public StateModelAnalysisService(WorkspaceService workspaceService) {
         this.workspaceService = workspaceService;
     }
 
-    public synchronized StateModelLaunchDto open(String workspaceName) {
+    public synchronized StateModelStatusDto open(String workspaceName) {
+        return start(workspaceName);
+    }
+
+    public synchronized StateModelStatusDto start(String workspaceName) {
         Path runtimeHome = workspaceService.workspaceRuntimeHomeDirectory(workspaceName);
         Path debugLogPath = runtimeHome.resolve("state-model-debug.log");
         StateModelDebugLog.install(debugLogPath);
@@ -45,16 +61,65 @@ public final class StateModelAnalysisService {
         StateModelDebugLog.log("Opening state model analysis for workspace: " + workspaceName);
         StateModelDebugLog.log("State model analysis runtime home: " + runtimeHome);
 
-        if (jettyServer != null && jettyServer.isRunning()) {
+        if (isRunning()) {
             StateModelDebugLog.log("Reusing in-process state model analysis server instance.");
-            return new StateModelLaunchDto(ANALYSIS_URL, "State model analysis is already running.");
+            status = STATUS_RUNNING;
+            message = "State model analysis is already running.";
+            return status();
         }
 
         if (isAnalysisServerReachable()) {
             StateModelDebugLog.log("State model analysis server already reachable, reusing existing instance.");
-            return new StateModelLaunchDto(ANALYSIS_URL, "State model analysis is already running.");
+            status = STATUS_RUNNING;
+            message = "State model analysis is already running.";
+            return status();
         }
 
+        if (STATUS_STARTING.equals(status)) {
+            return status();
+        }
+
+        status = STATUS_STARTING;
+        message = "State model analysis is starting. OrientDB may be recovering the datastore.";
+        executorService.submit(() -> startAnalysis(workspaceName, runtimeHome));
+        return status();
+    }
+
+    public synchronized StateModelStatusDto status() {
+        if (isRunning() || isAnalysisServerReachable()) {
+            status = STATUS_RUNNING;
+            message = "State model analysis is running.";
+        }
+
+        return new StateModelStatusDto(status, ANALYSIS_URL, message, STATUS_RUNNING.equals(status));
+    }
+
+    public synchronized StateModelStatusDto stop() {
+        try {
+            if (jettyServer == null && isAnalysisServerReachable()) {
+                status = STATUS_FAILED;
+                message = "State model analysis is running outside the current WebStudio process. Stop the owning process to close it.";
+                return new StateModelStatusDto(status, ANALYSIS_URL, message, false);
+            }
+
+            if (jettyServer != null) {
+                jettyServer.stop();
+                jettyServer = null;
+            }
+
+            closeAnalysisManager();
+            status = STATUS_STOPPED;
+            message = "State model analysis stopped.";
+            return status();
+        } catch (Exception exception) {
+            StateModelDebugLog.log("Unable to stop state model analysis cleanly.", exception);
+            status = STATUS_FAILED;
+            message = "Unable to stop state model analysis: " + exception.getMessage();
+            return status();
+        }
+    }
+
+    private void startAnalysis(String workspaceName, Path runtimeHome) {
         Path workspaceDirectory = workspaceService.workspaceDirectory(workspaceName);
         Path testSettingsFile = workspaceDirectory.resolve("test.settings");
 
@@ -63,7 +128,7 @@ public final class StateModelAnalysisService {
             Settings settings = Settings.loadSettings(new String[0], testSettingsFile.toString());
             validateSettings(settings);
 
-            Path graphsDirectory = resolveGraphsDirectory(runtimeHome, settings);
+            Path graphsDirectory = resolveGraphsDirectory(runtimeHome);
             Files.createDirectories(graphsDirectory);
 
             Config config = new Config();
@@ -81,22 +146,45 @@ public final class StateModelAnalysisService {
             jettyServer = new JettyServer();
             jettyServer.start(graphsDirectory.toString() + File.separator, analysisManager);
 
-            return new StateModelLaunchDto(ANALYSIS_URL, "State model analysis server started.");
+            setRunning("State model analysis server started.");
         } catch (Exception exception) {
             StateModelDebugLog.log("Unable to open state model analysis for workspace: " + workspaceName, exception);
             if (isAddressAlreadyInUse(exception) && isAnalysisServerReachable()) {
-                return new StateModelLaunchDto(ANALYSIS_URL, "State model analysis is already running.");
+                setRunning("State model analysis is already running.");
+                return;
             }
 
             if (isMissingStateModelDatabase(exception)) {
-                throw new IllegalStateException(
-                    "No generated state model was found yet. Please run TESTAR in Generate mode first, then open View State Model.",
-                    exception
-                );
+                setFailed("No generated state model was found yet. Please run TESTAR in Generate mode first, then open View State Model.");
+                return;
             }
 
-            throw new IllegalStateException("Unable to start state model analysis: " + exception.getMessage(), exception);
+            setFailed("Unable to start state model analysis: " + exception.getMessage());
         }
+    }
+
+    private synchronized void setRunning(String message) {
+        status = STATUS_RUNNING;
+        this.message = message;
+    }
+
+    private synchronized void setFailed(String message) {
+        closeAnalysisManager();
+        status = STATUS_FAILED;
+        this.message = message;
+    }
+
+    private boolean isRunning() {
+        return jettyServer != null && jettyServer.isRunning();
+    }
+
+    private void closeAnalysisManager() {
+        if (analysisManager == null) {
+            return;
+        }
+
+        analysisManager.shutdown();
+        analysisManager = null;
     }
 
     private void validateSettings(Settings settings) {
@@ -131,9 +219,8 @@ public final class StateModelAnalysisService {
         }
     }
 
-    private Path resolveGraphsDirectory(Path testarHome, Settings settings) {
-        Path outputDirectory = resolveAgainstTestarHome(testarHome, settings.get(ConfigTags.OutputDir, "./output"));
-        return outputDirectory.resolve("graphs").toAbsolutePath().normalize();
+    static Path resolveGraphsDirectory(Path testarHome) {
+        return testarHome.resolve("output").resolve("graphs").toAbsolutePath().normalize();
     }
 
     private Path resolveAgainstTestarHome(Path testarHome, String value) {

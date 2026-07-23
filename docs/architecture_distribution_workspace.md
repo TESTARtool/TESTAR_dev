@@ -354,6 +354,12 @@ This avoids split behavior where scriptless TESTAR and CLI write to different ou
 
 State model analysis should resolve the datastore associated with the selected workspace and shared runtime root.
 
+State model analysis web assets are served from the shared runtime graph assets directory:
+
+```text
+target/install/testar/bin/output/graphs/
+```
+
 ## WebStudio Behavior
 
 WebStudio should:

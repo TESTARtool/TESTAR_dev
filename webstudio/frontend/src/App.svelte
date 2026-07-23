@@ -77,7 +77,6 @@
     let workspaces = [];
     let selectedWorkspaceName = "";
     let selectedWorkspaceSummary = null;
-    let selectedWorkspaceAvailableInSharedRuntime = false;
     let workspaceDocument = null;
     let selectedWorkspaceSutConnector = "";
     let selectedWorkspaceSutConnectorValue = "";
@@ -128,8 +127,12 @@
     let stateModelDialog = {
         open: false,
         title: "",
-        message: ""
+        message: "",
+        status: "STOPPED",
+        url: STATE_MODEL_URL,
+        running: false
     };
+    let stateModelStatusTimer = null;
     let visualSettingsDirty = false;
     let unsavedSettingsDialog = {
         open: false,
@@ -169,19 +172,26 @@
         }, 2000);
     }
 
-    function openStateModelDialog(title, dialogMessage) {
+    function openStateModelDialog(title, dialogMessage, stateModelStatus = {}) {
         stateModelDialog = {
             open: true,
             title,
-            message: dialogMessage
+            message: dialogMessage,
+            status: stateModelStatus.status || "STOPPED",
+            url: stateModelStatus.url || STATE_MODEL_URL,
+            running: Boolean(stateModelStatus.running)
         };
     }
 
     function closeStateModelDialog() {
+        stopStateModelStatusPolling();
         stateModelDialog = {
             open: false,
             title: "",
-            message: ""
+            message: "",
+            status: "STOPPED",
+            url: STATE_MODEL_URL,
+            running: false
         };
     }
 
@@ -233,6 +243,70 @@
             title: "Unable To Open State Model",
             message: "Dear user, before opening the analysis mode, TESTAR must execute a Generate run with the state model enabled. Currently there are no generated state models available."
         };
+    }
+
+    function stateModelDialogTitle(status) {
+        if (status === "RUNNING") {
+            return "State Model Analysis Running";
+        }
+        if (status === "STARTING") {
+            return "State Model Analysis Starting";
+        }
+        if (status === "FAILED") {
+            return "Unable To Open State Model";
+        }
+        return "State Model Analysis";
+    }
+
+    function showStateModelStatus(statusResponse) {
+        openStateModelDialog(
+            stateModelDialogTitle(statusResponse?.status),
+            statusResponse?.message || "State model analysis status is unknown.",
+            statusResponse || {}
+        );
+    }
+
+    function stopStateModelStatusPolling() {
+        if (stateModelStatusTimer !== null) {
+            window.clearTimeout(stateModelStatusTimer);
+            stateModelStatusTimer = null;
+        }
+    }
+
+    function scheduleStateModelStatusPolling() {
+        stopStateModelStatusPolling();
+        stateModelStatusTimer = window.setTimeout(refreshStateModelStatus, 2000);
+    }
+
+    async function refreshStateModelStatus() {
+        try {
+            const statusResponse = await loadJson("/api/statemodel/status");
+            showStateModelStatus(statusResponse);
+            if (statusResponse.status === "STARTING") {
+                scheduleStateModelStatusPolling();
+            }
+        } catch (statusError) {
+            reportClientError("Unable to refresh state model analysis status", statusError);
+        }
+    }
+
+    async function stopStateModelAnalysis() {
+        saving = true;
+        try {
+            const statusResponse = await loadJson("/api/statemodel/stop", {
+                method: "POST"
+            });
+            showStateModelStatus(statusResponse);
+            showTemporaryMessage(statusResponse.message || "State model analysis stopped.");
+        } catch (stopError) {
+            reportClientError("Unable to stop state model analysis", stopError);
+            openStateModelDialog(
+                "Unable To Stop State Model",
+                stopError.message || "State model analysis could not be stopped."
+            );
+        } finally {
+            saving = false;
+        }
     }
 
     async function loadJson(path, options = {}) {
@@ -1141,12 +1215,6 @@
         window.open(url, "_blank", "noopener,noreferrer");
     }
 
-    function workspaceAvailableInSharedRuntime(workspaceSummary = selectedWorkspaceSummary) {
-        return Boolean(workspaceSummary);
-    }
-
-    $: selectedWorkspaceAvailableInSharedRuntime = workspaceAvailableInSharedRuntime();
-
     function workspaceSettingValue(settingKey) {
         for (const settingsGroup of workspaceDocument?.settingsGroups || []) {
             for (const setting of settingsGroup.settings || []) {
@@ -1556,10 +1624,7 @@
     }
 
     async function navigateToStateModel() {
-        const workspaceDialog = stateModelWorkspaceDialog(
-            selectedWorkspaceName,
-            selectedWorkspaceAvailableInSharedRuntime
-        );
+        const workspaceDialog = stateModelWorkspaceDialog(selectedWorkspaceName);
         if (workspaceDialog) {
             openStateModelDialog(workspaceDialog.title, workspaceDialog.message);
             return;
@@ -1572,8 +1637,13 @@
             const response = await loadJson(`/api/statemodel/open/${selectedWorkspaceName}`, {
                 method: "POST"
             });
-            openStateModelExternalTab(response.url || STATE_MODEL_URL);
-            showTemporaryMessage(response.message || "State model analysis opened.");
+            showStateModelStatus(response);
+            if (response.status === "RUNNING") {
+                openStateModelExternalTab(response.url || STATE_MODEL_URL);
+            } else if (response.status === "STARTING") {
+                scheduleStateModelStatusPolling();
+            }
+            showTemporaryMessage(response.message || "State model analysis requested.");
         } catch (openError) {
             reportClientError("Unable to open state model analysis", openError);
             const dialogContent = stateModelDialogMessage(openError);
@@ -3367,6 +3437,14 @@
                     </div>
                 </div>
                 <div class="composition-modal-actions">
+                    {#if stateModelDialog.running}
+                        <button type="button" on:click={() => openStateModelExternalTab(stateModelDialog.url)}>
+                            Open State Model
+                        </button>
+                        <button type="button" class="danger" on:click={stopStateModelAnalysis} disabled={saving}>
+                            Stop State Model
+                        </button>
+                    {/if}
                     <button type="button" class="secondary" on:click={closeStateModelDialog}>
                         Close
                     </button>

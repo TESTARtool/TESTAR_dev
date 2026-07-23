@@ -364,6 +364,8 @@ public final class WebStudioServer {
         routes.post("/api/statemodel/open/{workspace}", context -> handle(context, () ->
             stateModelAnalysisController.open(context.pathParam("workspace"))
         ));
+        routes.get("/api/statemodel/status", context -> handle(context, stateModelAnalysisController::status));
+        routes.post("/api/statemodel/stop", context -> handle(context, stateModelAnalysisController::stop));
     }
 
     private void writeJson(Context context, Object payload) {

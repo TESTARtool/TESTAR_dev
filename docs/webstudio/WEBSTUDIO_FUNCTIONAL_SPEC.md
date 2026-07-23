@@ -927,17 +927,30 @@ Scriptless Generate mode and CLI mode can generate state models when the selecte
 
 The execution mode is responsible for automatic OrientDB preparation, including download/bootstrap when required by the configured state model storage settings.
 
+Spy mode uses the no-op state model manager and only inspects the current SUT state.
+
 `View State Model` opens the external analysis mode URL after server-side preparation.
 
 The user must see a friendly modal dialog instead of raw server or browser console errors when analysis cannot be opened.
+
+State model analysis startup can take time when OrientDB needs to recover or initialize a datastore.
+
+During startup, WebStudio must keep the user in a visible status dialog and must not report the model as unavailable only because startup is still running.
 
 ### Runtime Resolution
 
 - State model analysis uses the selected workspace and the shared distribution runtime home.
 - The shared runtime home is `testar/target/install/testar/bin`.
 - State model datastore paths are resolved from the selected workspace settings against the shared runtime home.
+- State model analysis web assets are served from `output/graphs` under the shared runtime home.
 - `View State Model` uses the selected shared workspace directly.
 - Generate and CLI executions can both contribute state model data to the same configured datastore when they use the same selected workspace and datastore settings.
+
+### Analysis Controls
+
+- When state model analysis is starting, WebStudio must show the startup status and poll until it is running or failed.
+- When state model analysis is running, WebStudio must provide an action to open the analysis URL.
+- When state model analysis is running, WebStudio must provide an action to stop the analysis server owned by the current WebStudio process.
 
 ### Error Handling
 

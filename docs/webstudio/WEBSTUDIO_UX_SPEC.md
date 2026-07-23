@@ -545,6 +545,8 @@ Empty state behavior:
 Expected behavior:
 
 - state model errors are shown as friendly UI messages, not raw server errors
+- startup and datastore recovery are shown as a visible starting state
+- running analysis exposes actions to open the analysis page and stop the analysis server
 
 ## Debug UX Contract
 

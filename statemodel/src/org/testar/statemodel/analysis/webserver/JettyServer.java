@@ -34,6 +34,20 @@ public class JettyServer {
         return server != null && server.isStarted();
     }
 
+    public void stop() throws Exception {
+        if (server == null) {
+            return;
+        }
+
+        if (server.isRunning() || server.isStarted() || server.isStarting()) {
+            server.stop();
+        }
+
+        server.destroy();
+        server = null;
+        StateModelDebugLog.log("State model analysis server stopped.");
+    }
+
     /**
      * Call this method to start running the jetty server.
      * @param resourceBase

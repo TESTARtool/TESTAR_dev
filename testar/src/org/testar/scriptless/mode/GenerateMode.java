@@ -28,66 +28,68 @@ public class GenerateMode {
     private boolean exceptionThrown = false;
 
     public void runGenerateOuterLoop(ComposedProtocol protocol) {
-        protocol.initializeTestSession();
-        protocol.runtimeContext().setSequenceCount(1);
+        try {
+            protocol.initializeTestSession();
+            protocol.runtimeContext().setSequenceCount(1);
 
-        while (protocol.runtimeContext().mode() != TestarMode.Quit && protocol.stopCriteriaTestSession()) {
-            exceptionThrown = false;
-            SUT system = null;
+            while (protocol.runtimeContext().mode() != TestarMode.Quit && protocol.stopCriteriaTestSession()) {
+                exceptionThrown = false;
+                SUT system = null;
 
-            synchronized (this) {
-                OutputStructure.calculateInnerLoopDateString();
-                OutputStructure.sequenceInnerLoopCount++;
-            }
-
-            try {
-                protocol.startTestSequence();
-
-                system = protocol.startSystem();
-
-                LogSerialiser.log("Obtaining system initial state before beginSequence...\n", LogSerialiser.LogLevel.Debug);
-                State initialState = protocol.getState(system);
-                List<Verdict> initialVerdicts = filterSequenceVerdicts(
-                        protocol,
-                        protocol.getVerdicts(system, initialState)
-                );
-
-                if (!Verdict.helperAreAllVerdictsOK(initialVerdicts)) {
-                    // If failure exists in the initial state
-                    // Save initial state information in the state model before finishing
-                    protocol.runtimeContext().stateModelManager().notifyNewStateReached(initialState, Collections.emptySet());
-                    // Finish the test sequence and state model only with the initial state verdicts
-                    finishGeneratedSequence(protocol, system, initialVerdicts);
-                } else {
-                    LogSerialiser.log("Invoking begin sequence in the initial state...\n", LogSerialiser.LogLevel.Debug);
-                    // beginSequence() - a script to interact with GUI, for example login screen
-                    protocol.beginSequence(system, initialState);
-                    // starting the INNER LOOP with the updated state after SUT modification
-                    List<Verdict> finalSequenceVerdicts = runGenerateInnerLoop(protocol, system, protocol.getState(system));
-                    // Finish the test sequence and state model with the final state verdicts
-                    finishGeneratedSequence(protocol, system, finalSequenceVerdicts);
+                synchronized (this) {
+                    OutputStructure.calculateInnerLoopDateString();
+                    OutputStructure.sequenceInnerLoopCount++;
                 }
 
-            } catch (Exception exception) {
-                exception.printStackTrace();
-                String message = "Thread: name=" + Thread.currentThread().getName() + ",id=" + Thread.currentThread().getId() + ", TESTAR throws exception";
-                System.out.println(message);
-                StringJoiner stackTrace = new StringJoiner(System.lineSeparator());
-                stackTrace.add(message);
-                Arrays.stream(exception.getStackTrace()).map(StackTraceElement::toString).forEach(stackTrace::add);
-                protocol.runtimeContext().stateModelManager().notifyTestSequenceInterruptedBySystem(stackTrace.toString());
-                exceptionThrown = true;
-                Verdict unexpectedCloseVerdict = new Verdict(Verdict.Severity.UNEXPECTEDCLOSE, "System is offline! Closed Unexpectedly! I assume it crashed!");
-                finishGeneratedSequence(protocol, system, Arrays.asList(unexpectedCloseVerdict));
+                try {
+                    protocol.startTestSequence();
+
+                    system = protocol.startSystem();
+
+                    LogSerialiser.log("Obtaining system initial state before beginSequence...\n", LogSerialiser.LogLevel.Debug);
+                    State initialState = protocol.getState(system);
+                    List<Verdict> initialVerdicts = filterSequenceVerdicts(
+                            protocol,
+                            protocol.getVerdicts(system, initialState)
+                    );
+
+                    if (!Verdict.helperAreAllVerdictsOK(initialVerdicts)) {
+                        // If failure exists in the initial state
+                        // Save initial state information in the state model before finishing
+                        protocol.runtimeContext().stateModelManager().notifyNewStateReached(initialState, Collections.emptySet());
+                        // Finish the test sequence and state model only with the initial state verdicts
+                        finishGeneratedSequence(protocol, system, initialVerdicts);
+                    } else {
+                        LogSerialiser.log("Invoking begin sequence in the initial state...\n", LogSerialiser.LogLevel.Debug);
+                        // beginSequence() - a script to interact with GUI, for example login screen
+                        protocol.beginSequence(system, initialState);
+                        // starting the INNER LOOP with the updated state after SUT modification
+                        List<Verdict> finalSequenceVerdicts = runGenerateInnerLoop(protocol, system, protocol.getState(system));
+                        // Finish the test sequence and state model with the final state verdicts
+                        finishGeneratedSequence(protocol, system, finalSequenceVerdicts);
+                    }
+
+                } catch (Exception exception) {
+                    exception.printStackTrace();
+                    String message = "Thread: name=" + Thread.currentThread().getName() + ",id=" + Thread.currentThread().getId() + ", TESTAR throws exception";
+                    System.out.println(message);
+                    StringJoiner stackTrace = new StringJoiner(System.lineSeparator());
+                    stackTrace.add(message);
+                    Arrays.stream(exception.getStackTrace()).map(StackTraceElement::toString).forEach(stackTrace::add);
+                    protocol.runtimeContext().stateModelManager().notifyTestSequenceInterruptedBySystem(stackTrace.toString());
+                    exceptionThrown = true;
+                    Verdict unexpectedCloseVerdict = new Verdict(Verdict.Severity.UNEXPECTEDCLOSE, "System is offline! Closed Unexpectedly! I assume it crashed!");
+                    finishGeneratedSequence(protocol, system, Arrays.asList(unexpectedCloseVerdict));
+                }
             }
-        }
 
-        if (protocol.runtimeContext().mode() == TestarMode.Quit && !exceptionThrown) {
-            protocol.runtimeContext().stateModelManager().notifyTestSequenceInterruptedByUser();
+            if (protocol.runtimeContext().mode() == TestarMode.Quit && !exceptionThrown) {
+                protocol.runtimeContext().stateModelManager().notifyTestSequenceInterruptedByUser();
+            }
+        } finally {
+            protocol.runtimeContext().stateModelManager().notifyTestingEnded();
+            protocol.runtimeContext().setMode(TestarMode.Quit);
         }
-
-        protocol.runtimeContext().stateModelManager().notifyTestingEnded();
-        protocol.runtimeContext().setMode(TestarMode.Quit);
     }
 
     private List<Verdict> runGenerateInnerLoop(ComposedProtocol protocol, SUT system, State state) throws Exception {

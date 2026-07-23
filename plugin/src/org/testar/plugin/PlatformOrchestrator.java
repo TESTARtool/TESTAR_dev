@@ -23,6 +23,7 @@ import java.time.format.DateTimeFormatter;
 import org.testar.config.ConfigTags;
 import org.testar.config.CliStateProjectionMode;
 import org.testar.config.StateModelTags;
+import org.testar.config.TestarMode;
 import org.testar.config.settings.Settings;
 import org.testar.core.CodingManager;
 import org.testar.core.state.SUT;
@@ -102,7 +103,16 @@ public final class PlatformOrchestrator {
 
     public static PlatformSession openSpySession(PlatformSessionSpecification sessionSpec) {
         // Spy Mode needs a live platform session without generating TESTAR reports.
-        return openSession(sessionSpec, resolve(sessionSpec), false);
+        return openSession(
+                sessionSpec,
+                resolve(
+                        sessionSpec,
+                        PolicySessionConfiguration.defaults(),
+                        ServiceSessionConfiguration.defaults(),
+                        new DummyModelManager()
+                ),
+                false
+        );
     }
 
     private static void configureNativePlatform(OperatingSystems operatingSystem) {
@@ -315,9 +325,10 @@ public final class PlatformOrchestrator {
 
     private static StateModelManager createStateModelManager(PlatformSessionSpecification sessionSpec) {
         Settings settings = sessionSpec.getSettings();
+        initializeCodingManager(settings);
 
-        // Skip model initialization entirely when the state model is disabled.
-        if (!settings.get(StateModelTags.StateModelInference , false)) {
+        // Skip model initialization entirely when the state model is disabled or Spy mode is active.
+        if (usesDummyStateModelManager(settings)) {
             return new DummyModelManager();
         }
 
@@ -337,11 +348,10 @@ public final class PlatformOrchestrator {
 
     private static void bootstrapStateModelStorage(Settings settings) {
         // Bootstrap the local OrientDB storage only for the matching configuration.
-        boolean stateModelInference = settings.get(StateModelTags.StateModelInference, false);
         String dataStore = settings.get(StateModelTags.DataStore, "");
         String dataStoreType = settings.get(StateModelTags.DataStoreType, "");
 
-        if (!stateModelInference) {
+        if (usesDummyStateModelManager(settings)) {
             return;
         }
 
@@ -359,6 +369,11 @@ public final class PlatformOrchestrator {
                 settings.get(StateModelTags.DataStoreUser, ""),
                 settings.get(StateModelTags.DataStorePassword, "")
         );
+    }
+
+    private static boolean usesDummyStateModelManager(Settings settings) {
+        return !settings.get(StateModelTags.StateModelInference, false)
+                || settings.get(ConfigTags.Mode, TestarMode.Spy) == TestarMode.Spy;
     }
 
     private static void initializeCodingManager(Settings settings) {
