@@ -124,17 +124,6 @@ LogOracleFiles =
 #################################################################
 
 AbstractStateAttributes = WidgetControlType,WebWidgetId
-CliStateProjectionMode = INTERACTIVE_SEMANTIC_WIDGETS
-AgentCLIApiKeyEnvVar = OPENAI_API_KEY
-AgentCLIBaseUrl =
-AgentCLIModel = gpt-5.4-mini
-AgentCLIReasoningEffort = medium
-AgentCLISandboxMode = danger-full-access
-AgentCLIApprovalPolicy = never
-AgentCLIAllowNetworkAccess = false
-AgentCLISkipGitRepoCheck = true
-AgentCLIPromptTitle = Test Parabank Login
-AgentCLIPromptText = As a test agent verify that you can log in with the credentials john/demo. Then the Welcome John Smith message is shown.
 
 #################################################################
 # State model inference settings
@@ -173,11 +162,27 @@ StateModelStoreWidgets = true
 ResetDataStore = false
 
 #################################################################
+# Agent CLI configuration settings
+#################################################################
+
+CliStateProjectionMode = INTERACTIVE_SEMANTIC_WIDGETS
+AgentCLIApiKeyEnvVar = OPENAI_API_KEY
+AgentCLIBaseUrl =
+AgentCLIModel = gpt-5.4-mini
+AgentCLIReasoningEffort = medium
+AgentCLISandboxMode = danger-full-access
+AgentCLIApprovalPolicy = never
+AgentCLIAllowNetworkAccess = false
+AgentCLISkipGitRepoCheck = true
+AgentCLIPromptTitle = Test Parabank Login
+AgentCLIPromptText = As a test agent verify that you can log in with the credentials john/demo. Then the Welcome John Smith message is shown.
+
+#################################################################
 # WebDriver features
 #
-# ClickableClasses: Indicate which web CSS classes need to be considered clickable
-# TypeableClasses: Indicate which web CSS classes need to be considered typeable
-# DeniedExtensions: Indicate which web URL extensions need to be ignored when testing
+# WebClickableClasses: Indicate which web CSS classes need to be considered clickable
+# WebTypeableClasses: Indicate which web CSS classes need to be considered typeable
+# WebDeniedExtensions: Indicate which web URL extensions need to be ignored when testing
 # WebDomainsAllowed: Indicate which web URL domains are allowed to explore when testing
 # WebPathsAllowed: Regular expressions to indicate which web URL paths are allowed to explore when testing
 # FollowLinks: Indicate if allowing to follow links opened in new tabs
@@ -187,7 +192,7 @@ ResetDataStore = false
 
 WebClickableClasses = 
 WebTypeableClasses =
-DeniedExtensions = pdf;jpg;png;pfx;xml
+WebDeniedExtensions = pdf;jpg;png;pfx;xml
 WebDomainsAllowed = para.testar.org
 WebPathsAllowed = null
 FollowLinks = false

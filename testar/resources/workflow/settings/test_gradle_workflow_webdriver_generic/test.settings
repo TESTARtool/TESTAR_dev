@@ -127,9 +127,9 @@ AbstractStateAttributes = WebWidgetId
 #################################################################
 # WebDriver features
 #################################################################
-ClickableClasses = v-menubar-menuitem;v-menubar-menuitem-caption
-TypeableClasses = custom-type-input
-DeniedExtensions = pdf;jpg;png
+WebClickableClasses = v-menubar-menuitem;v-menubar-menuitem-caption
+WebTypeableClasses = custom-type-input
+WebDeniedExtensions = pdf;jpg;png
 WebDomainsAllowed = testar.org
 WebPathsAllowed = .*cookies.htm.*|.*index.htm.*|.*overview.*|.*activity.*
 FollowLinks = true

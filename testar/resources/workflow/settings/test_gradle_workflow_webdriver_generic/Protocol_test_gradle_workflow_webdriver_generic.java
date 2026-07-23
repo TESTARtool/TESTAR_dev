@@ -86,11 +86,11 @@ public class Protocol_test_gradle_workflow_webdriver_generic extends WebdriverPr
         Assert.collectionContains(webDomainsAllowed, "testar.org");
         Assert.isTrue(settings.get(ConfigTags.WebPathsAllowed).contains("index.htm"));
         Assert.isTrue(webPathsAllowed.contains("index.htm"));
-        Assert.collectionSize(settings.get(ConfigTags.DeniedExtensions), 3);
+        Assert.collectionSize(settings.get(ConfigTags.WebDeniedExtensions), 3);
         Assert.collectionSize(deniedExtensions, 3);
-        Assert.collectionContains(settings.get(ConfigTags.ClickableClasses), "v-menubar-menuitem");
-        Assert.collectionContains(settings.get(ConfigTags.ClickableClasses), "v-menubar-menuitem-caption");
-        Assert.collectionContains(settings.get(ConfigTags.TypeableClasses), "custom-type-input");
+        Assert.collectionContains(settings.get(ConfigTags.WebClickableClasses), "v-menubar-menuitem");
+        Assert.collectionContains(settings.get(ConfigTags.WebClickableClasses), "v-menubar-menuitem-caption");
+        Assert.collectionContains(settings.get(ConfigTags.WebTypeableClasses), "custom-type-input");
 
         // Add a force click action for policy attributes
         policyAttributes.put("id", "bad");

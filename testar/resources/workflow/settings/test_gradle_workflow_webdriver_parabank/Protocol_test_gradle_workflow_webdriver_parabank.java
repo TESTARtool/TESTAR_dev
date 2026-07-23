@@ -75,8 +75,8 @@ public class Protocol_test_gradle_workflow_webdriver_parabank extends WebdriverP
         Assert.collectionContains(webDomainsAllowed, "para.testar.org");
         Assert.isTrue(webPathsAllowed.contains("index.htm"));
         Assert.collectionSize(deniedExtensions, 5);
-        Assert.isTrue(settings.get(ConfigTags.ClickableClasses).isEmpty());
-        Assert.isTrue(settings.get(ConfigTags.TypeableClasses).isEmpty());
+        Assert.isTrue(settings.get(ConfigTags.WebClickableClasses).isEmpty());
+        Assert.isTrue(settings.get(ConfigTags.WebTypeableClasses).isEmpty());
 
         // WebDriver advanced state fetcher configuration verification
         Assert.isTrue(Constants.getHiddenTags().contains("canvas"));

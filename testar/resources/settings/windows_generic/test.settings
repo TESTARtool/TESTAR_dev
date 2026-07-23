@@ -1,46 +1,151 @@
 #################################################################
-# Windows generic sample
-#
-# This sample uses the built-in Windows composition and points to
-# a resource file where users can register delegate-based capability
-# and service wrappers.
+# Windows composition settings
 #################################################################
-
-Mode = Spy
-
-SUTConnector = COMMAND_LINE
-SUTConnectorValue = c:\\windows\\system32\\notepad.exe
-SUTProcesses =
-JavaAccessBridge = false
-
-Sequences = 8
-SequenceLength = 10
 
 CompositionProfile = windows_composition
 CustomCompositionResource = ./settings/windows_generic/composition.properties
 CustomPoliciesResource = ./settings/windows_generic/policies.properties
 
+#################################################################
+# TESTAR mode
+# Set the mode you want TESTAR to start in
+#################################################################
+
+Mode = Spy
+
+#################################################################
+# Connect to the System Under Test (SUT)
+#
+# Indicate how you want to connect to the SUT:
+#
+# SUTCONNECTOR = COMMAND_LINE, SUTConnectorValue property must be a command line that
+# starts the SUT.
+# It should work from a Command Prompt terminal window (e.g. java - jar SUTs/calc.jar ).
+# For web applications, follow the next format: web_browser_path SUT_URL.
+#
+# SUTCONNECTOR = SUT_WINDOW_TITLE, then SUTConnectorValue property must be the title displayed
+# in the SUT main window. The SUT must be manually started and closed.
+#
+# SUTCONNECTOR = SUT_PROCESS_NAME: SUTConnectorValue property must be the process name of the SUT.
+# The SUT must be manually started and closed.
+#
+# SUTCONNECTOR = WEB_DRIVER: SUTConnectorValue property consists of webdriver path and web url
+# Format : <path of webdriver> [optional size/position] <url of web application>
+# Example format for the dimensions and position : 1920x1000+1680+0
+#################################################################
+
+SUTConnector = COMMAND_LINE
+SUTConnectorValue = c:\\windows\\system32\\notepad.exe
+JavaAccessBridge = false
+
+#################################################################
+# Sequences
+# Number of sequences and the length of these sequences
+#################################################################
+
+Sequences = 8
+SequenceLength = 10
+
+#################################################################
+# Sets the type of Test Report to be created
+#################################################################
+
+ReportInHTML = true
+ReportInPlainText = false
+
+#################################################################
+# SUT execution timing configurations
+#################################################################
+
+ActionDuration = 0.0
+TimeToWaitAfterAction = 0.1
+StartupTime = 10.0
+MaxTime = 3.1536E7
+
+#################################################################
+# Actionfilter
+# Regular expression and Tags to apply them.
+#################################################################
+
 ClickFilter = .*[sS]istema.*|.*[sS]ystem.*|.*[cC]errar.*|.*[cC]lose.*|.*[sS]alir.*|.*[eE]xit.*|.*[mM]inimizar.*|.*[mM]inimi[zs]e.*|.*[gG]uardar.*|.*[sS]ave.*|.*[iI]mprimir.*|.*[pP]rint.*
 TagsToFilter = Title
 ProcessesToKillDuringTest =
 
+#################################################################
+# Sets whether to ignore reporting with duplicate verdicts
+#################################################################
+
 IgnoreDuplicatedVerdicts = false
+
+#################################################################
+# Oracles based on suspicious tag values
+# Regular expression and Tags to apply them
+#################################################################
+
 SuspiciousTags = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
 TagsForSuspiciousOracle = Title
 
+#################################################################
+# Oracles based on Suspicious Outputs detected by Process Listeners
+# (Only available for desktop applications through COMMAND_LINE)
+#
+# Regular expression SuspiciousProcessOutput contains the specification
+# of what is considered to be suspicious output.
+#################################################################
+
 ProcessListener = false
 SuspiciousProcessOutput = .*[eE]rror.*|.*[eE]xcep[ct]i[o?]n.*
+
+#################################################################
+# Process Logs
+# (Only available for desktop applications through COMMAND_LINE)
+#
+# Allow TESTAR to store execution logs coming from the processes.
+# 
+# Use the regular expression ProcessLogs below to filter the logs. 
+# 
+# Use .*.* if you want to store all the outputs of the process.
+#################################################################
+
 ProcessLogs = .*.*
+
+#################################################################
+# Oracles based on suspicious titles in SUT output files
+#################################################################
 
 LogOracle = false
 LogOracleRegex = .*([Ee]xception|[Ee]rror).*
 LogOracleCommands =
 LogOracleFiles = test_print_exception.log;../../testar/bin/test_print_error.log
 
-ActionDuration = 0.1
-TimeToWaitAfterAction = 0.1
-StartupTime = 10.0
-MaxTime = 3.1536E7
+#################################################################
+# State identifier attributes
+#
+# Specify the widget attributes that you wish to use in constructing
+# the widget and state hash strings. Use a comma separated list.
+#################################################################
+
+AbstractStateAttributes = WidgetControlType
+
+#################################################################
+# State model inference settings
+#
+# ApplicationName: Name to identify the SUT. Especially important to identify a State Model
+# ApplicationVersion: Version to identify the SUT. Especially important to identify a State Model
+#
+# StateModelInference: Enable or disable the State Model feature
+# DataStore: The graph database we use to store the State Model: OrientDB
+# DataStoreType: The mode we use to connect to the database: remote or plocal
+# DataStoreServer: IP address to connect if we desired to use remote mode
+# DataStoreDirectory: Path of the directory on which local OrientDB exists, if we use plocal mode
+# DataStoreDB: The name of the desired database on which we want to store the State Model.
+# DataStoreUser: User credential to authenticate TESTAR in OrientDB
+# DataStorePassword: Password credential to authenticate TESTAR in OrientDB
+# DataStoreMode: Indicate how TESTAR should store the model objects in the database: instant, delayed, hybrid, none
+# ActionSelectionAlgorithm: State Model Action Selection mechanism to explore the SUT: random or unvisited
+# StateModelStoreWidgets: Save all widget tree information in the State Model every time TESTAR discovers a new Concrete State
+# ResetDataStore: WARNING: Delete all existing State Models from the selected database before creating a new one
+#################################################################
 
 ApplicationName = Windows Generic
 ApplicationVersion =
@@ -58,7 +163,10 @@ ActionSelectionAlgorithm = random
 StateModelStoreWidgets = false
 ResetDataStore = false
 
-AbstractStateAttributes = WidgetControlType
+#################################################################
+# Agent CLI configuration settings
+#################################################################
+
 CliStateProjectionMode = INTERACTIVE_SEMANTIC_WIDGETS
 AgentCLIApiKeyEnvVar = OPENAI_API_KEY
 AgentCLIBaseUrl =
@@ -68,8 +176,12 @@ AgentCLISandboxMode = danger-full-access
 AgentCLIApprovalPolicy = never
 AgentCLIAllowNetworkAccess = false
 AgentCLISkipGitRepoCheck = true
-AgentCLIPromptTitle = Test Parabank Login
-AgentCLIPromptText = As a test agent verify that you can log in with the credentials john/demo. Then the Welcome John Smith message is shown.
+AgentCLIPromptTitle = Test Notepad Date
+AgentCLIPromptText = As a Notepad test agent, I want to open the Edit menu and choose the Date/Time option. Then Notepad inserts the current system date and time into the text editor.
+
+#################################################################
+# Settings (string) that can be used for user specified protocols
+#################################################################
 
 ProtocolSpecificSetting_1 =
 ProtocolSpecificSetting_2 =
@@ -77,9 +189,15 @@ ProtocolSpecificSetting_3 =
 ProtocolSpecificSetting_4 =
 ProtocolSpecificSetting_5 =
 
-ReportInHTML = true
-ReportInPlainText = true
+#################################################################
+# Extended test oracles
+#################################################################
+
 ExtendedOracles =
+
+#################################################################
+# Other settings
+#################################################################
 
 ShowVisualSettingsDialogOnStartup = true
 ForceForeground = true

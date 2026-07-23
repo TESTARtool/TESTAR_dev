@@ -1,74 +1,36 @@
 #################################################################
-# Android generic sample
-#
-# This sample uses the built-in Android composition and points to
-# a resource file where users can register delegate-based capability
-# and service wrappers.
+# Android composition settings
 #################################################################
-
-Mode = Spy
-
-SUTConnector = ANDROID_APPIUM
-SUTConnectorValue =
-SUTProcesses =
-
-Sequences = 5
-SequenceLength = 10
 
 CompositionProfile = android_composition
 CustomCompositionResource = ./settings/android_generic/composition.properties
 CustomPoliciesResource = ./settings/android_generic/policies.properties
 
-ClickFilter = .*Graphics.*
-TagsToFilter = AndroidAccessibilityId;AndroidText
-ProcessesToKillDuringTest =
+#################################################################
+# TESTAR mode
+# Set the mode you want TESTAR to start in
+#################################################################
 
-IgnoreDuplicatedVerdicts = false
-SuspiciousTags = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
-TagsForSuspiciousOracle = Title
+Mode = Spy
 
-ProcessListener = false
-SuspiciousProcessOutput = .*[eE]rror.*|.*[eE]xcep[ct]i[o?]n.*
-ProcessLogs = .*.*
+#################################################################
+# Connect to the System Under Test (SUT)
+#################################################################
 
-LogOracle = false
-LogOracleRegex = .*([Ee]xception|[Ee]rror).*
-LogOracleCommands =
-LogOracleFiles =
+SUTConnector = ANDROID_APPIUM
+SUTConnectorValue = 
 
-ActionDuration = 0.1
-TimeToWaitAfterAction = 2.0
-StartupTime = 2.0
-MaxTime = 3.1536E7
+#################################################################
+# Sequences
+# Number of sequences and the length of these sequences
+#################################################################
 
-ApplicationName = Android Generic
-ApplicationVersion =
+Sequences = 5
+SequenceLength = 10
 
-StateModelInference = false
-DataStore =
-DataStoreType = remote
-DataStoreServer =
-DataStoreDirectory =
-DataStoreDB =
-DataStoreUser =
-DataStorePassword =
-DataStoreMode = none
-ActionSelectionAlgorithm = random
-StateModelStoreWidgets = false
-ResetDataStore = false
-
-AbstractStateAttributes = WidgetControlType
-CliStateProjectionMode = INTERACTIVE_SEMANTIC_WIDGETS
-AgentCLIApiKeyEnvVar = OPENAI_API_KEY
-AgentCLIBaseUrl =
-AgentCLIModel = gpt-5.4-mini
-AgentCLIReasoningEffort = medium
-AgentCLISandboxMode = danger-full-access
-AgentCLIApprovalPolicy = never
-AgentCLIAllowNetworkAccess = false
-AgentCLISkipGitRepoCheck = true
-AgentCLIPromptTitle = Test Parabank Login
-AgentCLIPromptText = As a test agent verify that you can log in with the credentials john/demo. Then the Welcome John Smith message is shown.
+#################################################################
+# Android-Appium settings
+#################################################################
 
 AppiumPlatformName = Android
 AppiumIsApkInstalled = false
@@ -89,15 +51,158 @@ AppiumUiautomator2ServerLaunchTimeout = 120000
 AndroidClickableClasses =
 AndroidTypeableClasses =
 
+#################################################################
+# Sets the type of Test Report to be created
+#################################################################
+
+ReportInHTML = true
+ReportInPlainText = false
+
+#################################################################
+# SUT execution timing configurations
+#################################################################
+
+ActionDuration = 0.1
+TimeToWaitAfterAction = 2.0
+StartupTime = 2.0
+MaxTime = 3.1536E7
+
+#################################################################
+# Actionfilter
+# Regular expression and Tags to apply them.
+#################################################################
+
+ClickFilter = .*Graphics.*
+TagsToFilter = AndroidAccessibilityId;AndroidText
+ProcessesToKillDuringTest =
+
+#################################################################
+# Sets whether to ignore reporting with duplicate verdicts
+#################################################################
+
+IgnoreDuplicatedVerdicts = false
+
+#################################################################
+# Oracles based on suspicious tag values
+# Regular expression and Tags to apply them
+#################################################################
+
+SuspiciousTags = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
+TagsForSuspiciousOracle = Title
+
+#################################################################
+# Oracles based on Suspicious Outputs detected by Process Listeners
+# (Only available for desktop applications through COMMAND_LINE)
+#
+# Regular expression SuspiciousProcessOutput contains the specification
+# of what is considered to be suspicious output.
+#################################################################
+
+ProcessListener = false
+SuspiciousProcessOutput = .*[eE]rror.*|.*[eE]xcep[ct]i[o?]n.*
+
+#################################################################
+# Process Logs
+# (Only available for desktop applications through COMMAND_LINE)
+#
+# Allow TESTAR to store execution logs coming from the processes.
+# 
+# Use the regular expression ProcessLogs below to filter the logs. 
+# 
+# Use .*.* if you want to store all the outputs of the process.
+#################################################################
+
+ProcessLogs = .*.*
+
+#################################################################
+# Oracles based on suspicious titles in SUT output files
+#################################################################
+
+LogOracle = false
+LogOracleRegex = .*([Ee]xception|[Ee]rror).*
+LogOracleCommands =
+LogOracleFiles =
+
+#################################################################
+# State identifier attributes
+#
+# Specify the widget attributes that you wish to use in constructing
+# the widget and state hash strings. Use a comma separated list.
+#################################################################
+
+AbstractStateAttributes = WidgetControlType
+
+#################################################################
+# State model inference settings
+#
+# ApplicationName: Name to identify the SUT. Especially important to identify a State Model
+# ApplicationVersion: Version to identify the SUT. Especially important to identify a State Model
+#
+# StateModelInference: Enable or disable the State Model feature
+# DataStore: The graph database we use to store the State Model: OrientDB
+# DataStoreType: The mode we use to connect to the database: remote or plocal
+# DataStoreServer: IP address to connect if we desired to use remote mode
+# DataStoreDirectory: Path of the directory on which local OrientDB exists, if we use plocal mode
+# DataStoreDB: The name of the desired database on which we want to store the State Model.
+# DataStoreUser: User credential to authenticate TESTAR in OrientDB
+# DataStorePassword: Password credential to authenticate TESTAR in OrientDB
+# DataStoreMode: Indicate how TESTAR should store the model objects in the database: instant, delayed, hybrid, none
+# ActionSelectionAlgorithm: State Model Action Selection mechanism to explore the SUT: random or unvisited
+# StateModelStoreWidgets: Save all widget tree information in the State Model every time TESTAR discovers a new Concrete State
+# ResetDataStore: WARNING: Delete all existing State Models from the selected database before creating a new one
+#################################################################
+
+ApplicationName = Android Generic
+ApplicationVersion = 
+
+StateModelInference = false
+DataStore =
+DataStoreType = remote
+DataStoreServer =
+DataStoreDirectory =
+DataStoreDB =
+DataStoreUser =
+DataStorePassword =
+DataStoreMode = none
+ActionSelectionAlgorithm = random
+StateModelStoreWidgets = false
+ResetDataStore = false
+
+#################################################################
+# Agent CLI configuration settings
+#################################################################
+
+CliStateProjectionMode = INTERACTIVE_SEMANTIC_WIDGETS
+AgentCLIApiKeyEnvVar = OPENAI_API_KEY
+AgentCLIBaseUrl =
+AgentCLIModel = gpt-5.4-mini
+AgentCLIReasoningEffort = medium
+AgentCLISandboxMode = danger-full-access
+AgentCLIApprovalPolicy = never
+AgentCLIAllowNetworkAccess = false
+AgentCLISkipGitRepoCheck = true
+AgentCLIPromptTitle = Test Parabank Login
+AgentCLIPromptText = As an Android API Demos test agent, I want to open the MediaPlayer demo screen and confirm that the Play Streaming Video button is available. 
+
+#################################################################
+# Settings (string) that can be used for user specified protocols
+#################################################################
+
 ProtocolSpecificSetting_1 =
 ProtocolSpecificSetting_2 =
 ProtocolSpecificSetting_3 =
 ProtocolSpecificSetting_4 =
 ProtocolSpecificSetting_5 =
 
-ReportInHTML = true
-ReportInPlainText = true
+#################################################################
+# Extended test oracles
+#################################################################
+
 ExtendedOracles =
+
+#################################################################
+# Other settings
+#################################################################
 
 ShowVisualSettingsDialogOnStartup = true
 ForceForeground = true
@@ -113,3 +218,4 @@ Discount = .95
 CreateWidgetInfoJsonFile = false
 OutputDir = ./output
 TempDir = ./output/temp
+SUTProcesses = 
