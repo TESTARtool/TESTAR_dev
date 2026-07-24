@@ -25,6 +25,7 @@ import org.testar.webdriver.WebdriverPathResolver;
 import org.testar.webdriver.manager.WdBrowserManager;
 import org.testar.webdriver.alayer.WdCanvasDimensions;
 import org.testar.webdriver.alayer.WdMouse;
+import org.testar.webdriver.util.WdConstants;
 import org.openqa.selenium.*;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.logging.LogEntries;
@@ -87,9 +88,11 @@ public class WdDriver extends SUTBase {
 
 	  if (screenDimensions != null) {
 		  remoteWebDriver.manage().window().setSize(screenDimensions);
+		  logger.log(Level.INFO, String.format("Browser window size configured to: %s", screenDimensions));
 	  }
 	  if (screenPosition != null) {
 		  remoteWebDriver.manage().window().setPosition(screenPosition);
+		  logger.log(Level.INFO, String.format("Browser window position configured to: %s", screenPosition));
 	  }
 
 	  loadUrlWithRetry(url);
@@ -226,8 +229,22 @@ public class WdDriver extends SUTBase {
       throw new IllegalArgumentException("settings cannot be null");
     }
 
+    configureFromSettings(settings);
+
     String sutConnector = settings.get(ConfigTags.SUTConnectorValue, "");
     return fromExecutable(sutConnector);
+  }
+
+  public static void configureFromSettings(Settings settings) {
+    if (settings == null) {
+      throw new IllegalArgumentException("settings cannot be null");
+    }
+
+    followLinks = settings.get(ConfigTags.FollowLinks);
+    fullScreen = settings.get(ConfigTags.BrowserFullScreen);
+    forceActivateTab = settings.get(ConfigTags.SwitchNewTabs);
+    WdConstants.setIgnoredTags(settings.get(ConfigTags.WebIgnoredTags));
+    WdConstants.setIgnoredAttributes(settings.get(ConfigTags.WebIgnoredAttributes));
   }
 
   @SuppressWarnings("unchecked")

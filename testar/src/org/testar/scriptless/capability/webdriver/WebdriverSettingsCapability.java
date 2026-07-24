@@ -6,12 +6,10 @@
 
 package org.testar.scriptless.capability.webdriver;
 
-import org.testar.config.ConfigTags;
 import org.testar.config.settings.Settings;
 import org.testar.core.Assert;
 import org.testar.scriptless.capability.SettingsCapability;
 import org.testar.webdriver.state.WdDriver;
-import org.testar.webdriver.util.WdConstants;
 
 public class WebdriverSettingsCapability extends SettingsCapability {
 
@@ -26,22 +24,7 @@ public class WebdriverSettingsCapability extends SettingsCapability {
         Assert.notNull(settings);
         settings = delegate.initializeSettings(settings);
 
-        // If true, follow links opened in new tabs
-        // If false, stay with the original (ignore links opened in new tabs)
-        WdDriver.followLinks = settings.get(ConfigTags.FollowLinks);
-
-        //Force the browser to run in full screen mode
-        WdDriver.fullScreen = settings.get(ConfigTags.BrowserFullScreen);
-
-        //Force webdriver to switch to a new tab if opened
-        //This feature can block the correct display of select dropdown elements 
-        WdDriver.forceActivateTab = settings.get(ConfigTags.SwitchNewTabs);
-
-        // List of HTML tags that TESTAR should ignore when obtaining the web state
-        WdConstants.setIgnoredTags(settings.get(ConfigTags.WebIgnoredTags));
-
-        // List of web attributes that TESTAR should ignore when obtaining the web state
-        WdConstants.setIgnoredAttributes(settings.get(ConfigTags.WebIgnoredAttributes));
+        WdDriver.configureFromSettings(settings);
 
         return settings;
     }

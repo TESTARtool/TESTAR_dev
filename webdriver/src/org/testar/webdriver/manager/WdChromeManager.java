@@ -67,6 +67,7 @@ public class WdChromeManager implements WdBrowserManager {
 
 		if(WdDriver.fullScreen) {
 			options.addArguments("--start-maximized");
+			logger.log(Level.INFO, "Browser window starting maximized");
 		}
 		if(WdDriver.disableSecurity) {
 			options.addArguments("ignore-certificate-errors");

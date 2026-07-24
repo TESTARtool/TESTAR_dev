@@ -62,6 +62,7 @@ public class WdFirefoxManager implements WdBrowserManager {
 
 		if (WdDriver.fullScreen) {
 			options.addArguments("--start-maximized");
+			logger.log(Level.INFO, "Browser window starting maximized");
 		}
 
 		if (WdDriver.disableSecurity) {
