@@ -10,7 +10,6 @@ import org.testar.dialog.components.RegexButton;
 import org.testar.dialog.components.RestoreButton;
 import org.testar.dialog.components.UndoTextArea;
 import org.testar.config.ConfigTags;
-import org.testar.rascal.DslOracleStudio;
 import org.testar.config.settings.Settings;
 import org.apache.commons.lang3.StringUtils;
 
@@ -51,8 +50,6 @@ public class OraclePanel extends SettingsPanel {
     private String extendedOracles = "";
     private JButton extendedOraclesButton = new JButton("ExtendedOracles");
     private ExtendedOraclesDialog extendedOraclesDialog;
-
-    private JButton dslOracleStudioButton = new JButton("DslOracleStudio");
 
     private JCheckBox enableVisualValidationCheckBox;
 
@@ -137,16 +134,6 @@ public class OraclePanel extends SettingsPanel {
             }
         });
         add(extendedOraclesButton);
-
-        dslOracleStudioButton.setBounds(450, 330, 150, 27);
-        dslOracleStudioButton.setToolTipText("Open the DSL Oracle studio");
-        dslOracleStudioButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                openDslOracleStudio();
-            }
-        });
-        add(dslOracleStudioButton);
     }
 
     private void openExtendedOraclesDialog() {
@@ -156,18 +143,6 @@ public class OraclePanel extends SettingsPanel {
             public void windowClosing(WindowEvent e) {
                 // tell the manager to shut down its connection
             	extendedOracles = extendedOraclesDialog.getSavedExtendedOracles();
-            }
-        });
-    }
-
-    private void openDslOracleStudio() {
-        javax.swing.SwingUtilities.invokeLater(() -> {
-            try {
-                DslOracleStudio studio = new DslOracleStudio();
-                studio.setLocationRelativeTo(SwingUtilities.getWindowAncestor(this));
-                studio.setVisible(true);
-            } catch (Exception e) {
-                e.printStackTrace();
             }
         });
     }

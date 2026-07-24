@@ -12,6 +12,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.testar.oracle.OracleSelection;
+import org.testar.rascal.DslOracleMetadata;
 import org.testar.webstudio.api.dto.TestOracleInventoryDto;
 import org.testar.webstudio.api.dto.TestOracleItemDto;
 import org.testar.webstudio.api.dto.WorkspaceFileDto;
@@ -21,6 +22,18 @@ public class TestOracleServiceTest {
 
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
+
+    @Test
+    public void dslMetadataExposesRascalOracleEditorMetadata() throws Exception {
+        TestOracleService testOracleService = createServiceWithWorkspace("webdriver_generic");
+
+        DslOracleMetadata metadata = testOracleService.dslMetadata();
+
+        Assert.assertTrue(metadata.keywords().contains("assert"));
+        Assert.assertTrue(metadata.widgetTypes().contains("static_text"));
+        Assert.assertTrue(metadata.fieldNames().contains("visible"));
+        Assert.assertTrue(metadata.conditionOperators().contains("has nonempty"));
+    }
 
     @Test
     public void inventoryExposesWorkspaceJavaAndDslOracles() throws Exception {

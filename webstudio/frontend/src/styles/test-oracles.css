@@ -227,6 +227,15 @@
     font-family: "JetBrains Mono", "Cascadia Code", monospace;
 }
 
+.oracle-monaco-editor {
+    min-height: 550px;
+    max-height: 550px;
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid rgba(24, 38, 63, 0.12);
+    border-radius: 14px;
+}
+
 .oracle-dsl-feedback-panel {
     display: grid;
     gap: 8px;
@@ -274,4 +283,55 @@
 
 .oracle-dsl-diagnostics p {
     word-break: break-word;
+}
+
+.oracle-dsl-model-dialog {
+    width: min(980px, 94vw);
+}
+
+.oracle-dsl-model-body {
+    display: grid;
+    gap: 14px;
+    min-height: 0;
+}
+
+.oracle-dsl-model-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+    max-height: 62vh;
+    min-height: 0;
+    overflow: auto;
+}
+
+.oracle-dsl-model-card {
+    display: grid;
+    align-content: start;
+    gap: 10px;
+    padding: 14px;
+    border: 1px solid rgba(24, 38, 63, 0.12);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.74);
+}
+
+.oracle-dsl-model-card h4 {
+    margin: 0;
+    color: var(--text);
+}
+
+.oracle-dsl-model-fields {
+    display: grid;
+    gap: 6px;
+}
+
+.oracle-dsl-model-fields code {
+    min-width: 0;
+    padding: 6px 8px;
+    border-radius: 9px;
+    background: rgba(255, 250, 244, 0.9);
+    color: var(--text);
+    font-size: 0.78rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }

@@ -210,6 +210,9 @@ public final class WebStudioServer {
         routes.get("/api/workspaces/{workspace}/test-oracles", context -> handle(context, () ->
             testOracleController.inventory(context.pathParam("workspace"))
         ));
+        routes.get("/api/test-oracles/dsl/metadata", context -> handle(context,
+            testOracleController::dslMetadata
+        ));
         routes.get("/api/workspaces/{workspace}/test-oracles/dsl/file", context -> handle(context, () ->
             testOracleController.readDslFile(context.pathParam("workspace"), context.queryParam("path"))
         ));

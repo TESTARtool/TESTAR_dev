@@ -98,6 +98,7 @@
     let selectedOraclePanelId = TEST_ORACLE_PANEL_IDS.ACTIVE;
     let testOracleInventory = null;
     let testOracleInventoryLoading = false;
+    let dslOracleMetadata = null;
     let selectedOracleSourceFile = null;
     let oracleSourceDraftContent = "";
     let savedOracleSourceContent = "";
@@ -1949,6 +1950,15 @@
         }
     }
 
+    async function loadDslOracleMetadata() {
+        try {
+            dslOracleMetadata = await loadJson("/api/test-oracles/dsl/metadata");
+        } catch (metadataError) {
+            dslOracleMetadata = null;
+            reportClientError("Unable to load DSL oracle metadata", metadataError);
+        }
+    }
+
     function updateExtendedOraclesSetting(nextValue) {
         for (const settingsGroup of workspaceDocument?.settingsGroups || []) {
             const setting = (settingsGroup.settings || []).find((item) => item.key === "ExtendedOracles");
@@ -2948,6 +2958,7 @@
         try {
             currentRole = storedWebStudioRole();
             currentPage = pageForRole(currentRole, currentPage);
+            await loadDslOracleMetadata();
             await refreshInitialData();
             if (workspaces.length > 0) {
                 const defaultWorkspace = workspaces.find((workspace) => workspace.name === "webdriver_generic") || workspaces[0];
@@ -3108,6 +3119,7 @@
             oracleSourceDirty={oracleSourceDirty}
             oracleDslResult={oracleDslResult}
             javaCompileResult={javaCompileResult}
+            dslOracleMetadata={dslOracleMetadata}
             compileOracleJavaFile={compileOracleJavaFile}
             createOracleDslFile={createOracleDslFile}
             createOracleJavaFile={createOracleJavaFile}

@@ -11,6 +11,7 @@
     },
     "devDependencies": {
         "@sveltejs/vite-plugin-svelte": "^4.0.4",
+        "monaco-editor": "^0.56.0",
         "svelte": "^5.38.6",
         "vite": "^5.4.19"
     }

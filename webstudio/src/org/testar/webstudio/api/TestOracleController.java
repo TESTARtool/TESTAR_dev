@@ -10,6 +10,7 @@ import org.testar.webstudio.api.dto.TestOracleInventoryDto;
 import org.testar.webstudio.api.dto.TestOracleDslResultDto;
 import org.testar.webstudio.api.dto.WorkspaceFileDto;
 import org.testar.webstudio.api.dto.WorkspaceJavaCompileResultDto;
+import org.testar.rascal.DslOracleMetadata;
 import org.testar.webstudio.testoracle.TestOracleService;
 
 public final class TestOracleController {
@@ -22,6 +23,10 @@ public final class TestOracleController {
 
     public TestOracleInventoryDto inventory(String workspaceName) {
         return testOracleService.inventory(workspaceName);
+    }
+
+    public DslOracleMetadata dslMetadata() {
+        return testOracleService.dslMetadata();
     }
 
     public WorkspaceFileDto readDslFile(String workspaceName, String relativePath) {

@@ -35,6 +35,8 @@ import org.testar.config.ConfigTags;
 import org.testar.config.TestarDirectories;
 import org.testar.oracle.OracleSelection;
 import org.testar.rascal.DslOracleCompiler;
+import org.testar.rascal.DslOracleMetadata;
+import org.testar.rascal.DslOracleMetadataGenerator;
 import org.testar.rascal.DslOracleOperationResult;
 import org.testar.webstudio.api.dto.TestOracleDslDiagnosticDto;
 import org.testar.webstudio.api.dto.TestOracleDslResultDto;
@@ -57,6 +59,7 @@ public final class TestOracleService {
 
     private final WorkspaceService workspaceService;
     private DslOracleCompiler dslOracleCompiler;
+    private DslOracleMetadata dslOracleMetadata;
 
     public TestOracleService(WorkspaceService workspaceService) {
         this.workspaceService = workspaceService;
@@ -106,6 +109,14 @@ public final class TestOracleService {
 
             return new TestOracleInventoryDto(workspaceName, activeOracles, items);
         });
+    }
+
+    public synchronized DslOracleMetadata dslMetadata() {
+        if (dslOracleMetadata == null) {
+            dslOracleMetadata = new DslOracleMetadataGenerator().generate();
+        }
+
+        return dslOracleMetadata;
     }
 
     public WorkspaceFileDto readDslFile(String workspaceName, String relativePath) {

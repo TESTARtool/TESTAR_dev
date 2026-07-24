@@ -387,6 +387,12 @@ Java oracle source edits must use `Save and Compile` to persist the selected fil
 
 DSL oracle authoring must create and edit `.testar` files under `settings/<workspace>/oracles/dsl`.
 
+The WebStudio DSL editor uses metadata generated from the Rascal oracle module sources for widget types, fields, root statement keywords, condition operators, connector keywords, and locale suggestions.
+
+The WebStudio DSL editor provides frontend autocomplete, syntax coloring, and lightweight local diagnostics.
+
+Rascal backend validation remains the authoritative validation and generation step.
+
 DSL source edits must use `Save and Generate Java-DSL` to save the current `.testar` editor content, validate it, and generate Java oracle classes into `settings/<workspace>/oracles/java`.
 
 Generated Java files should use the DSL file name as the generated Java file name with the `.java` extension.

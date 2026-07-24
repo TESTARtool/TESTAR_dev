@@ -237,6 +237,14 @@ Workspace Java oracles should show whether they are active and editable.
 
 DSL source files should be editable in the Test Oracles view.
 
+DSL source files should use the Monaco editor.
+
+The Monaco editor should provide syntax coloring, autocomplete, and lightweight local diagnostics from backend-generated Rascal DSL metadata.
+
+Local diagnostics should help users catch common typing and structure mistakes while editing.
+
+The feedback panel should still show the authoritative Rascal backend validation and generation result after `Save and Generate Java-DSL`.
+
 The DSL editor should expose a single `Save and Generate Java-DSL` action near the source editor controls.
 
 Generated Java files should be visible through the workspace Java oracle group after DSL generation.

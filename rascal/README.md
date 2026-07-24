@@ -21,6 +21,7 @@ The intended workflow is:
 - Exposes Rascal bridge functions for Java and WebStudio integration.
 - Includes Java helper classes for loading, validating, and generating DSL oracles.
 - Exposes a `DslOracleCompiler` facade that can be used by modules like WebStudio.
+- Exposes a `DslOracleMetadataGenerator` that reads the Rascal DSL/model sources and produces editor metadata for WebStudio.
 
 ## Workspace Layout
 
@@ -51,6 +52,31 @@ Generated Java oracles participate in the same enable, disable, compile, and exe
 - `testar-oracle/lang/testar/testar.model`: validation model.
 - `src/org/testar/rascal`: Java loader and helper classes used by WebStudio integration.
 
+## DSL Editor Metadata
+
+WebStudio uses Monaco for interactive DSL editing.
+
+The editor metadata is generated from the Rascal module sources:
+
+- `testar.model` provides widget types, fields, and field types.
+- `Oracle.rsc` provides grammar keywords and statement keywords.
+- `Locale.rsc` provides spell-check locale values.
+
+`DslOracleMetadataGenerator` reads those files and returns editor-friendly metadata:
+
+- keywords
+- widget types
+- fields by widget type
+- field names
+- root statement keywords
+- condition operators
+- connector keywords
+- locales
+
+WebStudio loads this metadata from the backend to support Monaco syntax highlighting, autocomplete, and lightweight local checks.
+
+The Rascal validation and generation pipeline remains the authoritative source for full syntax, semantic, type, import, and Java generation feedback.
+
 ## WebStudio Integration
 
 WebStudio exposes DSL oracle files in the Test Oracles view.
@@ -58,7 +84,8 @@ WebStudio exposes DSL oracle files in the Test Oracles view.
 The integration should allow users to:
 
 - create and edit `.testar` DSL oracle files in the selected workspace
-- validate DSL files and show diagnostics in the editor
+- provide Monaco editor assistance using generated DSL metadata
+- validate DSL files through the Rascal backend and show diagnostics in the editor
 - generate Java oracle files into `settings/<workspace>/oracles/java`
 - inspect and edit generated Java oracle files
 - compile workspace Java oracles

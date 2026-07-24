@@ -1,4 +1,5 @@
 <script>
+    import DslOracleEditor from "./DslOracleEditor.svelte";
     import TestSettingsView from "./TestSettingsView.svelte";
     import {
         TEST_ORACLE_PANEL_IDS,
@@ -36,6 +37,7 @@
     export let oracleSourceDirty = false;
     export let oracleDslResult = null;
     export let javaCompileResult = null;
+    export let dslOracleMetadata = null;
     export let compileOracleJavaFile;
     export let createOracleDslFile;
     export let createOracleJavaFile;
@@ -67,9 +69,12 @@
     $: extendedOracleItems = extendedOracleCheckboxItems(testOracleInventory);
     $: javaOracleFiles = javaOracleSourceFiles(testOracleInventory);
     $: dslOracleFiles = oracleFilesByOrigin(testOracleInventory, "DSL_SOURCE");
+    $: dslModelWidgetEntries = Object.entries(dslOracleMetadata?.fieldsByWidgetType || {})
+        .sort(([leftWidgetType], [rightWidgetType]) => leftWidgetType.localeCompare(rightWidgetType));
     let newJavaFilePath = "";
     let newDslFilePath = "";
     let deleteDialog = closedOracleDeleteDialog();
+    let dslModelDialogOpen = false;
 
     function normalizedJavaPath(path) {
         const trimmedPath = path.trim();
@@ -115,6 +120,20 @@
     function closeDeleteDialogFromBackdrop(event) {
         if (event.target === event.currentTarget) {
             closeDeleteDialog();
+        }
+    }
+
+    function openDslModelDialog() {
+        dslModelDialogOpen = true;
+    }
+
+    function closeDslModelDialog() {
+        dslModelDialogOpen = false;
+    }
+
+    function closeDslModelDialogFromBackdrop(event) {
+        if (event.target === event.currentTarget) {
+            closeDslModelDialog();
         }
     }
 
@@ -423,6 +442,9 @@
                                     <p>{selectedOracleSourceFile.location}</p>
                                 </div>
                                 <div class="button-row">
+                                    <button type="button" class="secondary" on:click={openDslModelDialog}>
+                                        View DSL model
+                                    </button>
                                     <button type="button" on:click={generateJavaFromOracleDslFile} disabled={saving}>
                                         Save and Generate Java-DSL
                                     </button>
@@ -435,12 +457,13 @@
                                     </button>
                                 </div>
                             </div>
-                            <textarea
-                                class="oracle-source-textarea"
+                            <DslOracleEditor
                                 value={oracleSourceDraftContent}
-                                on:input={(event) => setOracleSourceDraftContent(event.currentTarget.value)}
-                                spellcheck="false"
-                            ></textarea>
+                                disabled={saving}
+                                dslMetadata={dslOracleMetadata}
+                                serverDiagnostics={oracleDslResult?.diagnostics || []}
+                                onChange={setOracleSourceDraftContent}
+                            />
                             <section
                                 class="oracle-dsl-feedback-panel"
                                 class:oracle-dsl-feedback-success={oracleDslResult?.success}
@@ -472,6 +495,45 @@
         {/if}
     </section>
 </main>
+
+{#if dslModelDialogOpen}
+    <div class="composition-modal-backdrop" role="presentation" on:click={closeDslModelDialogFromBackdrop}>
+        <div class="composition-modal state-model-dialog oracle-dsl-model-dialog" role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="dsl-model-title">
+            <div class="composition-modal-header">
+                <div>
+                    <span class="flow-node-kicker">DSL Reference</span>
+                    <h3 id="dsl-model-title">TESTAR DSL Model</h3>
+                </div>
+                <div class="composition-modal-actions">
+                    <button type="button" class="secondary" on:click={closeDslModelDialog}>
+                        Close
+                    </button>
+                </div>
+            </div>
+            <div class="composition-modal-body oracle-dsl-model-body">
+                <p>
+                    Available Rascal DSL widget types and fields to use in this Monaco editor.
+                </p>
+                {#if dslModelWidgetEntries.length === 0}
+                    <div class="empty-state">No DSL model metadata is available.</div>
+                {:else}
+                    <div class="oracle-dsl-model-grid">
+                        {#each dslModelWidgetEntries as [widgetType, fields]}
+                            <section class="oracle-dsl-model-card">
+                                <h4>{widgetType}</h4>
+                                <div class="oracle-dsl-model-fields">
+                                    {#each fields as field}
+                                        <code>{field.name}: {field.type}</code>
+                                    {/each}
+                                </div>
+                            </section>
+                        {/each}
+                    </div>
+                {/if}
+            </div>
+        </div>
+    </div>
+{/if}
 
 {#if deleteDialog.open}
     <div class="composition-modal-backdrop" role="presentation" on:click={closeDeleteDialogFromBackdrop}>
