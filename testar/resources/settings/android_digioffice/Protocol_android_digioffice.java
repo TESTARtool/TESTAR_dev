@@ -88,8 +88,8 @@ public class Protocol_android_digioffice extends AndroidProtocol {
     private final String digiofficeDomainPackage = "com.digioffice.app";
 
     private static final String TESTAR_UUID_SEARCH = "TESTAR_UUID_SEARCH";
-    private final AndroidDigiOfficeRandomSearchShowsEmptyListOrFallback searchRandomUUIDEmptyListOrFallbackOracle =
-            new AndroidDigiOfficeRandomSearchShowsEmptyListOrFallback("Testar User");
+    private final AndroidDigiOfficeRandomSearchShowsEmptyList searchRandomUUIDEmptyListOracle =
+            new AndroidDigiOfficeRandomSearchShowsEmptyList();
 
     // List of active DigiOffice oracles to be applied and tracked during testing
     private final List<Oracle> digiOfficeOracles = Arrays.asList(
@@ -120,7 +120,7 @@ public class Protocol_android_digioffice extends AndroidProtocol {
                 new AndroidDigiOfficeTaskTabsDrawerContainsExpectedActions(), // Task drawer subtree contains submit, start, and share actions
                 new AndroidDigiOfficeTaskInfoRowIsNotEmptyNotNA(), // Task info row is not empty not NA
                 new AndroidDigiOfficeTaskInfoRowIsNotEmptyNotNAAllowDash(), // Task info row is not empty not NA and allows dash
-                searchRandomUUIDEmptyListOrFallbackOracle // Search a random UUID should show a list-empty-text or fallback user in following states
+                searchRandomUUIDEmptyListOracle // Search a random UUID should show an empty list in following states
         );
     private final List<AbstractAndroidDigiOfficeOracle> trackedDigiOfficeOracles = digiOfficeOracles.stream()
             .filter(AbstractAndroidDigiOfficeOracle.class::isInstance)
@@ -162,7 +162,7 @@ public class Protocol_android_digioffice extends AndroidProtocol {
     @Override
     protected void beginSequence(SUT system, State state) {
         super.beginSequence(system, state);
-        searchRandomUUIDEmptyListOrFallbackOracle.deactivate(); // Initially disable the AndroidDigiOfficeRandomSearchShowsEmptyListOrFallback
+        searchRandomUUIDEmptyListOracle.deactivate(); // Initially disable the AndroidDigiOfficeRandomSearchShowsEmptyList
         if(this.mode().equals(Modes.Generate)) loginDigiOffice(system);
     }
 
@@ -557,7 +557,7 @@ public class Protocol_android_digioffice extends AndroidProtocol {
                 String customInput = InputDataManager.getRandomTextFromCustomInputDataFile(System.getProperty("user.dir") + "/settings/custom_input_data.txt");
                 actions.add(new AndroidActionType(state, widget, customInput));
 
-                // In the search states, derive an action to trigger the AndroidDigiOfficeRandomSearchShowsEmptyListOrFallback
+                // In the search states, derive an action to trigger the AndroidDigiOfficeRandomSearchShowsEmptyList
                 if (isSearchTypeableWidget(widget)) {
                     actions.add(new AndroidActionType(state, widget, buildRandomLongSearchInput()));
                 }
@@ -589,11 +589,11 @@ public class Protocol_android_digioffice extends AndroidProtocol {
         boolean executed = super.executeAction(system, state, action);
 
         if (executed) {
-            // Enable/Disable the AndroidDigiOfficeRandomSearchShowsEmptyListOrFallback if the trigger search action is executed
+            // Enable/Disable the AndroidDigiOfficeRandomSearchShowsEmptyList if the trigger search action is executed
             if (isSearchEmptyResultAction(action)) {
-                searchRandomUUIDEmptyListOrFallbackOracle.activate();
+                searchRandomUUIDEmptyListOracle.activate();
             } else {
-                searchRandomUUIDEmptyListOrFallbackOracle.deactivate();
+                searchRandomUUIDEmptyListOracle.deactivate();
             }
         }
 
@@ -696,7 +696,7 @@ public class Protocol_android_digioffice extends AndroidProtocol {
      */
     @Override
     protected void finishSequence() {
-        searchRandomUUIDEmptyListOrFallbackOracle.deactivate(); // Disable the AndroidDigiOfficeRandomSearchShowsEmptyListOrFallback at the end
+        searchRandomUUIDEmptyListOracle.deactivate(); // Disable the AndroidDigiOfficeRandomSearchShowsEmptyList at the end
         super.finishSequence();
     }
 
