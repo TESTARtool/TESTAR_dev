@@ -566,7 +566,7 @@ test("accepts fields available for the current for all widget type", () => {
 
 test("maps DSL diagnostics to Monaco marker data", () => {
     assert.deepEqual(dslMonacoMarkerData([
-        { severity: "ERROR", line: 3, column: 5, endColumn: 20, message: "Unexpected token" },
+        { severity: "ERROR", line: 3, column: 5, endLine: 4, endColumn: 20, message: "Unexpected token" },
         { severity: "WARNING", line: -1, column: -1, message: "No source location" }
     ]), [
         {
@@ -574,7 +574,7 @@ test("maps DSL diagnostics to Monaco marker data", () => {
             message: "Unexpected token",
             startLineNumber: 3,
             startColumn: 5,
-            endLineNumber: 3,
+            endLineNumber: 4,
             endColumn: 20
         },
         {

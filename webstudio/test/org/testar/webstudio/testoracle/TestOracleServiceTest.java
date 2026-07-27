@@ -231,6 +231,8 @@ public class TestOracleServiceTest {
 
         Assert.assertFalse(result.success());
         Assert.assertFalse(result.diagnostics().isEmpty());
+        Assert.assertTrue(result.diagnostics().get(0).endLine() > 0);
+        Assert.assertTrue(result.diagnostics().get(0).endColumn() > 0);
     }
 
     @Test

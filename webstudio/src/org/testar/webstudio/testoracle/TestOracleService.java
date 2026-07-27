@@ -559,6 +559,8 @@ public final class TestOracleService {
                 diagnostic.severity(),
                 diagnostic.line(),
                 diagnostic.column(),
+                diagnostic.endLine(),
+                diagnostic.endColumn(),
                 diagnostic.message()
             ))
             .collect(Collectors.toList());

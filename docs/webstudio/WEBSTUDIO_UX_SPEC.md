@@ -245,6 +245,8 @@ Local diagnostics should help users catch common typing and structure mistakes w
 
 The feedback panel should still show the authoritative Rascal backend validation and generation result after `Save and Generate Java-DSL`.
 
+Rascal backend diagnostics should appear as Monaco editor markers with hover messages when source ranges are available.
+
 The DSL editor should expose a single `Save and Generate Java-DSL` action near the source editor controls.
 
 Generated Java files should be visible through the workspace Java oracle group after DSL generation.

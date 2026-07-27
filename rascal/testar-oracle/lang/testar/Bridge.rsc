@@ -4,6 +4,7 @@ import lang::testar::Oracle;    // grammar: start[Oracle]
 import lang::testar::Compiler;  // compileToJava(start[Oracle])
 import lang::testar::Check;     // check(start[Oracle], start[Model])
 import lang::testar::Model;     // start[Model]
+import lang::json::IO;
 import ParseTree;
 
 // ---- compiler entry point ----
@@ -29,6 +30,37 @@ public list[Diagnostic] validateAtWithModel(loc oracleFile, loc modelFile) {
 
   set[Message] msgs = check(ast, mdl);
   return [ msg2diag(m) | m <- msgs ];
+}
+
+/**
+ * Java/WebStudio integration entry point.
+ * The checker remains the source of truth; this only exposes diagnostics as
+ * simple JSON data so Java does not need to inspect Rascal constructors.
+ */
+public str validateAtWithModelJson(loc oracleFile, loc modelFile) =
+  asJSON([ diag2json(d) | Diagnostic d <- validateAtWithModel(oracleFile, modelFile) ], unpackedLocations=true);
+
+public map[str, value] diag2json(Diagnostic d) {
+  if (diag(Severity sev, loc where, str message) := d) {
+    return (
+      "severity": severityName(sev),
+      "location": where,
+      "message": message
+    );
+  }
+
+  return (
+    "severity": "ERROR",
+    "location": |unknown:///|,
+    "message": "Unhandled Diagnostic: <d>"
+  );
+}
+
+public str severityName(Severity sev) {
+  if (SevError() := sev) return "ERROR";
+  if (SevWarning() := sev) return "WARNING";
+  if (SevInfo() := sev) return "INFO";
+  return "ERROR";
 }
 
 // --------- Message -> Diagnostic (tolerant) ----------

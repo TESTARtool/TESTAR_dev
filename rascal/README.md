@@ -22,6 +22,7 @@ The intended workflow is:
 - Includes Java helper classes for loading, validating, and generating DSL oracles.
 - Exposes a `DslOracleCompiler` facade that can be used by modules like WebStudio.
 - Exposes a `DslOracleMetadataGenerator` that reads the Rascal DSL/model sources and produces editor metadata for WebStudio.
+- Exposes validation diagnostics as JSON for WebStudio editor markers and feedback panels.
 
 ## Workspace Layout
 
@@ -77,6 +78,24 @@ WebStudio loads this metadata from the backend to support Monaco syntax highligh
 
 The Rascal validation and generation pipeline remains the authoritative source for full syntax, semantic, type, import, and Java generation feedback.
 
+## DSL Diagnostics
+
+`Bridge.rsc` is the Java-facing integration boundary for validation and generation.
+
+The bridge exposes:
+
+- `compileAt(loc)`: parses DSL and generates Java source.
+- `validateAtWithModel(loc, loc)`: validates DSL and returns Rascal diagnostics.
+- `validateAtWithModelJson(loc, loc)`: validates DSL and returns JSON diagnostics for Java/WebStudio.
+
+JSON diagnostics include:
+
+- severity
+- message
+- source location
+
+Java normalizes the source location into line, column, end line, and end column fields before returning diagnostics to WebStudio.
+
 ## WebStudio Integration
 
 WebStudio exposes DSL oracle files in the Test Oracles view.
@@ -85,7 +104,7 @@ The integration should allow users to:
 
 - create and edit `.testar` DSL oracle files in the selected workspace
 - provide Monaco editor assistance using generated DSL metadata
-- validate DSL files through the Rascal backend and show diagnostics in the editor
+- validate DSL files through the Rascal backend and show JSON diagnostics in the editor
 - generate Java oracle files into `settings/<workspace>/oracles/java`
 - inspect and edit generated Java oracle files
 - compile workspace Java oracles

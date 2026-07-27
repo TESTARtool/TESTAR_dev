@@ -393,6 +393,10 @@ The WebStudio DSL editor provides frontend autocomplete, syntax coloring, and li
 
 Rascal backend validation remains the authoritative validation and generation step.
 
+Rascal backend validation must return structured diagnostics that WebStudio can show in the feedback panel and Monaco editor markers.
+
+Structured diagnostics must include severity, message, line, column, end line, and end column when source locations are available.
+
 DSL source edits must use `Save and Generate Java-DSL` to save the current `.testar` editor content, validate it, and generate Java oracle classes into `settings/<workspace>/oracles/java`.
 
 Generated Java files should use the DSL file name as the generated Java file name with the `.java` extension.

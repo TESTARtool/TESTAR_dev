@@ -422,12 +422,13 @@ export function dslMonacoMarkerData(diagnostics = []) {
     return diagnostics.map((diagnostic) => {
         const line = diagnostic.line > 0 ? diagnostic.line : 1;
         const column = diagnostic.column > 0 ? diagnostic.column : 1;
+        const endLine = diagnostic.endLine > 0 ? diagnostic.endLine : line;
         return {
             severity: diagnostic.severity || "INFO",
             message: diagnostic.message || "",
             startLineNumber: line,
             startColumn: column,
-            endLineNumber: line,
+            endLineNumber: endLine,
             endColumn: diagnostic.endColumn > column ? diagnostic.endColumn : column + 1
         };
     });
