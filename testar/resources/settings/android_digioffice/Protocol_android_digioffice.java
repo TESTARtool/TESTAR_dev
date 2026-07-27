@@ -90,6 +90,8 @@ public class Protocol_android_digioffice extends AndroidProtocol {
     private static final String TESTAR_UUID_SEARCH = "TESTAR_UUID_SEARCH";
     private final AndroidDigiOfficeRandomSearchShowsEmptyList searchRandomUUIDEmptyListOracle =
             new AndroidDigiOfficeRandomSearchShowsEmptyList();
+    private final AndroidDigiOfficeDummyButton dummyButtonOracle =
+            new AndroidDigiOfficeDummyButton();
 
     // List of active DigiOffice oracles to be applied and tracked during testing
     private final List<Oracle> digiOfficeOracles = Arrays.asList(
@@ -97,6 +99,7 @@ public class Protocol_android_digioffice extends AndroidProtocol {
                 new AndroidDigiOfficeHeaderIsNotEmptyNotNA(), // Header Is Not Empty Not NA
                 new AndroidDigiOfficePersonNameIsNotEmptyNotNA(), // Person Name Is Not Empty Not NA
                 new AndroidDigiOfficeCompanyNameIsNotEmptyNotNA(), // Company Name Is Not Empty Not NA
+                new AndroidDigiOfficeDuplicatedText(""), // Android text should not contain duplicated or repeated content
                 new AndroidDigiOfficeWidgetIsNotEmpty(), // Widget Is Not Empty
                 new AndroidDigiOfficePhoneTextIsNotValid(), // Phone Text Is Not Valid
                 new AndroidDigiOfficeMobileTextIsNotValid(), // Mobile Text Is Not Valid
@@ -120,7 +123,8 @@ public class Protocol_android_digioffice extends AndroidProtocol {
                 new AndroidDigiOfficeTaskTabsDrawerContainsExpectedActions(), // Task drawer subtree contains submit, start, and share actions
                 new AndroidDigiOfficeTaskInfoRowIsNotEmptyNotNA(), // Task info row is not empty not NA
                 new AndroidDigiOfficeTaskInfoRowIsNotEmptyNotNAAllowDash(), // Task info row is not empty not NA and allows dash
-                searchRandomUUIDEmptyListOracle // Search a random UUID should show an empty list in following states
+                searchRandomUUIDEmptyListOracle, // Search a random UUID should show an empty list in following states
+                dummyButtonOracle // AndroidButton clicks should change the state
         );
     private final List<AbstractAndroidDigiOfficeOracle> trackedDigiOfficeOracles = digiOfficeOracles.stream()
             .filter(AbstractAndroidDigiOfficeOracle.class::isInstance)
@@ -163,6 +167,7 @@ public class Protocol_android_digioffice extends AndroidProtocol {
     protected void beginSequence(SUT system, State state) {
         super.beginSequence(system, state);
         searchRandomUUIDEmptyListOracle.deactivate(); // Initially disable the AndroidDigiOfficeRandomSearchShowsEmptyList
+        dummyButtonOracle.deactivate(); // Initially disable the AndroidDigiOfficeDummyButton
         if(this.mode().equals(Modes.Generate)) loginDigiOffice(system);
     }
 
@@ -602,6 +607,12 @@ public class Protocol_android_digioffice extends AndroidProtocol {
             } else {
                 searchRandomUUIDEmptyListOracle.deactivate();
             }
+            // Enable/Disable the AndroidDigiOfficeDummyButton if a click button action is executed
+            if (isClickButtonActionExecuted(action)) {
+                dummyButtonOracle.activate(state.get(Tags.ConcreteID, ""));
+            } else {
+                dummyButtonOracle.deactivate();
+            }
         }
 
         return executed;
@@ -704,6 +715,7 @@ public class Protocol_android_digioffice extends AndroidProtocol {
     @Override
     protected void finishSequence() {
         searchRandomUUIDEmptyListOracle.deactivate(); // Disable the AndroidDigiOfficeRandomSearchShowsEmptyList at the end
+        dummyButtonOracle.deactivate(); // Disable the AndroidDigiOfficeDummyButton at the end
         super.finishSequence();
     }
 
@@ -744,5 +756,18 @@ public class Protocol_android_digioffice extends AndroidProtocol {
 
         String inputText = action.get(Tags.InputText, "");
         return inputText.startsWith(TESTAR_UUID_SEARCH);
+    }
+
+    private boolean isClickButtonActionExecuted(Action action) {
+        if (!(action instanceof AndroidActionClick)) {
+            return false;
+        }
+
+        Widget originWidget = action.get(Tags.OriginWidget, null);
+        if (originWidget == null) {
+            return false;
+        }
+
+        return AndroidRoles.AndroidButton.equals(originWidget.get(Tags.Role, null));
     }
 }
