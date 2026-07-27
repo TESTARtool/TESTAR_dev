@@ -299,6 +299,8 @@ public class Protocol_android_digioffice extends AndroidProtocol {
                     return;
                 }
             }
+            System.out.println("Waiting Enter your email or phone... attempt: " + attempt);
+            Util.pause(1);
         }
     }
 
@@ -315,6 +317,8 @@ public class Protocol_android_digioffice extends AndroidProtocol {
                     return;
                 }
             }
+            System.out.println("Waiting Enter the password for... attempt: " + attempt);
+            Util.pause(1);
         }
     }
 
@@ -329,6 +333,8 @@ public class Protocol_android_digioffice extends AndroidProtocol {
                     return;
                 }
             }
+            System.out.println("Waiting Pick an account... attempt: " + attempt);
+            Util.pause(1);
         }
     }
 
@@ -336,13 +342,14 @@ public class Protocol_android_digioffice extends AndroidProtocol {
         for (int attempt = 0; attempt < 60; attempt++) {
             State state = getState(system);
             for (Widget w : state) {
-                if (w.get(AndroidTags.AndroidClassName, "").contains("webkit.WebView")
-                        && w.get(AndroidTags.AndroidText, "").contains("Sign in to your account")) {
+                if (w.get(AndroidTags.AndroidClassName, "").contains("webkit.WebView")) {
                     System.out.println("Press ENTER to continue...");
                     AndroidAppiumFramework.pressKeyEvent(new KeyEvent(AndroidKey.ENTER));
                     return;
                 }
             }
+            System.out.println("Waiting Press ENTER to continue... attempt: " + attempt);
+            Util.pause(1);
         }
     }
 
