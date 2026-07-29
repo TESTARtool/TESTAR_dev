@@ -5,6 +5,7 @@ import org.junit.Test;
 
 public class ResultVerdictStatusTest {
 
+    // Verifies WS-FUNC-TEST-RESULTS-001: OK and LLM_COMPLETE are successful report outcomes.
     @Test
     public void treatsOkAndLlmCompleteAsSuccessfulResults() {
         Assert.assertEquals("ok", ResultVerdictStatus.forResultFileName("sequence_1_V001_OK.html"));

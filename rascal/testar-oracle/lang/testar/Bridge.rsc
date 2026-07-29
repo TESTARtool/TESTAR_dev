@@ -33,6 +33,7 @@ public list[Diagnostic] validateAtWithModel(loc oracleFile, loc modelFile) {
 }
 
 /**
+ * Implements WS-FUNC-ORACLE-DSL-EDITOR-001.
  * Java/WebStudio integration entry point.
  * The checker remains the source of truth; this only exposes diagnostics as
  * simple JSON data so Java does not need to inspect Rascal constructors.

@@ -8,6 +8,8 @@ package org.testar.webstudio.api.dto;
 
 import java.util.List;
 
+// Implements WS-FUNC-WORKSPACE-SOURCE-EDITOR-001 and WS-FUNC-ORACLE-JAVA-ENABLEMENT-001:
+// Java compilation result contract for workspace and oracle source editors.
 public final class WorkspaceJavaCompileResultDto {
 
     private final boolean success;

@@ -1,78 +1,202 @@
 <script>
     import { onDestroy, onMount } from "svelte";
-    import BasicSettingsView from "./BasicSettingsView.svelte";
-    import CliModeView from "./CliModeView.svelte";
-    import TestCompositionPageView from "./TestCompositionPageView.svelte";
-    import TestPoliciesPageView from "./TestPoliciesPageView.svelte";
-    import TestSettingsPageView from "./TestSettingsPageView.svelte";
-    import RunTestarView from "./RunTestarView.svelte";
-    import SpyModeView from "./SpyModeView.svelte";
-    import TestResultsView from "./TestResultsView.svelte";
-    import InspectLogsView from "./InspectLogsView.svelte";
-    import TestGoalsView from "./TestGoalsView.svelte";
-    import TestOraclesView from "./TestOraclesView.svelte";
-    import { testGoalFolderSelectionState } from "./testGoalsModel.js";
+    import AppOverlays from "./app/AppOverlays.svelte";
+    import TopNavigation from "./app/TopNavigation.svelte";
+    import BasicSettingsView from "./views/settings/BasicSettingsView.svelte";
+    import TestCompositionPageView from "./views/composition/TestCompositionPageView.svelte";
+    import TestPoliciesPageView from "./views/policies/TestPoliciesPageView.svelte";
+    import TestSettingsPageView from "./views/settings/TestSettingsPageView.svelte";
+    import RuntimePages from "./views/runtime/RuntimePages.svelte";
+    import {
+        RUNTIME_ACTIONS,
+        RUNTIME_FEEDBACK_ACTIONS,
+        runtimeActionFeedbackMessage,
+        runtimePageForAction,
+        runtimeStatusReturnedError
+    } from "./views/runtime/runtimeModel.js";
+    import {
+        executeSpyActionRequest,
+        executeSpyWidgetDefaultActionRequest,
+        executeSpyWidgetDirectTypeRequest,
+        loadCliStatusRequest,
+        loadRemoteSpyStatusRequest,
+        loadScriptlessStatusRequest,
+        refreshRemoteSpyRequest,
+        runCliManualCommandRequest,
+        startCliAgentSessionRequest,
+        startCliManualSessionRequest,
+        startGenerateRequest,
+        startLocalSpyRequest,
+        startRemoteSpyRequest,
+        stopCliAgentSessionRequest,
+        stopCliManualSessionRequest,
+        stopRemoteSpyRequest,
+        stopScriptlessRequest
+    } from "./views/runtime/runtimeApi.js";
+    import TestResultsView from "./views/results/TestResultsView.svelte";
+    import InspectLogsView from "./views/debug/InspectLogsView.svelte";
+    import TestGoalsView from "./views/goals/TestGoalsView.svelte";
+    import TestOraclesView from "./views/oracles/TestOraclesView.svelte";
+    import {
+        compileOracleJavaFileRequest,
+        createOracleDslFileRequest,
+        createOracleJavaFileRequest,
+        deleteOracleDslFileRequest,
+        deleteOracleJavaFileRequest,
+        generateJavaFromOracleDslFileRequest,
+        loadDslOracleMetadataRequest,
+        loadOracleDslFileRequest,
+        loadOracleJavaFileRequest,
+        loadTestOracleInventoryRequest,
+        saveOracleJavaFileRequest
+    } from "./views/oracles/testOraclesApi.js";
+    import {
+        saveTestSettingsRequest,
+        validateRegexRequest
+    } from "./views/settings/settingsApi.js";
+    import {
+        buildTestSettingsContent,
+        canRestoreSettingDefault,
+        restoredSettingDefaultValue,
+        updatedRegexValidationResults
+    } from "./views/settings/settingsEditorModel.js";
+    import {
+        loadDebugFileRequest,
+        loadDebugFilesRequest
+    } from "./views/debug/debugFilesApi.js";
+    import {
+        createTestGoalFileRequest,
+        createTestGoalFolderRequest,
+        deleteTestGoalPathRequest,
+        loadTestGoalFileRequest,
+        loadTestGoalTreeRequest,
+        saveTestGoalFileRequest
+    } from "./views/goals/testGoalsApi.js";
+    import {
+        clearedTestGoalSelectionState,
+        loadedTestGoalFileState,
+        shouldClearTestGoalSelectionAfterDelete,
+        testGoalFolderSelectionState
+    } from "./views/goals/testGoalsModel.js";
     import {
         TEST_ORACLE_PANEL_IDS,
+        clearedOracleSourceState,
         extendedOracleCheckboxItems,
         extendedOracleItemsWithEnablement,
         extendedOracleSettingValue,
-        oracleSettingsGroupId
-    } from "./testOraclesModel.js";
-    import { shouldGuardConfigurationTransition } from "./configurationGuard.js";
-    import { clearSelectedSourceState } from "./policyEditorState.js";
-    import { stateModelWorkspaceDialog } from "./stateModelNavigation.js";
-    import { objectSnapshot } from "./editorDirtyState.js";
-    import { resultFileUrl, resultGroupDeleteUrl, resultListUrl } from "./resultApi.js";
+        loadedOracleSourceState,
+        oracleDslGenerationErrorResult,
+        oracleJavaCompileErrorResult,
+        oracleSettingsGroupId,
+        shouldClearOracleSourceAfterDelete
+    } from "./views/oracles/testOraclesModel.js";
+    import { refreshedResultSelectionState } from "./views/results/testResultsViewModel.js";
+    import {
+        cliAgentSettingsGuardDetails,
+        configurationDirtyAreas as buildConfigurationDirtyAreas,
+        guardDialogDetails,
+        guardSaveTarget,
+        initialPendingGuardState,
+        pendingGuardState,
+        settingsEditorSelected,
+        shouldGuardConfigurationTransition,
+        testGoalGuardDetails
+    } from "./app/configurationGuard.js";
+    import {
+        clearedSourceSelectionState,
+        currentEditorDocumentDescriptor,
+        openedEditorSelectionState,
+        selectedAllowedSettingsGroupId,
+        selectedSettingsGroupForEditor
+    } from "./models/editorSelectionModel.js";
+    import {
+        createCompositionModuleSourceRequest,
+        createPolicySourceRequest,
+        compileWorkspaceProfileRequest,
+        compileWorkspaceSourceRequest,
+        loadWorkspaceDocumentRequest,
+        loadWorkspaceSourceRequest,
+        saveWorkspaceCompositionPropertiesRequest,
+        saveWorkspacePoliciesPropertiesRequest,
+        saveWorkspaceSourceRequest
+    } from "./models/sourceEditorApi.js";
+    import {
+        buildCompositionFlowNodes,
+        compositionSourceFilesFromWorkspace,
+        policySourceFilesFromWorkspace,
+        refreshedSelectedCompositionFlowNode
+    } from "./views/composition/compositionFlowModel.js";
+    import {
+        inferPolicyPropertyKey,
+        sourceClassName,
+        sourceFilesForReferencedClasses,
+        sourceFilesNotInReferenceSet,
+        updatedPolicyPropertiesContent
+    } from "./models/sourceEditorModel.js";
+    import {
+        STATE_MODEL_DEFAULT_URL,
+        stateModelDialogFromStatus,
+        stateModelDialogMessage,
+        stateModelExternalUrl,
+        stateModelRequestedMessage,
+        stateModelShouldOpenExternalTab,
+        stateModelShouldPollStatus,
+        stateModelStoppedMessage,
+        stateModelWorkspaceDialog
+    } from "./app/stateModelNavigation.js";
+    import {
+        loadStateModelStatusRequest,
+        openStateModelRequest,
+        stopStateModelRequest
+    } from "./app/stateModelApi.js";
+    import { objectSnapshot } from "./models/editorDirtyState.js";
+    import {
+        deleteResultFileRequest,
+        deleteResultGroupRequest,
+        loadResultFileRequest,
+        loadResultListRequest
+    } from "./api/resultApi.js";
     import {
         defaultWorkspaceCreateDraft,
         defaultWorkspaceRenameDraft,
-        workspaceCreateRequest,
         workspaceCreateValidation,
-        workspaceRenameRequest,
         workspaceRenameValidation
-    } from "./workspaceManagementModel.js";
+    } from "./models/workspaceManagementModel.js";
+    import {
+        createWorkspaceRequest,
+        renameWorkspaceRequest
+    } from "./models/workspaceManagementApi.js";
+    import {
+        CLI_AGENT_SETTING_KEYS,
+        DEFAULT_CLI_AGENT_SETTINGS,
+        cliAgentSettingsFromWorkspace,
+        clearedWorkspaceDocumentState,
+        emptyWorkspaceState,
+        findWorkspaceSetting,
+        normalizeSettingDisplayValue,
+        normalizedCliAgentSettings,
+        parsePropertiesContent,
+        preferredDefaultWorkspace,
+        updatedSavedSourceContents,
+        validSettingsGroupId,
+        workspaceDocumentBaseline,
+        workspaceSummaryForName
+    } from "./models/workspaceSettingsModel.js";
     import {
         BASIC_ROLE_SETTINGS_GROUP_IDS,
         TEST_SETTINGS_GROUP_IDS,
         WEB_STUDIO_ROLES,
         normalizeWebStudioRole,
         pageForRole,
+        storeWebStudioRole as storeWebStudioRoleInStorage,
+        storedWebStudioRole as storedWebStudioRoleFromStorage,
         workspaceManagementLandingPageForRole
-    } from "./webStudioRoles.js";
+    } from "./app/webStudioRoles.js";
     import {
-        menuHasActivePage,
-        resultMenuItems,
-        runModeMenuItems,
-        testConfigurationMenuItems
-    } from "./webStudioNavigation.js";
-
-    const STATE_MODEL_URL = "http://localhost:8090/models";
-    const ROLE_STORAGE_KEY = "testar-webstudio-role";
-    const CLI_AGENT_SETTING_KEYS = {
-        apiKeyEnvVarName: "AgentCLIApiKeyEnvVar",
-        baseUrl: "AgentCLIBaseUrl",
-        model: "AgentCLIModel",
-        reasoningEffort: "AgentCLIReasoningEffort",
-        sandboxMode: "AgentCLISandboxMode",
-        approvalPolicy: "AgentCLIApprovalPolicy",
-        allowNetworkAccess: "AgentCLIAllowNetworkAccess",
-        skipGitRepoCheck: "AgentCLISkipGitRepoCheck",
-        promptTitle: "AgentCLIPromptTitle",
-        promptText: "AgentCLIPromptText"
-    };
-    const DEFAULT_CLI_AGENT_SETTINGS = {
-        apiKeyEnvVarName: "OPENAI_API_KEY",
-        baseUrl: "",
-        model: "gpt-5.4-mini",
-        reasoningEffort: "medium",
-        sandboxMode: "danger-full-access",
-        approvalPolicy: "never",
-        allowNetworkAccess: false,
-        skipGitRepoCheck: true,
-        promptTitle: "Test Parabank Login",
-        promptText: "As a test agent verify that you can log in with the credentials john/demo. Then the Welcome John Smith message is shown."
-    };
+        NAVIGATION_ACTIONS,
+        navigationActionForMenuItem,
+        toggledNavMenu
+    } from "./app/webStudioNavigation.js";
 
     let workspaces = [];
     let selectedWorkspaceName = "";
@@ -130,7 +254,7 @@
         title: "",
         message: "",
         status: "STOPPED",
-        url: STATE_MODEL_URL,
+        url: STATE_MODEL_DEFAULT_URL,
         running: false
     };
     let stateModelStatusTimer = null;
@@ -150,14 +274,14 @@
     let savedCompositionPropertiesContent = "";
     let savedPoliciesPropertiesContent = "";
     let savedSourceContents = {};
-    let pendingConfigurationAction = null;
-    let pendingGuardKind = "configuration";
+    let pendingGuard = initialPendingGuardState();
 
     $: testGoalDirty = selectedTestGoalFile !== null
         && testGoalDraftContent !== savedTestGoalContent;
     $: oracleSourceDirty = selectedOracleSourceFile !== null
         && oracleSourceDraftContent !== savedOracleSourceContent;
 
+    // Shared feedback helpers keep API errors and temporary user messages consistent.
     function reportClientError(context, clientError) {
         console.error(`[WebStudio] ${context}`, clientError);
     }
@@ -173,13 +297,14 @@
         }, 2000);
     }
 
+    // State model analysis is started by navigation, but its dialog/status lifecycle is owned here.
     function openStateModelDialog(title, dialogMessage, stateModelStatus = {}) {
         stateModelDialog = {
             open: true,
             title,
             message: dialogMessage,
             status: stateModelStatus.status || "STOPPED",
-            url: stateModelStatus.url || STATE_MODEL_URL,
+            url: stateModelStatus.url || STATE_MODEL_DEFAULT_URL,
             running: Boolean(stateModelStatus.running)
         };
     }
@@ -191,15 +316,9 @@
             title: "",
             message: "",
             status: "STOPPED",
-            url: STATE_MODEL_URL,
+            url: STATE_MODEL_DEFAULT_URL,
             running: false
         };
-    }
-
-    function closeStateModelDialogFromBackdrop(event) {
-        if (event.currentTarget === event.target) {
-            closeStateModelDialog();
-        }
     }
 
     function openUnsavedSettingsDialog(title, dialogMessage, saveLabel = "Save") {
@@ -218,52 +337,15 @@
             message: "",
             saveLabel: "Save"
         };
-        pendingConfigurationAction = null;
-        pendingGuardKind = "configuration";
-    }
-
-    function closeUnsavedSettingsDialogFromBackdrop(event) {
-        if (event.currentTarget === event.target) {
-            closeUnsavedSettingsDialog();
-        }
-    }
-
-    function stateModelDialogMessage(openError) {
-        const errorMessage = openError?.message || "";
-
-        if (errorMessage.includes("No generated state model was found yet")
-            || errorMessage.includes("Cannot open the storage")
-            || errorMessage.includes("because it does not exist")) {
-            return {
-                title: "State Model Not Available",
-                message: "Dear user, before opening the analysis mode, TESTAR must execute a Generate run with the state model enabled. Currently there are no generated state models available."
-            };
-        }
-
-        return {
-            title: "Unable To Open State Model",
-            message: "Dear user, before opening the analysis mode, TESTAR must execute a Generate run with the state model enabled. Currently there are no generated state models available."
-        };
-    }
-
-    function stateModelDialogTitle(status) {
-        if (status === "RUNNING") {
-            return "State Model Analysis Running";
-        }
-        if (status === "STARTING") {
-            return "State Model Analysis Starting";
-        }
-        if (status === "FAILED") {
-            return "Unable To Open State Model";
-        }
-        return "State Model Analysis";
+        pendingGuard = initialPendingGuardState();
     }
 
     function showStateModelStatus(statusResponse) {
+        const dialog = stateModelDialogFromStatus(statusResponse);
         openStateModelDialog(
-            stateModelDialogTitle(statusResponse?.status),
-            statusResponse?.message || "State model analysis status is unknown.",
-            statusResponse || {}
+            dialog.title,
+            dialog.message,
+            dialog.status
         );
     }
 
@@ -281,9 +363,9 @@
 
     async function refreshStateModelStatus() {
         try {
-            const statusResponse = await loadJson("/api/statemodel/status");
+            const statusResponse = await loadStateModelStatusRequest(loadJson);
             showStateModelStatus(statusResponse);
-            if (statusResponse.status === "STARTING") {
+            if (stateModelShouldPollStatus(statusResponse)) {
                 scheduleStateModelStatusPolling();
             }
         } catch (statusError) {
@@ -294,11 +376,9 @@
     async function stopStateModelAnalysis() {
         saving = true;
         try {
-            const statusResponse = await loadJson("/api/statemodel/stop", {
-                method: "POST"
-            });
+            const statusResponse = await stopStateModelRequest(loadJson);
             showStateModelStatus(statusResponse);
-            showTemporaryMessage(statusResponse.message || "State model analysis stopped.");
+            showTemporaryMessage(stateModelStoppedMessage(statusResponse));
         } catch (stopError) {
             reportClientError("Unable to stop state model analysis", stopError);
             openStateModelDialog(
@@ -310,6 +390,7 @@
         }
     }
 
+    // Central JSON loader normalizes backend error responses before view-specific handlers use them.
     async function loadJson(path, options = {}) {
         const response = await fetch(path, options);
         if (!response.ok) {
@@ -329,12 +410,13 @@
         return response.json();
     }
 
+    // Initial data and workspace loading reset dependent view state before applying fresh backend data.
     async function refreshInitialData() {
         const [workspaceResponse, cliStatusResponse, scriptlessResponse, spyResponse] = await Promise.all([
             loadJson("/api/workspaces"),
-            loadJson("/api/execution/status/cli"),
-            loadJson("/api/execution/status/scriptless"),
-            loadJson("/api/spy/status")
+            loadCliStatusRequest(loadJson),
+            loadScriptlessStatusRequest(loadJson),
+            loadRemoteSpyStatusRequest(loadJson)
         ]);
 
         workspaces = workspaceResponse;
@@ -343,22 +425,27 @@
         spyState = spyResponse;
     }
 
+    // Implements WS-FUNC-WORKSPACE-SOURCE-EDITOR-001: load workspace documents and reset editor state for the selected workspace.
     async function loadWorkspace(workspaceName) {
         if (!workspaceName) {
-            selectedWorkspaceSummary = null;
-            selectedWorkspaceName = "";
-            workspaceDocument = null;
-            selectedWorkspaceSutConnector = "";
-            selectedWorkspaceSutConnectorValue = "";
-            selectedWorkspaceCliStateProjectionMode = "";
-            cliAgentSettings = { ...DEFAULT_CLI_AGENT_SETTINGS };
-            savedCliAgentSettings = { ...DEFAULT_CLI_AGENT_SETTINGS };
-            savedTestSettingsContent = "";
+            const emptyState = emptyWorkspaceState();
+            selectedWorkspaceSummary = emptyState.selectedWorkspaceSummary;
+            selectedWorkspaceName = emptyState.selectedWorkspaceName;
+            workspaceDocument = emptyState.workspaceDocument;
+            selectedWorkspaceSutConnector = emptyState.selectedWorkspaceSutConnector;
+            selectedWorkspaceSutConnectorValue = emptyState.selectedWorkspaceSutConnectorValue;
+            selectedWorkspaceCliStateProjectionMode = emptyState.selectedWorkspaceCliStateProjectionMode;
+            cliAgentSettings = emptyState.cliAgentSettings;
+            savedCliAgentSettings = emptyState.savedCliAgentSettings;
+            savedTestSettingsContent = emptyState.savedTestSettingsContent;
+            savedCompositionPropertiesContent = emptyState.savedCompositionPropertiesContent;
+            savedPoliciesPropertiesContent = emptyState.savedPoliciesPropertiesContent;
+            savedSourceContents = emptyState.savedSourceContents;
+            selectedSettingsGroupId = emptyState.selectedSettingsGroupId;
             visualSettingsDirty = false;
             selectedSourceName = "";
             selectedSourceFile = null;
             selectedEditor = "java-composition";
-            selectedSettingsGroupId = "";
             selectedCompositionFlowNode = null;
             regexValidationResults = {};
             javaCompileResult = null;
@@ -376,21 +463,51 @@
         loading = true;
         message = "";
         selectedWorkspaceName = workspaceName;
-        selectedWorkspaceSummary = workspaces.find((workspace) => workspace.name === workspaceName) || null;
+        const clearedDocumentState = clearedWorkspaceDocumentState();
+        workspaceDocument = clearedDocumentState.workspaceDocument;
+        selectedWorkspaceSutConnector = clearedDocumentState.selectedWorkspaceSutConnector;
+        selectedWorkspaceSutConnectorValue = clearedDocumentState.selectedWorkspaceSutConnectorValue;
+        selectedWorkspaceCliStateProjectionMode = clearedDocumentState.selectedWorkspaceCliStateProjectionMode;
+        cliAgentSettings = clearedDocumentState.cliAgentSettings;
+        savedCliAgentSettings = clearedDocumentState.savedCliAgentSettings;
+        savedTestSettingsContent = clearedDocumentState.savedTestSettingsContent;
+        savedCompositionPropertiesContent = clearedDocumentState.savedCompositionPropertiesContent;
+        savedPoliciesPropertiesContent = clearedDocumentState.savedPoliciesPropertiesContent;
+        savedSourceContents = clearedDocumentState.savedSourceContents;
+        selectedSettingsGroupId = clearedDocumentState.selectedSettingsGroupId;
+        visualSettingsDirty = false;
+        selectedSourceName = "";
+        selectedSourceFile = null;
+        selectedEditor = "java-composition";
+        selectedCompositionFlowNode = null;
+        regexValidationResults = {};
+        javaCompileResult = null;
+        resetTestGoalSelection();
+        resetOracleSourceSelection();
+        testOracleInventory = null;
+        testOracleInventoryLoading = false;
+        testGoalTree = null;
+        resultsData = null;
+        selectedResultGroup = null;
+        selectedResultFile = null;
 
         try {
-            workspaceDocument = await loadJson(`/api/workspaces/${workspaceName}`);
-            savedTestSettingsContent = workspaceDocument?.testSettings?.content || "";
-            savedCompositionPropertiesContent = workspaceDocument?.compositionProperties?.content || "";
-            savedPoliciesPropertiesContent = workspaceDocument?.policiesProperties?.content || "";
+            workspaceDocument = await loadWorkspaceDocumentRequest(loadJson, workspaceName);
+            const documentBaseline = workspaceDocumentBaseline(workspaceDocument);
+            savedTestSettingsContent = documentBaseline.savedTestSettingsContent;
+            savedCompositionPropertiesContent = documentBaseline.savedCompositionPropertiesContent;
+            savedPoliciesPropertiesContent = documentBaseline.savedPoliciesPropertiesContent;
             savedSourceContents = {};
             visualSettingsDirty = false;
-            syncWorkspaceRuntimeSettings();
-            savedCliAgentSettings = normalizedCliAgentSettings(cliAgentSettings);
+            selectedWorkspaceSutConnector = documentBaseline.selectedWorkspaceSutConnector;
+            selectedWorkspaceSutConnectorValue = documentBaseline.selectedWorkspaceSutConnectorValue;
+            selectedWorkspaceCliStateProjectionMode = documentBaseline.selectedWorkspaceCliStateProjectionMode;
+            cliAgentSettings = documentBaseline.cliAgentSettings;
+            savedCliAgentSettings = documentBaseline.savedCliAgentSettings;
             selectedSourceName = "";
             selectedSourceFile = null;
             selectedEditor = "java-composition";
-            selectedSettingsGroupId = workspaceDocument?.settingsGroups?.[0]?.id || "";
+            selectedSettingsGroupId = documentBaseline.selectedSettingsGroupId;
             selectedCompositionFlowNode = null;
             regexValidationResults = {};
             javaCompileResult = null;
@@ -419,6 +536,7 @@
         }
     }
 
+    // Implements WS-UX-SOURCE-EDITOR-001: centralize source selection so editor views clear stale state consistently.
     async function selectSource(sourceName, editorId = null) {
         if (!selectedWorkspaceName || !sourceName) {
             selectedSourceName = "";
@@ -427,17 +545,14 @@
         }
 
         selectedSourceName = sourceName;
-        selectedSourceFile = await loadJson(`/api/workspaces/${selectedWorkspaceName}/sources/${sourceName}`);
-        savedSourceContents = {
-            ...savedSourceContents,
-            [sourceName]: selectedSourceFile?.content || ""
-        };
+        selectedSourceFile = await loadWorkspaceSourceRequest(loadJson, selectedWorkspaceName, sourceName);
+        savedSourceContents = updatedSavedSourceContents(savedSourceContents, sourceName, selectedSourceFile);
         selectedEditor = editorId || `source:${sourceName}`;
         javaCompileResult = null;
     }
 
     function clearSelectedSource() {
-        const nextState = clearSelectedSourceState({
+        const nextState = clearedSourceSelectionState({
             selectedSourceName,
             selectedSourceFile,
             javaCompileResult
@@ -463,13 +578,19 @@
     }
 
     function openEditorImmediate(editorId) {
-        selectedSourceName = "";
-        selectedSourceFile = null;
-        selectedEditor = editorId;
-        javaCompileResult = null;
-        if (editorId !== "java-composition") {
-            selectedCompositionFlowNode = null;
-        }
+        const nextState = openedEditorSelectionState({
+            selectedSourceName,
+            selectedSourceFile,
+            selectedEditor,
+            selectedCompositionFlowNode,
+            javaCompileResult
+        }, editorId);
+
+        selectedSourceName = nextState.selectedSourceName;
+        selectedSourceFile = nextState.selectedSourceFile;
+        selectedEditor = nextState.selectedEditor;
+        selectedCompositionFlowNode = nextState.selectedCompositionFlowNode;
+        javaCompileResult = nextState.javaCompileResult;
     }
 
     async function openEditor(editorId) {
@@ -488,18 +609,13 @@
 
     async function openVisualSettings() {
         await openEditor("settings-form");
-        if (!selectedSettingsGroupId && workspaceDocument?.settingsGroups?.length > 0) {
-            selectedSettingsGroupId = workspaceDocument.settingsGroups[0].id;
-        }
+        selectedSettingsGroupId = selectedSettingsGroupForEditor(workspaceDocument, "", selectedSettingsGroupId);
     }
 
     async function openVisualSettingsGroup(groupId) {
         await guardConfigurationTransition(async () => {
             openEditorImmediate("settings-form");
-            selectedSettingsGroupId = groupId || selectedSettingsGroupId;
-            if (!selectedSettingsGroupId && workspaceDocument?.settingsGroups?.length > 0) {
-                selectedSettingsGroupId = workspaceDocument.settingsGroups[0].id;
-            }
+            selectedSettingsGroupId = selectedSettingsGroupForEditor(workspaceDocument, groupId, selectedSettingsGroupId);
         }, "settings-form");
     }
 
@@ -524,47 +640,45 @@
             return;
         }
 
-        workspaceDocument = await loadJson(`/api/workspaces/${selectedWorkspaceName}`);
-        savedTestSettingsContent = workspaceDocument?.testSettings?.content || "";
-        savedCompositionPropertiesContent = workspaceDocument?.compositionProperties?.content || "";
-        savedPoliciesPropertiesContent = workspaceDocument?.policiesProperties?.content || "";
+        workspaceDocument = await loadWorkspaceDocumentRequest(loadJson, selectedWorkspaceName);
+        const documentBaseline = workspaceDocumentBaseline(workspaceDocument);
+        savedTestSettingsContent = documentBaseline.savedTestSettingsContent;
+        savedCompositionPropertiesContent = documentBaseline.savedCompositionPropertiesContent;
+        savedPoliciesPropertiesContent = documentBaseline.savedPoliciesPropertiesContent;
         visualSettingsDirty = false;
-        syncWorkspaceRuntimeSettings();
-        savedCliAgentSettings = normalizedCliAgentSettings(cliAgentSettings);
+        selectedWorkspaceSutConnector = documentBaseline.selectedWorkspaceSutConnector;
+        selectedWorkspaceSutConnectorValue = documentBaseline.selectedWorkspaceSutConnectorValue;
+        selectedWorkspaceCliStateProjectionMode = documentBaseline.selectedWorkspaceCliStateProjectionMode;
+        cliAgentSettings = documentBaseline.cliAgentSettings;
+        savedCliAgentSettings = documentBaseline.savedCliAgentSettings;
     }
 
     async function restoreEditorState(editorId, sourceName) {
         selectedEditor = editorId;
-        if (selectedCompositionFlowNode) {
-            selectedCompositionFlowNode = compositionFlowNodes.find((flowNode) => flowNode.id === selectedCompositionFlowNode.id) || selectedCompositionFlowNode;
-        }
-        if (workspaceDocument?.settingsGroups?.length > 0) {
-            const matchingSettingsGroup = workspaceDocument.settingsGroups.find((settingsGroup) => settingsGroup.id === selectedSettingsGroupId);
-            if (!matchingSettingsGroup) {
-                selectedSettingsGroupId = workspaceDocument.settingsGroups[0].id;
-            }
-        } else {
-            selectedSettingsGroupId = "";
-        }
+        selectedCompositionFlowNode = refreshedSelectedCompositionFlowNode(compositionFlowNodes, selectedCompositionFlowNode);
+        selectedSettingsGroupId = validSettingsGroupId(workspaceDocument, selectedSettingsGroupId);
         if (sourceName) {
             await selectSource(sourceName, editorId);
         }
     }
 
-    async function saveWorkspaceFile(endpoint, content) {
+    // Implements WS-FUNC-COMPOSITION-FLOW-001 and WS-FUNC-POLICIES-001:
+    // saves composition/policies properties and compiles Java configuration sources.
+    // Workspace document persistence also covers raw settings, visual settings, policies, and profile compilation.
+    async function saveWorkspaceFile(fileKind, content) {
         saving = true;
         message = "";
         const activeEditorId = selectedEditor;
         const activeSourceName = selectedSourceName;
 
         try {
-            await loadJson(endpoint, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ content })
-            });
+            if (fileKind === "composition-properties") {
+                await saveWorkspaceCompositionPropertiesRequest(loadJson, selectedWorkspaceName, content);
+            } else if (fileKind === "policies-properties") {
+                await saveWorkspacePoliciesPropertiesRequest(loadJson, selectedWorkspaceName, content);
+            } else {
+                throw new Error(`Unsupported workspace file kind: ${fileKind}`);
+            }
 
             await refreshWorkspaceDocument();
             await restoreEditorState(activeEditorId, activeSourceName);
@@ -573,7 +687,7 @@
             visualSettingsDirty = false;
             showTemporaryMessage("Workspace file saved.");
         } catch (saveError) {
-            reportClientError(`Unable to save ${endpoint}`, saveError);
+            reportClientError(`Unable to save ${fileKind}`, saveError);
         } finally {
             saving = false;
         }
@@ -584,10 +698,22 @@
             return;
         }
 
-        await saveWorkspaceFile(
-            `/api/workspaces/${selectedWorkspaceName}/sources/${selectedSourceFile.name}`,
-            selectedSourceFile.content
-        );
+        saving = true;
+        message = "";
+        const activeEditorId = selectedEditor;
+        const activeSourceName = selectedSourceName;
+
+        try {
+            await saveWorkspaceSourceRequest(loadJson, selectedWorkspaceName, selectedSourceFile.name, selectedSourceFile.content);
+            await refreshWorkspaceDocument();
+            await restoreEditorState(activeEditorId, activeSourceName);
+            await refreshScriptlessStatus();
+            showTemporaryMessage("Workspace file saved.");
+        } catch (saveError) {
+            reportClientError(`Unable to save source ${selectedSourceFile.name}`, saveError);
+        } finally {
+            saving = false;
+        }
     }
 
     async function persistSelectedSourceForCompile() {
@@ -598,18 +724,7 @@
         const activeEditorId = selectedEditor;
         const activeSourceName = selectedSourceName;
 
-        await loadJson(
-            `/api/workspaces/${selectedWorkspaceName}/sources/${selectedSourceFile.name}`,
-            {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    content: selectedSourceFile.content
-                })
-            }
-        );
+        await saveWorkspaceSourceRequest(loadJson, selectedWorkspaceName, selectedSourceFile.name, selectedSourceFile.content);
 
         await refreshWorkspaceDocument();
         await restoreEditorState(activeEditorId, activeSourceName);
@@ -625,12 +740,7 @@
 
         try {
             await persistSelectedSourceForCompile();
-            javaCompileResult = await loadJson(
-                `/api/workspaces/${selectedWorkspaceName}/sources/${encodeURIComponent(selectedSourceFile.name)}/compile`,
-                {
-                    method: "POST"
-                }
-            );
+            javaCompileResult = await compileWorkspaceSourceRequest(loadJson, selectedWorkspaceName, selectedSourceFile.name);
             return javaCompileResult;
         } catch (compileError) {
             reportClientError(`Unable to compile Java source ${selectedSourceFile.name}`, compileError);
@@ -650,12 +760,7 @@
 
         try {
             await persistSelectedSourceForCompile();
-            javaCompileResult = await loadJson(
-                `/api/workspaces/${selectedWorkspaceName}/compile-profile`,
-                {
-                    method: "POST"
-                }
-            );
+            javaCompileResult = await compileWorkspaceProfileRequest(loadJson, selectedWorkspaceName);
             return javaCompileResult;
         } catch (compileError) {
             reportClientError(`Unable to compile workspace profile ${selectedWorkspaceName}`, compileError);
@@ -665,10 +770,6 @@
         }
     }
 
-    function escapeRegExp(text) {
-        return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    }
-
     function touchWorkspaceDocument() {
         workspaceDocument = workspaceDocument
             ? {
@@ -676,62 +777,6 @@
                 settingsGroups: [...(workspaceDocument.settingsGroups || [])]
             }
             : workspaceDocument;
-    }
-
-    function shouldPersistVisualSetting(setting) {
-        const settingValue = (setting?.value ?? "").trim();
-        const settingType = setting?.type || "string";
-
-        if (settingValue !== "") {
-            return true;
-        }
-
-        return settingType === "string" || settingType === "list";
-    }
-
-    function buildTestSettingsContent(currentContent, settingsGroups) {
-        const settingsEntries = [];
-
-        for (const settingsGroup of settingsGroups || []) {
-            for (const setting of settingsGroup.settings || []) {
-                settingsEntries.push({
-                    key: setting.key,
-                    value: setting.value ?? "",
-                    persist: shouldPersistVisualSetting(setting)
-                });
-            }
-        }
-
-        let nextContent = currentContent || "";
-        const missingEntries = [];
-
-        for (const settingEntry of settingsEntries) {
-            const key = settingEntry.key;
-            const value = settingEntry.value;
-            const escapedKey = escapeRegExp(key);
-            const propertyPattern = new RegExp(`^\\s*${escapedKey}\\s*=.*(?:\\r?\\n|$)`, "gm");
-
-            if (settingEntry.persist) {
-                if (propertyPattern.test(nextContent)) {
-                    nextContent = nextContent.replace(propertyPattern, `${key} = ${value}\n`);
-                } else {
-                    missingEntries.push(`${key} = ${value}`);
-                }
-            } else {
-                nextContent = nextContent.replace(propertyPattern, "");
-            }
-        }
-
-        if (missingEntries.length > 0) {
-            if (nextContent.length === 0) {
-                nextContent = `${missingEntries.join("\n")}\n`;
-            } else {
-                const separator = nextContent.endsWith("\n") ? "" : "\n";
-                nextContent = `${nextContent}${separator}\n${missingEntries.join("\n")}\n`;
-            }
-        }
-
-        return nextContent;
     }
 
     async function saveVisualSettings() {
@@ -746,10 +791,9 @@
 
         workspaceDocument.testSettings.content = nextContent;
 
-        await saveWorkspaceFile(
-            `/api/workspaces/${selectedWorkspaceName}/test-settings`,
-            nextContent
-        );
+        await saveTestSettingsRequest(loadJson, selectedWorkspaceName, nextContent);
+        savedTestSettingsContent = nextContent;
+        visualSettingsDirty = false;
     }
 
     async function validateRegexExpression(setting) {
@@ -760,20 +804,8 @@
         touchWorkspaceDocument();
 
         try {
-            const validationResult = await loadJson("/api/settings/regex/validate", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    value: setting.value || ""
-                })
-            });
-
-            regexValidationResults = {
-                ...regexValidationResults,
-                [setting.key]: validationResult
-            };
+            const validationResult = await validateRegexRequest(loadJson, setting.value);
+            regexValidationResults = updatedRegexValidationResults(regexValidationResults, setting.key, validationResult);
             setting.regexValidation = validationResult;
             touchWorkspaceDocument();
         } catch (validationError) {
@@ -786,22 +818,18 @@
             return;
         }
 
-        if (setting.key === "SuspiciousTags" || setting.key === "SuspiciousProcessOutput") {
-            if ((setting.value || "").trim() !== "") {
-                return;
-            }
+        if (!canRestoreSettingDefault(setting)) {
+            return;
         }
 
-        setting.value = setting.defaultValue || "";
+        setting.value = restoredSettingDefaultValue(setting);
         setting.regexValidation = null;
         visualSettingsDirty = true;
         touchWorkspaceDocument();
-        regexValidationResults = {
-            ...regexValidationResults,
-            [setting.key]: null
-        };
+        regexValidationResults = updatedRegexValidationResults(regexValidationResults, setting.key, null);
     }
 
+    // Generate mode and shared runtime polling keep the status panels synchronized with backend execution.
     async function startGenerate() {
         if (!selectedWorkspaceName) {
             return;
@@ -809,16 +837,14 @@
 
         saving = true;
         message = "";
-        currentPage = "run";
+        currentPage = runtimePageForAction(RUNTIME_ACTIONS.GENERATE);
 
         try {
-            scriptlessStatus = await loadJson(`/api/execution/scriptless/generate/${selectedWorkspaceName}`, {
-                method: "POST"
-            });
-            if (scriptlessStatus.status === "error") {
+            scriptlessStatus = await startGenerateRequest(loadJson, selectedWorkspaceName);
+            if (runtimeStatusReturnedError(scriptlessStatus)) {
                 reportClientError("Generate mode returned an error status", scriptlessStatus.message);
             } else {
-                showTemporaryMessage(scriptlessStatus.message || "Generate mode started.");
+                showTemporaryMessage(runtimeActionFeedbackMessage(RUNTIME_FEEDBACK_ACTIONS.GENERATE_STARTED, scriptlessStatus));
             }
         } catch (executionError) {
             reportClientError("Unable to start Generate mode", executionError);
@@ -832,10 +858,8 @@
         message = "";
 
         try {
-            scriptlessStatus = await loadJson("/api/execution/scriptless/stop", {
-                method: "POST"
-            });
-            showTemporaryMessage(scriptlessStatus.message || "Generate mode stopped.");
+            scriptlessStatus = await stopScriptlessRequest(loadJson);
+            showTemporaryMessage(runtimeActionFeedbackMessage(RUNTIME_FEEDBACK_ACTIONS.GENERATE_STOPPED, scriptlessStatus));
         } catch (executionError) {
             reportClientError("Unable to stop Generate mode", executionError);
         } finally {
@@ -844,15 +868,15 @@
     }
 
     async function refreshScriptlessStatus() {
-        scriptlessStatus = await loadJson("/api/execution/status/scriptless");
+        scriptlessStatus = await loadScriptlessStatusRequest(loadJson);
     }
 
     async function refreshCliStatus() {
-        cliStatus = await loadJson("/api/execution/status/cli");
+        cliStatus = await loadCliStatusRequest(loadJson);
     }
 
     async function refreshRemoteSpyStatus() {
-        spyState = await loadJson("/api/spy/status");
+        spyState = await loadRemoteSpyStatusRequest(loadJson);
     }
 
     function startScriptlessPolling() {
@@ -874,32 +898,18 @@
         }
     }
 
+    // Role and navigation changes share the same guarded transition path as editor changes.
     function storedWebStudioRole() {
-        if (typeof window === "undefined") {
-            return WEB_STUDIO_ROLES.ADVANCED;
-        }
-
-        return normalizeWebStudioRole(window.localStorage.getItem(ROLE_STORAGE_KEY));
+        return storedWebStudioRoleFromStorage(typeof window === "undefined" ? null : window.localStorage);
     }
 
     function storeWebStudioRole(role) {
-        if (typeof window !== "undefined") {
-            window.localStorage.setItem(ROLE_STORAGE_KEY, normalizeWebStudioRole(role));
-        }
-    }
-
-    function firstSettingsGroupId(allowedSettingsGroupIds) {
-        const availableGroupIds = new Set((workspaceDocument?.settingsGroups || []).map((settingsGroup) => settingsGroup.id));
-        return allowedSettingsGroupIds.find((groupId) => availableGroupIds.has(groupId))
-            || workspaceDocument?.settingsGroups?.[0]?.id
-            || "";
+        storeWebStudioRoleInStorage(typeof window === "undefined" ? null : window.localStorage, role);
     }
 
     function openAllowedSettingsImmediate(allowedSettingsGroupIds) {
         openEditorImmediate("settings-form");
-        if (!allowedSettingsGroupIds.includes(selectedSettingsGroupId)) {
-            selectedSettingsGroupId = firstSettingsGroupId(allowedSettingsGroupIds);
-        }
+        selectedSettingsGroupId = selectedAllowedSettingsGroupId(workspaceDocument, allowedSettingsGroupIds, selectedSettingsGroupId);
     }
 
     function openBasicSettingsImmediate() {
@@ -955,6 +965,7 @@
         }
     }
 
+    // Implements WS-FUNC-TOP-NAV-ROLES-001: role and menu transitions run through the shared navigation guard.
     async function changeWebStudioRole(nextRole) {
         const normalizedRole = normalizeWebStudioRole(nextRole);
         if (normalizedRole === currentRole) {
@@ -1086,37 +1097,39 @@
     }
 
     function toggleNavMenu(menuId) {
-        activeNavMenu = activeNavMenu === menuId ? "" : menuId;
+        activeNavMenu = toggledNavMenu(activeNavMenu, menuId);
     }
 
     async function navigateFromMenu(item) {
-        if (item.disabled) {
+        const navigationAction = navigationActionForMenuItem(item);
+
+        if (navigationAction === NAVIGATION_ACTIONS.NONE) {
             return;
         }
 
         activeNavMenu = "";
 
-        if (item.id === "basic-settings") {
+        if (navigationAction === NAVIGATION_ACTIONS.BASIC_SETTINGS) {
             await navigateToBasicSettings();
-        } else if (item.id === "settings") {
+        } else if (navigationAction === NAVIGATION_ACTIONS.SETTINGS) {
             await navigateToSettings();
-        } else if (item.id === "basic-oracles" || item.id === "advanced-oracles") {
+        } else if (navigationAction === NAVIGATION_ACTIONS.TEST_ORACLES) {
             await navigateToTestOracles();
-        } else if (item.id === "test-goals") {
+        } else if (navigationAction === NAVIGATION_ACTIONS.TEST_GOALS) {
             await navigateToTestGoals();
-        } else if (item.id === "composition") {
+        } else if (navigationAction === NAVIGATION_ACTIONS.COMPOSITION_FLOW) {
             await navigateToAdvancedCompositionFlow();
-        } else if (item.id === "policies") {
+        } else if (navigationAction === NAVIGATION_ACTIONS.POLICIES) {
             await navigateToAdvancedPolicies();
-        } else if (item.id === "run") {
+        } else if (navigationAction === NAVIGATION_ACTIONS.GENERATE_MODE) {
             await navigateToRun();
-        } else if (item.id === "cli") {
+        } else if (navigationAction === NAVIGATION_ACTIONS.CLI_MODE) {
             await navigateToCli();
-        } else if (item.id === "results") {
+        } else if (navigationAction === NAVIGATION_ACTIONS.TEST_RESULTS) {
             await navigateToResults();
-        } else if (item.id === "state-model") {
+        } else if (navigationAction === NAVIGATION_ACTIONS.STATE_MODEL) {
             await navigateToStateModel();
-        } else if (item.id === "logs") {
+        } else if (navigationAction === NAVIGATION_ACTIONS.DEBUG_LOGS) {
             await navigateToLogs();
         }
     }
@@ -1140,12 +1153,6 @@
         workspaceManagementError = "";
     }
 
-    function closeWorkspaceManagementDialogFromBackdrop(event) {
-        if (event.target === event.currentTarget) {
-            closeWorkspaceManagementDialog();
-        }
-    }
-
     async function createWorkspaceFromDialog() {
         const validation = workspaceCreateValidation(workspaceCreateDraft, workspaces);
         if (!validation.valid) {
@@ -1158,17 +1165,10 @@
         message = "";
 
         try {
-            const request = workspaceCreateRequest(workspaceCreateDraft);
-            const createdWorkspace = await loadJson("/api/workspaces", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(request)
-            });
+            const { request, workspace } = await createWorkspaceRequest(loadJson, workspaceCreateDraft);
             await refreshInitialData();
             currentPage = workspaceManagementLandingPageForRole(currentRole);
-            await loadWorkspace(createdWorkspace?.name || request.name);
+            await loadWorkspace(workspace?.name || request.name);
             workspaceManagementDialogOpen = false;
             showTemporaryMessage(`Workspace ${request.name} created.`);
         } catch (createError) {
@@ -1191,17 +1191,10 @@
         message = "";
 
         try {
-            const request = workspaceRenameRequest(workspaceRenameDraft);
-            const renamedWorkspace = await loadJson(`/api/workspaces/${selectedWorkspaceName}/rename`, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(request)
-            });
+            const { request, workspace } = await renameWorkspaceRequest(loadJson, selectedWorkspaceName, workspaceRenameDraft);
             await refreshInitialData();
             currentPage = workspaceManagementLandingPageForRole(currentRole);
-            await loadWorkspace(renamedWorkspace?.name || request.name);
+            await loadWorkspace(workspace?.name || request.name);
             workspaceManagementDialogOpen = false;
             showTemporaryMessage(`Workspace renamed to ${request.name}.`);
         } catch (renameError) {
@@ -1212,111 +1205,13 @@
         }
     }
 
-    function openStateModelExternalTab(url = STATE_MODEL_URL) {
+    function openStateModelExternalTab(url = STATE_MODEL_DEFAULT_URL) {
         window.open(url, "_blank", "noopener,noreferrer");
     }
 
-    function workspaceSettingValue(settingKey) {
-        for (const settingsGroup of workspaceDocument?.settingsGroups || []) {
-            for (const setting of settingsGroup.settings || []) {
-                if (setting.key === settingKey) {
-                    return setting.value || "";
-                }
-            }
-        }
-
-        return "";
-    }
-
-    function workspaceSettingBoolean(settingKey, defaultValue = false) {
-        const value = workspaceSettingValue(settingKey);
-        if (value === "") {
-            return defaultValue;
-        }
-
-        return value === true || `${value}`.toLowerCase() === "true";
-    }
-
-    function workspaceSettingDefaultValue(settingKey) {
-        const setting = findWorkspaceSetting(settingKey);
-        return setting?.defaultValue || "";
-    }
-
-    function normalizedCliAgentSettings(settings) {
-        const source = settings || {};
-        const valueOrDefault = (value, defaultValue) => {
-            if (value === null || value === undefined || value === "") {
-                return defaultValue;
-            }
-
-            return value;
-        };
-
-        return {
-            apiKeyEnvVarName: valueOrDefault(source.apiKeyEnvVarName, DEFAULT_CLI_AGENT_SETTINGS.apiKeyEnvVarName),
-            baseUrl: source.baseUrl ?? DEFAULT_CLI_AGENT_SETTINGS.baseUrl,
-            model: valueOrDefault(source.model, DEFAULT_CLI_AGENT_SETTINGS.model),
-            reasoningEffort: valueOrDefault(source.reasoningEffort, DEFAULT_CLI_AGENT_SETTINGS.reasoningEffort),
-            sandboxMode: valueOrDefault(source.sandboxMode, DEFAULT_CLI_AGENT_SETTINGS.sandboxMode),
-            approvalPolicy: valueOrDefault(source.approvalPolicy, DEFAULT_CLI_AGENT_SETTINGS.approvalPolicy),
-            allowNetworkAccess: Boolean(source.allowNetworkAccess),
-            skipGitRepoCheck: source.skipGitRepoCheck !== false,
-            promptTitle: valueOrDefault(source.promptTitle, DEFAULT_CLI_AGENT_SETTINGS.promptTitle),
-            promptText: valueOrDefault(source.promptText, DEFAULT_CLI_AGENT_SETTINGS.promptText)
-        };
-    }
-
-    function cliAgentSettingsFromWorkspace() {
-        return normalizedCliAgentSettings({
-            apiKeyEnvVarName: workspaceSettingValue(CLI_AGENT_SETTING_KEYS.apiKeyEnvVarName),
-            baseUrl: workspaceSettingValue(CLI_AGENT_SETTING_KEYS.baseUrl),
-            model: workspaceSettingValue(CLI_AGENT_SETTING_KEYS.model),
-            reasoningEffort: workspaceSettingValue(CLI_AGENT_SETTING_KEYS.reasoningEffort),
-            sandboxMode: workspaceSettingValue(CLI_AGENT_SETTING_KEYS.sandboxMode),
-            approvalPolicy: workspaceSettingValue(CLI_AGENT_SETTING_KEYS.approvalPolicy),
-            allowNetworkAccess: workspaceSettingBoolean(
-                CLI_AGENT_SETTING_KEYS.allowNetworkAccess,
-                DEFAULT_CLI_AGENT_SETTINGS.allowNetworkAccess
-            ),
-            skipGitRepoCheck: workspaceSettingBoolean(
-                CLI_AGENT_SETTING_KEYS.skipGitRepoCheck,
-                DEFAULT_CLI_AGENT_SETTINGS.skipGitRepoCheck
-            ),
-            promptTitle: workspaceSettingValue(CLI_AGENT_SETTING_KEYS.promptTitle),
-            promptText: workspaceSettingValue(CLI_AGENT_SETTING_KEYS.promptText)
-        });
-    }
-
-    function syncWorkspaceRuntimeSettings() {
-        selectedWorkspaceSutConnector = normalizeSettingDisplayValue(
-            parsePropertiesContent(workspaceDocument?.testSettings?.content || "").SUTConnector
-                || workspaceSettingValue("SUTConnector")
-        );
-        selectedWorkspaceSutConnectorValue = normalizeSettingDisplayValue(
-            parsePropertiesContent(workspaceDocument?.testSettings?.content || "").SUTConnectorValue
-                || workspaceSettingValue("SUTConnectorValue")
-        );
-        selectedWorkspaceCliStateProjectionMode = normalizeSettingDisplayValue(
-            parsePropertiesContent(workspaceDocument?.testSettings?.content || "").CliStateProjectionMode
-                || workspaceSettingValue("CliStateProjectionMode")
-                || workspaceSettingDefaultValue("CliStateProjectionMode")
-        );
-        cliAgentSettings = cliAgentSettingsFromWorkspace();
-    }
-
-    function findWorkspaceSetting(settingKey) {
-        for (const settingsGroup of workspaceDocument?.settingsGroups || []) {
-            const setting = (settingsGroup.settings || []).find((candidate) => candidate.key === settingKey);
-            if (setting) {
-                return setting;
-            }
-        }
-
-        return null;
-    }
-
+    // Unsaved-change guards decide whether navigation, role changes, and runtime launches may continue.
     function setWorkspaceSettingByKey(settingKey, value) {
-        const setting = findWorkspaceSetting(settingKey);
+        const setting = findWorkspaceSetting(workspaceDocument, settingKey);
         if (!setting) {
             return;
         }
@@ -1327,27 +1222,6 @@
     function hasCliAgentSettingsChanges() {
         return JSON.stringify(normalizedCliAgentSettings(cliAgentSettings))
             !== JSON.stringify(normalizedCliAgentSettings(savedCliAgentSettings));
-    }
-
-    function normalizeSettingDisplayValue(value) {
-        const text = String(value || "").trim();
-        if (text.length >= 2) {
-            const hasDoubleQuotes = text.startsWith("\"") && text.endsWith("\"");
-            const hasSingleQuotes = text.startsWith("'") && text.endsWith("'");
-            if (hasDoubleQuotes || hasSingleQuotes) {
-                return text.slice(1, -1).trim();
-            }
-        }
-
-        return text;
-    }
-
-    function settingsEditorId(editorId) {
-        return editorId === "settings-form" || editorId === "test-settings";
-    }
-
-    function settingsEditorSelected() {
-        return settingsEditorId(selectedEditor);
     }
 
     function hasSettingsChanges() {
@@ -1388,75 +1262,20 @@
         return oracleSourceDirty;
     }
 
+    // Implements WS-FUNC-CONFIG-GUARD-001 and WS-UX-CONFIG-GUARD-001:
+    // coordinates dirty-state checks, guard dialogs, save/discard actions, and pending navigation.
     function configurationDirtyAreas() {
-        return {
-            settings: hasSettingsChanges(),
-            "composition-file": hasCompositionPropertiesChanges(),
-            "composition-flow": hasSelectedSourceChanges(["service", "capability"]),
-            "policies-file": hasPoliciesPropertiesChanges(),
-            "policies-flow": hasSelectedSourceChanges(["policy"]),
-            "oracle-source": hasOracleSourceChanges()
-        };
+        return buildConfigurationDirtyAreas({
+            settingsDirty: hasSettingsChanges(),
+            compositionPropertiesDirty: hasCompositionPropertiesChanges(),
+            compositionFlowDirty: hasSelectedSourceChanges(["service", "capability"]),
+            policiesPropertiesDirty: hasPoliciesPropertiesChanges(),
+            policiesFlowDirty: hasSelectedSourceChanges(["policy"]),
+            oracleSourceDirty: hasOracleSourceChanges()
+        });
     }
 
-    function activeGuardDialogDetails() {
-        if (settingsEditorSelected()) {
-            return {
-                title: "Unsaved Settings Changes",
-                message: "Detected unsaved settings changes. Save them before continuing, discard them, or cancel this navigation.",
-                saveLabel: "Save"
-            };
-        }
-
-        if (selectedEditor === "composition-properties") {
-            return {
-                title: "Unsaved Composition File Changes",
-                message: "Detected unsaved composition.properties changes. Save them before continuing, discard them, or cancel this navigation.",
-                saveLabel: "Save"
-            };
-        }
-
-        if (selectedEditor === "policies-properties") {
-            return {
-                title: "Unsaved Policies File Changes",
-                message: "Detected unsaved policies.properties changes. Save them before continuing, discard them, or cancel this navigation.",
-                saveLabel: "Save"
-            };
-        }
-
-        if (selectedEditor === "java-composition") {
-            return {
-                title: "Unsaved and Uncompiled Composition Changes",
-                message: "Detected unsaved Java composition changes. Save and compile before continuing, discard them, or cancel this navigation.",
-                saveLabel: "Save and Compile"
-            };
-        }
-
-        if (selectedEditor === "java-policies") {
-            return {
-                title: "Unsaved and Uncompiled Policy Changes",
-                message: "Detected unsaved Java policy changes. Save and compile before continuing, discard them, or cancel this navigation.",
-                saveLabel: "Save and Compile"
-            };
-        }
-
-        if (selectedEditor === "oracle-source") {
-            return {
-                title: "Unsaved Oracle Source Changes",
-                message: "Detected unsaved oracle source changes. Save them before continuing, discard them, or cancel this navigation.",
-                saveLabel: selectedOracleSourceFile?.category === "dsl-oracle"
-                    ? "Save and Generate Java-DSL"
-                    : "Save"
-            };
-        }
-
-        return {
-            title: "Unsaved Changes",
-            message: "Detected unsaved changes. Save them before continuing, discard them, or cancel this navigation.",
-            saveLabel: "Save"
-        };
-    }
-
+    // Implements WS-FUNC-TEST-SETTINGS-001: saves either the visual settings form or raw test.settings editor.
     async function saveCurrentSettingsEditor() {
         if (selectedEditor === "settings-form") {
             await saveVisualSettings();
@@ -1464,22 +1283,21 @@
         }
 
         if (selectedEditor === "test-settings" && workspaceDocument?.testSettings) {
-            await saveWorkspaceFile(
-                `/api/workspaces/${selectedWorkspaceName}/test-settings`,
-                workspaceDocument.testSettings.content
-            );
+            await saveTestSettingsRequest(loadJson, selectedWorkspaceName, workspaceDocument.testSettings.content);
+            savedTestSettingsContent = workspaceDocument.testSettings.content || "";
+            visualSettingsDirty = false;
         }
     }
 
     async function saveCurrentGuardedEditor() {
-        if (settingsEditorSelected()) {
+        if (settingsEditorSelected(selectedEditor)) {
             await saveCurrentSettingsEditor();
             return true;
         }
 
         if (selectedEditor === "composition-properties" && workspaceDocument?.compositionProperties) {
             await saveWorkspaceFile(
-                `/api/workspaces/${selectedWorkspaceName}/composition-properties`,
+                "composition-properties",
                 workspaceDocument.compositionProperties.content
             );
             return true;
@@ -1487,7 +1305,7 @@
 
         if (selectedEditor === "policies-properties" && workspaceDocument?.policiesProperties) {
             await saveWorkspaceFile(
-                `/api/workspaces/${selectedWorkspaceName}/policies-properties`,
+                "policies-properties",
                 workspaceDocument.policiesProperties.content
             );
             return true;
@@ -1536,8 +1354,8 @@
             return;
         }
 
-        pendingConfigurationAction = action;
-        const dialogDetails = activeGuardDialogDetails();
+        pendingGuard = pendingGuardState(action);
+        const dialogDetails = guardDialogDetails(selectedEditor, selectedOracleSourceFile);
         openUnsavedSettingsDialog(dialogDetails.title, dialogDetails.message, dialogDetails.saveLabel);
     }
 
@@ -1565,30 +1383,31 @@
     }
 
     function openCliAgentSettingsGuard(action) {
-        pendingConfigurationAction = action;
-        pendingGuardKind = "cli-agent";
+        const dialogDetails = cliAgentSettingsGuardDetails();
+        pendingGuard = pendingGuardState(action, dialogDetails.kind);
         openUnsavedSettingsDialog(
-            "Unsaved Agent CLI Settings",
-            "Detected unsaved Agent CLI settings. Save them before continuing, discard them, or cancel this navigation.",
-            "Save"
+            dialogDetails.title,
+            dialogDetails.message,
+            dialogDetails.saveLabel
         );
     }
 
     function openTestGoalGuard(action) {
-        pendingConfigurationAction = action;
-        pendingGuardKind = "test-goal";
+        const dialogDetails = testGoalGuardDetails();
+        pendingGuard = pendingGuardState(action, dialogDetails.kind);
         openUnsavedSettingsDialog(
-            "Unsaved Test Goal Changes",
-            "Detected unsaved Test Goal changes. Save them before continuing, discard them, or cancel this navigation.",
-            "Save"
+            dialogDetails.title,
+            dialogDetails.message,
+            dialogDetails.saveLabel
         );
     }
 
     async function discardUnsavedConfigurationChanges() {
-        const action = pendingConfigurationAction;
-        if (pendingGuardKind === "cli-agent") {
+        const action = pendingGuard.action;
+        const saveTarget = guardSaveTarget(pendingGuard.kind);
+        if (saveTarget === "cli-agent") {
             cliAgentSettings = normalizedCliAgentSettings(savedCliAgentSettings);
-        } else if (pendingGuardKind === "test-goal") {
+        } else if (saveTarget === "test-goal") {
             discardTestGoalChanges();
         } else {
             await refreshWorkspaceDocument();
@@ -1600,11 +1419,12 @@
     }
 
     async function saveUnsavedConfigurationChanges() {
-        const action = pendingConfigurationAction;
+        const action = pendingGuard.action;
+        const saveTarget = guardSaveTarget(pendingGuard.kind);
         let saved;
-        if (pendingGuardKind === "cli-agent") {
+        if (saveTarget === "cli-agent") {
             saved = await saveCliAgentSettings();
-        } else if (pendingGuardKind === "test-goal") {
+        } else if (saveTarget === "test-goal") {
             saved = await saveTestGoalFile();
         } else {
             saved = await saveCurrentGuardedEditor();
@@ -1614,7 +1434,7 @@
             return;
         }
 
-        if (pendingGuardKind !== "cli-agent" && hasCurrentGuardedChanges()) {
+        if (saveTarget !== "cli-agent" && hasCurrentGuardedChanges()) {
             return;
         }
 
@@ -1624,6 +1444,7 @@
         }
     }
 
+    // State model navigation starts analysis when needed and keeps the modal actionable during startup.
     async function navigateToStateModel() {
         const workspaceDialog = stateModelWorkspaceDialog(selectedWorkspaceName);
         if (workspaceDialog) {
@@ -1635,16 +1456,14 @@
         message = "";
 
         try {
-            const response = await loadJson(`/api/statemodel/open/${selectedWorkspaceName}`, {
-                method: "POST"
-            });
+            const response = await openStateModelRequest(loadJson, selectedWorkspaceName);
             showStateModelStatus(response);
-            if (response.status === "RUNNING") {
-                openStateModelExternalTab(response.url || STATE_MODEL_URL);
-            } else if (response.status === "STARTING") {
+            if (stateModelShouldOpenExternalTab(response)) {
+                openStateModelExternalTab(stateModelExternalUrl(response));
+            } else if (stateModelShouldPollStatus(response)) {
                 scheduleStateModelStatusPolling();
             }
-            showTemporaryMessage(response.message || "State model analysis requested.");
+            showTemporaryMessage(stateModelRequestedMessage(response));
         } catch (openError) {
             reportClientError("Unable to open state model analysis", openError);
             const dialogContent = stateModelDialogMessage(openError);
@@ -1656,34 +1475,6 @@
 
     function isSelectedEditor(editorId) {
         return selectedEditor === editorId;
-    }
-
-    function sourceClassName(sourceFile) {
-        if (!sourceFile?.name) {
-            return "";
-        }
-
-        return sourceFile.name.endsWith(".java")
-            ? sourceFile.name.slice(0, -".java".length)
-            : sourceFile.name;
-    }
-
-    function referencedClasses(referenceGroup) {
-        if (!workspaceDocument?.references?.[referenceGroup]) {
-            return [];
-        }
-
-        return workspaceDocument.references[referenceGroup];
-    }
-
-    function sourceFilesForReferencedClasses(sourceFiles, referenceGroup) {
-        const configuredClassNames = new Set(referencedClasses(referenceGroup));
-        return sourceFiles.filter((sourceFile) => configuredClassNames.has(sourceClassName(sourceFile)));
-    }
-
-    function sourceFilesNotInReferenceSet(sourceFiles, referenceGroup) {
-        const configuredClassNames = new Set(referencedClasses(referenceGroup));
-        return sourceFiles.filter((sourceFile) => !configuredClassNames.has(sourceClassName(sourceFile)));
     }
 
     function setSettingValue(setting, value) {
@@ -1702,31 +1493,10 @@
             selectedWorkspaceCliStateProjectionMode = normalizeSettingDisplayValue(value);
         }
         if (Object.values(CLI_AGENT_SETTING_KEYS).includes(setting.key)) {
-            cliAgentSettings = cliAgentSettingsFromWorkspace();
+            cliAgentSettings = cliAgentSettingsFromWorkspace(workspaceDocument);
         }
         visualSettingsDirty = true;
         touchWorkspaceDocument();
-    }
-
-    function parsePropertiesContent(content) {
-        const properties = {};
-        if (!content) {
-            return properties;
-        }
-
-        for (const rawLine of content.split(/\r?\n/)) {
-            const line = rawLine.trim();
-            if (!line || line.startsWith("#") || !line.includes("=")) {
-                continue;
-            }
-
-            const separatorIndex = line.indexOf("=");
-            const key = line.slice(0, separatorIndex).trim();
-            const value = line.slice(separatorIndex + 1).trim();
-            properties[key] = value;
-        }
-
-        return properties;
     }
 
     function toPropertiesContent(properties) {
@@ -1736,38 +1506,7 @@
             .concat("\n");
     }
 
-    function sourceFileByClassName(className) {
-        if (!className) {
-            return null;
-        }
-
-        return compositionSourceFiles.find((sourceFile) => sourceClassName(sourceFile) === className)
-            || policySourceFiles.find((sourceFile) => sourceClassName(sourceFile) === className)
-            || null;
-    }
-
-    function createCompositionFlowNode(nodeDefinition, properties) {
-        const configuredClassName = nodeDefinition.propertyKey ? (properties[nodeDefinition.propertyKey] || "") : "";
-        const sourceFile = sourceFileByClassName(configuredClassName);
-        const isCustom = configuredClassName !== "";
-        const color = nodeDefinition.kind === "oracle"
-            ? "oracle"
-            : (isCustom ? (sourceFile ? "custom" : "invalid") : "default");
-
-        return {
-            id: nodeDefinition.id,
-            title: nodeDefinition.title,
-            propertyKey: nodeDefinition.propertyKey,
-            kind: nodeDefinition.kind,
-            configuredClassName,
-            sourceFile,
-            color,
-            description: isCustom
-                ? configuredClassName
-                : `Default ${nodeDefinition.kind} implementation`
-        };
-    }
-
+    // Composition Flow and Policies map selected nodes to editable Java/profile sources.
     function selectCompositionFlowNode(flowNode) {
         if (!flowNode) {
             selectedCompositionFlowNode = null;
@@ -1792,47 +1531,12 @@
         return selectedEditor === "java-policies" && selectedSourceName === sourceFile.name;
     }
 
-    function policyInterfaceSimpleName(propertyKey) {
-        const interfaceByPropertyKey = {
-            clickablePolicies: "ClickablePolicy",
-            typeablePolicies: "TypeablePolicy",
-            scrollablePolicies: "ScrollablePolicy",
-            selectablePolicies: "SelectablePolicy",
-            enabledPolicies: "EnabledPolicy",
-            blockedPolicies: "BlockedPolicy",
-            widgetFilterPolicies: "WidgetFilterPolicy",
-            visiblePolicies: "VisiblePolicy",
-            topLevelPolicies: "TopLevelPolicy"
-        };
-
-        return interfaceByPropertyKey[propertyKey] || "";
-    }
-
-    function inferPolicyPropertyKey(sourceFile) {
-        const className = sourceClassName(sourceFile);
-        for (const policyDefinition of workspaceDocument?.policyDefinitions || []) {
-            if ((policyDefinition.configuredClassNames || []).includes(className)) {
-                return policyDefinition.propertyKey;
-            }
-        }
-
-        const content = sourceFile?.content || "";
-        for (const policyDefinition of workspaceDocument?.policyDefinitions || []) {
-            const interfaceName = policyInterfaceSimpleName(policyDefinition.propertyKey);
-            if (interfaceName && content.includes(`implements ${interfaceName}`)) {
-                return policyDefinition.propertyKey;
-            }
-        }
-
-        return "";
-    }
-
     async function togglePolicySourceActivation(sourceFile, enablePolicy) {
         if (!selectedWorkspaceName || !workspaceDocument?.policiesProperties?.content || !sourceFile) {
             return;
         }
 
-        const propertyKey = inferPolicyPropertyKey(sourceFile);
+        const propertyKey = inferPolicyPropertyKey(sourceFile, workspaceDocument?.policyDefinitions || []);
         if (!propertyKey) {
             reportClientError(`Unable to infer policy seam for ${sourceFile.name}`, new Error("Unknown policy seam"));
             return;
@@ -1840,23 +1544,15 @@
 
         const className = sourceClassName(sourceFile);
         const properties = parsePropertiesContent(workspaceDocument.policiesProperties.content);
-        const existingValues = (properties[propertyKey] || "")
-            .split(";")
-            .map((value) => value.trim())
-            .filter((value) => value !== "" && value !== className);
-
-        if (enablePolicy) {
-            existingValues.push(className);
-        }
-
-        properties[propertyKey] = existingValues.join("; ");
+        const nextProperties = updatedPolicyPropertiesContent(properties, propertyKey, className, enablePolicy);
 
         await saveWorkspaceFile(
-            `/api/workspaces/${selectedWorkspaceName}/policies-properties`,
-            toPropertiesContent(properties)
+            "policies-properties",
+            toPropertiesContent(nextProperties)
         );
     }
 
+    // Test Results and Debug Files are workspace-scoped output views with independent loading state.
     async function loadResults(workspaceName = selectedWorkspaceName) {
         if (!workspaceName) {
             resultsData = null;
@@ -1866,7 +1562,7 @@
         }
 
         try {
-            resultsData = await loadJson(resultListUrl(workspaceName));
+            resultsData = await loadResultListRequest(loadJson, workspaceName);
             const resultGroups = resultsData.groups || [];
             if (resultGroups.length > 0) {
                 await selectResultGroup(resultGroups[resultGroups.length - 1]);
@@ -1881,7 +1577,7 @@
 
     async function loadDebugFiles() {
         try {
-            debugFiles = await loadJson("/api/debug-files");
+            debugFiles = await loadDebugFilesRequest(loadJson);
             if (debugFiles.length > 0) {
                 await loadDebugFile(debugFiles[0]);
             } else {
@@ -1901,8 +1597,7 @@
         }
 
         try {
-            const debugFilePath = encodeURIComponent(debugFile.path);
-            selectedDebugFile = await loadJson(`/api/debug-files/${debugFile.name}?path=${debugFilePath}`);
+            selectedDebugFile = await loadDebugFileRequest(loadJson, debugFile);
         } catch (debugFileError) {
             selectedDebugFile = {
                 name: debugFile.name,
@@ -1913,25 +1608,25 @@
         }
     }
 
+    // Test Goals and Test Oracles have their own source selections, separate from Composition/Policy Java files.
     function resetTestGoalSelection() {
-        selectedTestGoalFile = null;
-        selectedTestGoalFolderPath = "";
-        testGoalDraftContent = "";
-        savedTestGoalContent = "";
+        const nextState = clearedTestGoalSelectionState();
+        selectedTestGoalFolderPath = nextState.selectedTestGoalFolderPath;
+        selectedTestGoalFile = nextState.selectedTestGoalFile;
+        testGoalDraftContent = nextState.testGoalDraftContent;
+        savedTestGoalContent = nextState.savedTestGoalContent;
     }
 
     function resetOracleSourceSelection() {
-        selectedOracleSourceFile = null;
-        oracleSourceDraftContent = "";
-        savedOracleSourceContent = "";
-        oracleDslResult = null;
+        const nextState = clearedOracleSourceState();
+        selectedOracleSourceFile = nextState.selectedOracleSourceFile;
+        oracleSourceDraftContent = nextState.oracleSourceDraftContent;
+        savedOracleSourceContent = nextState.savedOracleSourceContent;
+        oracleDslResult = nextState.oracleDslResult;
+        javaCompileResult = nextState.javaCompileResult;
     }
 
-    function testOracleApiPath(workspaceName, suffix = "") {
-        const encodedWorkspaceName = encodeURIComponent(workspaceName || selectedWorkspaceName);
-        return `/api/workspaces/${encodedWorkspaceName}/test-oracles${suffix}`;
-    }
-
+    // Test Oracles combine settings-backed enablement with workspace Java and DSL oracle files.
     async function loadTestOracleInventory(workspaceName = selectedWorkspaceName) {
         if (!workspaceName) {
             testOracleInventory = null;
@@ -1941,7 +1636,7 @@
 
         testOracleInventoryLoading = true;
         try {
-            testOracleInventory = await loadJson(testOracleApiPath(workspaceName));
+            testOracleInventory = await loadTestOracleInventoryRequest(loadJson, workspaceName);
         } catch (oracleError) {
             reportClientError("Unable to load Test Oracles", oracleError);
             testOracleInventory = null;
@@ -1950,15 +1645,17 @@
         }
     }
 
+    // Implements WS-FUNC-ORACLE-DSL-EDITOR-001: load backend-generated DSL metadata used by Monaco assistance.
     async function loadDslOracleMetadata() {
         try {
-            dslOracleMetadata = await loadJson("/api/test-oracles/dsl/metadata");
+            dslOracleMetadata = await loadDslOracleMetadataRequest(loadJson);
         } catch (metadataError) {
             dslOracleMetadata = null;
             reportClientError("Unable to load DSL oracle metadata", metadataError);
         }
     }
 
+    // Implements WS-FUNC-ORACLE-JAVA-ENABLEMENT-001: write Java oracle checkbox state into ExtendedOracles.
     function updateExtendedOraclesSetting(nextValue) {
         for (const settingsGroup of workspaceDocument?.settingsGroups || []) {
             const setting = (settingsGroup.settings || []).find((item) => item.key === "ExtendedOracles");
@@ -2023,12 +1720,13 @@
 
         await guardConfigurationTransition(async () => {
             try {
-                const oraclePath = encodeURIComponent(oracleFile.path);
-                selectedOracleSourceFile = await loadJson(`${testOracleApiPath(selectedWorkspaceName, "/dsl/file")}?path=${oraclePath}`);
-                oracleSourceDraftContent = selectedOracleSourceFile.content || "";
-                savedOracleSourceContent = selectedOracleSourceFile.content || "";
-                oracleDslResult = null;
-                javaCompileResult = null;
+                selectedOracleSourceFile = await loadOracleDslFileRequest(loadJson, selectedWorkspaceName, oracleFile.path);
+                const nextState = loadedOracleSourceState(selectedOracleSourceFile);
+                selectedOracleSourceFile = nextState.selectedOracleSourceFile;
+                oracleSourceDraftContent = nextState.oracleSourceDraftContent;
+                savedOracleSourceContent = nextState.savedOracleSourceContent;
+                oracleDslResult = nextState.oracleDslResult;
+                javaCompileResult = nextState.javaCompileResult;
             } catch (oracleError) {
                 reportClientError(`Unable to load DSL oracle ${oracleFile.path}`, oracleError);
             }
@@ -2049,11 +1747,13 @@
 
         await guardConfigurationTransition(async () => {
             try {
-                const oraclePath = encodeURIComponent(oracleFile.path);
-                selectedOracleSourceFile = await loadJson(`${testOracleApiPath(selectedWorkspaceName, "/java/file")}?path=${oraclePath}`);
-                oracleSourceDraftContent = selectedOracleSourceFile.content || "";
-                savedOracleSourceContent = selectedOracleSourceFile.content || "";
-                oracleDslResult = null;
+                selectedOracleSourceFile = await loadOracleJavaFileRequest(loadJson, selectedWorkspaceName, oracleFile.path);
+                const nextState = loadedOracleSourceState(selectedOracleSourceFile);
+                selectedOracleSourceFile = nextState.selectedOracleSourceFile;
+                oracleSourceDraftContent = nextState.oracleSourceDraftContent;
+                savedOracleSourceContent = nextState.savedOracleSourceContent;
+                oracleDslResult = nextState.oracleDslResult;
+                javaCompileResult = nextState.javaCompileResult;
             } catch (oracleError) {
                 reportClientError(`Unable to load Java oracle ${oracleFile.path}`, oracleError);
             }
@@ -2078,17 +1778,17 @@
         message = "";
 
         try {
-            const oraclePath = encodeURIComponent(selectedOracleSourceFile.location);
-            selectedOracleSourceFile = await loadJson(`${testOracleApiPath(selectedWorkspaceName, "/java/file")}?path=${oraclePath}`, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ content: oracleSourceDraftContent })
-            });
-            oracleSourceDraftContent = selectedOracleSourceFile.content || "";
-            savedOracleSourceContent = selectedOracleSourceFile.content || "";
-            javaCompileResult = null;
+            selectedOracleSourceFile = await saveOracleJavaFileRequest(
+                loadJson,
+                selectedWorkspaceName,
+                selectedOracleSourceFile.location,
+                oracleSourceDraftContent
+            );
+            const nextState = loadedOracleSourceState(selectedOracleSourceFile);
+            selectedOracleSourceFile = nextState.selectedOracleSourceFile;
+            oracleSourceDraftContent = nextState.oracleSourceDraftContent;
+            savedOracleSourceContent = nextState.savedOracleSourceContent;
+            javaCompileResult = nextState.javaCompileResult;
             await loadTestOracleInventory();
             showTemporaryMessage("Java oracle saved.");
             return true;
@@ -2109,14 +1809,12 @@
         message = "";
 
         try {
-            const oraclePath = encodeURIComponent(selectedOracleSourceFile.location);
-            javaCompileResult = await loadJson(`${testOracleApiPath(selectedWorkspaceName, "/java/file/compile")}?path=${oraclePath}`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ content: oracleSourceDraftContent })
-            });
+            javaCompileResult = await compileOracleJavaFileRequest(
+                loadJson,
+                selectedWorkspaceName,
+                selectedOracleSourceFile.location,
+                oracleSourceDraftContent
+            );
             if (javaCompileResult?.success) {
                 savedOracleSourceContent = oracleSourceDraftContent;
                 await refreshWorkspaceDocument();
@@ -2127,13 +1825,7 @@
             return javaCompileResult?.success === true;
         } catch (oracleError) {
             reportClientError(`Unable to compile Java oracle ${selectedOracleSourceFile.location}`, oracleError);
-            javaCompileResult = {
-                success: false,
-                scope: "oracle-source",
-                targetName: selectedOracleSourceFile.name,
-                message: oracleError?.message || "Java oracle compilation failed.",
-                diagnostics: []
-            };
+            javaCompileResult = oracleJavaCompileErrorResult(selectedOracleSourceFile, oracleError?.message);
             return false;
         } finally {
             saving = false;
@@ -2149,14 +1841,13 @@
         message = "";
 
         try {
-            const oraclePath = encodeURIComponent(path);
-            selectedOracleSourceFile = await loadJson(`${testOracleApiPath(selectedWorkspaceName, "/dsl/file")}?path=${oraclePath}`, {
-                method: "POST"
-            });
-            oracleSourceDraftContent = selectedOracleSourceFile.content || "";
-            savedOracleSourceContent = selectedOracleSourceFile.content || "";
-            oracleDslResult = null;
-            javaCompileResult = null;
+            selectedOracleSourceFile = await createOracleDslFileRequest(loadJson, selectedWorkspaceName, path);
+            const nextState = loadedOracleSourceState(selectedOracleSourceFile);
+            selectedOracleSourceFile = nextState.selectedOracleSourceFile;
+            oracleSourceDraftContent = nextState.oracleSourceDraftContent;
+            savedOracleSourceContent = nextState.savedOracleSourceContent;
+            oracleDslResult = nextState.oracleDslResult;
+            javaCompileResult = nextState.javaCompileResult;
             await loadTestOracleInventory();
             showTemporaryMessage("DSL oracle created.");
         } catch (oracleError) {
@@ -2175,13 +1866,13 @@
         message = "";
 
         try {
-            const oraclePath = encodeURIComponent(path);
-            selectedOracleSourceFile = await loadJson(`${testOracleApiPath(selectedWorkspaceName, "/java/file")}?path=${oraclePath}`, {
-                method: "POST"
-            });
-            oracleSourceDraftContent = selectedOracleSourceFile.content || "";
-            savedOracleSourceContent = selectedOracleSourceFile.content || "";
-            oracleDslResult = null;
+            selectedOracleSourceFile = await createOracleJavaFileRequest(loadJson, selectedWorkspaceName, path);
+            const nextState = loadedOracleSourceState(selectedOracleSourceFile);
+            selectedOracleSourceFile = nextState.selectedOracleSourceFile;
+            oracleSourceDraftContent = nextState.oracleSourceDraftContent;
+            savedOracleSourceContent = nextState.savedOracleSourceContent;
+            oracleDslResult = nextState.oracleDslResult;
+            javaCompileResult = nextState.javaCompileResult;
             await refreshWorkspaceDocument();
             await loadTestOracleInventory();
             showTemporaryMessage("Java oracle created.");
@@ -2201,11 +1892,8 @@
         message = "";
 
         try {
-            const oraclePath = encodeURIComponent(path);
-            testOracleInventory = await loadJson(`${testOracleApiPath(selectedWorkspaceName, "/dsl/file")}?path=${oraclePath}`, {
-                method: "DELETE"
-            });
-            if (selectedOracleSourceFile?.location === path) {
+            testOracleInventory = await deleteOracleDslFileRequest(loadJson, selectedWorkspaceName, path);
+            if (shouldClearOracleSourceAfterDelete(selectedOracleSourceFile, path)) {
                 resetOracleSourceSelection();
             }
             showTemporaryMessage("DSL oracle deleted.");
@@ -2225,14 +1913,12 @@
         message = "";
 
         try {
-            const oraclePath = encodeURIComponent(selectedOracleSourceFile.location);
-            oracleDslResult = await loadJson(`${testOracleApiPath(selectedWorkspaceName, "/dsl/generate-java")}?path=${oraclePath}`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ content: oracleSourceDraftContent })
-            });
+            oracleDslResult = await generateJavaFromOracleDslFileRequest(
+                loadJson,
+                selectedWorkspaceName,
+                selectedOracleSourceFile.location,
+                oracleSourceDraftContent
+            );
             if (oracleDslResult?.success) {
                 savedOracleSourceContent = oracleSourceDraftContent;
                 await refreshWorkspaceDocument();
@@ -2241,12 +1927,7 @@
             }
         } catch (oracleError) {
             reportClientError(`Unable to generate Java from DSL oracle ${selectedOracleSourceFile.location}`, oracleError);
-            oracleDslResult = {
-                success: false,
-                message: oracleError?.message || "DSL generation failed.",
-                generatedJavaPath: "",
-                diagnostics: []
-            };
+            oracleDslResult = oracleDslGenerationErrorResult(oracleError?.message);
         } finally {
             saving = false;
         }
@@ -2261,11 +1942,8 @@
         message = "";
 
         try {
-            const oraclePath = encodeURIComponent(path);
-            testOracleInventory = await loadJson(`${testOracleApiPath(selectedWorkspaceName, "/java/file")}?path=${oraclePath}`, {
-                method: "DELETE"
-            });
-            if (selectedOracleSourceFile?.location === path) {
+            testOracleInventory = await deleteOracleJavaFileRequest(loadJson, selectedWorkspaceName, path);
+            if (shouldClearOracleSourceAfterDelete(selectedOracleSourceFile, path)) {
                 resetOracleSourceSelection();
             }
             showTemporaryMessage("Java oracle deleted.");
@@ -2276,11 +1954,7 @@
         }
     }
 
-    function testGoalApiPath(workspaceName, suffix = "") {
-        const encodedWorkspaceName = encodeURIComponent(workspaceName || selectedWorkspaceName);
-        return `/api/workspaces/${encodedWorkspaceName}/test-goals${suffix}`;
-    }
-
+    // Test Goals are authored per workspace and guarded like other editable workspace documents.
     async function loadTestGoalTree(workspaceName = selectedWorkspaceName) {
         if (!workspaceName) {
             testGoalTree = null;
@@ -2288,7 +1962,7 @@
         }
 
         try {
-            testGoalTree = await loadJson(testGoalApiPath(workspaceName));
+            testGoalTree = await loadTestGoalTreeRequest(loadJson, workspaceName);
         } catch (testGoalError) {
             reportClientError("Unable to load Test Goals", testGoalError);
             testGoalTree = null;
@@ -2297,19 +1971,17 @@
 
     async function loadTestGoalFileNow(goalFile) {
         if (!goalFile?.path) {
-            selectedTestGoalFile = null;
-            selectedTestGoalFolderPath = "";
-            testGoalDraftContent = "";
-            savedTestGoalContent = "";
+            resetTestGoalSelection();
             return;
         }
 
         try {
-            const goalPath = encodeURIComponent(goalFile.path);
-            selectedTestGoalFile = await loadJson(`${testGoalApiPath(selectedWorkspaceName, "/file")}?path=${goalPath}`);
-            selectedTestGoalFolderPath = null;
-            testGoalDraftContent = selectedTestGoalFile.content || "";
-            savedTestGoalContent = selectedTestGoalFile.content || "";
+            selectedTestGoalFile = await loadTestGoalFileRequest(loadJson, selectedWorkspaceName, goalFile.path);
+            const nextState = loadedTestGoalFileState(selectedTestGoalFile);
+            selectedTestGoalFolderPath = nextState.selectedTestGoalFolderPath;
+            selectedTestGoalFile = nextState.selectedTestGoalFile;
+            testGoalDraftContent = nextState.testGoalDraftContent;
+            savedTestGoalContent = nextState.savedTestGoalContent;
         } catch (testGoalError) {
             reportClientError(`Unable to load Test Goal ${goalFile.path}`, testGoalError);
         }
@@ -2358,16 +2030,17 @@
         message = "";
 
         try {
-            const goalPath = encodeURIComponent(selectedTestGoalFile.path);
-            selectedTestGoalFile = await loadJson(`${testGoalApiPath(selectedWorkspaceName, "/file")}?path=${goalPath}`, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ content: testGoalDraftContent })
-            });
-            testGoalDraftContent = selectedTestGoalFile.content || "";
-            savedTestGoalContent = selectedTestGoalFile.content || "";
+            selectedTestGoalFile = await saveTestGoalFileRequest(
+                loadJson,
+                selectedWorkspaceName,
+                selectedTestGoalFile.path,
+                testGoalDraftContent
+            );
+            const nextState = loadedTestGoalFileState(selectedTestGoalFile);
+            selectedTestGoalFolderPath = nextState.selectedTestGoalFolderPath;
+            selectedTestGoalFile = nextState.selectedTestGoalFile;
+            testGoalDraftContent = nextState.testGoalDraftContent;
+            savedTestGoalContent = nextState.savedTestGoalContent;
             await loadTestGoalTree();
             showTemporaryMessage("Test goal saved.");
             return true;
@@ -2389,14 +2062,13 @@
         message = "";
 
         try {
-            const goalPath = encodeURIComponent(path);
-            selectedTestGoalFile = await loadJson(`${testGoalApiPath(selectedWorkspaceName, "/file")}?path=${goalPath}`, {
-                method: "POST"
-            });
-            testGoalDraftContent = selectedTestGoalFile.content || "";
-            savedTestGoalContent = selectedTestGoalFile.content || "";
+            selectedTestGoalFile = await createTestGoalFileRequest(loadJson, selectedWorkspaceName, path);
+            const nextState = loadedTestGoalFileState(selectedTestGoalFile);
+            selectedTestGoalFolderPath = nextState.selectedTestGoalFolderPath;
+            selectedTestGoalFile = nextState.selectedTestGoalFile;
+            testGoalDraftContent = nextState.testGoalDraftContent;
+            savedTestGoalContent = nextState.savedTestGoalContent;
             await loadTestGoalTree();
-            selectedTestGoalFolderPath = null;
             showTemporaryMessage("Test goal created.");
         } catch (testGoalError) {
             reportClientError(`Unable to create Test Goal ${path}`, testGoalError);
@@ -2410,10 +2082,7 @@
         message = "";
 
         try {
-            const goalPath = encodeURIComponent(path);
-            testGoalTree = await loadJson(`${testGoalApiPath(selectedWorkspaceName, "/folder")}?path=${goalPath}`, {
-                method: "POST"
-            });
+            testGoalTree = await createTestGoalFolderRequest(loadJson, selectedWorkspaceName, path);
             showTemporaryMessage("Test goal folder created.");
         } catch (testGoalError) {
             reportClientError(`Unable to create Test Goal folder ${path}`, testGoalError);
@@ -2431,15 +2100,9 @@
         message = "";
 
         try {
-            const goalPath = encodeURIComponent(path);
-            testGoalTree = await loadJson(`${testGoalApiPath(selectedWorkspaceName)}?path=${goalPath}`, {
-                method: "DELETE"
-            });
-            if (selectedTestGoalFile?.path === path || selectedTestGoalFile?.path?.startsWith(`${path}/`)) {
-                selectedTestGoalFile = null;
-                selectedTestGoalFolderPath = "";
-                testGoalDraftContent = "";
-                savedTestGoalContent = "";
+            testGoalTree = await deleteTestGoalPathRequest(loadJson, selectedWorkspaceName, path);
+            if (shouldClearTestGoalSelectionAfterDelete(selectedTestGoalFile, path)) {
+                resetTestGoalSelection();
             }
             showTemporaryMessage("Test goal item deleted.");
         } catch (testGoalError) {
@@ -2449,32 +2112,14 @@
         }
     }
 
+    // Derived view state feeds child components with current source lists and editor document metadata.
     $: if (workspaceDocument?.sourceFiles) {
-        policySourceFiles = workspaceDocument.sourceFiles.filter((sourceFile) => sourceFile.category === "policy");
-        compositionSourceFiles = workspaceDocument.sourceFiles.filter((sourceFile) =>
-            sourceFile.category === "service" || sourceFile.category === "capability"
-        );
-        activePolicySourceFiles = sourceFilesForReferencedClasses(policySourceFiles, "policies");
-        inactivePolicySourceFiles = sourceFilesNotInReferenceSet(policySourceFiles, "policies");
-        const compositionProperties = parsePropertiesContent(workspaceDocument.compositionProperties.content);
-        compositionFlowNodes = [
-            createCompositionFlowNode({ id: "settings", title: "SettingsCapability", propertyKey: "settingsCapabilityClass", kind: "capability" }, compositionProperties),
-            createCompositionFlowNode({ id: "test-session", title: "TestSessionCapability", propertyKey: "testSessionCapabilityClass", kind: "capability" }, compositionProperties),
-            createCompositionFlowNode({ id: "test-sequence", title: "TestSequenceCapability", propertyKey: "testSequenceCapabilityClass", kind: "capability" }, compositionProperties),
-            createCompositionFlowNode({ id: "system", title: "SystemService", propertyKey: "systemServiceClass", kind: "service" }, compositionProperties),
-            createCompositionFlowNode({ id: "stop-criteria", title: "StopCriteriaCapability", propertyKey: "stopCriteriaCapabilityClass", kind: "capability" }, compositionProperties),
-            createCompositionFlowNode({ id: "state", title: "StateService", propertyKey: "stateServiceClass", kind: "service" }, compositionProperties),
-            createCompositionFlowNode({ id: "state-identifier", title: "StateIdentifierService", propertyKey: "stateIdentifierServiceClass", kind: "service" }, compositionProperties),
-            createCompositionFlowNode({ id: "oracle-evaluation", title: "OracleEvaluationService", propertyKey: "", kind: "service" }, compositionProperties),
-            createCompositionFlowNode({ id: "oracle-services", title: "Custom Oracle Services", propertyKey: "oracleComposerClass", kind: "oracle" }, compositionProperties),
-            createCompositionFlowNode({ id: "action-derivation", title: "ActionDerivationService", propertyKey: "actionDerivationServiceClass", kind: "service" }, compositionProperties),
-            createCompositionFlowNode({ id: "action-identifier", title: "ActionIdentifierService", propertyKey: "actionIdentifierServiceClass", kind: "service" }, compositionProperties),
-            createCompositionFlowNode({ id: "action-selector", title: "ActionSelectorService", propertyKey: "actionSelectorServiceClass", kind: "service" }, compositionProperties),
-            createCompositionFlowNode({ id: "action-execution", title: "ActionExecutionService", propertyKey: "actionExecutionServiceClass", kind: "service" }, compositionProperties)
-        ];
-        if (selectedCompositionFlowNode) {
-            selectedCompositionFlowNode = compositionFlowNodes.find((flowNode) => flowNode.id === selectedCompositionFlowNode.id) || selectedCompositionFlowNode;
-        }
+        policySourceFiles = policySourceFilesFromWorkspace(workspaceDocument);
+        compositionSourceFiles = compositionSourceFilesFromWorkspace(workspaceDocument);
+        activePolicySourceFiles = sourceFilesForReferencedClasses(policySourceFiles, workspaceDocument, "policies");
+        inactivePolicySourceFiles = sourceFilesNotInReferenceSet(policySourceFiles, workspaceDocument, "policies");
+        compositionFlowNodes = buildCompositionFlowNodes(workspaceDocument, compositionSourceFiles.concat(policySourceFiles));
+        selectedCompositionFlowNode = refreshedSelectedCompositionFlowNode(compositionFlowNodes, selectedCompositionFlowNode);
     } else {
         policySourceFiles = [];
         compositionSourceFiles = [];
@@ -2483,60 +2128,59 @@
         compositionFlowNodes = [];
     }
 
-    $: if (!workspaceDocument) {
-        currentEditorDocument = null;
-    } else if (selectedEditor === "test-settings") {
-        currentEditorDocument = {
-            title: "Edit Settings",
-            saveLabel: "Save Settings",
-            dirty: hasSettingsChanges(),
-            save: () => saveWorkspaceFile(
-                `/api/workspaces/${selectedWorkspaceName}/test-settings`,
-                workspaceDocument.testSettings.content
-            )
-        };
-    } else if (selectedEditor === "settings-form") {
-        currentEditorDocument = {
-            title: "Edit Settings",
-            saveLabel: "Save Settings",
-            dirty: hasSettingsChanges(),
-            save: saveVisualSettings
-        };
-    } else if (selectedEditor === "policies-properties") {
-        currentEditorDocument = {
-            title: "Edit policies.properties",
-            saveLabel: "Save policies.properties",
-            dirty: hasPoliciesPropertiesChanges(),
-            save: () => saveWorkspaceFile(
-                `/api/workspaces/${selectedWorkspaceName}/policies-properties`,
-                workspaceDocument.policiesProperties.content
-            )
-        };
-    } else if (selectedEditor === "composition-properties") {
-        currentEditorDocument = {
-            title: "Edit composition.properties",
-            saveLabel: "Save composition.properties",
-            dirty: hasCompositionPropertiesChanges(),
-            save: () => saveWorkspaceFile(
-                `/api/workspaces/${selectedWorkspaceName}/composition-properties`,
-                workspaceDocument.compositionProperties.content
-            )
-        };
-    } else if (selectedEditor !== "java-policies" && selectedEditor !== "java-composition" && selectedSourceFile) {
-        currentEditorDocument = {
-            title: selectedSourceFile.name,
-            saveLabel: "Save source",
-            dirty: hasSelectedSourceChanges([selectedSourceFile.category]),
-            save: saveSelectedSource
-        };
-    } else {
-        currentEditorDocument = null;
+    $: {
+        const editorDocumentDescriptor = currentEditorDocumentDescriptor({
+            workspaceDocument,
+            selectedEditor,
+            selectedSourceFile
+        });
+
+        if (!editorDocumentDescriptor) {
+            currentEditorDocument = null;
+        } else if (editorDocumentDescriptor.kind === "test-settings") {
+            currentEditorDocument = {
+                ...editorDocumentDescriptor,
+                dirty: hasSettingsChanges(),
+                save: saveCurrentSettingsEditor
+            };
+        } else if (editorDocumentDescriptor.kind === "settings-form") {
+            currentEditorDocument = {
+                ...editorDocumentDescriptor,
+                dirty: hasSettingsChanges(),
+                save: saveVisualSettings
+            };
+        } else if (editorDocumentDescriptor.kind === "policies-properties") {
+            currentEditorDocument = {
+                ...editorDocumentDescriptor,
+                dirty: hasPoliciesPropertiesChanges(),
+                save: () => saveWorkspaceFile(
+                    "policies-properties",
+                    workspaceDocument.policiesProperties.content
+                )
+            };
+        } else if (editorDocumentDescriptor.kind === "composition-properties") {
+            currentEditorDocument = {
+                ...editorDocumentDescriptor,
+                dirty: hasCompositionPropertiesChanges(),
+                save: () => saveWorkspaceFile(
+                    "composition-properties",
+                    workspaceDocument.compositionProperties.content
+                )
+            };
+        } else if (editorDocumentDescriptor.kind === "source") {
+            currentEditorDocument = {
+                ...editorDocumentDescriptor,
+                dirty: hasSelectedSourceChanges([editorDocumentDescriptor.sourceCategory]),
+                save: saveSelectedSource
+            };
+        }
     }
 
     $: if (selectedEditor === "settings-form" && !selectedSettingsGroupId && workspaceDocument?.settingsGroups?.length > 0) {
-        selectedSettingsGroupId = workspaceDocument.settingsGroups[0].id;
+        selectedSettingsGroupId = selectedSettingsGroupForEditor(workspaceDocument, "", selectedSettingsGroupId);
     }
 
+    // Result selection and deletion update the workspace-scoped report model without reloading the whole app.
     async function selectResultGroup(resultGroup) {
         selectedResultGroup = resultGroup;
         selectedResultFile = null;
@@ -2553,23 +2197,17 @@
         }
 
         try {
-            selectedResultFile = await loadJson(resultFileUrl(selectedWorkspaceName, resultFile));
+            selectedResultFile = await loadResultFileRequest(loadJson, selectedWorkspaceName, resultFile);
         } catch (fileError) {
             reportClientError(`Unable to load result file ${resultFile.name}`, fileError);
         }
     }
 
     function applyRefreshedResults(refreshedResults, preferredGroupPath = "") {
-        resultsData = refreshedResults;
-        const resultGroups = resultsData?.groups || [];
-        if (resultGroups.length > 0) {
-            selectedResultGroup = resultGroups.find((resultGroup) => resultGroup.path === preferredGroupPath)
-                || resultGroups[resultGroups.length - 1];
-        } else {
-            selectedResultGroup = null;
-        }
-
-        selectedResultFile = null;
+        const nextState = refreshedResultSelectionState(refreshedResults, preferredGroupPath);
+        resultsData = nextState.resultsData;
+        selectedResultGroup = nextState.selectedResultGroup;
+        selectedResultFile = nextState.selectedResultFile;
     }
 
     async function deleteResultFile(resultFile) {
@@ -2579,9 +2217,7 @@
 
         try {
             const currentGroupPath = selectedResultGroup?.path || "";
-            const refreshedResults = await loadJson(resultFileUrl(selectedWorkspaceName, resultFile), {
-                method: "DELETE"
-            });
+            const refreshedResults = await deleteResultFileRequest(loadJson, selectedWorkspaceName, resultFile);
             applyRefreshedResults(refreshedResults, currentGroupPath);
         } catch (deleteError) {
             reportClientError(`Unable to delete result file ${resultFile.name}`, deleteError);
@@ -2594,15 +2230,14 @@
         }
 
         try {
-            const refreshedResults = await loadJson(resultGroupDeleteUrl(selectedWorkspaceName, resultGroup), {
-                method: "DELETE"
-            });
+            const refreshedResults = await deleteResultGroupRequest(loadJson, selectedWorkspaceName, resultGroup);
             applyRefreshedResults(refreshedResults);
         } catch (deleteError) {
             reportClientError(`Unable to delete result output folder ${resultGroup.name}`, deleteError);
         }
     }
 
+    // Runtime execution actions drive Spy, Generate, and CLI modes while preserving shared status polling.
     async function startRemoteSpyMode() {
         if (!selectedWorkspaceName) {
             return;
@@ -2610,13 +2245,11 @@
 
         saving = true;
         message = "";
-        currentPage = "spy";
+        currentPage = runtimePageForAction(RUNTIME_ACTIONS.REMOTE_SPY);
 
         try {
-            spyState = await loadJson(`/api/spy/start/${selectedWorkspaceName}`, {
-                method: "POST"
-            });
-            showTemporaryMessage(spyState.message || "Remote Spy Mode started.");
+            spyState = await startRemoteSpyRequest(loadJson, selectedWorkspaceName);
+            showTemporaryMessage(runtimeActionFeedbackMessage(RUNTIME_FEEDBACK_ACTIONS.REMOTE_SPY_STARTED, spyState));
         } catch (spyError) {
             reportClientError("Unable to start remote Spy Mode", spyError);
         } finally {
@@ -2624,6 +2257,7 @@
         }
     }
 
+    // Implements WS-FUNC-COMPOSITION-FLOW-001: creates or opens the Java source linked to a composition node.
     async function createCompositionModuleSource(flowNode) {
         if (!selectedWorkspaceName || !flowNode?.propertyKey) {
             return;
@@ -2633,12 +2267,7 @@
         message = "";
 
         try {
-            const sourceFile = await loadJson(
-                `/api/workspaces/${selectedWorkspaceName}/composition/modules/${encodeURIComponent(flowNode.propertyKey)}/source`,
-                {
-                    method: "POST"
-                }
-            );
+            const sourceFile = await createCompositionModuleSourceRequest(loadJson, selectedWorkspaceName, flowNode.propertyKey);
 
             await refreshWorkspaceDocument();
             selectedSourceName = sourceFile.name;
@@ -2652,6 +2281,7 @@
         }
     }
 
+    // Implements WS-FUNC-POLICIES-001: creates Java policy source files for selected policy seams.
     async function createPolicySource(policyDefinition) {
         if (!selectedWorkspaceName || !policyDefinition?.propertyKey) {
             return;
@@ -2661,12 +2291,7 @@
         message = "";
 
         try {
-            const sourceFile = await loadJson(
-                `/api/workspaces/${selectedWorkspaceName}/policies/${encodeURIComponent(policyDefinition.propertyKey)}/source`,
-                {
-                    method: "POST"
-                }
-            );
+            const sourceFile = await createPolicySourceRequest(loadJson, selectedWorkspaceName, policyDefinition.propertyKey);
 
             await refreshWorkspaceDocument();
             selectedSourceName = sourceFile.name;
@@ -2685,9 +2310,7 @@
         message = "";
 
         try {
-            spyState = await loadJson("/api/spy/refresh", {
-                method: "POST"
-            });
+            spyState = await refreshRemoteSpyRequest(loadJson);
         } catch (spyError) {
             reportClientError("Unable to refresh remote Spy Mode", spyError);
         } finally {
@@ -2700,10 +2323,8 @@
         message = "";
 
         try {
-            spyState = await loadJson("/api/spy/stop", {
-                method: "POST"
-            });
-            showTemporaryMessage(spyState.message || "Remote Spy Mode stopped.");
+            spyState = await stopRemoteSpyRequest(loadJson);
+            showTemporaryMessage(runtimeActionFeedbackMessage(RUNTIME_FEEDBACK_ACTIONS.REMOTE_SPY_STOPPED, spyState));
         } catch (spyError) {
             reportClientError("Unable to stop remote Spy Mode", spyError);
         } finally {
@@ -2720,9 +2341,7 @@
         message = "";
 
         try {
-            spyState = await loadJson(`/api/spy/actions/${encodeURIComponent(actionId)}`, {
-                method: "POST"
-            });
+            spyState = await executeSpyActionRequest(loadJson, actionId);
         } catch (spyError) {
             reportClientError(`Unable to execute Spy Mode action ${actionId}`, spyError);
         } finally {
@@ -2739,9 +2358,7 @@
         message = "";
 
         try {
-            spyState = await loadJson(`/api/spy/widgets/${encodeURIComponent(widgetId)}/default-action`, {
-                method: "POST"
-            });
+            spyState = await executeSpyWidgetDefaultActionRequest(loadJson, widgetId);
         } catch (spyError) {
             reportClientError(`Unable to execute default Spy Mode action for ${widgetId}`, spyError);
         } finally {
@@ -2756,13 +2373,11 @@
 
         saving = true;
         message = "";
-        currentPage = "spy";
+        currentPage = runtimePageForAction(RUNTIME_ACTIONS.LOCAL_SPY);
 
         try {
-            scriptlessStatus = await loadJson(`/api/execution/scriptless/local-spy/${selectedWorkspaceName}`, {
-                method: "POST"
-            });
-            showTemporaryMessage(scriptlessStatus.message || "Local Spy Mode started.");
+            scriptlessStatus = await startLocalSpyRequest(loadJson, selectedWorkspaceName);
+            showTemporaryMessage(runtimeActionFeedbackMessage(RUNTIME_FEEDBACK_ACTIONS.LOCAL_SPY_STARTED, scriptlessStatus));
         } catch (spyError) {
             reportClientError("Unable to start local Spy Mode", spyError);
         } finally {
@@ -2775,10 +2390,8 @@
         message = "";
 
         try {
-            scriptlessStatus = await loadJson("/api/execution/scriptless/stop", {
-                method: "POST"
-            });
-            showTemporaryMessage(scriptlessStatus.message || "Local Spy Mode stopped.");
+            scriptlessStatus = await stopScriptlessRequest(loadJson);
+            showTemporaryMessage(runtimeActionFeedbackMessage(RUNTIME_FEEDBACK_ACTIONS.LOCAL_SPY_STOPPED, scriptlessStatus));
         } catch (spyError) {
             reportClientError("Unable to stop local Spy Mode", spyError);
         } finally {
@@ -2795,13 +2408,7 @@
         message = "";
 
         try {
-            spyState = await loadJson(`/api/spy/widgets/${encodeURIComponent(widgetId)}/direct-type`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ text })
-            });
+            spyState = await executeSpyWidgetDirectTypeRequest(loadJson, widgetId, text);
         } catch (spyError) {
             reportClientError(`Unable to type into Spy Mode widget ${widgetId}`, spyError);
         } finally {
@@ -2820,16 +2427,11 @@
 
         saving = true;
         message = "";
-        currentPage = "cli";
+        currentPage = runtimePageForAction(RUNTIME_ACTIONS.CLI_MANUAL);
 
         try {
-            cliStatus = await loadJson(`/api/execution/cli/manual/start/${selectedWorkspaceName}`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            });
-            showTemporaryMessage(cliStatus.message || "Manual CLI session started.");
+            cliStatus = await startCliManualSessionRequest(loadJson, selectedWorkspaceName);
+            showTemporaryMessage(runtimeActionFeedbackMessage(RUNTIME_FEEDBACK_ACTIONS.CLI_MANUAL_STARTED, cliStatus));
         } catch (cliError) {
             reportClientError("Unable to start manual CLI session", cliError);
         } finally {
@@ -2848,16 +2450,11 @@
 
         saving = true;
         message = "";
-        currentPage = "cli";
+        currentPage = runtimePageForAction(RUNTIME_ACTIONS.CLI_AGENT);
 
         try {
-            cliStatus = await loadJson(`/api/execution/cli/agent/start/${selectedWorkspaceName}`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            });
-            showTemporaryMessage(cliStatus.message || "Agent CLI execution started.");
+            cliStatus = await startCliAgentSessionRequest(loadJson, selectedWorkspaceName);
+            showTemporaryMessage(runtimeActionFeedbackMessage(RUNTIME_FEEDBACK_ACTIONS.CLI_AGENT_STARTED, cliStatus));
         } catch (cliError) {
             reportClientError("Unable to start agent CLI execution", cliError);
         } finally {
@@ -2870,13 +2467,7 @@
         message = "";
 
         try {
-            cliStatus = await loadJson("/api/execution/cli/manual/command", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ commandLine })
-            });
+            cliStatus = await runCliManualCommandRequest(loadJson, commandLine);
         } catch (cliError) {
             reportClientError(`Unable to execute CLI command ${commandLine}`, cliError);
         } finally {
@@ -2889,10 +2480,8 @@
         message = "";
 
         try {
-            cliStatus = await loadJson("/api/execution/cli/manual/stop", {
-                method: "POST"
-            });
-            showTemporaryMessage(cliStatus.message || "Manual CLI session stopped.");
+            cliStatus = await stopCliManualSessionRequest(loadJson);
+            showTemporaryMessage(runtimeActionFeedbackMessage(RUNTIME_FEEDBACK_ACTIONS.CLI_MANUAL_STOPPED, cliStatus));
         } catch (cliError) {
             reportClientError("Unable to stop manual CLI session", cliError);
         } finally {
@@ -2905,10 +2494,8 @@
         message = "";
 
         try {
-            cliStatus = await loadJson("/api/execution/cli/agent/stop", {
-                method: "POST"
-            });
-            showTemporaryMessage(cliStatus.message || "Agent CLI execution stopped.");
+            cliStatus = await stopCliAgentSessionRequest(loadJson);
+            showTemporaryMessage(runtimeActionFeedbackMessage(RUNTIME_FEEDBACK_ACTIONS.CLI_AGENT_STOPPED, cliStatus));
         } catch (cliError) {
             reportClientError("Unable to stop agent CLI execution", cliError);
         } finally {
@@ -2949,10 +2536,11 @@
         }
     }
 
-    $: selectedWorkspaceSummary = workspaces.find((workspace) => workspace.name === selectedWorkspaceName) || null;
+    $: selectedWorkspaceSummary = workspaceSummaryForName(workspaces, selectedWorkspaceName);
     $: workspaceCreateValidationState = workspaceCreateValidation(workspaceCreateDraft, workspaces);
     $: workspaceRenameValidationState = workspaceRenameValidation(workspaceRenameDraft, selectedWorkspaceName, workspaces);
 
+    // Startup loads metadata, backend status, and the default workspace before child views render.
     onMount(async () => {
         startScriptlessPolling();
         try {
@@ -2961,7 +2549,7 @@
             await loadDslOracleMetadata();
             await refreshInitialData();
             if (workspaces.length > 0) {
-                const defaultWorkspace = workspaces.find((workspace) => workspace.name === "webdriver_generic") || workspaces[0];
+                const defaultWorkspace = preferredDefaultWorkspace(workspaces);
                 await loadWorkspace(defaultWorkspace.name);
                 if (currentPage === "basic-settings") {
                     openBasicSettingsImmediate();
@@ -2982,102 +2570,25 @@
 </svelte:head>
 
 <div class="page">
-    <nav class="panel panel-wide page-nav">
-        <div class="page-nav-workspace">
-            <button type="button" class="secondary page-workspace-action" on:click={openWorkspaceManagementDialog}>
-                Workspace
-            </button>
-            <select
-                id="page-workspace-select"
-                value={selectedWorkspaceName}
-                on:change={(event) => {
-                    const nextWorkspaceName = event.currentTarget.value;
-                    guardApplicationTransition(async () => {
-                        await loadWorkspace(nextWorkspaceName);
-                    });
-                }}
-            >
-                {#each workspaces as workspace}
-                    <option value={workspace.name}>{workspace.name}</option>
-                {/each}
-            </select>
-        </div>
-        <div class="page-nav-role">
-            <label for="page-role-select">Role</label>
-            <select
-                id="page-role-select"
-                value={currentRole}
-                on:change={(event) => changeWebStudioRole(event.currentTarget.value)}
-            >
-                <option value={WEB_STUDIO_ROLES.BASIC}>Basic</option>
-                <option value={WEB_STUDIO_ROLES.ADVANCED}>Advanced</option>
-            </select>
-        </div>
-        <div class="page-nav-menu">
-            <button
-                class:secondary={!menuHasActivePage(testConfigurationMenuItems(currentRole), currentPage)}
-                type="button"
-                on:click={() => toggleNavMenu("configure")}
-            >
-                ⚙️ Test Configuration ▼
-            </button>
-            {#if activeNavMenu === "configure"}
-                <div class="page-nav-dropdown">
-                    {#each testConfigurationMenuItems(currentRole) as item}
-                        <button type="button" class:secondary={item.id !== currentPage} disabled={item.disabled} on:click={() => navigateFromMenu(item)}>
-                            {item.label}
-                        </button>
-                    {/each}
-                </div>
-            {/if}
-        </div>
-        <button class:secondary={currentPage !== "oracles"} on:click={navigateToTestOracles}>
-            🔮 Test Oracles
-        </button>
-        <button class:secondary={currentPage !== "test-goals"} on:click={navigateToTestGoals}>
-            🎯 Test Goals
-        </button>
-        <button class:secondary={currentPage !== "spy"} on:click={navigateToSpy}>
-            🔍 Spy Mode
-        </button>
-        <div class="page-nav-menu">
-            <button
-                class:secondary={!menuHasActivePage(runModeMenuItems(), currentPage)}
-                type="button"
-                on:click={() => toggleNavMenu("run")}
-            >
-                🔄 Run Modes ▼
-            </button>
-            {#if activeNavMenu === "run"}
-                <div class="page-nav-dropdown">
-                    {#each runModeMenuItems() as item}
-                        <button type="button" class:secondary={item.id !== currentPage} disabled={item.disabled} on:click={() => navigateFromMenu(item)}>
-                            {item.label}
-                        </button>
-                    {/each}
-                </div>
-            {/if}
-        </div>
-        <div class="page-nav-menu">
-            <button
-                class:secondary={!menuHasActivePage(resultMenuItems(currentRole), currentPage)}
-                type="button"
-                on:click={() => toggleNavMenu("results")}
-            >
-                👁️ View Results ▼
-            </button>
-            {#if activeNavMenu === "results"}
-                <div class="page-nav-dropdown">
-                    {#each resultMenuItems(currentRole) as item}
-                        <button type="button" class:secondary={item.id !== currentPage} disabled={item.disabled} on:click={() => navigateFromMenu(item)}>
-                            {item.label}
-                        </button>
-                    {/each}
-                </div>
-            {/if}
-        </div>
-    </nav>
-
+    <TopNavigation
+        activeNavMenu={activeNavMenu}
+        currentPage={currentPage}
+        currentRole={currentRole}
+        selectedWorkspaceName={selectedWorkspaceName}
+        workspaces={workspaces}
+        onWorkspaceManage={openWorkspaceManagementDialog}
+        onWorkspaceChange={(nextWorkspaceName) => {
+            guardApplicationTransition(async () => {
+                await loadWorkspace(nextWorkspaceName);
+            });
+        }}
+        onRoleChange={changeWebStudioRole}
+        onToggleMenu={toggleNavMenu}
+        onNavigateFromMenu={navigateFromMenu}
+        onNavigateToTestOracles={navigateToTestOracles}
+        onNavigateToTestGoals={navigateToTestGoals}
+        onNavigateToSpy={navigateToSpy}
+    />
     {#if currentPage === "basic-settings"}
         <BasicSettingsView
             currentEditorDocument={currentEditorDocument}
@@ -3206,55 +2717,35 @@
         />
     {/if}
 
-    {#if currentPage === "run"}
-        <RunTestarView
-            saving={saving}
-            scriptlessStatus={scriptlessStatus}
-            selectedWorkspaceName={selectedWorkspaceName}
-            selectedWorkspaceSutConnectorValue={selectedWorkspaceSutConnectorValue}
-            startGenerate={startGenerate}
-            stopGenerate={stopGenerate}
-        />
-    {/if}
-
-    {#if currentPage === "spy"}
-        <SpyModeView
-            scriptlessStatus={scriptlessStatus}
-            saving={saving}
-            selectedWorkspaceName={selectedWorkspaceName}
-            selectedWorkspaceSutConnectorValue={selectedWorkspaceSutConnectorValue}
-            spyState={spyState}
-            startRemoteSpyMode={startRemoteSpyMode}
-            refreshRemoteSpyMode={refreshRemoteSpyMode}
-            stopRemoteSpyMode={stopRemoteSpyMode}
-            startLocalSpyMode={startLocalSpyMode}
-            stopLocalSpyMode={stopLocalSpyMode}
-            executeSpyAction={executeSpyAction}
-            executeSpyWidgetDefaultAction={executeSpyWidgetDefaultAction}
-            executeSpyWidgetDirectType={executeSpyWidgetDirectType}
-        />
-    {/if}
-
-    {#if currentPage === "cli"}
-        {#key `cli:${selectedWorkspaceName}`}
-            <CliModeView
-                cliAgentSettings={cliAgentSettings}
-                cliStatus={cliStatus}
-                savedCliAgentSettings={savedCliAgentSettings}
-                saving={saving}
-                saveCliAgentSettings={saveCliAgentSettings}
-                selectedWorkspaceSutConnector={selectedWorkspaceSutConnector}
-                selectedWorkspaceSutConnectorValue={selectedWorkspaceSutConnectorValue}
-                selectedWorkspaceCliStateProjectionMode={selectedWorkspaceCliStateProjectionMode}
-                selectedWorkspaceAvailableInCli={Boolean(selectedWorkspaceName)}
-                startCliAgentSession={startCliAgentSession}
-                startCliManualSession={startCliManualSession}
-                runCliManualCommand={runCliManualCommand}
-                stopCliAgentSession={stopCliAgentSession}
-                stopCliManualSession={stopCliManualSession}
-            />
-        {/key}
-    {/if}
+    <RuntimePages
+        cliAgentSettings={cliAgentSettings}
+        cliStatus={cliStatus}
+        currentPage={currentPage}
+        savedCliAgentSettings={savedCliAgentSettings}
+        saving={saving}
+        scriptlessStatus={scriptlessStatus}
+        selectedWorkspaceName={selectedWorkspaceName}
+        selectedWorkspaceSutConnector={selectedWorkspaceSutConnector}
+        selectedWorkspaceSutConnectorValue={selectedWorkspaceSutConnectorValue}
+        selectedWorkspaceCliStateProjectionMode={selectedWorkspaceCliStateProjectionMode}
+        spyState={spyState}
+        executeSpyAction={executeSpyAction}
+        executeSpyWidgetDefaultAction={executeSpyWidgetDefaultAction}
+        executeSpyWidgetDirectType={executeSpyWidgetDirectType}
+        refreshRemoteSpyMode={refreshRemoteSpyMode}
+        runCliManualCommand={runCliManualCommand}
+        saveCliAgentSettings={saveCliAgentSettings}
+        startCliAgentSession={startCliAgentSession}
+        startCliManualSession={startCliManualSession}
+        startGenerate={startGenerate}
+        startLocalSpyMode={startLocalSpyMode}
+        startRemoteSpyMode={startRemoteSpyMode}
+        stopCliAgentSession={stopCliAgentSession}
+        stopCliManualSession={stopCliManualSession}
+        stopGenerate={stopGenerate}
+        stopLocalSpyMode={stopLocalSpyMode}
+        stopRemoteSpyMode={stopRemoteSpyMode}
+    />
 
     {#if currentPage === "test-goals"}
         <TestGoalsView
@@ -3297,200 +2788,38 @@
         />
     {/if}
 
-    {#if message}
-        <div class="toast-message">
-            {message}
-        </div>
-    {/if}
-
-    {#if workspaceManagementDialogOpen}
-        <div class="composition-modal-backdrop" role="presentation" on:click={closeWorkspaceManagementDialogFromBackdrop}>
-            <div
-                class="composition-modal state-model-dialog workspace-management-dialog"
-                role="dialog"
-                aria-modal="true"
-                aria-labelledby="workspace-management-dialog-title"
-            >
-                <div class="composition-modal-header">
-                    <div>
-                        <h2 id="workspace-management-dialog-title">Manage Workspace</h2>
-                        <p>Create a workspace from an existing base, or rename the selected workspace.</p>
-                    </div>
-                </div>
-                <div class="workspace-management-tabs" role="tablist" aria-label="Workspace management actions">
-                    <button
-                        type="button"
-                        class:secondary={workspaceManagementTab !== "create"}
-                        on:click={() => {
-                            workspaceManagementTab = "create";
-                            workspaceManagementError = "";
-                        }}
-                        disabled={saving}
-                    >
-                        Create Workspace
-                    </button>
-                    <button
-                        type="button"
-                        class:secondary={workspaceManagementTab !== "rename"}
-                        on:click={() => {
-                            workspaceManagementTab = "rename";
-                            workspaceManagementError = "";
-                        }}
-                        disabled={saving || !selectedWorkspaceName}
-                    >
-                        Rename Workspace
-                    </button>
-                </div>
-                <div class="composition-modal-body workspace-management-form">
-                    {#if workspaceManagementTab === "create"}
-                        <label>
-                            <span>Workspace name</span>
-                            <input
-                                type="text"
-                                bind:value={workspaceCreateDraft.name}
-                                placeholder="platform_application (e.g., webdriver_parabank)"
-                                disabled={saving}
-                            />
-                        </label>
-                        <label>
-                            <span>Base workspace</span>
-                            <select bind:value={workspaceCreateDraft.baseWorkspace} disabled={saving}>
-                                {#each workspaces as workspace}
-                                    <option value={workspace.name}>{workspace.name}</option>
-                                {/each}
-                            </select>
-                        </label>
-                        <label class="workspace-management-checkbox">
-                            <input
-                                type="checkbox"
-                                bind:checked={workspaceCreateDraft.copyTestGoals}
-                                disabled={saving}
-                            />
-                            <span>Copy Test Goals from base workspace</span>
-                        </label>
-                        <label class="workspace-management-checkbox">
-                            <input
-                                type="checkbox"
-                                bind:checked={workspaceCreateDraft.copyOracles}
-                                disabled={saving}
-                            />
-                            <span>Copy Java and DSL Oracles from base workspace</span>
-                        </label>
-                        <p class="workspace-management-note">
-                            Java and DSL oracle files live in the workspace oracles directory. Uncheck this to create an empty oracle workspace.
-                        </p>
-                        {#if workspaceManagementError || workspaceCreateValidationState.message}
-                            <p class:settings-validation-invalid={workspaceManagementError || !workspaceCreateValidationState.valid}>
-                                {workspaceManagementError || workspaceCreateValidationState.message}
-                            </p>
-                        {/if}
-                    {:else}
-                        <label>
-                            <span>Current workspace</span>
-                            <input type="text" value={selectedWorkspaceName} disabled />
-                        </label>
-                        <label>
-                            <span>New workspace name</span>
-                            <input
-                                type="text"
-                                bind:value={workspaceRenameDraft.name}
-                                placeholder="platform_application (e.g., webdriver_parabank)"
-                                disabled={saving}
-                            />
-                        </label>
-                        <p class="workspace-management-note">
-                            Existing output results for {selectedWorkspaceName} will move to the renamed workspace.
-                        </p>
-                        {#if workspaceManagementError || workspaceRenameValidationState.message}
-                            <p class:settings-validation-invalid={workspaceManagementError || !workspaceRenameValidationState.valid}>
-                                {workspaceManagementError || workspaceRenameValidationState.message}
-                            </p>
-                        {/if}
-                    {/if}
-                </div>
-                <div class="composition-modal-actions">
-                    {#if workspaceManagementTab === "create"}
-                        <button
-                            type="button"
-                            on:click={createWorkspaceFromDialog}
-                            disabled={saving || !workspaceCreateValidationState.valid}
-                        >
-                            Create
-                        </button>
-                    {:else}
-                        <button
-                            type="button"
-                            on:click={renameWorkspaceFromDialog}
-                            disabled={saving || !workspaceRenameValidationState.valid}
-                        >
-                            Rename
-                        </button>
-                    {/if}
-                    <button type="button" class="secondary" on:click={closeWorkspaceManagementDialog} disabled={saving}>
-                        Discard
-                    </button>
-                </div>
-            </div>
-        </div>
-    {/if}
-
-    {#if stateModelDialog.open}
-        <div class="composition-modal-backdrop" role="presentation" on:click={closeStateModelDialogFromBackdrop}>
-            <div
-                class="composition-modal state-model-dialog"
-                role="dialog"
-                aria-modal="true"
-                aria-labelledby="state-model-dialog-title"
-            >
-                <div class="composition-modal-header">
-                    <div>
-                        <h2 id="state-model-dialog-title">{stateModelDialog.title}</h2>
-                        <p>{stateModelDialog.message}</p>
-                    </div>
-                </div>
-                <div class="composition-modal-actions">
-                    {#if stateModelDialog.running}
-                        <button type="button" on:click={() => openStateModelExternalTab(stateModelDialog.url)}>
-                            Open State Model
-                        </button>
-                        <button type="button" class="danger" on:click={stopStateModelAnalysis} disabled={saving}>
-                            Stop State Model
-                        </button>
-                    {/if}
-                    <button type="button" class="secondary" on:click={closeStateModelDialog}>
-                        Close
-                    </button>
-                </div>
-            </div>
-        </div>
-    {/if}
-
-    {#if unsavedSettingsDialog.open}
-        <div class="composition-modal-backdrop" role="presentation" on:click={closeUnsavedSettingsDialogFromBackdrop}>
-            <div
-                class="composition-modal state-model-dialog"
-                role="dialog"
-                aria-modal="true"
-                aria-labelledby="unsaved-settings-dialog-title"
-            >
-                <div class="composition-modal-header">
-                    <div>
-                        <h2 id="unsaved-settings-dialog-title">{unsavedSettingsDialog.title}</h2>
-                        <p>{unsavedSettingsDialog.message}</p>
-                    </div>
-                </div>
-                <div class="composition-modal-actions">
-                    <button type="button" on:click={saveUnsavedConfigurationChanges} disabled={saving}>
-                        {unsavedSettingsDialog.saveLabel}
-                    </button>
-                    <button type="button" class="secondary" on:click={discardUnsavedConfigurationChanges} disabled={saving}>
-                        Discard
-                    </button>
-                    <button type="button" class="secondary" on:click={closeUnsavedSettingsDialog} disabled={saving}>
-                        Cancel
-                    </button>
-                </div>
-            </div>
-        </div>
-    {/if}
+    <AppOverlays
+        createDraft={workspaceCreateDraft}
+        createValidation={workspaceCreateValidationState}
+        error={workspaceManagementError}
+        message={message}
+        openWorkspaceDialog={workspaceManagementDialogOpen}
+        renameDraft={workspaceRenameDraft}
+        renameValidation={workspaceRenameValidationState}
+        saving={saving}
+        selectedWorkspaceName={selectedWorkspaceName}
+        stateModelDialog={stateModelDialog}
+        unsavedSettingsDialog={unsavedSettingsDialog}
+        workspaceManagementTab={workspaceManagementTab}
+        workspaces={workspaces}
+        onCloseStateModelDialog={closeStateModelDialog}
+        onCloseUnsavedDialog={closeUnsavedSettingsDialog}
+        onCloseWorkspaceDialog={closeWorkspaceManagementDialog}
+        onCreateWorkspace={createWorkspaceFromDialog}
+        onDiscardUnsavedChanges={discardUnsavedConfigurationChanges}
+        onOpenStateModelExternalTab={openStateModelExternalTab}
+        onRenameWorkspace={renameWorkspaceFromDialog}
+        onSaveUnsavedChanges={saveUnsavedConfigurationChanges}
+        onStopStateModelAnalysis={stopStateModelAnalysis}
+        onWorkspaceCreateDraftChange={(nextDraft) => {
+            workspaceCreateDraft = nextDraft;
+        }}
+        onWorkspaceManagementTabChange={(nextTab) => {
+            workspaceManagementTab = nextTab;
+            workspaceManagementError = "";
+        }}
+        onWorkspaceRenameDraftChange={(nextDraft) => {
+            workspaceRenameDraft = nextDraft;
+        }}
+    />
 </div>

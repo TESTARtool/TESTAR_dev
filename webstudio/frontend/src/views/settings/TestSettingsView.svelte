@@ -1,0 +1,409 @@
+<script>
+    // Implements WS-UX-TEST-SETTINGS-001: shared visual/raw test.settings editor surface.
+    import { contentChanged } from "../../models/editorDirtyState.js";
+    import { shouldShowBlankSelectOption } from "./settingsSelectOptions.js";
+
+    export let currentEditorDocument = null;
+    export let allowedSettingsGroupIds = null;
+    export let allowedSettingKeys = null;
+    export let excludedSettingKeys = null;
+    export let allowSettingsFileToggle = true;
+    export let loading = false;
+    export let openTestSettings;
+    export let openVisualSettings;
+    export let openVisualSettingsGroup;
+    export let regexValidationResults = {};
+    export let renderContent = true;
+    export let renderSidebar = true;
+    export let savedTestSettingsContent = "";
+    export let saving = false;
+    export let setSettingValue;
+    export let selectedEditor = "";
+    export let selectedSettingsGroupId = "";
+    export let settingsDescription = "Main common TESTAR settings with grouped controls. Use the test.settings editor for advanced control.";
+    export let showSettingsSearch = true;
+    export let restoreSettingDefault;
+    export let validateRegexExpression;
+    export let workspaceDocument = null;
+
+    function regexValidation(setting) {
+        return setting?.regexValidation || regexValidationResults?.[setting?.key] || null;
+    }
+
+    function canRestoreSetting(setting) {
+        return setting?.key === "SuspiciousTags" || setting?.key === "SuspiciousProcessOutput";
+    }
+
+    function normalizedSearchText(text) {
+        return (text || "").trim().toLowerCase();
+    }
+
+    function matchesSettingsSearch(setting, searchText) {
+        const normalized = normalizedSearchText(searchText);
+
+        if (!normalized) {
+            return true;
+        }
+
+        return [
+            setting?.key,
+            setting?.type,
+            setting?.value,
+            setting?.description
+        ]
+            .filter(Boolean)
+            .some((item) => item.toLowerCase().includes(normalized));
+    }
+
+    let settingsSearch = "";
+    let expandedSettingsGroups = {};
+    let settingsExpansionWorkspaceKey = "";
+
+    function toggleSettingsGroup(groupId) {
+        expandedSettingsGroups = {
+            ...expandedSettingsGroups,
+            [groupId]: !expandedSettingsGroups[groupId]
+        };
+    }
+
+    async function openSettingsGroup(groupId) {
+        if (groupId) {
+            await openVisualSettingsGroup(groupId);
+            expandedSettingsGroups = {
+                ...expandedSettingsGroups,
+                [groupId]: true
+            };
+        }
+    }
+
+    function toggleSettingsRepresentation() {
+        if (selectedEditor === "test-settings") {
+            openVisualSettings();
+            return;
+        }
+
+        openTestSettings();
+    }
+
+    $: normalizedSettingsSearch = normalizedSearchText(settingsSearch);
+
+    $: allowedSettingsGroupSet = Array.isArray(allowedSettingsGroupIds)
+        ? new Set(allowedSettingsGroupIds)
+        : null;
+    $: allowedSettingKeySet = Array.isArray(allowedSettingKeys)
+        ? new Set(allowedSettingKeys)
+        : null;
+    $: excludedSettingKeySet = Array.isArray(excludedSettingKeys)
+        ? new Set(excludedSettingKeys)
+        : null;
+
+    $: roleFilteredSettingsGroups = (workspaceDocument?.settingsGroups || [])
+        .filter((settingsGroup) => !allowedSettingsGroupSet || allowedSettingsGroupSet.has(settingsGroup.id))
+        .map((settingsGroup) => ({
+            ...settingsGroup,
+            settings: (settingsGroup.settings || [])
+                .filter((setting) => !excludedSettingKeySet || !excludedSettingKeySet.has(setting.key))
+        }))
+        .filter((settingsGroup) => settingsGroup.settings.length > 0);
+
+    $: filteredSettingsGroups = roleFilteredSettingsGroups
+        .map((settingsGroup) => ({
+            ...settingsGroup,
+            settings: (settingsGroup.settings || [])
+                .filter((setting) => !allowedSettingKeySet || allowedSettingKeySet.has(setting.key))
+                .filter((setting) => matchesSettingsSearch(setting, settingsSearch))
+        }))
+        .filter((settingsGroup) => settingsGroup.settings.length > 0);
+
+    $: settingsNavigationGroups = roleFilteredSettingsGroups;
+    $: visibleSettingsGroups = normalizedSettingsSearch
+        ? filteredSettingsGroups
+        : filteredSettingsGroups.filter((settingsGroup) => settingsGroup.id === selectedSettingsGroupId);
+    $: rawSettingsDirty = contentChanged(workspaceDocument?.testSettings?.content, savedTestSettingsContent);
+
+    $: {
+        const nextWorkspaceKey = workspaceDocument?.workspaceName || "";
+
+        if (nextWorkspaceKey !== settingsExpansionWorkspaceKey) {
+            settingsExpansionWorkspaceKey = nextWorkspaceKey;
+            expandedSettingsGroups = workspaceDocument?.settingsGroups?.length > 0
+                ? Object.fromEntries(
+                    workspaceDocument.settingsGroups.map((settingsGroup) => [settingsGroup.id, true])
+                )
+                : {};
+        }
+    }
+</script>
+
+{#if renderSidebar && loading}
+    <p>Loading workspace...</p>
+{:else if renderSidebar && workspaceDocument}
+    <section class="sidebar-section">
+        <h3>Test Settings</h3>
+        <div class="settings-sidebar-tree">
+            <button
+                class:selected={selectedEditor === "settings-form" || selectedEditor === "test-settings"}
+                class="source-item settings-tree-root"
+                on:click={openVisualSettings}
+            >
+                <span>Edit Settings</span>
+            </button>
+            {#if settingsNavigationGroups.length > 0}
+                <div class="settings-sidebar-nav">
+                    {#each settingsNavigationGroups as settingsGroup}
+                        <button
+                            type="button"
+                            class="source-item settings-nav-item"
+                            class:selected={selectedEditor === "settings-form" && selectedSettingsGroupId === settingsGroup.id}
+                            on:click={() => openSettingsGroup(settingsGroup.id)}
+                        >
+                            <span>{settingsGroup.title}</span>
+                        </button>
+                    {/each}
+                </div>
+            {/if}
+        </div>
+    </section>
+
+{/if}
+
+{#if renderContent && loading}
+    <p>Loading workspace...</p>
+{:else if renderContent && workspaceDocument}
+    {#if selectedEditor === "settings-form" && currentEditorDocument}
+        <section class="editor-section">
+            <div class="section-header">
+                <div>
+                    <h2>{currentEditorDocument.title}</h2>
+                    <p>{settingsDescription}</p>
+                </div>
+                <div class="button-row">
+                    {#if allowSettingsFileToggle}
+                        <button
+                            type="button"
+                            class="secondary"
+                            on:click={toggleSettingsRepresentation}
+                            disabled={saving}
+                        >
+                            Show settings file
+                        </button>
+                    {/if}
+                    <button
+                        class="secondary"
+                        disabled={saving || !currentEditorDocument.dirty}
+                        on:click={currentEditorDocument.save}
+                    >
+                        {currentEditorDocument.saveLabel}
+                    </button>
+                </div>
+            </div>
+
+            {#if showSettingsSearch}
+                <section class="settings-toolbar top-gap">
+                    <div class="settings-search">
+                        <label class="field-label" for="settings-search">Search in all settings</label>
+                        <input
+                            id="settings-search"
+                            type="search"
+                            bind:value={settingsSearch}
+                            placeholder="Search by key, value, type, or description"
+                        />
+                    </div>
+                </section>
+            {/if}
+
+            <section class="settings-groups top-gap">
+                {#if visibleSettingsGroups.length > 0}
+                    {#each visibleSettingsGroups as settingsGroup (settingsGroup.id)}
+                        <article class="settings-group-card">
+                            <button
+                                type="button"
+                                class="settings-group-toggle"
+                                aria-expanded={normalizedSettingsSearch ? true : Boolean(expandedSettingsGroups[settingsGroup.id])}
+                                on:click={() => toggleSettingsGroup(settingsGroup.id)}
+                            >
+                                <div class="settings-group-header">
+                                    <div>
+                                        <h3>{settingsGroup.title}</h3>
+                                        <p>{settingsGroup.description}</p>
+                                    </div>
+                                    <div class="settings-group-summary">
+                                        <span class="settings-group-count">{settingsGroup.settings.length}</span>
+                                        <span class="settings-group-chevron">
+                                            {#if normalizedSettingsSearch ? true : Boolean(expandedSettingsGroups[settingsGroup.id])}
+                                                Hide
+                                            {:else}
+                                                Show
+                                            {/if}
+                                        </span>
+                                    </div>
+                                </div>
+                            </button>
+
+                            {#if normalizedSettingsSearch ? true : Boolean(expandedSettingsGroups[settingsGroup.id])}
+                                <div class="settings-fields">
+                                    {#each settingsGroup.settings as setting}
+                                        <div
+                                            class="settings-field"
+                                            class:settings-field-wide={setting.type === "list"}
+                                            class:settings-field-boolean={setting.type === "boolean"}
+                                        >
+                                            <div class="settings-field-header">
+                                                <span class="settings-field-label">{setting.key}</span>
+                                                {#if setting.regexCapable}
+                                                    <div
+                                                        class="settings-validation-message settings-validation-inline"
+                                                        class:settings-validation-valid={regexValidation(setting)?.valid}
+                                                        class:settings-validation-invalid={regexValidation(setting) && !regexValidation(setting).valid}
+                                                        class:settings-validation-idle={!regexValidation(setting)}
+                                                    >
+                                                        {#if regexValidation(setting)}
+                                                            <span>{regexValidation(setting).message}</span>
+                                                        {:else}
+                                                            <span>No validation executed yet.</span>
+                                                        {/if}
+                                                    </div>
+                                                {/if}
+                                                <div class="settings-field-actions">
+                                                    {#if setting.regexCapable}
+                                                        <button
+                                                            type="button"
+                                                            class="secondary settings-action-button"
+                                                            on:click={() => validateRegexExpression(setting)}
+                                                        >
+                                                            Check Regex
+                                                        </button>
+                                                    {/if}
+                                                    {#if canRestoreSetting(setting)}
+                                                        <button
+                                                            type="button"
+                                                            class="secondary settings-action-button"
+                                                            on:click={() => restoreSettingDefault(setting)}
+                                                        >
+                                                            Restore Default
+                                                        </button>
+                                                    {/if}
+                                                </div>
+                                            </div>
+
+                                            {#if setting.type === "boolean"}
+                                                <span class="settings-checkbox-row">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={setting.value === "true"}
+                                                        on:change={(event) => {
+                                                            setSettingValue(setting, event.currentTarget.checked ? "true" : "false");
+                                                        }}
+                                                    />
+                                                    <span>Enabled</span>
+                                                </span>
+                                            {:else if setting.options?.length > 0}
+                                                <select
+                                                    value={setting.value}
+                                                    on:change={(event) => {
+                                                        setSettingValue(setting, event.currentTarget.value);
+                                                    }}
+                                                >
+                                                    {#if shouldShowBlankSelectOption(setting)}
+                                                        <option value=""></option>
+                                                    {/if}
+                                                    {#each setting.options as option}
+                                                        <option value={option}>{option}</option>
+                                                    {/each}
+                                                </select>
+                                            {:else if setting.type === "list"}
+                                                <textarea
+                                                    class="settings-list-input"
+                                                    value={setting.value}
+                                                    on:input={(event) => {
+                                                        setSettingValue(setting, event.currentTarget.value);
+                                                    }}
+                                                    placeholder="Keep TESTAR list syntax here"
+                                                ></textarea>
+                                            {:else if setting.type === "integer"}
+                                                <input
+                                                    type="number"
+                                                    step="1"
+                                                    value={setting.value}
+                                                    on:input={(event) => {
+                                                        setSettingValue(setting, event.currentTarget.value);
+                                                    }}
+                                                />
+                                            {:else if setting.type === "number"}
+                                                <input
+                                                    type="number"
+                                                    step="any"
+                                                    value={setting.value}
+                                                    on:input={(event) => {
+                                                        setSettingValue(setting, event.currentTarget.value);
+                                                    }}
+                                                />
+                                            {:else}
+                                                <input
+                                                    type="text"
+                                                    value={setting.value}
+                                                    on:input={(event) => {
+                                                        setSettingValue(setting, event.currentTarget.value);
+                                                    }}
+                                                />
+                                            {/if}
+
+                                            {#if canRestoreSetting(setting)}
+                                                <small class="settings-field-default">
+                                                    Default: {setting.defaultValue === "" ? "(empty)" : setting.defaultValue}
+                                                </small>
+                                            {/if}
+
+                                            <div class="settings-field-footer">
+                                                {#if setting.description}
+                                                    <small class="settings-field-help">{setting.description}</small>
+                                                {/if}
+                                            </div>
+                                        </div>
+                                    {/each}
+                                </div>
+                            {/if}
+                        </article>
+                    {/each}
+                {:else}
+                    <p class="progress-message">
+                        {#if normalizedSettingsSearch}
+                            No settings matched the current search.
+                        {:else}
+                            Select a settings category to inspect its fields.
+                        {/if}
+                    </p>
+                {/if}
+            </section>
+        </section>
+    {:else if selectedEditor === "test-settings" && currentEditorDocument}
+        <section class="editor-section">
+            <div class="section-header">
+                <div>
+                    <h2>{currentEditorDocument.title}</h2>
+                    <p>Classic raw test.settings editor for advanced users.</p>
+                </div>
+                <div class="button-row">
+                    {#if allowSettingsFileToggle}
+                        <button
+                            type="button"
+                            class="secondary"
+                            on:click={toggleSettingsRepresentation}
+                            disabled={saving}
+                        >
+                            Show settings form
+                        </button>
+                    {/if}
+                    <button
+                        class="secondary"
+                        disabled={saving || !rawSettingsDirty}
+                        on:click={currentEditorDocument.save}
+                    >
+                        {currentEditorDocument.saveLabel}
+                    </button>
+                </div>
+            </div>
+            <textarea bind:value={workspaceDocument.testSettings.content}></textarea>
+        </section>
+    {/if}
+{/if}

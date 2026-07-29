@@ -113,6 +113,7 @@ public final class WorkspaceService {
         return resolveWorkspaceRuntimeHomeDirectory(workspaceName);
     }
 
+    // Implements WS-FUNC-WORKSPACE-MANAGEMENT-001: creates workspace clones and renames workspace/output folders.
     public WorkspaceSummaryDto createWorkspace(String workspaceName, String baseWorkspaceName, boolean copyTestGoals) {
         return createWorkspace(workspaceName, baseWorkspaceName, copyTestGoals, true);
     }
@@ -252,6 +253,7 @@ public final class WorkspaceService {
         }
     }
 
+    // Implements WS-FUNC-DEBUG-FILES-001: lists .log files from the shared runtime home.
     public List<DebugFileSummaryDto> listDebugFiles() {
         Path testarHomeDirectory = testarHomeDirectory();
         if (!Files.isDirectory(testarHomeDirectory)) {
@@ -273,6 +275,7 @@ public final class WorkspaceService {
         }
     }
 
+    // Implements WS-FUNC-DEBUG-FILES-001: reads a selected runtime .log file safely.
     public DebugFileDto readDebugFile(String fileName, String filePath) {
         Path testarHomeDirectory = testarHomeDirectory();
         Path resolvedFile;
@@ -306,6 +309,8 @@ public final class WorkspaceService {
         }
     }
 
+    // Implements WS-FUNC-WORKSPACE-SOURCE-EDITOR-001 and WS-FUNC-TEST-SETTINGS-001:
+    // reads workspace files, source summaries, references, and visual settings groups.
     public WorkspaceDocumentDto readWorkspaceDocument(String workspaceName) {
         Path workspaceDirectory = resolveWorkspaceDirectory(workspaceName);
         WorkspaceFileDto testSettings = readWorkspaceFile(workspaceName, TEST_SETTINGS_FILE, "settings");
@@ -349,6 +354,7 @@ public final class WorkspaceService {
         }
     }
 
+    // Implements WS-FUNC-WORKSPACE-SOURCE-EDITOR-001: reads validated Java source files from the workspace root.
     public WorkspaceFileDto readWorkspaceSourceFile(String workspaceName, String sourceName) {
         ensureJavaSourceName(sourceName);
         Path workspaceDirectory = resolveWorkspaceDirectory(workspaceName);
@@ -375,6 +381,7 @@ public final class WorkspaceService {
         return new WorkspaceFileDto(file.getFileName().toString(), file.toString(), content, category);
     }
 
+    // Implements WS-FUNC-WORKSPACE-SOURCE-EDITOR-001: persists validated Java source files in the workspace root.
     public WorkspaceFileDto saveWorkspaceSourceFile(String workspaceName, String sourceName, String content) {
         ensureJavaSourceName(sourceName);
         Path workspaceDirectory = resolveWorkspaceDirectory(workspaceName);
@@ -384,6 +391,7 @@ public final class WorkspaceService {
         return saveWorkspaceFile(workspaceName, sourceName, category, content);
     }
 
+    // Implements WS-FUNC-COMPOSITION-FLOW-001: creates missing Java module sources and updates composition.properties.
     public WorkspaceFileDto createOrOpenModuleSource(String workspaceName, String propertyKey) {
         ModuleWorkspaceHelper.ModuleDefinition moduleDefinition = findModuleDefinition(propertyKey);
         Path workspaceDirectory = resolveWorkspaceDirectory(workspaceName);
@@ -406,6 +414,7 @@ public final class WorkspaceService {
         );
     }
 
+    // Implements WS-FUNC-POLICIES-001: creates Java policy sources and updates policies.properties.
     public WorkspaceFileDto createOrOpenPolicySource(String workspaceName, String propertyKey) {
         PolicyWorkspaceHelper.PolicyDefinition policyDefinition = findPolicyDefinition(propertyKey);
         Path workspaceDirectory = resolveWorkspaceDirectory(workspaceName);
@@ -425,12 +434,14 @@ public final class WorkspaceService {
         );
     }
 
+    // Implements WS-FUNC-WORKSPACE-SOURCE-EDITOR-001 and WS-FUNC-COMPOSITION-FLOW-001: validates selected Java source files.
     public WorkspaceJavaCompileResultDto compileWorkspaceSource(String workspaceName, String sourceName) {
         ensureJavaSourceName(sourceName);
         Path workspaceDirectory = resolveWorkspaceDirectory(workspaceName);
         return compileWorkspaceJava(workspaceDirectory, "source", sourceName);
     }
 
+    // Implements WS-FUNC-WORKSPACE-SOURCE-EDITOR-001: validates all Java source files for the selected workspace profile.
     public WorkspaceJavaCompileResultDto compileWorkspaceProfile(String workspaceName) {
         Path workspaceDirectory = resolveWorkspaceDirectory(workspaceName);
         return compileWorkspaceJava(workspaceDirectory, "profile", workspaceName);
@@ -868,6 +879,7 @@ public final class WorkspaceService {
             .collect(Collectors.toList());
     }
 
+    // Implements WS-FUNC-POLICIES-001: exposes active policy class lists to WebStudio.
     private List<WorkspacePolicyDefinitionDto> buildPolicyDefinitions(Properties policyProperties) {
         return Arrays.stream(PolicyWorkspaceHelper.POLICY_DEFINITIONS)
             .map(policyDefinition -> new WorkspacePolicyDefinitionDto(

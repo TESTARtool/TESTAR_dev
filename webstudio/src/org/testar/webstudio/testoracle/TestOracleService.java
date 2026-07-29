@@ -65,6 +65,7 @@ public final class TestOracleService {
         this.workspaceService = workspaceService;
     }
 
+    // Implements WS-FUNC-TEST-ORACLES-001: builds selected-workspace oracle inventory and enablement state.
     public TestOracleInventoryDto inventory(String workspaceName) {
         Path workspaceDirectory = workspaceService.workspaceDirectory(workspaceName);
         List<String> activeOracles = readActiveOracles(workspaceDirectory);
@@ -111,6 +112,7 @@ public final class TestOracleService {
         });
     }
 
+    // Implements WS-FUNC-ORACLE-DSL-EDITOR-001: cache metadata generated from the Rascal DSL/model sources.
     public synchronized DslOracleMetadata dslMetadata() {
         if (dslOracleMetadata == null) {
             dslOracleMetadata = new DslOracleMetadataGenerator().generate();
@@ -180,6 +182,7 @@ public final class TestOracleService {
         }
     }
 
+    // Implements WS-FUNC-ORACLE-DSL-EDITOR-001: validate DSL content through the Rascal backend.
     public TestOracleDslResultDto validateDslFile(String workspaceName, String relativePath, String content) {
         Path dslRoot = dslRoot(workspaceName);
         Path file = resolveDslPath(dslRoot, relativePath);
@@ -193,6 +196,7 @@ public final class TestOracleService {
         return toDslResultDto(result, "");
     }
 
+    // Implements WS-FUNC-ORACLE-DSL-EDITOR-001: save DSL, generate Java, and enable generated oracle classes.
     public TestOracleDslResultDto generateJavaFromDslFile(String workspaceName, String relativePath, String content) {
         WorkspaceFileDto savedDslFile = saveDslFile(workspaceName, relativePath, content);
         DslOracleOperationResult result = dslOracleCompiler().generateJava(savedDslFile.location(), savedDslFile.content());
@@ -212,6 +216,7 @@ public final class TestOracleService {
         return toDslResultDto(result, toRelativePath(javaRoot, generatedJavaFile));
     }
 
+    // Implements WS-FUNC-ORACLE-JAVA-ENABLEMENT-001: read workspace Java oracle source from oracles/java.
     public WorkspaceFileDto readJavaFile(String workspaceName, String relativePath) {
         Path javaRoot = javaRoot(workspaceName);
         Path file = resolveOracleSourcePath(javaRoot, relativePath, "Java oracle");
@@ -231,6 +236,7 @@ public final class TestOracleService {
         }
     }
 
+    // Implements WS-FUNC-ORACLE-JAVA-ENABLEMENT-001: save workspace Java oracle source in oracles/java.
     public WorkspaceFileDto saveJavaFile(String workspaceName, String relativePath, String content) {
         Path javaRoot = javaRoot(workspaceName);
         Path file = resolveOracleSourcePath(javaRoot, relativePath, "Java oracle");
@@ -246,6 +252,7 @@ public final class TestOracleService {
         }
     }
 
+    // Implements WS-FUNC-ORACLE-JAVA-ENABLEMENT-001: create Java oracle source and add its class to ExtendedOracles.
     public WorkspaceFileDto createJavaFile(String workspaceName, String relativePath) {
         Path javaRoot = javaRoot(workspaceName);
         Path file = resolveOracleSourcePath(javaRoot, relativePath, "Java oracle");
@@ -259,6 +266,7 @@ public final class TestOracleService {
         return createdFile;
     }
 
+    // Implements WS-FUNC-ORACLE-JAVA-ENABLEMENT-001: delete Java oracle source and return refreshed oracle inventory.
     public TestOracleInventoryDto deleteJavaFile(String workspaceName, String relativePath) {
         Path javaRoot = javaRoot(workspaceName);
         Path file = resolveOracleSourcePath(javaRoot, relativePath, "Java oracle");
@@ -276,6 +284,7 @@ public final class TestOracleService {
         }
     }
 
+    // Implements WS-FUNC-ORACLE-JAVA-ENABLEMENT-001: compile Java oracle sources and enable compiled oracle classes.
     public WorkspaceJavaCompileResultDto compileJavaFile(String workspaceName, String relativePath, String content) {
         WorkspaceFileDto savedFile = saveJavaFile(workspaceName, relativePath, content);
         Path javaRoot = javaRoot(workspaceName);
@@ -553,6 +562,7 @@ public final class TestOracleService {
         );
     }
 
+    // Implements WS-FUNC-ORACLE-DSL-EDITOR-001: map Rascal diagnostics to WebStudio DTOs.
     private TestOracleDslResultDto toDslResultDto(DslOracleOperationResult result, String generatedJavaPath) {
         List<TestOracleDslDiagnosticDto> diagnostics = result.diagnostics().stream()
             .map(diagnostic -> new TestOracleDslDiagnosticDto(
@@ -602,6 +612,7 @@ public final class TestOracleService {
         return file.getFileName().toString().replaceFirst("(?i)\\.java$", "");
     }
 
+    // Implements WS-FUNC-ORACLE-JAVA-ENABLEMENT-001: persist active Java oracle class names in ExtendedOracles.
     private void enableOracleClassNames(String workspaceName, List<String> oracleClassNames) {
         List<String> normalizedNames = oracleClassNames.stream()
             .map(name -> name == null ? "" : name.trim())

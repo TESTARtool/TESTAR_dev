@@ -17,6 +17,7 @@ public final class StateModelAnalysisController {
         this.service = service;
     }
 
+    // Implements WS-FUNC-STATE-MODEL-001: exposes state model analysis open/status/stop commands.
     public StateModelStatusDto open(String workspaceName) {
         return service.open(workspaceName);
     }

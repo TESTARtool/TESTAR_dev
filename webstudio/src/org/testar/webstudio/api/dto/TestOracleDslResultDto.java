@@ -8,6 +8,8 @@ package org.testar.webstudio.api.dto;
 
 import java.util.List;
 
+// Implements WS-FUNC-TEST-ORACLES-001 and WS-FUNC-ORACLE-DSL-EDITOR-001:
+// DSL validation/generation result contract for WebStudio.
 public final class TestOracleDslResultDto {
 
     private final boolean success;

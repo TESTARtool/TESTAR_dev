@@ -12,6 +12,7 @@ final class ResultWorkspacePaths {
 
     private ResultWorkspacePaths() { }
 
+    // Implements WS-FUNC-TEST-RESULTS-001: resolves workspace-scoped output paths and settings values.
     static Path workspaceOutputDirectory(Path runtimeHome, String workspaceName) {
         return runtimeHome
             .resolve("output")

@@ -11,6 +11,7 @@ import java.nio.file.Path;
 
 public class ResultArtifactDeletionTest {
 
+    // Verifies WS-FUNC-TEST-RESULTS-001: result deletion stays inside the workspace output directory.
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
 

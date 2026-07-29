@@ -40,6 +40,7 @@ public final class WorkspaceSettingsCatalog {
 
     private WorkspaceSettingsCatalog() { }
 
+    // Implements WS-FUNC-TEST-SETTINGS-001: builds grouped visual controls from test.settings properties.
     public static List<WorkspaceSettingsGroupDto> buildSettingsGroups(Properties settingsProperties) {
         return List.of(
             group(

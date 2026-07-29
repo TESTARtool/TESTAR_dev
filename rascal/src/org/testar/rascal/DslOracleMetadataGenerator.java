@@ -22,6 +22,7 @@ import java.util.regex.Pattern;
 
 public final class DslOracleMetadataGenerator {
 
+    // Implements WS-FUNC-ORACLE-DSL-EDITOR-001: derive editor metadata from Rascal DSL/model sources.
     private static final Pattern MODEL_RECORD_PATTERN = Pattern.compile(
         "(?m)^\\s*([A-Za-z_][A-Za-z0-9_]*)\\s*\\{([\\s\\S]*?)^\\s*\\}"
     );

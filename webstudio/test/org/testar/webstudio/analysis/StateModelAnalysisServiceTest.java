@@ -10,6 +10,7 @@ import java.nio.file.Path;
 
 public class StateModelAnalysisServiceTest {
 
+    // Verifies WS-FUNC-STATE-MODEL-001: analysis graph assets use the shared runtime output directory.
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
 

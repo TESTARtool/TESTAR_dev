@@ -38,6 +38,8 @@ For CLI execution, the workspace is resolved from:
 
 ### User Roles
 
+Traceability: [`WS-FUNC-TOP-NAV-ROLES-001`](./WEBSTUDIO_SPEC_TRACE.md#ws-func-top-nav-roles-001---role-based-navigation)
+
 Web Studio should support role-based user experiences.
 
 The role defines which workflows and configuration options are primary in the frontend.
@@ -115,6 +117,8 @@ No functional behavior is required for Intermediate until its scope is explicitl
 
 ### Editors
 
+Traceability: [`WS-FUNC-WORKSPACE-SOURCE-EDITOR-001`](./WEBSTUDIO_SPEC_TRACE.md#ws-func-workspace-source-editor-001---workspace-document-and-source-editor-api)
+
 The `Test Configuration` area exposes separate pages for settings, composition, and policies.
 
 `Test Settings` exposes:
@@ -137,6 +141,8 @@ Java source editors are used by the composition and policies pages for their rel
 
 ### Composition Views
 
+Traceability: [`WS-FUNC-COMPOSITION-FLOW-001`](./WEBSTUDIO_SPEC_TRACE.md#ws-func-composition-flow-001---composition-file-and-java-flow)
+
 The two composition views are:
 
 - `Edit composition.properties file` allows users to edit the file content directly.
@@ -147,6 +153,8 @@ The `Edit Java Composition Flow` view is treated as one logical editing area for
 
 ### Policies Views
 
+Traceability: [`WS-FUNC-POLICIES-001`](./WEBSTUDIO_SPEC_TRACE.md#ws-func-policies-001---policies-file-and-java-policies)
+
 The two policies views are:
 
 - `Edit policies.properties file` allows users to edit the file content directly.
@@ -156,6 +164,8 @@ The `Edit policies.properties file` view is treated as one logical editing area 
 The `Edit Java Policies` view is treated as one logical editing area for unsaved-change and uncompiled-change behavior.
 
 ### Settings View
+
+Traceability: [`WS-FUNC-TEST-SETTINGS-001`](./WEBSTUDIO_SPEC_TRACE.md#ws-func-test-settings-001---workspace-test-settings-editor)
 
 The settings editor is exposed as one left-sidebar entry:
 
@@ -209,6 +219,8 @@ The `Edit Settings` view must render `CliStateProjectionMode` as a dropdown usin
 - Changing the selected workspace reloads the workspace document and resets editor state.
 
 ### Workspace Management
+
+Traceability: [`WS-FUNC-WORKSPACE-MANAGEMENT-001`](./WEBSTUDIO_SPEC_TRACE.md#ws-func-workspace-management-001---workspace-creation-and-rename)
 
 WebStudio must expose workspace-level management from the workspace selector area.
 
@@ -343,6 +355,12 @@ Top-level navigation:
 
 ## Test Oracles View
 
+Traceability: [`WS-FUNC-TEST-ORACLES-001`](./WEBSTUDIO_SPEC_TRACE.md#ws-func-test-oracles-001---workspace-scoped-test-oracles)
+
+Traceability: [`WS-FUNC-ORACLE-DSL-EDITOR-001`](./WEBSTUDIO_SPEC_TRACE.md#ws-func-oracle-dsl-editor-001---rascal-dsl-metadata-and-diagnostics)
+
+Traceability: [`WS-FUNC-ORACLE-JAVA-ENABLEMENT-001`](./WEBSTUDIO_SPEC_TRACE.md#ws-func-oracle-java-enablement-001---workspace-java-oracles-and-extendedoracles-enablement)
+
 The `Test Oracles` view is available in Basic and Advanced roles.
 
 Left panel order:
@@ -412,6 +430,8 @@ Individual oracle checks must be implemented as Java or DSL-generated `Oracle` c
 Oracle composition customization belongs to the Composition Flow and is used for changing verdict aggregation behavior, not for individual test oracles.
 
 ## Test Configuration
+
+Traceability: [`WS-FUNC-CONFIG-GUARD-001`](./WEBSTUDIO_SPEC_TRACE.md#ws-func-config-guard-001---configuration-unsaved-change-protection)
 
 ### Unsaved Composition File Behavior
 
@@ -595,6 +615,8 @@ If a user attempts to leave a dirty editor without saving, the guard dialog must
 
 ## Generate Mode
 
+Traceability: [`WS-FUNC-RUNTIME-EXECUTION-001`](./WEBSTUDIO_SPEC_TRACE.md#ws-func-runtime-execution-001---runtime-execution-modes)
+
 Generate Mode allows launching and stopping scriptless TESTAR execution.
 
 Header information:
@@ -647,6 +669,8 @@ Workspace selection:
 - Manual and Agent CLI execution use the selected workspace settings, including `CliStateProjectionMode` and `AgentCLI...` values
 
 ## Test Goals
+
+Traceability: [`WS-FUNC-TEST-GOALS-001`](./WEBSTUDIO_SPEC_TRACE.md#ws-func-test-goals-001---workspace-scoped-test-goals)
 
 Test Goals are reusable goal definitions consumed by AI guided execution modes (e.g., CLI mode).
 
@@ -805,6 +829,8 @@ When CLI reporting is enabled, generated report artifacts must include the final
 
 ## Test Results
 
+Traceability: [`WS-FUNC-TEST-RESULTS-001`](./WEBSTUDIO_SPEC_TRACE.md#ws-func-test-results-001---workspace-scoped-test-results)
+
 The Test Results page supports inspection of output folders for the selected workspace.
 
 Output results are workspace-scoped artifacts.
@@ -933,6 +959,8 @@ Deletion rules:
 
 ## State Model
 
+Traceability: [`WS-FUNC-STATE-MODEL-001`](./WEBSTUDIO_SPEC_TRACE.md#ws-func-state-model-001---state-model-analysis-lifecycle)
+
 Scriptless Generate mode and CLI mode can generate state models when the selected workspace enables state model settings.
 
 The execution mode is responsible for automatic OrientDB preparation, including download/bootstrap when required by the configured state model storage settings.
@@ -970,6 +998,8 @@ During startup, WebStudio must keep the user in a visible status dialog and must
 - If analysis startup fails for another reason, WebStudio must show a user-facing `Unable To Open State Model` dialog and log details server-side.
 
 ## Debug Files
+
+Traceability: [`WS-FUNC-DEBUG-FILES-001`](./WEBSTUDIO_SPEC_TRACE.md#ws-func-debug-files-001---runtime-debug-file-inspection)
 
 The debug files page supports:
 

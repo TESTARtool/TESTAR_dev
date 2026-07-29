@@ -18,6 +18,9 @@ import java.util.stream.Stream;
 import org.testar.webstudio.api.dto.TestGoalFileDto;
 import org.testar.webstudio.api.dto.TestGoalNodeDto;
 
+/**
+ * Implements WS-FUNC-TEST-GOALS-001: workspace-scoped Test Goal file management.
+ */
 public final class TestGoalService {
 
     private final Path settingsRoot;

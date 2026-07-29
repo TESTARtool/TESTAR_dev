@@ -10,6 +10,7 @@ import java.util.Properties;
 
 public class WorkspaceSettingsCatalogCliAgentTest {
 
+    // Verifies WS-FUNC-TEST-SETTINGS-001: Agent CLI and CLI projection settings are visual controls.
     @Test
     public void includesAgentCliSettingsGroup() {
         List<WorkspaceSettingsGroupDto> groups = WorkspaceSettingsCatalog.buildSettingsGroups(new Properties());

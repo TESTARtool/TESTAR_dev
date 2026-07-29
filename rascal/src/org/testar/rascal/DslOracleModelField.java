@@ -6,6 +6,7 @@
 
 package org.testar.rascal;
 
+// Implements WS-FUNC-ORACLE-DSL-EDITOR-001: widget model field metadata for DSL editor assistance.
 public final class DslOracleModelField {
 
     private final String name;

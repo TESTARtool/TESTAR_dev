@@ -105,6 +105,7 @@ public final class CliExecutionAdapter implements ExecutionAdapter {
         return buildStatus(lastStatus, lastMessage);
     }
 
+    // Implements WS-FUNC-RUNTIME-EXECUTION-001: manages manual and agent CLI runtime sessions.
     public synchronized ExecutionStatusDto startManualSession(String workspaceName) {
         debugLog.log("startManualSession workspace=" + workspaceName);
         if (isAgentExecutionRunning()) {
@@ -280,6 +281,7 @@ public final class CliExecutionAdapter implements ExecutionAdapter {
         return buildStatus(lastStatus, lastMessage);
     }
 
+    // Implements WS-FUNC-TEST-RESULTS-001: loads and mutates selected workspace CLI reports.
     public synchronized ScriptlessResultsDto cliResults(String workspaceName) {
         List<ResultOutputGroupDto> groups = loadResultGroups(workspaceName);
         if (groups.isEmpty()) {

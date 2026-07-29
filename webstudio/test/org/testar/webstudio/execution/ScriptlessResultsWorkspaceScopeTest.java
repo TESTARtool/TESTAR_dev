@@ -14,6 +14,7 @@ import java.nio.file.Path;
 
 public class ScriptlessResultsWorkspaceScopeTest {
 
+    // Verifies WS-FUNC-TEST-RESULTS-001: result lists are scoped to the selected workspace output folder.
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
 

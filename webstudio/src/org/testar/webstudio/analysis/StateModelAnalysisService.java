@@ -53,6 +53,7 @@ public final class StateModelAnalysisService {
         return start(workspaceName);
     }
 
+    // Implements WS-FUNC-STATE-MODEL-001: starts or reuses state model analysis for a selected workspace.
     public synchronized StateModelStatusDto start(String workspaceName) {
         Path runtimeHome = workspaceService.workspaceRuntimeHomeDirectory(workspaceName);
         Path debugLogPath = runtimeHome.resolve("state-model-debug.log");

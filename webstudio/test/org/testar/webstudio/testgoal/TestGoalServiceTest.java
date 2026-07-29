@@ -11,6 +11,9 @@ import org.junit.rules.TemporaryFolder;
 import org.testar.webstudio.api.dto.TestGoalFileDto;
 import org.testar.webstudio.api.dto.TestGoalNodeDto;
 
+/**
+ * Verifies WS-FUNC-TEST-GOALS-001: Test Goal files stay inside the selected workspace root.
+ */
 public class TestGoalServiceTest {
 
     @Rule

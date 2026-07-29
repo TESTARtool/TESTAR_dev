@@ -12,6 +12,7 @@ import java.nio.file.Path;
 
 public class WorkspaceServiceManagementTest {
 
+    // Verifies WS-FUNC-WORKSPACE-MANAGEMENT-001: workspace clone and rename filesystem behavior.
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
 

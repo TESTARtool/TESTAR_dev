@@ -6,6 +6,7 @@
 
 package org.testar.webstudio.api.dto;
 
+// Implements WS-FUNC-ORACLE-DSL-EDITOR-001: source-ranged DSL diagnostic contract for WebStudio.
 public final class TestOracleDslDiagnosticDto {
 
     private final String severity;

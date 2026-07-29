@@ -91,6 +91,8 @@ Workspace selection and workspace management belong to the shared top navigation
 
 ## Top Navigation UX
 
+Traceability: [`WS-UX-TOP-NAV-ROLES-001`](./WEBSTUDIO_SPEC_TRACE.md#ws-ux-top-nav-roles-001---top-navigation-and-role-selector)
+
 The top navigation should group pages by workflow intent instead of exposing every page as a flat button.
 
 Target top navigation:
@@ -205,6 +207,12 @@ Do not implement Intermediate-specific UI until its scope is defined.
 
 ## Test Oracles View
 
+Traceability: [`WS-UX-TEST-ORACLES-001`](./WEBSTUDIO_SPEC_TRACE.md#ws-ux-test-oracles-001---test-oracles-configuration-view)
+
+Traceability: [`WS-UX-ORACLE-DSL-EDITOR-001`](./WEBSTUDIO_SPEC_TRACE.md#ws-ux-oracle-dsl-editor-001---monaco-dsl-editor-assistance)
+
+Traceability: [`WS-UX-ORACLE-JAVA-ENABLEMENT-001`](./WEBSTUDIO_SPEC_TRACE.md#ws-ux-oracle-java-enablement-001---workspace-java-oracle-management)
+
 The `Test Oracles` view should provide a left-panel workflow in this order:
 
 - `Active Oracles`
@@ -269,6 +277,8 @@ The Test Oracles view should guide users toward Java and DSL-generated `Oracle` 
 
 ## Workspace Selector UX Contract
 
+Traceability: [`WS-UX-WORKSPACE-MANAGEMENT-001`](./WEBSTUDIO_SPEC_TRACE.md#ws-ux-workspace-management-001---workspace-management-modal)
+
 The workspace selector area is the primary place for workspace selection and workspace management.
 
 Expected behavior:
@@ -325,6 +335,20 @@ Example:
 
 - CLI command buttons such as `getStateScreenshot` must not overflow the panel. If the button size is fixed, reduce label font size or use a shorter visible label with a full tooltip.
 
+## Source Editor UX Contract
+
+Traceability: [`WS-UX-SOURCE-EDITOR-001`](./WEBSTUDIO_SPEC_TRACE.md#ws-ux-source-editor-001---source-editor-state-and-document-selection)
+
+Workspace source editors should provide consistent source selection, save labels, and diagnostics handling across settings, composition, policies, and oracle source editing.
+
+Expected behavior:
+
+- editor headers identify the selected document or source file
+- save actions use labels that match the selected document type
+- switching editors clears stale source selection and diagnostics
+- Java source diagnostics remain associated with the selected source editor
+- source editor panels scroll internally when content is larger than the visible area
+
 ## Modal and Dialog Contract
 
 Modals must overlay the current page without resizing it.
@@ -354,6 +378,8 @@ If compilation fails from a guard dialog:
 
 ## Configuration UX Contract
 
+Traceability: [`WS-UX-CONFIG-GUARD-001`](./WEBSTUDIO_SPEC_TRACE.md#ws-ux-config-guard-001---configuration-guard-dialogs-and-save-buttons)
+
 The `Test Configuration` area is the main technical configuration surface.
 
 The `Test Configuration` dropdown routes to focused pages:
@@ -368,6 +394,8 @@ The default configuration landing view is `Test Settings`.
 
 ### Composition
 
+Traceability: [`WS-UX-COMPOSITION-FLOW-001`](./WEBSTUDIO_SPEC_TRACE.md#ws-ux-composition-flow-001---composition-flow-editor-view)
+
 The Java composition flow is a visual map of active services and capabilities.
 
 Expected behavior:
@@ -381,6 +409,8 @@ Expected behavior:
 
 ### Policies
 
+Traceability: [`WS-UX-POLICIES-001`](./WEBSTUDIO_SPEC_TRACE.md#ws-ux-policies-001---java-policies-editor-view)
+
 The Java policies view compares active and available policies.
 
 Expected behavior:
@@ -392,6 +422,8 @@ Expected behavior:
 - Java source feedback appears inside the modal
 
 ### Settings
+
+Traceability: [`WS-UX-TEST-SETTINGS-001`](./WEBSTUDIO_SPEC_TRACE.md#ws-ux-test-settings-001---test-settings-editor-view)
 
 The left sidebar shows a single `Edit Settings` entry for workspace settings.
 
@@ -433,6 +465,8 @@ Expected behavior:
 
 ## Runtime UX Contract
 
+Traceability: [`WS-UX-RUNTIME-EXECUTION-001`](./WEBSTUDIO_SPEC_TRACE.md#ws-ux-runtime-execution-001---runtime-execution-pages)
+
 Runtime pages include Generate, Spy, and CLI.
 
 Runtime pages prioritize monitoring and control, not profile editing.
@@ -470,6 +504,8 @@ Expected behavior:
 
 ### Test Goals
 
+Traceability: [`WS-UX-TEST-GOALS-001`](./WEBSTUDIO_SPEC_TRACE.md#ws-ux-test-goals-001---test-goals-authoring-view)
+
 Expected behavior:
 
 - Test Goals use a dedicated authoring view
@@ -492,6 +528,8 @@ Avoid:
 - treating arbitrary free-text files as managed executable goals
 
 ## Test Results UX Contract
+
+Traceability: [`WS-UX-TEST-RESULTS-001`](./WEBSTUDIO_SPEC_TRACE.md#ws-ux-test-results-001---test-results-inspection-view)
 
 The results page should provide fast visual understanding of output health.
 
@@ -552,6 +590,8 @@ Empty state behavior:
 
 ## State Model UX Contract
 
+Traceability: [`WS-UX-STATE-MODEL-001`](./WEBSTUDIO_SPEC_TRACE.md#ws-ux-state-model-001---state-model-dialog-and-actions)
+
 Expected behavior:
 
 - state model errors are shown as friendly UI messages, not raw server errors
@@ -559,6 +599,8 @@ Expected behavior:
 - running analysis exposes actions to open the analysis page and stop the analysis server
 
 ## Debug UX Contract
+
+Traceability: [`WS-UX-DEBUG-FILES-001`](./WEBSTUDIO_SPEC_TRACE.md#ws-ux-debug-files-001---debug-file-inspection-view)
 
 Expected behavior:
 

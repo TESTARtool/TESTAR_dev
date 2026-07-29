@@ -6,6 +6,7 @@
 
 package org.testar.rascal;
 
+// Implements WS-FUNC-ORACLE-DSL-EDITOR-001: normalized Rascal validation diagnostic for WebStudio.
 public final class DslOracleDiagnostic {
 
     private final String severity;

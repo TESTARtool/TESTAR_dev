@@ -6,6 +6,7 @@
 
 package org.testar.webstudio.api.dto;
 
+// Implements WS-FUNC-TEST-ORACLES-001: one built-in, workspace Java, or DSL oracle inventory item.
 public final class TestOracleItemDto {
 
     private final String name;

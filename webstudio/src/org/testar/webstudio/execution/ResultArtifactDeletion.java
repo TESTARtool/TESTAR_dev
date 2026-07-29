@@ -19,6 +19,7 @@ final class ResultArtifactDeletion {
         // Utility class.
     }
 
+    // Implements WS-FUNC-TEST-RESULTS-001: protects delete operations inside a workspace output directory.
     static void deleteResultFile(Path outputDirectory, String filePath) {
         Path resultFile = resolvePathInsideOutput(outputDirectory, filePath);
         if (!Files.isRegularFile(resultFile)) {

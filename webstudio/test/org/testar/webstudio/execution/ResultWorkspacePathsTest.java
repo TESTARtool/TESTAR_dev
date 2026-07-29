@@ -10,6 +10,7 @@ import java.nio.file.Path;
 
 public class ResultWorkspacePathsTest {
 
+    // Verifies WS-FUNC-TEST-RESULTS-001: output paths are workspace-scoped and safe.
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
