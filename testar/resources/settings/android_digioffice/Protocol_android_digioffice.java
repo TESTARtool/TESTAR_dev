@@ -609,7 +609,7 @@ public class Protocol_android_digioffice extends AndroidProtocol {
             }
             // Enable/Disable the AndroidDigiOfficeDummyButton if a click button action is executed
             if (isClickButtonActionExecuted(action)) {
-                dummyButtonOracle.activate(state.get(Tags.ConcreteID, ""));
+                dummyButtonOracle.activate(state.get(Tags.ConcreteID, ""), action.get(Tags.OriginWidget, null));
             } else {
                 dummyButtonOracle.deactivate();
             }
@@ -657,6 +657,7 @@ public class Protocol_android_digioffice extends AndroidProtocol {
 
         // If we are not anymore in the DigiOffice state
         if (!widgetTreePackageMatches(state, digiofficeDomainPackage)) {
+            dummyButtonOracle.deactivate();
 
             if (lastExecutedAction != null && lastExecutedAction.get(Tags.OriginWidget, null) != null) {
                 Widget lastExecutedWidget = lastExecutedAction.get(Tags.OriginWidget);

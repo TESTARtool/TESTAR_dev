@@ -1,11 +1,14 @@
 package android_digioffice.oracles;
 
 import org.testar.monkey.alayer.Rect;
+import org.testar.monkey.alayer.Role;
+import org.testar.monkey.alayer.Roles;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Verdict;
 import org.testar.monkey.alayer.Widget;
 import org.testar.monkey.alayer.android.enums.AndroidTags;
+import org.testar.plugin.NativeLinker;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,8 +20,10 @@ import java.util.regex.Pattern;
 public class AndroidDigiOfficeDuplicatedText extends AbstractAndroidDigiOfficeOracle {
 
     private static final String DUPLICATED_TEXT_PATTERN_REGEX = "^(?=\\b(.*\\D.*)(\\s*\\W*\\s*)\\1(\\b|\\W))(?!\\W)";
+    private static final String REPEATED_PUNCTUATION_PATTERN_REGEX = "([\\p{Punct}])\\1{2,}";
 
     private final Pattern duplicatedTextPattern;
+    private final Pattern repeatedPunctuationPattern;
     private final Pattern ignorePattern;
     private final String ignorePatternRegEx;
 
@@ -29,6 +34,7 @@ public class AndroidDigiOfficeDuplicatedText extends AbstractAndroidDigiOfficeOr
     public AndroidDigiOfficeDuplicatedText(String ignorePatternRegEx) {
         super("AndroidDigiOfficeDuplicatedText");
         this.duplicatedTextPattern = Pattern.compile(DUPLICATED_TEXT_PATTERN_REGEX);
+        this.repeatedPunctuationPattern = Pattern.compile(REPEATED_PUNCTUATION_PATTERN_REGEX);
         this.ignorePatternRegEx = ignorePatternRegEx == null ? "" : ignorePatternRegEx;
         this.ignorePattern = this.ignorePatternRegEx.isEmpty() ? null : Pattern.compile(this.ignorePatternRegEx);
     }
@@ -37,7 +43,7 @@ public class AndroidDigiOfficeDuplicatedText extends AbstractAndroidDigiOfficeOr
     protected boolean isApplicable(State state) {
         for (Widget widget : state) {
             String textValue = widget.get(AndroidTags.AndroidText, "");
-            if (!textValue.isEmpty()) {
+            if (!textValue.isEmpty() && !isEditTextWidget(widget)) {
                 return true;
             }
         }
@@ -51,12 +57,13 @@ public class AndroidDigiOfficeDuplicatedText extends AbstractAndroidDigiOfficeOr
 
         for (Widget widget : state) {
             String textValue = widget.get(AndroidTags.AndroidText, "");
-            if (textValue.isEmpty()) {
+            if (textValue.isEmpty() || isEditTextWidget(widget)) {
                 continue;
             }
 
             Matcher duplicatedTextMatcher = this.duplicatedTextPattern.matcher(textValue);
-            if (!duplicatedTextMatcher.find()) {
+            Matcher repeatedPunctuationMatcher = this.repeatedPunctuationPattern.matcher(textValue);
+            if (!duplicatedTextMatcher.find() && !repeatedPunctuationMatcher.find()) {
                 continue;
             }
 
@@ -68,9 +75,7 @@ public class AndroidDigiOfficeDuplicatedText extends AbstractAndroidDigiOfficeOr
             }
 
             String verdictMsg = String.format(
-                    "Detected duplicated or repeated Android text! Role: %s , Path: %s , AndroidResourceId: %s , AndroidText: %s",
-                    widget.get(Tags.Role),
-                    widget.get(Tags.Path),
+                    "Detected duplicated or repeated Android text! AndroidResourceId: %s , AndroidText: %s",
                     widget.get(AndroidTags.AndroidResourceId, ""),
                     textValue);
 
@@ -85,5 +90,10 @@ public class AndroidDigiOfficeDuplicatedText extends AbstractAndroidDigiOfficeOr
         }
 
         return verdicts;
+    }
+
+    private boolean isEditTextWidget(Widget widget) {
+        Role role = widget.get(Tags.Role, Roles.Widget);
+        return Role.isOneOf(role, NativeLinker.getNativeTypeableRoles());
     }
 }
