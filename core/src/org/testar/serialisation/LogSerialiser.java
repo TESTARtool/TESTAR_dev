@@ -74,7 +74,6 @@ public class LogSerialiser extends Thread {
 		alive = false;
 	}
 	
-	// by Sebastian Bauersfeld
 	public static enum LogLevel{ 
 		Critical(0), Info(1), Debug(2);
 		final int significance;
@@ -169,8 +168,7 @@ public class LogSerialiser extends Thread {
 						}
 					}
 				}
-			} catch (Exception e) {} // log may be set to null when we try to sync on it	
-			//System.out.println("LogManager exited");
+			} catch (Exception e) {} // log may be set to null when we try to sync on it
 			log = null;
 		}
 	}

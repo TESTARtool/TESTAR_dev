@@ -107,18 +107,15 @@ public class TestSerialiser extends Thread {
 		if (currentTest != null){
 			try {
 				currentTest.flush();
+			} catch (IOException e) {
+				LogSerialiser.log("I/O exception flushing test file!\n", LogSerialiser.LogLevel.Critical);
+			}
+			try {
 				currentTest.close();
 			} catch (IOException e) {
-				LogSerialiser.log("I/O exception serialising test file!\n", LogSerialiser.LogLevel.Critical);
-			} finally{
-				try {
-					currentTest.close();
-				} catch (IOException e) {
-					LogSerialiser.log("I/O exception closing serialisation of test file!\n", LogSerialiser.LogLevel.Critical);				
-				}
+				LogSerialiser.log("I/O exception closing serialisation of test file!\n", LogSerialiser.LogLevel.Critical);
 			}
 			synchronized(currentTest){
-				//System.out.println("TestSerialiser finished");
 				singletonTestSerialiser = null;
 				currentTest.notifyAll();
 			}
@@ -178,8 +175,7 @@ public class TestSerialiser extends Thread {
 						}
 					}
 				}
-			} catch (Exception e) {} // test may be set to null when we try to sync on it		
-			//System.out.println("TestSerialisationManager exited");
+			} catch (Exception e) {} // test may be set to null when we try to sync on it
 			test = null;
 		}
 	}

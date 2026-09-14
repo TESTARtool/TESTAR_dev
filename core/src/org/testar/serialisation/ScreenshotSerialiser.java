@@ -36,6 +36,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -113,6 +114,10 @@ public class ScreenshotSerialiser extends Thread {
 				synchronized(scrshotSavingQueue){
 					r = scrshotSavingQueue.removeFirst();
 				}
+				if (r.scrshot == null) {
+					logger.error("ScreenshotSerialiser skipped saving a screenshot because the AWTCanvas is null.");
+					continue;
+				}
 				try {
 					// Write to a temp file, then atomically move/replace it to the final name.
 					Path finalPath = Paths.get(r.scrshotPath);
@@ -122,7 +127,7 @@ public class ScreenshotSerialiser extends Thread {
 						Files.move(tmpPath, finalPath,
 								StandardCopyOption.ATOMIC_MOVE,
 								StandardCopyOption.REPLACE_EXISTING);
-					} catch (java.nio.file.AtomicMoveNotSupportedException e) {
+					} catch (AtomicMoveNotSupportedException e) {
 						// fall back to a regular replace if ATOMIC_MOVE not available (e.g., some filesystems)
 						Files.move(tmpPath, finalPath, StandardCopyOption.REPLACE_EXISTING);
 					}
@@ -159,6 +164,10 @@ public class ScreenshotSerialiser extends Thread {
 	}
 
 	private static void savethis(String scrshotPath, AWTCanvas scrshot){
+		if (scrshot == null) {
+			logger.error("ScreenshotSerialiser skipped queuing a screenshot because the AWTCanvas is null.");
+			return;
+		}
 		if (alive){
 			synchronized(scrshotSavingQueue){
 				scrshotSavingQueue.add(new ScrshotRecord(scrshotPath,scrshot));

@@ -29,6 +29,17 @@ public class ScreenshotSerialiserNullGuardTest {
         Assert.assertNull(getStaticField("singletonScreenshotSerialiser"));
     }
 
+    @Test
+    public void saveStateshot_WhenCanvasIsNull_DoesNotQueueScreenshot() throws Exception {
+        setStaticField("alive", true);
+        setStaticField("scrshotOutputFolder", "build/null-screenshot-" + System.nanoTime());
+        setStaticField("testSequenceFolder", "sequence");
+
+        ScreenshotSerialiser.saveStateshot("state-id", null);
+
+        Assert.assertEquals(0, ScreenshotSerialiser.queueLength());
+    }
+
     private ScreenshotSerialiser newScreenshotSerialiserInstance() throws Exception {
         Constructor<ScreenshotSerialiser> constructor = ScreenshotSerialiser.class.getDeclaredConstructor();
         constructor.setAccessible(true);

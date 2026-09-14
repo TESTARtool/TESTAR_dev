@@ -8,6 +8,9 @@ import org.testar.monkey.alayer.TaggableBase;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectOutputStream;
+import java.io.IOException;
 import java.util.LinkedList;
 
 public class TestSerialiserNullGuardTest {
@@ -39,6 +42,19 @@ public class TestSerialiserNullGuardTest {
         writethis.invoke(null, new TaggableBase());
     }
 
+    @Test
+    public void run_WhenTestStreamIsValid_ClosesStreamOnce() throws Exception {
+        CountingObjectOutputStream outputStream = new CountingObjectOutputStream();
+        TestSerialiser serialiser = newTestSerialiserInstance();
+        setStaticField("test", outputStream);
+        setStaticField("singletonTestSerialiser", serialiser);
+        setStaticField("alive", false);
+
+        serialiser.run();
+
+        Assert.assertEquals(1, outputStream.getCloseCount());
+    }
+
     private TestSerialiser newTestSerialiserInstance() throws Exception {
         Constructor<TestSerialiser> constructor = TestSerialiser.class.getDeclaredConstructor();
         constructor.setAccessible(true);
@@ -55,5 +71,24 @@ public class TestSerialiserNullGuardTest {
         Field field = TestSerialiser.class.getDeclaredField(fieldName);
         field.setAccessible(true);
         field.set(null, value);
+    }
+
+    private static class CountingObjectOutputStream extends ObjectOutputStream {
+
+        private int closeCount;
+
+        private CountingObjectOutputStream() throws IOException {
+            super(new ByteArrayOutputStream());
+        }
+
+        @Override
+        public void close() throws IOException {
+            closeCount++;
+            super.close();
+        }
+
+        private int getCloseCount() {
+            return closeCount;
+        }
     }
 }
