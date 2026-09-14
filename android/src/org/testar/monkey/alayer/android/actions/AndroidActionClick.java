@@ -78,7 +78,7 @@ public class AndroidActionClick extends TaggableBase implements Action {
 	@Override
 	public String toParametersString() {
 		String widgetConcreteId = widget.get(Tags.ConcreteID, "NoWidgetConcreteIdAvailable");
-		return "role=" + this.get(Tags.Role, ActionRoles.LeftClickAt)
+		return "role=" + this.get(Tags.Role)
 				+ ",widget=" + widgetConcreteId
 				+ ",widgetClass=" + this.widgetClass
 				+ ",text=" + this.text

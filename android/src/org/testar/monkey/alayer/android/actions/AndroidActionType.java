@@ -93,7 +93,7 @@ public class AndroidActionType extends TaggableBase implements Action {
 	public String toParametersString() {
 		String widgetConcreteId = this.widget.get(Tags.ConcreteID, "NoWidgetConcreteIdAvailable");
 		String inputText = this.get(Tags.InputText, "");
-		return "role=" + this.get(Tags.Role, ActionRoles.ClickTypeInto)
+		return "role=" + this.get(Tags.Role)
 				+ ",widget=" + widgetConcreteId
 				+ ",widgetClass=" + this.widgetClass
 				+ ",text=" + this.text
