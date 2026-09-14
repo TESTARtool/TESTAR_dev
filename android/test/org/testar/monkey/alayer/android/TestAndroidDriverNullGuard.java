@@ -4,7 +4,9 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
+import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.appmanagement.ApplicationState;
+import org.openqa.selenium.WebDriverException;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.SUT;
 import org.testar.monkey.alayer.Tags;
@@ -48,6 +50,42 @@ public class TestAndroidDriverNullGuard {
 
         State state = buildStateWithUnresponsiveFlag();
         Assert.assertTrue(state.get(Tags.NotResponding, false));
+    }
+
+    @Test
+    public void buildState_WhenPageSourceFails_PreservesFeedbackAndClearsUnresponsiveFlag() throws Exception {
+        AndroidDriver driver = Mockito.mock(AndroidDriver.class);
+        Mockito.when(driver.getPageSource()).thenThrow(new WebDriverException("page source timeout"));
+        setStaticDriver(driver);
+
+        SUT system = Mockito.mock(SUT.class);
+        Mockito.when(system.isRunning()).thenReturn(true);
+        Mockito.when(system.get(Tags.PID, (long) -1)).thenReturn((long) -1);
+
+        State state = new AndroidStateBuilder(1.0).apply(system);
+
+        Assert.assertTrue(state.get(Tags.NotResponding, false));
+        Assert.assertTrue(state.get(Tags.StateFeedback, "").contains("page source timeout"));
+        Assert.assertFalse(AndroidAppiumFramework.isDriverUnresponsive());
+        Mockito.verify(system, Mockito.times(1)).isRunning();
+    }
+
+    @Test
+    public void buildState_WhenAlreadyUnresponsive_DoesNotQuerySystemRunning() throws Exception {
+        setStaticDriver(null);
+        AndroidAppiumFramework.getActivity();
+
+        SUT system = Mockito.mock(SUT.class);
+        Mockito.when(system.isRunning()).thenAnswer(invocation -> {
+            AndroidAppiumFramework.getActivity();
+            return true;
+        });
+
+        State state = new AndroidStateBuilder(1.0).apply(system);
+
+        Assert.assertTrue(state.get(Tags.NotResponding, false));
+        Assert.assertFalse(AndroidAppiumFramework.isDriverUnresponsive());
+        Mockito.verify(system, Mockito.never()).isRunning();
     }
 
     @Test
