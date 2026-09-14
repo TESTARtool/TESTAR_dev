@@ -398,10 +398,6 @@ public class WdElement extends TaggableBase implements Serializable {
     return rect != null && rect.contains(x - scrollLeft, y - scrollTop);
   }
 
-  public boolean visibleAt(double x, double y, boolean obscuredByChildFeature) {
-    return visibleAt(x, y);
-  }
-  
   private boolean isFullVisibleAtCanvasBrowser() {
 	  if (rect == null) return false;
 
