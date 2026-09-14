@@ -1,3 +1,16 @@
+#TESTAR v2.8.16 (15-Sep-2026)
+- Bump org.seleniumhq.selenium:selenium-java from 4.48.0 to 4.49.0
+- Update devtools dependencies to v153
+- Add state feedback tag
+- Add log, screenshots, and test serialiser null guards
+- Calculate WdElement visibleAt logic with scrollTop
+- Extend web ensureCanvasOnTop logic
+- Extend AndroidLogcatOracle to normalize file paths and object IDs
+- Update android actions toString description, which constitutes the action's concrete ID. This also fixes an issue with HTML report action screenshots
+- Delete unused AndroidActionPinch
+- Catch potential android driver initialization and non responsive issues to avoid breaking TESTAR execution
+
+
 #TESTAR v2.8.15 (14-Sep-2026)
 - Bump org.seleniumhq.selenium:selenium-java from 4.46.0 to 4.48.0
 - Update devtools dependencies to v152
