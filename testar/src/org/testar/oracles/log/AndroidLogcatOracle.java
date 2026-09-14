@@ -71,6 +71,9 @@ public class AndroidLogcatOracle implements Oracle {
     );
     private static final Pattern NUMBER_PATTERN = Pattern.compile("\\d+");
     private static final Pattern NORMALIZABLE_NUMBER_PATTERN = Pattern.compile("(?<![A-Za-z])\\d+(?![A-Za-z])");
+    private static final Pattern MEANINGFUL_NUMBER_CONTEXT_PATTERN = Pattern.compile(
+            "(?i)(?:status|code|count|attempts?|retries?|version|line|column|port|offset|length|size|index)\\s*(?:=|:)?\\s*$"
+    );
     private static final Pattern JAVA_OBJECT_IDENTITY_PATTERN = Pattern.compile("@(?i:[a-f0-9]{6,})");
     private static final Pattern ANDROID_ABSOLUTE_PATH_PATTERN = Pattern.compile(
             "((?:/data/user/\\d+|/data/data|/storage/emulated/\\d+|/sdcard|/mnt/sdcard|/cache|/system|/vendor|/product|/apex)"
@@ -84,6 +87,10 @@ public class AndroidLogcatOracle implements Oracle {
     );
     private static final Pattern UUID_SEGMENT_PATTERN = Pattern.compile(
             "(?i)[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"
+    );
+    private static final Pattern TIMESTAMP_SEGMENT_PATTERN = Pattern.compile("\\d{10,17}");
+    private static final Pattern MIXED_ENTROPY_SEGMENT_PATTERN = Pattern.compile(
+            "(?i)(?=[a-z0-9_-]{16,}$)(?=.*[a-z])(?=.*\\d)[a-z0-9_-]+"
     );
 
     private final Settings settings;
@@ -195,10 +202,10 @@ public class AndroidLogcatOracle implements Oracle {
         }
 
         for (String raw : lines) {
-            String normalized = normalizeThreadtimeLine(raw);
+            String unnormalizedMessage = stripThreadtimeLine(raw);
             try {
-                if (p.matcher(normalized).find()) {
-                    matches.add(normalized);
+                if (p.matcher(unnormalizedMessage).find()) {
+                    matches.add(normalizeThreadtimeLine(unnormalizedMessage));
                 }
             } catch (Exception ignored) {
             }
@@ -207,23 +214,26 @@ public class AndroidLogcatOracle implements Oracle {
     }
 
     private String normalizeThreadtimeLine(String line) {
+        String message = stripThreadtimeLine(line);
+        return normalizeNumbers(
+                normalizeDynamicObjectIdentities(
+                        normalizeAndroidPaths(message)
+                )
+        );
+    }
+
+    private String stripThreadtimeLine(String line) {
         if (line == null) {
             return "";
         }
         line = line.trim();
         Matcher m = THREADTIME_PATTERN.matcher(line);
         if (!m.matches()) {
-            return normalizeNumbers(normalizeDynamicObjectIdentities(normalizeAndroidPaths(line.replaceAll("\\s+", " "))));
+            return line.replaceAll("\\s+", " ");
         }
 
         String tag = m.group(2).trim();
-        String msg = normalizeNumbers(
-                normalizeDynamicObjectIdentities(
-                        normalizeAndroidPaths(m.group(3).trim().replaceAll("\\s+", " "))
-                )
-        );
-
-        return tag + ": " + msg;
+        return tag + ": " + m.group(3).trim().replaceAll("\\s+", " ");
     }
 
     private String normalizeDynamicObjectIdentities(String text) {
@@ -252,6 +262,10 @@ public class AndroidLogcatOracle implements Oracle {
     private String normalizeAndroidPath(String path) {
         String[] segments = path.split("/");
         StringBuilder normalized = new StringBuilder();
+        boolean withinVolatileDirectory = false;
+        boolean userIndexExpected = false;
+        boolean packageSegmentExpected = false;
+        String previousSegment = "";
 
         for (String segment : segments) {
             if (segment.isEmpty()) {
@@ -259,7 +273,33 @@ public class AndroidLogcatOracle implements Oracle {
                 continue;
             }
 
-            normalized.append(normalizePathSegment(segment)).append("/");
+            boolean currentPackageSegment = packageSegmentExpected;
+            boolean currentUserIndex = userIndexExpected;
+            packageSegmentExpected = false;
+            userIndexExpected = false;
+
+            normalized.append(normalizePathSegment(
+                    segment,
+                    withinVolatileDirectory,
+                    currentPackageSegment,
+                    currentUserIndex
+            )).append("/");
+
+            if ("user".equals(segment) || "emulated".equals(segment)) {
+                userIndexExpected = true;
+            } else if (currentUserIndex) {
+                packageSegmentExpected = true;
+            }
+
+            if ("data".equals(segment)
+                    && ("data".equals(previousSegment) || "Android".equals(previousSegment))) {
+                packageSegmentExpected = true;
+            }
+
+            if (isVolatilePathSegment(segment)) {
+                withinVolatileDirectory = true;
+            }
+            previousSegment = segment;
         }
 
         if (normalized.length() > 1 && normalized.charAt(normalized.length() - 1) == '/') {
@@ -269,7 +309,12 @@ public class AndroidLogcatOracle implements Oracle {
         return normalized.toString();
     }
 
-    private String normalizePathSegment(String segment) {
+    private String normalizePathSegment(
+            String segment,
+            boolean withinVolatileDirectory,
+            boolean packageSegment,
+            boolean userIndex
+    ) {
         if (segment == null || segment.isEmpty()) {
             return "";
         }
@@ -278,7 +323,7 @@ public class AndroidLogcatOracle implements Oracle {
             return segment;
         }
 
-        if (PACKAGE_SEGMENT_PATTERN.matcher(segment).matches()) {
+        if (packageSegment && PACKAGE_SEGMENT_PATTERN.matcher(segment).matches()) {
             return "<package>";
         }
 
@@ -290,7 +335,9 @@ public class AndroidLogcatOracle implements Oracle {
             return "<id>";
         }
 
-        if (NUMBER_PATTERN.matcher(segment).matches()) {
+        if (TIMESTAMP_SEGMENT_PATTERN.matcher(segment).matches()
+                || (userIndex && NUMBER_PATTERN.matcher(segment).matches())
+                || (withinVolatileDirectory && NUMBER_PATTERN.matcher(segment).matches())) {
             return "<num>";
         }
 
@@ -301,7 +348,7 @@ public class AndroidLogcatOracle implements Oracle {
             if (isDynamicFileName(name)) {
                 return "<file>" + extension;
             }
-            return "<file>" + extension;
+            return segment;
         }
 
         int underscoreIndex = segment.indexOf('_');
@@ -313,7 +360,22 @@ public class AndroidLogcatOracle implements Oracle {
             }
         }
 
-        return "<path>";
+        if (isMixedEntropySegment(segment)) {
+            return "<id>";
+        }
+
+        return withinVolatileDirectory ? "<path>" : segment;
+    }
+
+    private boolean isVolatilePathSegment(String segment) {
+        switch (segment) {
+            case "cache":
+            case "code_cache":
+            case "tmp":
+                return true;
+            default:
+                return false;
+        }
     }
 
     private boolean isStablePathSegment(String segment) {
@@ -341,12 +403,18 @@ public class AndroidLogcatOracle implements Oracle {
 
     private boolean isDynamicFileName(String value) {
         if (value == null || value.isEmpty()) {
-            return true;
+            return false;
         }
 
-        return NUMBER_PATTERN.matcher(value).matches()
+        return TIMESTAMP_SEGMENT_PATTERN.matcher(value).matches()
+                || (NUMBER_PATTERN.matcher(value).matches() && value.length() >= 4)
                 || HEX_OR_HASH_SEGMENT_PATTERN.matcher(value).matches()
-                || UUID_SEGMENT_PATTERN.matcher(value).matches();
+                || UUID_SEGMENT_PATTERN.matcher(value).matches()
+                || isMixedEntropySegment(value);
+    }
+
+    private boolean isMixedEntropySegment(String value) {
+        return value != null && MIXED_ENTROPY_SEGMENT_PATTERN.matcher(value).matches();
     }
 
     private String normalizeNumbers(String text) {
@@ -357,7 +425,10 @@ public class AndroidLogcatOracle implements Oracle {
         StringBuffer sb = new StringBuffer();
         while (matcher.find()) {
             String num = matcher.group();
-            if (isHttpFailureStatus(num)) {
+            if (isHttpFailureStatus(num)
+                    || isWithinAndroidPath(text, matcher.start(), matcher.end())
+                    || isMeaningfulNumber(text, matcher.start())
+                    || !isHighConfidenceDynamicNumber(text, matcher.start(), num)) {
                 matcher.appendReplacement(sb, num);
             } else {
                 matcher.appendReplacement(sb, "<num>");
@@ -365,6 +436,30 @@ public class AndroidLogcatOracle implements Oracle {
         }
         matcher.appendTail(sb);
         return sb.toString();
+    }
+
+    private boolean isMeaningfulNumber(String text, int start) {
+        int contextStart = Math.max(0, start - 32);
+        String context = text.substring(contextStart, start);
+        return MEANINGFUL_NUMBER_CONTEXT_PATTERN.matcher(context).find();
+    }
+
+    private boolean isWithinAndroidPath(String text, int start, int end) {
+        Matcher pathMatcher = ANDROID_ABSOLUTE_PATH_PATTERN.matcher(text);
+        while (pathMatcher.find()) {
+            if (start >= pathMatcher.start(1) && end <= pathMatcher.end(1)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isHighConfidenceDynamicNumber(String text, int start, String number) {
+        if (number.length() >= 4) {
+            return true;
+        }
+
+        return start > 0 && (text.charAt(start - 1) == '@' || text.charAt(start - 1) == ':');
     }
 
     private boolean isHttpFailureStatus(String num) {

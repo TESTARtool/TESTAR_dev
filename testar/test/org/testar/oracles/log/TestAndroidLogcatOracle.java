@@ -90,6 +90,31 @@ public class TestAndroidLogcatOracle {
     }
 
     @Test
+    public void generateModeVerdict_MatchesRegexBeforeDynamicNormalization() {
+        OutputStructure.logsOutputDir = Path.of("target").toString();
+        OutputStructure.startInnerLoopDateString = "YYYY-MM-DD_hh-mm-ss";
+        OutputStructure.executedSUTname = "test-sut";
+
+        Settings settings = buildSettings(RuntimeControlsProtocol.Modes.Generate, "Exception @1:207875");
+        AndroidLogcatOracle androidLogcatOracle = new AndroidLogcatOracle(settings);
+        State state = Mockito.mock(State.class);
+
+        String line = "02-09 08:59:33.844 17550 17575 E ViewRootImpl: Exception @1:207875";
+
+        try (MockedStatic<AndroidAppiumFramework> mocked = Mockito.mockStatic(AndroidAppiumFramework.class)) {
+            mocked.when(AndroidAppiumFramework::getAppPackageFromCapabilitiesOrCurrent).thenReturn("org.testar.app");
+            mocked.when(() -> AndroidAppiumFramework.dumpLogcatThreadtimeForPackage("org.testar.app"))
+                    .thenReturn(line);
+
+            androidLogcatOracle.initialize();
+            List<Verdict> verdicts = androidLogcatOracle.getVerdicts(state);
+
+            Assert.assertEquals(1, verdicts.size());
+            Assert.assertTrue(verdicts.get(0).info().contains("ViewRootImpl: Exception @<num>:<num>"));
+        }
+    }
+
+    @Test
     public void generateModeVerdict_ProcessesOnlyNewLinesAcrossCalls() {
         OutputStructure.logsOutputDir = Path.of("target").toString();
         OutputStructure.startInnerLoopDateString = "YYYY-MM-DD_hh-mm-ss";
@@ -279,6 +304,94 @@ public class TestAndroidLogcatOracle {
                     + "/data/user/<num>/<package>/cache/<path>/<id>/replay_<id>/<file>.jpg: "
                     + "open failed: ENOENT (No such file or directory)";
             Assert.assertEquals(expected, verdict.info());
+        }
+    }
+
+    @Test
+    public void generateModeVerdict_PreservesStableAndroidFilenames() {
+        OutputStructure.logsOutputDir = Path.of("target").toString();
+        OutputStructure.startInnerLoopDateString = "YYYY-MM-DD_hh-mm-ss";
+        OutputStructure.executedSUTname = "test-sut";
+
+        Settings settings = buildSettings(RuntimeControlsProtocol.Modes.Generate, "(?i)(.*Exception.*)");
+        AndroidLogcatOracle androidLogcatOracle = new AndroidLogcatOracle(settings);
+        State state = Mockito.mock(State.class);
+
+        String line1 = "07-06 11:48:55.095 29813 29884 E FileReader: Exception opening /data/data/com.example.app/files/reports/config.db";
+        String line2 = "07-06 11:48:56.095 29813 29884 E FileReader: Exception opening /data/data/com.example.app/files/reports/settings-2024.db";
+
+        try (MockedStatic<AndroidAppiumFramework> mocked = Mockito.mockStatic(AndroidAppiumFramework.class)) {
+            mocked.when(AndroidAppiumFramework::getAppPackageFromCapabilitiesOrCurrent).thenReturn("org.testar.app");
+            mocked.when(() -> AndroidAppiumFramework.dumpLogcatThreadtimeForPackage("org.testar.app"))
+                    .thenReturn(line1 + "\n" + line2);
+
+            androidLogcatOracle.initialize();
+            List<Verdict> verdicts = androidLogcatOracle.getVerdicts(state);
+
+            Assert.assertEquals(1, verdicts.size());
+            Assert.assertEquals(
+                    "Suspicious Android logcat line(s) detected "
+                            + "FileReader: Exception opening /data/data/<package>/files/reports/config.db"
+                            + " | FileReader: Exception opening /data/data/<package>/files/reports/settings-2024.db",
+                    verdicts.get(0).info()
+            );
+        }
+    }
+
+    @Test
+    public void generateModeVerdict_PreservesMeaningfulNumericValues() {
+        OutputStructure.logsOutputDir = Path.of("target").toString();
+        OutputStructure.startInnerLoopDateString = "YYYY-MM-DD_hh-mm-ss";
+        OutputStructure.executedSUTname = "test-sut";
+
+        Settings settings = buildSettings(RuntimeControlsProtocol.Modes.Generate, "(?i)(.*Exception.*)");
+        AndroidLogcatOracle androidLogcatOracle = new AndroidLogcatOracle(settings);
+        State state = Mockito.mock(State.class);
+
+        String line1 = "07-06 11:48:55.095 29813 29884 E Worker: Exception code 1";
+        String line2 = "07-06 11:48:56.095 29813 29884 E Worker: Exception code 2";
+
+        try (MockedStatic<AndroidAppiumFramework> mocked = Mockito.mockStatic(AndroidAppiumFramework.class)) {
+            mocked.when(AndroidAppiumFramework::getAppPackageFromCapabilitiesOrCurrent).thenReturn("org.testar.app");
+            mocked.when(() -> AndroidAppiumFramework.dumpLogcatThreadtimeForPackage("org.testar.app"))
+                    .thenReturn(line1 + "\n" + line2);
+
+            androidLogcatOracle.initialize();
+            List<Verdict> verdicts = androidLogcatOracle.getVerdicts(state);
+
+            Assert.assertEquals(1, verdicts.size());
+            Assert.assertEquals(
+                    "Suspicious Android logcat line(s) detected Worker: Exception code 1"
+                            + " | Worker: Exception code 2",
+                    verdicts.get(0).info()
+            );
+        }
+    }
+
+    @Test
+    public void generateModeVerdict_DoesNotCollapseDistinctExceptions() {
+        OutputStructure.logsOutputDir = Path.of("target").toString();
+        OutputStructure.startInnerLoopDateString = "YYYY-MM-DD_hh-mm-ss";
+        OutputStructure.executedSUTname = "test-sut";
+
+        Settings settings = buildSettings(RuntimeControlsProtocol.Modes.Generate, "(?i)(.*Exception.*)");
+        AndroidLogcatOracle androidLogcatOracle = new AndroidLogcatOracle(settings);
+        State state = Mockito.mock(State.class);
+
+        String line1 = "07-06 11:48:55.095 29813 29884 E Worker: IllegalArgumentException: invalid state";
+        String line2 = "07-06 11:48:56.095 29813 29884 E Worker: NullPointerException: missing state";
+
+        try (MockedStatic<AndroidAppiumFramework> mocked = Mockito.mockStatic(AndroidAppiumFramework.class)) {
+            mocked.when(AndroidAppiumFramework::getAppPackageFromCapabilitiesOrCurrent).thenReturn("org.testar.app");
+            mocked.when(() -> AndroidAppiumFramework.dumpLogcatThreadtimeForPackage("org.testar.app"))
+                    .thenReturn(line1 + "\n" + line2);
+
+            androidLogcatOracle.initialize();
+            List<Verdict> verdicts = androidLogcatOracle.getVerdicts(state);
+
+            Assert.assertEquals(1, verdicts.size());
+            Assert.assertTrue(verdicts.get(0).info().contains("IllegalArgumentException: invalid state"));
+            Assert.assertTrue(verdicts.get(0).info().contains("NullPointerException: missing state"));
         }
     }
 
