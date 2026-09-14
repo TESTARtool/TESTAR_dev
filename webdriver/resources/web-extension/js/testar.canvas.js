@@ -14,12 +14,7 @@ function addCanvasTestar() {
     // Create canvas, get reference to context
     testar_canvas = document.createElement('canvas');
     testar_canvas.id = 'testar_canvas';
-    testar_canvas.style.position = 'fixed';
-    testar_canvas.style.margin = '0px';
-    testar_canvas.style.padding = '0px';
-    testar_canvas.style.border = '0px';
-    testar_canvas.style.pointerEvents = 'none';
-    testar_canvas.style.zIndex = '2147483647';
+    document.body.appendChild(testar_canvas);
     testarCtx = testar_canvas.getContext('2d');
 
     // Set canvas to complete viewport
@@ -70,6 +65,23 @@ function ensureCanvasOnTop() {
 
     if (testar_canvas.parentNode !== canvasHost || canvasHost.lastElementChild !== testar_canvas) {
         canvasHost.appendChild(testar_canvas);
+    }
+
+    // Calculate z-index behavior for ordinary page content.
+    if (canvasHost === document.body) {
+        var zIndexes = Array.from(document.querySelectorAll('body *'))
+            .filter(element => element !== testar_canvas)
+            .map(element => parseFloat(window.getComputedStyle(element).zIndex))
+            .filter(zIndex => !isNaN(zIndex));
+
+        if (zIndexes.length > 0) {
+            var maxIndex = Math.max.apply(null, zIndexes);
+            var canvasIndex = parseFloat(window.getComputedStyle(testar_canvas).zIndex);
+
+            if (isNaN(canvasIndex) || canvasIndex <= maxIndex) {
+                testar_canvas.style.zIndex = maxIndex + 1;
+            }
+        }
     }
 }
 
