@@ -49,6 +49,7 @@ public class AndroidStateFetcher implements Callable<AndroidState> {
 	private Rect biggestRect = Rect.from(0, 0, 0, 0);
 
 	private String androidActivityVar;
+    private String stateFeedback = "";
 
 	public AndroidStateFetcher(SUT system) {
 		this.system = system;
@@ -79,6 +80,9 @@ public class AndroidStateFetcher implements Callable<AndroidState> {
 		AndroidState root = createWidgetTree(rootElement);
 		root.set(Tags.Role, Roles.Process);
 		root.set(Tags.NotResponding, false);
+        if (!stateFeedback.isEmpty()) {
+            root.set(Tags.StateFeedback, stateFeedback);
+        }
 
 		// After create the widget tree, set widgets Path
 		for (Widget w : root) {
@@ -99,8 +103,11 @@ public class AndroidStateFetcher implements Callable<AndroidState> {
 
 		rootElement.pid = system.get(Tags.PID, (long)-1);
 
+		AndroidPageSourceResult pageSourceResult = AndroidAppiumFramework.getAndroidPageSource();
+        stateFeedback = pageSourceResult.getFeedback();
+
 		Document xmlAndroid;
-		if((xmlAndroid = AndroidAppiumFramework.getAndroidPageSource()) != null) {
+		if((xmlAndroid = pageSourceResult.getDocument()) != null) {
 		    Node stateNode = xmlAndroid.getDocumentElement();
 
 		    if(stateNode.hasChildNodes()) {

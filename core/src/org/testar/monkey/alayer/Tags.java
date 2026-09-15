@@ -205,6 +205,11 @@ public final class Tags extends TagsBase {
 	public static final Tag<Double> StateRenderTime = from("StateRenderTime", Double.class);
 
 	/**
+	 * Provides feedback to indicate state fetching or other state information.
+	 */
+	public static final Tag<String> StateFeedback = from("StateFeedback", String.class);
+
+	/**
 	 * This method will return all the static tags that are available for use.
 	 * @return
 	 */

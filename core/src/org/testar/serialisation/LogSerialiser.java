@@ -1,6 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2016 - 2026 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2019 - 2026 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -30,6 +31,9 @@
 
 package org.testar.serialisation;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.PrintStream;
 import java.util.LinkedList;
 
@@ -37,11 +41,10 @@ import org.testar.monkey.Assert;
 
 /**
  * Logs serialiser.
- * 
- * @author Urko Rueda Molina (alias: urueda)
- *
  */
 public class LogSerialiser extends Thread {
+
+	protected static final Logger logger = LogManager.getLogger();
 
 	private static PrintStream log;
 	private static int logLevel;
@@ -71,7 +74,6 @@ public class LogSerialiser extends Thread {
 		alive = false;
 	}
 	
-	// by Sebastian Bauersfeld
 	public static enum LogLevel{ 
 		Critical(0), Info(1), Debug(2);
 		final int significance;
@@ -100,12 +102,17 @@ public class LogSerialiser extends Thread {
 				logthis(logR.logS, logR.logL);
 			}
 		}
-		log.flush();
-		log.close();
-		synchronized(log){
-			//System.out.println("<" + singletonLogSerialiser.getName() + "> LogSerialiser finished");
+		PrintStream currentLog = log;
+		if (currentLog != null){
+			currentLog.flush();
+			currentLog.close();
+			synchronized(currentLog){
+				singletonLogSerialiser = null;
+				currentLog.notifyAll();
+			}
+		} else {
+			logger.error("LogSerialiser finished without an active PrintStream.");
 			singletonLogSerialiser = null;
-			log.notifyAll();
 		}
 	}
 	
@@ -133,7 +140,9 @@ public class LogSerialiser extends Thread {
 	}
 	
 	public static void flush(){
-		log.flush();
+		if (log != null){
+			log.flush();
+		}
 	}
 	
 	public static PrintStream getLogStream(){
@@ -143,18 +152,23 @@ public class LogSerialiser extends Thread {
 	public static void exit(){
 		if (singletonLogSerialiser != null){
 			LogSerialiser.finish();
+			PrintStream currentLog = log;
+			if (currentLog == null){
+				logger.error("LogSerialiser.exit() called while log stream is null.");
+				singletonLogSerialiser = null;
+				return;
+			}
 			try {
-				synchronized(log){
+				synchronized(currentLog){
 					while (singletonLogSerialiser != null){
 						try {
-							log.wait(10);
+							currentLog.wait(10);
 						} catch (InterruptedException e) {
 							System.out.println("LogSerialiser exit interrupted");
 						}
 					}
 				}
-			} catch (Exception e) {} // log may be set to null when we try to sync on it	
-			//System.out.println("LogManager exited");
+			} catch (Exception e) {} // log may be set to null when we try to sync on it
 			log = null;
 		}
 	}

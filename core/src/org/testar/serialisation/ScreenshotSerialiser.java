@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2015, 2016, 2017, 2018, 2019 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
+ * Copyright (c) 2015 - 2026 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2019 - 2026 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -31,8 +31,12 @@
 
 package org.testar.serialisation;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -44,9 +48,10 @@ import org.testar.monkey.alayer.AWTCanvas;
 
 /**
  * SUT screenshots serialiser
- *
  */
 public class ScreenshotSerialiser extends Thread {
+
+	protected static final Logger logger = LogManager.getLogger();
 
 	public static final String SCRSHOTS = "scrshots";
 	private static String testSequenceFolder = null;
@@ -109,6 +114,10 @@ public class ScreenshotSerialiser extends Thread {
 				synchronized(scrshotSavingQueue){
 					r = scrshotSavingQueue.removeFirst();
 				}
+				if (r.scrshot == null) {
+					logger.error("ScreenshotSerialiser skipped saving a screenshot because the AWTCanvas is null.");
+					continue;
+				}
 				try {
 					// Write to a temp file, then atomically move/replace it to the final name.
 					Path finalPath = Paths.get(r.scrshotPath);
@@ -118,7 +127,7 @@ public class ScreenshotSerialiser extends Thread {
 						Files.move(tmpPath, finalPath,
 								StandardCopyOption.ATOMIC_MOVE,
 								StandardCopyOption.REPLACE_EXISTING);
-					} catch (java.nio.file.AtomicMoveNotSupportedException e) {
+					} catch (AtomicMoveNotSupportedException e) {
 						// fall back to a regular replace if ATOMIC_MOVE not available (e.g., some filesystems)
 						Files.move(tmpPath, finalPath, StandardCopyOption.REPLACE_EXISTING);
 					}
@@ -128,9 +137,15 @@ public class ScreenshotSerialiser extends Thread {
 				}
 			}
 		}
-		synchronized(testSequenceFolder){
+		String currentTestSequenceFolder = testSequenceFolder;
+		if (currentTestSequenceFolder != null){
+			synchronized(currentTestSequenceFolder){
+				singletonScreenshotSerialiser = null;
+				currentTestSequenceFolder.notifyAll();
+			}
+		} else {
+			logger.error("ScreenshotSerialiser finished without a test sequence folder.");
 			singletonScreenshotSerialiser = null;
-			testSequenceFolder.notifyAll();
 		}
 	}
 
@@ -149,6 +164,10 @@ public class ScreenshotSerialiser extends Thread {
 	}
 
 	private static void savethis(String scrshotPath, AWTCanvas scrshot){
+		if (scrshot == null) {
+			logger.error("ScreenshotSerialiser skipped queuing a screenshot because the AWTCanvas is null.");
+			return;
+		}
 		if (alive){
 			synchronized(scrshotSavingQueue){
 				scrshotSavingQueue.add(new ScrshotRecord(scrshotPath,scrshot));
@@ -159,11 +178,17 @@ public class ScreenshotSerialiser extends Thread {
 	public static void exit(){
 		if (singletonScreenshotSerialiser != null){
 			ScreenshotSerialiser.finish();
+			String currentTestSequenceFolder = testSequenceFolder;
+			if (currentTestSequenceFolder == null){
+				logger.error("ScreenshotSerialiser.exit() called while testSequenceFolder is null.");
+				singletonScreenshotSerialiser = null;
+				return;
+			}
 			try {
-				synchronized(testSequenceFolder){
+				synchronized(currentTestSequenceFolder){
 					while (singletonScreenshotSerialiser != null){
 						try {
-							testSequenceFolder.wait(10);
+							currentTestSequenceFolder.wait(10);
 						} catch (InterruptedException e) {
 							System.out.println("ScreenshotSerialiser exit interrupted");
 						}

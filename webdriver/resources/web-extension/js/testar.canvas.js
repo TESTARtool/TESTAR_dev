@@ -23,6 +23,12 @@ function addCanvasTestar() {
     // Make sure canvas keeps size of viewport on resize or scroll
     window.addEventListener('resize', resizeCanvasTestar, true);
     window.addEventListener('scroll', resizeCanvasTestar, true);
+    new MutationObserver(ensureCanvasOnTop).observe(document.documentElement, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['open', 'popover']
+    });
 
     ensureCanvasOnTop();
     return typeof testar_canvas;
@@ -33,12 +39,49 @@ function addCanvasTestar() {
  * will try to get their element the highest z-index
  */
 function ensureCanvasOnTop() {
-    var lengths = Array.from(document.querySelectorAll('body *'))
-        .map(a => parseFloat(window.getComputedStyle(a).zIndex))
-        .filter(a => !isNaN(a));
-    var maxIndex = Math.max.apply(null, lengths);
-    if (testar_canvas.style.zIndex < maxIndex) {
-        testar_canvas.style.zIndex = maxIndex + 1;
+    if (typeof testar_canvas !== 'object') {
+        return;
+    }
+
+    var canvasHost = document.body;
+
+    try {
+        var popoverHost = document.querySelector(':popover-open');
+        if (popoverHost) {
+            canvasHost = popoverHost;
+        }
+    } catch (error) {
+    }
+
+    if (canvasHost === document.body) {
+        try {
+            var modalHost = document.querySelector(':modal');
+            if (modalHost) {
+                canvasHost = modalHost;
+            }
+        } catch (error) {
+        }
+    }
+
+    if (testar_canvas.parentNode !== canvasHost || canvasHost.lastElementChild !== testar_canvas) {
+        canvasHost.appendChild(testar_canvas);
+    }
+
+    // Calculate z-index behavior for ordinary page content.
+    if (canvasHost === document.body) {
+        var zIndexes = Array.from(document.querySelectorAll('body *'))
+            .filter(element => element !== testar_canvas)
+            .map(element => parseFloat(window.getComputedStyle(element).zIndex))
+            .filter(zIndex => !isNaN(zIndex));
+
+        if (zIndexes.length > 0) {
+            var maxIndex = Math.max.apply(null, zIndexes);
+            var canvasIndex = parseFloat(window.getComputedStyle(testar_canvas).zIndex);
+
+            if (isNaN(canvasIndex) || canvasIndex <= maxIndex) {
+                testar_canvas.style.zIndex = maxIndex + 1;
+            }
+        }
     }
 }
 

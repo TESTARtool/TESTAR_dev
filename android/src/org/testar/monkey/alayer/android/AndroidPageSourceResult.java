@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 - 2026 Open Universiteit - www.ou.nl
- * Copyright (c) 2020 - 2026 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2026 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2026 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,51 +28,29 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.monkey.alayer.android.actions;
+package org.testar.monkey.alayer.android;
 
-import org.testar.monkey.alayer.*;
-import org.testar.monkey.alayer.actions.ActionRoles;
-import org.testar.monkey.alayer.exceptions.ActionFailedException;
-import org.testar.monkey.alayer.android.AndroidAppiumFramework;
+import org.w3c.dom.Document;
 
-public class AndroidBackAction extends TaggableBase implements Action {
+public final class AndroidPageSourceResult {
 
-    private static final long serialVersionUID = 6808185819403073531L;
-    private final State originState;
+    private final Document document;
+    private final String feedback;
 
-    public AndroidBackAction(State state) {
-        this.set(Tags.Role, ActionRoles.Action);
-        this.mapOriginWidget(state);
-        this.originState = state;
-        this.set(Tags.Desc, toShortString());
+    public AndroidPageSourceResult(Document document, String feedback) {
+        this.document = document;
+        this.feedback = feedback;
     }
 
-    @Override
-    public void run(SUT system, State state, double duration) throws ActionFailedException {
-        try {
-            AndroidAppiumFramework.clickBackButton();
-        } catch(Exception e) {
-            System.out.println("Exception trying to click Android back button: ");
-            System.out.println(e.getMessage());
-            throw new ActionFailedException(toShortString());
-        }
+    public Document getDocument() {
+        return document;
     }
 
-    @Override
-    public String toShortString() {
-        return "Execute click Android back button";
+    public String getFeedback() {
+        return feedback;
     }
 
-    @Override
-    public String toParametersString() {
-        String stateConcreteId = this.originState.get(Tags.ConcreteID, "NoStateConcreteIdAvailable");
-        return "role=" + this.get(Tags.Role)
-                + ",state=" + stateConcreteId
-                + ",action=back";
-    }
-
-    @Override
-    public String toString(Role... discardParameters) {
-        return this.toParametersString();
+    public boolean hasDocument() {
+        return document != null;
     }
 }
