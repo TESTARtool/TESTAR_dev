@@ -1,6 +1,7 @@
 <script>
+    import { committedSelectChangeState } from "./committedSelectModel.js";
     import { menuHasActivePage, resultMenuItems, runModeMenuItems, testConfigurationMenuItems } from "./webStudioNavigation.js";
-    import { WEB_STUDIO_ROLES } from "./webStudioRoles.js";
+    import { WEB_STUDIO_ROLES, roleSelectorChangeState } from "./webStudioRoles.js";
 
     // Implements WS-UX-TOP-NAV-ROLES-001: workspace selector, role selector, grouped menus, and stable top nav layout.
     export let activeNavMenu = "";
@@ -16,6 +17,18 @@
     export let onNavigateToTestOracles = () => {};
     export let onNavigateToTestGoals = () => {};
     export let onNavigateToSpy = () => {};
+
+    function changeRole(event) {
+        const nextState = roleSelectorChangeState(currentRole, event.currentTarget.value);
+        event.currentTarget.value = nextState.displayedRole;
+        onRoleChange(nextState.requestedRole);
+    }
+
+    function changeWorkspace(event) {
+        const nextState = committedSelectChangeState(selectedWorkspaceName, event.currentTarget.value);
+        event.currentTarget.value = nextState.displayedValue;
+        onWorkspaceChange(nextState.requestedValue);
+    }
 </script>
 
 <nav class="panel panel-wide page-nav">
@@ -26,7 +39,7 @@
         <select
             id="page-workspace-select"
             value={selectedWorkspaceName}
-            on:change={(event) => onWorkspaceChange(event.currentTarget.value)}
+            on:change={changeWorkspace}
         >
             {#each workspaces as workspace}
                 <option value={workspace.name}>{workspace.name}</option>
@@ -38,7 +51,7 @@
         <select
             id="page-role-select"
             value={currentRole}
-            on:change={(event) => onRoleChange(event.currentTarget.value)}
+            on:change={changeRole}
         >
             <option value={WEB_STUDIO_ROLES.BASIC}>Basic</option>
             <option value={WEB_STUDIO_ROLES.ADVANCED}>Advanced</option>

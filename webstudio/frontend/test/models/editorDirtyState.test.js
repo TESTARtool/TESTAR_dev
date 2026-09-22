@@ -4,7 +4,8 @@ import assert from "node:assert/strict";
 import {
     contentChanged,
     objectChanged,
-    objectSnapshot
+    objectSnapshot,
+    settingsChanged
 } from "../../src/models/editorDirtyState.js";
 
 test("detects changed text content for raw editor save buttons", () => {
@@ -16,6 +17,12 @@ test("treats missing text content as empty text", () => {
     assert.equal(contentChanged(null, ""), false);
     assert.equal(contentChanged(undefined, ""), false);
     assert.equal(contentChanged("value", null), true);
+});
+
+test("detects visual settings changes even when raw content is unchanged", () => {
+    assert.equal(settingsChanged("A = 1\n", "A = 1\n", false), false);
+    assert.equal(settingsChanged("A = 1\n", "A = 1\n", true), true);
+    assert.equal(settingsChanged("A = 2\n", "A = 1\n", false), true);
 });
 
 test("detects changed object content for Agent CLI save button", () => {

@@ -105,6 +105,7 @@
     import {
         clearedSourceSelectionState,
         currentEditorDocumentDescriptor,
+        currentEditorDocumentState,
         openedEditorSelectionState,
         selectedAllowedSettingsGroupId,
         selectedSettingsGroupForEditor
@@ -149,7 +150,7 @@
         openStateModelRequest,
         stopStateModelRequest
     } from "./app/stateModelApi.js";
-    import { objectSnapshot } from "./models/editorDirtyState.js";
+    import { objectSnapshot, settingsChanged } from "./models/editorDirtyState.js";
     import {
         deleteResultFileRequest,
         deleteResultGroupRequest,
@@ -180,6 +181,7 @@
         updatedSavedSourceContents,
         validSettingsGroupId,
         workspaceDocumentBaseline,
+        workspaceDocumentWithSettingsContentValues,
         workspaceSummaryForName
     } from "./models/workspaceSettingsModel.js";
     import {
@@ -280,6 +282,11 @@
         && testGoalDraftContent !== savedTestGoalContent;
     $: oracleSourceDirty = selectedOracleSourceFile !== null
         && oracleSourceDraftContent !== savedOracleSourceContent;
+    $: settingsDirty = settingsChanged(
+        workspaceDocument?.testSettings?.content,
+        savedTestSettingsContent,
+        visualSettingsDirty
+    );
 
     // Shared feedback helpers keep API errors and temporary user messages consistent.
     function reportClientError(context, clientError) {
@@ -608,12 +615,20 @@
     }
 
     async function openVisualSettings() {
-        await openEditor("settings-form");
-        selectedSettingsGroupId = selectedSettingsGroupForEditor(workspaceDocument, "", selectedSettingsGroupId);
+        if (selectedEditor === "settings-form") {
+            return;
+        }
+
+        await guardConfigurationTransition(async () => {
+            workspaceDocument = workspaceDocumentWithSettingsContentValues(workspaceDocument);
+            openEditorImmediate("settings-form");
+            selectedSettingsGroupId = selectedSettingsGroupForEditor(workspaceDocument, "", selectedSettingsGroupId);
+        }, "settings-form");
     }
 
     async function openVisualSettingsGroup(groupId) {
         await guardConfigurationTransition(async () => {
+            workspaceDocument = workspaceDocumentWithSettingsContentValues(workspaceDocument);
             openEditorImmediate("settings-form");
             selectedSettingsGroupId = selectedSettingsGroupForEditor(workspaceDocument, groupId, selectedSettingsGroupId);
         }, "settings-form");
@@ -781,19 +796,31 @@
 
     async function saveVisualSettings() {
         if (!workspaceDocument?.settingsGroups) {
-            return;
+            return false;
         }
 
-        const nextContent = buildTestSettingsContent(
-            workspaceDocument.testSettings.content,
-            workspaceDocument.settingsGroups
-        );
+        saving = true;
+        message = "";
 
-        workspaceDocument.testSettings.content = nextContent;
+        try {
+            const nextContent = buildTestSettingsContent(
+                workspaceDocument.testSettings.content,
+                workspaceDocument.settingsGroups
+            );
 
-        await saveTestSettingsRequest(loadJson, selectedWorkspaceName, nextContent);
-        savedTestSettingsContent = nextContent;
-        visualSettingsDirty = false;
+            workspaceDocument.testSettings.content = nextContent;
+            await saveTestSettingsRequest(loadJson, selectedWorkspaceName, nextContent);
+            savedTestSettingsContent = nextContent;
+            visualSettingsDirty = false;
+            touchWorkspaceDocument();
+            showTemporaryMessage("Settings saved.");
+            return true;
+        } catch (saveError) {
+            reportClientError("Unable to save settings", saveError);
+            return false;
+        } finally {
+            saving = false;
+        }
     }
 
     async function validateRegexExpression(setting) {
@@ -1225,13 +1252,11 @@
     }
 
     function hasSettingsChanges() {
-        const persistedContent = savedTestSettingsContent || "";
-        const currentContent = workspaceDocument?.testSettings?.content || "";
-        if (currentContent !== persistedContent) {
-            return true;
-        }
-
-        return visualSettingsDirty;
+        return settingsChanged(
+            workspaceDocument?.testSettings?.content,
+            savedTestSettingsContent,
+            visualSettingsDirty
+        );
     }
 
     function hasCompositionPropertiesChanges() {
@@ -1278,21 +1303,34 @@
     // Implements WS-FUNC-TEST-SETTINGS-001: saves either the visual settings form or raw test.settings editor.
     async function saveCurrentSettingsEditor() {
         if (selectedEditor === "settings-form") {
-            await saveVisualSettings();
-            return;
+            return saveVisualSettings();
         }
 
         if (selectedEditor === "test-settings" && workspaceDocument?.testSettings) {
-            await saveTestSettingsRequest(loadJson, selectedWorkspaceName, workspaceDocument.testSettings.content);
-            savedTestSettingsContent = workspaceDocument.testSettings.content || "";
-            visualSettingsDirty = false;
+            saving = true;
+            message = "";
+            try {
+                await saveTestSettingsRequest(loadJson, selectedWorkspaceName, workspaceDocument.testSettings.content);
+                savedTestSettingsContent = workspaceDocument.testSettings.content || "";
+                visualSettingsDirty = false;
+                workspaceDocument = workspaceDocumentWithSettingsContentValues(workspaceDocument);
+                touchWorkspaceDocument();
+                showTemporaryMessage("Settings saved.");
+                return true;
+            } catch (saveError) {
+                reportClientError("Unable to save settings", saveError);
+                return false;
+            } finally {
+                saving = false;
+            }
         }
+
+        return false;
     }
 
     async function saveCurrentGuardedEditor() {
         if (settingsEditorSelected(selectedEditor)) {
-            await saveCurrentSettingsEditor();
-            return true;
+            return saveCurrentSettingsEditor();
         }
 
         if (selectedEditor === "composition-properties" && workspaceDocument?.compositionProperties) {
@@ -1906,7 +1944,7 @@
 
     async function generateJavaFromOracleDslFile() {
         if (!selectedOracleSourceFile?.location) {
-            return;
+            return false;
         }
 
         saving = true;
@@ -1924,10 +1962,14 @@
                 await refreshWorkspaceDocument();
                 await loadTestOracleInventory();
                 showTemporaryMessage("DSL oracle saved and Java oracle generated.");
+                return true;
             }
+
+            return false;
         } catch (oracleError) {
             reportClientError(`Unable to generate Java from DSL oracle ${selectedOracleSourceFile.location}`, oracleError);
             oracleDslResult = oracleDslGenerationErrorResult(oracleError?.message);
+            return false;
         } finally {
             saving = false;
         }
@@ -2135,45 +2177,24 @@
             selectedSourceFile
         });
 
-        if (!editorDocumentDescriptor) {
-            currentEditorDocument = null;
-        } else if (editorDocumentDescriptor.kind === "test-settings") {
-            currentEditorDocument = {
-                ...editorDocumentDescriptor,
-                dirty: hasSettingsChanges(),
-                save: saveCurrentSettingsEditor
-            };
-        } else if (editorDocumentDescriptor.kind === "settings-form") {
-            currentEditorDocument = {
-                ...editorDocumentDescriptor,
-                dirty: hasSettingsChanges(),
-                save: saveVisualSettings
-            };
-        } else if (editorDocumentDescriptor.kind === "policies-properties") {
-            currentEditorDocument = {
-                ...editorDocumentDescriptor,
-                dirty: hasPoliciesPropertiesChanges(),
-                save: () => saveWorkspaceFile(
-                    "policies-properties",
-                    workspaceDocument.policiesProperties.content
-                )
-            };
-        } else if (editorDocumentDescriptor.kind === "composition-properties") {
-            currentEditorDocument = {
-                ...editorDocumentDescriptor,
-                dirty: hasCompositionPropertiesChanges(),
-                save: () => saveWorkspaceFile(
-                    "composition-properties",
-                    workspaceDocument.compositionProperties.content
-                )
-            };
-        } else if (editorDocumentDescriptor.kind === "source") {
-            currentEditorDocument = {
-                ...editorDocumentDescriptor,
-                dirty: hasSelectedSourceChanges([editorDocumentDescriptor.sourceCategory]),
-                save: saveSelectedSource
-            };
-        }
+        currentEditorDocument = currentEditorDocumentState({
+            descriptor: editorDocumentDescriptor,
+            settingsDirty,
+            policiesPropertiesDirty: hasPoliciesPropertiesChanges(),
+            compositionPropertiesDirty: hasCompositionPropertiesChanges(),
+            selectedSourceDirty: hasSelectedSourceChanges([editorDocumentDescriptor?.sourceCategory]),
+            saveCurrentSettingsEditor,
+            saveVisualSettings,
+            savePoliciesProperties: () => saveWorkspaceFile(
+                "policies-properties",
+                workspaceDocument.policiesProperties.content
+            ),
+            saveCompositionProperties: () => saveWorkspaceFile(
+                "composition-properties",
+                workspaceDocument.compositionProperties.content
+            ),
+            saveSelectedSource
+        });
     }
 
     $: if (selectedEditor === "settings-form" && !selectedSettingsGroupId && workspaceDocument?.settingsGroups?.length > 0) {

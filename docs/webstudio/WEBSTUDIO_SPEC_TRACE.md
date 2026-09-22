@@ -419,6 +419,10 @@ Keep the main functional and UX specs readable. Use this file when a reader need
 
 - None yet.
 
+**Acceptance scenarios**
+
+- [Test Settings scenarios](./WEBSTUDIO_ACCEPTANCE_SCENARIOS.md#test-settings)
+
 **Related requirements**
 
 - [WS-UX-TEST-SETTINGS-001](#ws-ux-test-settings-001---test-settings-editor-view)

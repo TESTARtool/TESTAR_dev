@@ -15,6 +15,7 @@ import {
     updatedSavedSourceContents,
     validSettingsGroupId,
     workspaceDocumentBaseline,
+    workspaceDocumentWithSettingsContentValues,
     workspaceRuntimeSettings,
     workspaceSummaryForName,
     workspaceSettingBoolean,
@@ -104,6 +105,49 @@ test("derives runtime settings from raw test.settings before visual settings", (
         sutConnectorValue: "https://example.org",
         cliStateProjectionMode: "INTERACTIVE_SEMANTIC_WIDGETS",
         cliAgentSettings: DEFAULT_CLI_AGENT_SETTINGS
+    });
+});
+
+test("syncs visual settings values from raw test.settings content", () => {
+    const document = workspaceDocument(
+        [
+            { key: "SUTConnector", value: "android" },
+            { key: "BrowserFullScreen", value: "false" },
+            { key: "Unchanged", value: "keep" }
+        ],
+        "SUTConnector = webdriver\nBrowserFullScreen = true\n"
+    );
+
+    const syncedDocument = workspaceDocumentWithSettingsContentValues(document);
+
+    assert.equal(workspaceSettingValue(syncedDocument, "SUTConnector"), "webdriver");
+    assert.equal(workspaceSettingValue(syncedDocument, "BrowserFullScreen"), "true");
+    assert.equal(workspaceSettingValue(syncedDocument, "Unchanged"), "keep");
+    assert.equal(workspaceSettingValue(document, "SUTConnector"), "android");
+});
+
+test("syncs visual settings values while preserving setting metadata", () => {
+    const document = workspaceDocument(
+        [
+            {
+                key: "SUTConnector",
+                value: "android",
+                type: "string",
+                description: "Connector"
+            }
+        ],
+        "SUTConnector = webdriver\n"
+    );
+
+    const syncedSetting = workspaceDocumentWithSettingsContentValues(document)
+        .settingsGroups[0]
+        .settings[0];
+
+    assert.deepEqual(syncedSetting, {
+        key: "SUTConnector",
+        value: "webdriver",
+        type: "string",
+        description: "Connector"
     });
 });
 

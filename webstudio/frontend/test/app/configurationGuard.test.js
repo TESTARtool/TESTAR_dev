@@ -56,11 +56,39 @@ test("guards toggling from visual settings to raw test.settings when settings ar
     );
 });
 
+test("does not guard switching between visual settings groups when settings are dirty", () => {
+    assert.equal(
+        shouldGuardConfigurationTransition({
+            currentPage: "settings",
+            currentEditor: "settings-form",
+            nextEditor: "settings-form",
+            dirtyAreas: {
+                settings: true
+            }
+        }),
+        false
+    );
+});
+
 test("guards leaving dirty basic settings", () => {
     assert.equal(
         shouldGuardConfigurationTransition({
             currentPage: "basic-settings",
             currentEditor: "settings-form",
+            nextEditor: "__leave__",
+            dirtyAreas: {
+                settings: true
+            }
+        }),
+        true
+    );
+});
+
+test("guards leaving dirty raw test.settings", () => {
+    assert.equal(
+        shouldGuardConfigurationTransition({
+            currentPage: "settings",
+            currentEditor: "test-settings",
             nextEditor: "__leave__",
             dirtyAreas: {
                 settings: true

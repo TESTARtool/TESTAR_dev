@@ -4,10 +4,11 @@ import path from "node:path";
 const repositoryRoot = path.resolve(import.meta.dirname, "../..");
 const webstudioDocsRoot = path.resolve(repositoryRoot, "docs/webstudio");
 const tracePath = path.join(webstudioDocsRoot, "WEBSTUDIO_SPEC_TRACE.md");
-const specificationPaths = [
+const requirementSpecificationPaths = [
     path.join(webstudioDocsRoot, "WEBSTUDIO_FUNCTIONAL_SPEC.md"),
     path.join(webstudioDocsRoot, "WEBSTUDIO_UX_SPEC.md")
 ];
+const acceptanceScenarioPath = path.join(webstudioDocsRoot, "WEBSTUDIO_ACCEPTANCE_SCENARIOS.md");
 
 const scannedCodeRoots = [
     path.join(repositoryRoot, "webstudio/src"),
@@ -17,9 +18,13 @@ const scannedCodeRoots = [
 ];
 
 const requirementPattern = /\bWS-(?:FUNC|UX)-[A-Z0-9-]+-\d+\b/g;
+const scenarioPattern = /\bWS-SCENARIO-[A-Z0-9-]+-\d+\b/g;
 const traceabilityPattern = /Traceability:\s*\[`(WS-(?:FUNC|UX)-[A-Z0-9-]+-\d+)`\]\(([^)]+)\)/g;
-const traceHeadingPattern = /^##\s+(WS-(?:FUNC|UX)-[A-Z0-9-]+-\d+)\s+[—-]\s+(.+)$/gm;
+const traceHeadingPattern = /^##\s+(WS-(?:FUNC|UX)-[A-Z0-9-]+-\d+)\s+[-\u2013\u2014]\s+(.+)$/gm;
 const markdownLinkPattern = /\[[^\]]+\]\(([^)]+)\)/g;
+
+const errors = [];
+const warnings = [];
 
 function readText(filePath) {
     return fs.readFileSync(filePath, "utf8");
@@ -29,9 +34,13 @@ function fail(message) {
     errors.push(message);
 }
 
+function warn(message) {
+    warnings.push(message);
+}
+
 function collectTraceabilityIds() {
     const ids = [];
-    for (const specificationPath of specificationPaths) {
+    for (const specificationPath of requirementSpecificationPaths) {
         const text = readText(specificationPath);
         for (const match of text.matchAll(traceabilityPattern)) {
             ids.push({
@@ -48,8 +57,18 @@ function collectTraceabilityIds() {
 function collectTraceEntries(traceText) {
     return Array.from(traceText.matchAll(traceHeadingPattern)).map((match) => ({
         id: match[1],
-        title: match[2]
+        title: match[2],
+        content: traceEntryContent(traceText, match.index)
     }));
+}
+
+function traceEntryContent(traceText, headingIndex) {
+    const nextHeadingIndex = traceText.indexOf("\n## ", headingIndex + 1);
+    if (nextHeadingIndex === -1) {
+        return traceText.slice(headingIndex);
+    }
+
+    return traceText.slice(headingIndex, nextHeadingIndex);
 }
 
 function collectRequirementIdsFromCode() {
@@ -72,6 +91,38 @@ function collectRequirementIdsFromCode() {
     }
 
     return ids;
+}
+
+function collectScenarioIds() {
+    if (!fs.existsSync(acceptanceScenarioPath)) {
+        return [];
+    }
+
+    return Array.from(readText(acceptanceScenarioPath).matchAll(scenarioPattern))
+        .map((match) => match[0]);
+}
+
+function collectScenarioBlocks() {
+    if (!fs.existsSync(acceptanceScenarioPath)) {
+        return [];
+    }
+
+    const text = readText(acceptanceScenarioPath);
+    const scenarioHeadingPattern = /^###\s+(WS-SCENARIO-[A-Z0-9-]+-\d+)\s+[-\u2013\u2014]\s+(.+)$/gm;
+    return Array.from(text.matchAll(scenarioHeadingPattern)).map((match) => ({
+        id: match[1],
+        title: match[2],
+        content: scenarioContent(text, match.index)
+    }));
+}
+
+function scenarioContent(text, headingIndex) {
+    const nextHeadingIndex = text.indexOf("\n### ", headingIndex + 1);
+    if (nextHeadingIndex === -1) {
+        return text.slice(headingIndex);
+    }
+
+    return text.slice(headingIndex, nextHeadingIndex);
 }
 
 function* walkFiles(root) {
@@ -100,7 +151,7 @@ function validateDuplicateIds(ids, context) {
     }
 
     for (const duplicate of duplicates) {
-        fail(`Duplicate ${context} requirement ID: ${duplicate}`);
+        fail(`Duplicate ${context} ID: ${duplicate}`);
     }
 }
 
@@ -119,17 +170,47 @@ function validateTraceLinks(traceText) {
     }
 }
 
-const errors = [];
+function validateTraceCompleteness(traceEntries) {
+    for (const traceEntry of traceEntries) {
+        if (!traceEntry.content.includes("**Unit tests**")) {
+            warn(`Trace entry has no Unit tests section: ${traceEntry.id}`);
+        }
+
+        if (traceEntry.content.includes("**Unit tests**")
+            && !traceEntry.content.match(/\*\*Unit tests\*\*[\s\S]*?-\s+\[[^\]]+\]\(/)) {
+            warn(`Trace entry has no mapped unit test files: ${traceEntry.id}`);
+        }
+
+        if (!traceEntry.content.includes("**Frontend implementation**")
+            && !traceEntry.content.includes("**Backend implementation**")) {
+            warn(`Trace entry has no implementation section: ${traceEntry.id}`);
+        }
+    }
+}
+
+function validateScenarioVerification(scenarioBlocks) {
+    for (const scenarioBlock of scenarioBlocks) {
+        if (!scenarioBlock.content.match(/Verification:\s*`[^`]+`/)) {
+            warn(`Acceptance scenario has no Verification line: ${scenarioBlock.id}`);
+        }
+    }
+}
+
 const traceText = readText(tracePath);
 const traceabilityEntries = collectTraceabilityIds();
 const specificationIds = traceabilityEntries.map((entry) => entry.id);
 const traceEntries = collectTraceEntries(traceText);
 const traceIds = new Set(traceEntries.map((entry) => entry.id));
 const codeIds = collectRequirementIdsFromCode();
+const scenarioIds = collectScenarioIds();
+const scenarioBlocks = collectScenarioBlocks();
 
-validateDuplicateIds(specificationIds, "specification");
-validateDuplicateIds(traceEntries.map((entry) => entry.id), "trace");
+validateDuplicateIds(specificationIds, "specification requirement");
+validateDuplicateIds(traceEntries.map((entry) => entry.id), "trace requirement");
+validateDuplicateIds(scenarioIds, "acceptance scenario");
 validateTraceLinks(traceText);
+validateTraceCompleteness(traceEntries);
+validateScenarioVerification(scenarioBlocks);
 
 for (const entry of traceabilityEntries) {
     if (!traceIds.has(entry.id)) {
@@ -162,4 +243,11 @@ if (errors.length > 0) {
     process.exit(1);
 }
 
-console.log(`WebStudio spec trace validation passed for ${specificationIds.length} requirement IDs.`);
+if (warnings.length > 0) {
+    console.warn("WebStudio spec trace validation warnings:");
+    for (const warning of warnings) {
+        console.warn(`- ${warning}`);
+    }
+}
+
+console.log(`WebStudio spec trace validation passed for ${specificationIds.length} requirement IDs and ${scenarioIds.length} acceptance scenario IDs.`);

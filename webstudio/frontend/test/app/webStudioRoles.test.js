@@ -12,6 +12,7 @@ import {
     normalizeWebStudioRole,
     pageAvailableForRole,
     pageForRole,
+    roleSelectorChangeState,
     storeWebStudioRole,
     storedWebStudioRole,
     workspaceManagementLandingPageForRole
@@ -89,6 +90,23 @@ test("checks page availability by role", () => {
     assert.equal(pageAvailableForRole(WEB_STUDIO_ROLES.ADVANCED, "composition"), true);
     assert.equal(pageAvailableForRole(WEB_STUDIO_ROLES.ADVANCED, "oracles"), true);
     assert.equal(pageAvailableForRole(WEB_STUDIO_ROLES.ADVANCED, "basic-settings"), false);
+});
+
+test("keeps role selector displaying the committed role during guarded changes", () => {
+    assert.deepEqual(
+        roleSelectorChangeState(WEB_STUDIO_ROLES.ADVANCED, WEB_STUDIO_ROLES.BASIC),
+        {
+            requestedRole: WEB_STUDIO_ROLES.BASIC,
+            displayedRole: WEB_STUDIO_ROLES.ADVANCED
+        }
+    );
+    assert.deepEqual(
+        roleSelectorChangeState(WEB_STUDIO_ROLES.BASIC, WEB_STUDIO_ROLES.ADVANCED),
+        {
+            requestedRole: WEB_STUDIO_ROLES.ADVANCED,
+            displayedRole: WEB_STUDIO_ROLES.BASIC
+        }
+    );
 });
 
 test("reads stored role from storage with advanced fallback", () => {

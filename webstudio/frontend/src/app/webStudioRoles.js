@@ -1,5 +1,7 @@
 // Implements WS-FUNC-TOP-NAV-ROLES-001 and WS-UX-TOP-NAV-ROLES-001:
 // role availability, page mapping, and persisted role preference helpers.
+import { committedSelectChangeState } from "./committedSelectModel.js";
+
 export const WEB_STUDIO_ROLES = {
     BASIC: "basic",
     ADVANCED: "advanced"
@@ -84,6 +86,15 @@ export function pageAvailableForRole(role, page) {
     return normalizeWebStudioRole(role) === WEB_STUDIO_ROLES.BASIC
         ? BASIC_PAGES.has(page)
         : ADVANCED_PAGES.has(page);
+}
+
+export function roleSelectorChangeState(currentRole, requestedRole) {
+    const nextState = committedSelectChangeState(currentRole, requestedRole, normalizeWebStudioRole);
+
+    return {
+        requestedRole: nextState.requestedValue,
+        displayedRole: nextState.displayedValue
+    };
 }
 
 export function storedWebStudioRole(storage) {

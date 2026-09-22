@@ -74,6 +74,31 @@ export function workspaceSettingDefaultValue(workspaceDocument, settingKey) {
     return findWorkspaceSetting(workspaceDocument, settingKey)?.defaultValue || "";
 }
 
+export function workspaceDocumentWithSettingsContentValues(workspaceDocument) {
+    if (!workspaceDocument) {
+        return workspaceDocument;
+    }
+
+    const properties = parsePropertiesContent(workspaceDocument?.testSettings?.content || "");
+
+    return {
+        ...workspaceDocument,
+        settingsGroups: (workspaceDocument.settingsGroups || []).map((settingsGroup) => ({
+            ...settingsGroup,
+            settings: (settingsGroup.settings || []).map((setting) => {
+                if (!Object.hasOwn(properties, setting.key)) {
+                    return setting;
+                }
+
+                return {
+                    ...setting,
+                    value: properties[setting.key]
+                };
+            })
+        }))
+    };
+}
+
 export function normalizeSettingDisplayValue(value) {
     const text = String(value || "").trim();
     if (text.length >= 2) {

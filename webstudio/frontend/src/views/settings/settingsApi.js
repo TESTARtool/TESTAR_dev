@@ -11,9 +11,9 @@ export async function saveTestSettingsRequest(loadJson, workspaceName, content) 
     return loadJson(testSettingsUrl(workspaceName), {
         method: "PUT",
         headers: {
-            "Content-Type": "text/plain"
+            "Content-Type": "application/json"
         },
-        body: content
+        body: JSON.stringify({ content })
     });
 }
 

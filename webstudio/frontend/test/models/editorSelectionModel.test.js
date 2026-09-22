@@ -5,6 +5,7 @@ import assert from "node:assert/strict";
 import {
     clearedSourceSelectionState,
     currentEditorDocumentDescriptor,
+    currentEditorDocumentState,
     openedEditorSelectionState,
     selectedAllowedSettingsGroupId,
     selectedSettingsGroupForEditor
@@ -114,6 +115,98 @@ test("builds settings editor document descriptors", () => {
         kind: "settings-form",
         title: "Edit Settings",
         saveLabel: "Save Settings"
+    });
+});
+
+test("builds settings editor document state from the shared settings dirty flag", () => {
+    const saveRawSettings = () => true;
+    const saveVisualSettings = () => true;
+
+    assert.deepEqual(currentEditorDocumentState({
+        descriptor: currentEditorDocumentDescriptor({
+            workspaceDocument: {},
+            selectedEditor: "test-settings"
+        }),
+        settingsDirty: true,
+        saveCurrentSettingsEditor: saveRawSettings,
+        saveVisualSettings
+    }), {
+        kind: "test-settings",
+        title: "Edit Settings",
+        saveLabel: "Save Settings",
+        dirty: true,
+        save: saveRawSettings
+    });
+
+    assert.deepEqual(currentEditorDocumentState({
+        descriptor: currentEditorDocumentDescriptor({
+            workspaceDocument: {},
+            selectedEditor: "settings-form"
+        }),
+        settingsDirty: true,
+        saveCurrentSettingsEditor: saveRawSettings,
+        saveVisualSettings
+    }), {
+        kind: "settings-form",
+        title: "Edit Settings",
+        saveLabel: "Save Settings",
+        dirty: true,
+        save: saveVisualSettings
+    });
+});
+
+test("builds properties and source editor document state with explicit save handlers", () => {
+    const savePoliciesProperties = () => true;
+    const saveCompositionProperties = () => true;
+    const saveSelectedSource = () => true;
+
+    assert.equal(currentEditorDocumentState(), null);
+    assert.deepEqual(currentEditorDocumentState({
+        descriptor: currentEditorDocumentDescriptor({
+            workspaceDocument: {},
+            selectedEditor: "policies-properties"
+        }),
+        policiesPropertiesDirty: true,
+        savePoliciesProperties
+    }), {
+        kind: "policies-properties",
+        title: "Edit policies.properties",
+        saveLabel: "Save policies.properties",
+        dirty: true,
+        save: savePoliciesProperties
+    });
+    assert.deepEqual(currentEditorDocumentState({
+        descriptor: currentEditorDocumentDescriptor({
+            workspaceDocument: {},
+            selectedEditor: "composition-properties"
+        }),
+        compositionPropertiesDirty: true,
+        saveCompositionProperties
+    }), {
+        kind: "composition-properties",
+        title: "Edit composition.properties",
+        saveLabel: "Save composition.properties",
+        dirty: true,
+        save: saveCompositionProperties
+    });
+    assert.deepEqual(currentEditorDocumentState({
+        descriptor: currentEditorDocumentDescriptor({
+            workspaceDocument: {},
+            selectedEditor: "source:CustomPolicy.java",
+            selectedSourceFile: {
+                name: "CustomPolicy.java",
+                category: "policy"
+            }
+        }),
+        selectedSourceDirty: true,
+        saveSelectedSource
+    }), {
+        kind: "source",
+        title: "CustomPolicy.java",
+        saveLabel: "Save source",
+        sourceCategory: "policy",
+        dirty: true,
+        save: saveSelectedSource
     });
 });
 

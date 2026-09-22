@@ -34,9 +34,11 @@ test("saves test.settings through provided loader", async () => {
             options: {
                 method: "PUT",
                 headers: {
-                    "Content-Type": "text/plain"
+                    "Content-Type": "application/json"
                 },
-                body: "SUTConnector = webdriver\n"
+                body: JSON.stringify({
+                    content: "SUTConnector = webdriver\n"
+                })
             }
         }
     ]);

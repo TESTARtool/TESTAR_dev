@@ -99,3 +99,62 @@ export function currentEditorDocumentDescriptor(state = {}) {
 
     return null;
 }
+
+export function currentEditorDocumentState({
+    descriptor,
+    settingsDirty = false,
+    policiesPropertiesDirty = false,
+    compositionPropertiesDirty = false,
+    selectedSourceDirty = false,
+    saveCurrentSettingsEditor = null,
+    saveVisualSettings = null,
+    savePoliciesProperties = null,
+    saveCompositionProperties = null,
+    saveSelectedSource = null
+} = {}) {
+    if (!descriptor) {
+        return null;
+    }
+
+    if (descriptor.kind === "test-settings") {
+        return {
+            ...descriptor,
+            dirty: settingsDirty,
+            save: saveCurrentSettingsEditor
+        };
+    }
+
+    if (descriptor.kind === "settings-form") {
+        return {
+            ...descriptor,
+            dirty: settingsDirty,
+            save: saveVisualSettings
+        };
+    }
+
+    if (descriptor.kind === "policies-properties") {
+        return {
+            ...descriptor,
+            dirty: policiesPropertiesDirty,
+            save: savePoliciesProperties
+        };
+    }
+
+    if (descriptor.kind === "composition-properties") {
+        return {
+            ...descriptor,
+            dirty: compositionPropertiesDirty,
+            save: saveCompositionProperties
+        };
+    }
+
+    if (descriptor.kind === "source") {
+        return {
+            ...descriptor,
+            dirty: selectedSourceDirty,
+            save: saveSelectedSource
+        };
+    }
+
+    return null;
+}
