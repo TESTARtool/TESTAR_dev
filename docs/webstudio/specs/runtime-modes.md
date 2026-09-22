@@ -35,6 +35,8 @@ Spy Mode supports:
 - widget hover and selection
 - derived, default, and direct widget actions
 
+When the local Spy loop ends because the SUT was closed, TESTAR emits a completion signal after session cleanup. WebStudio consumes that signal, stops tracking the local Spy process, and reports an idle status. The `Stop Local` control remains available as an explicit fallback for an externally unresponsive process.
+
 Run controls are available when a shared workspace is selected and no Spy execution is already running. The view exposes the current `SUTConnectorValue`, runtime progress, and runtime label.
 
 ### CLI Mode
@@ -110,3 +112,15 @@ And the five sequence 1 entries appear together before the four sequence 2 entri
 And every entry preserves its complete report label and individual status
 And the detailed list does not show standalone `sequence_1` or `sequence_2` entries
 And no verdict from sequence 1 is displayed under sequence 2
+
+### WS-SCENARIO-RUNTIME-SPY-001 - Local Spy Stops When the SUT Closes
+
+Verification: `ScriptlessExecutionAdapterTest.java`
+
+Given Local Spy is running for the selected workspace
+And the SUT is running
+When the user closes the SUT or presses `Shift+Down` to end the Spy loop
+Then TESTAR completes its Spy session cleanup
+And WebStudio receives the Spy completion signal
+And the scriptless execution status becomes `idle`
+And the Spy view no longer requires the user to click `Stop Local`

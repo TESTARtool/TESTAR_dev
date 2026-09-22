@@ -66,6 +66,7 @@ public abstract class ComposedProtocol implements Consumer<Settings> {
 
     public static final Logger INDEXLOG = LogManager.getLogger();
     public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+    public static final String SPY_SESSION_COMPLETED_SIGNAL = "TESTAR_SPY_SESSION_COMPLETED";
 
     protected TestingServices testingServices;
     public final TestingServices testingServices() {
@@ -151,6 +152,7 @@ public abstract class ComposedProtocol implements Consumer<Settings> {
 
         LogSerialiser.log("'" + runtimeContext().mode() + "' mode active.\n", LogSerialiser.LogLevel.Info);
 
+        final boolean spyExecution = runtimeContext().mode() == TestarMode.Spy;
         try {
             if (runtimeContext().mode() == TestarMode.Spy) {
                 new SpyMode().runSpyLoop(this);
@@ -163,6 +165,9 @@ public abstract class ComposedProtocol implements Consumer<Settings> {
             se.printStackTrace();
         } finally {
             closeTestSession();
+            if (spyExecution) {
+                System.out.println(SPY_SESSION_COMPLETED_SIGNAL);
+            }
         }
     }
 

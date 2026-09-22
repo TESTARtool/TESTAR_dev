@@ -329,6 +329,8 @@ Keep the main functional and UX specs readable. Use this file when a reader need
 - [RemoteSpyController.java](../../webstudio/src/org/testar/webstudio/api/RemoteSpyController.java)
 - [ScriptlessExecutionAdapter.java](../../webstudio/src/org/testar/webstudio/execution/ScriptlessExecutionAdapter.java)
 - [CliExecutionAdapter.java](../../webstudio/src/org/testar/webstudio/execution/CliExecutionAdapter.java)
+- [ComposedProtocol.java](../../testar/src/org/testar/scriptless/ComposedProtocol.java)
+- [SpyMode.java](../../testar/src/org/testar/scriptless/mode/SpyMode.java)
 
 **Frontend implementation**
 
@@ -342,6 +344,7 @@ Keep the main functional and UX specs readable. Use this file when a reader need
 - [runtimeModel.test.js](../../webstudio/frontend/test/views/runtime/runtimeModel.test.js)
 - [runtimeModeControls.test.js](../../webstudio/frontend/test/models/runtimeModeControls.test.js)
 - [ScriptlessSequenceVerdictTest.java](../../webstudio/test/org/testar/webstudio/execution/ScriptlessSequenceVerdictTest.java)
+- [ScriptlessExecutionAdapterTest.java](../../webstudio/test/org/testar/webstudio/execution/ScriptlessExecutionAdapterTest.java)
 
 **Integration tests**
 

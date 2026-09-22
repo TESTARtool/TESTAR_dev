@@ -27,6 +27,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.testar.core.verdict.Verdict;
+import org.testar.scriptless.ComposedProtocol;
 import org.testar.webstudio.api.dto.ExecutionStatusDto;
 import org.testar.webstudio.api.dto.ResultFileDto;
 import org.testar.webstudio.api.dto.ResultFileSummaryDto;
@@ -35,6 +36,7 @@ import org.testar.webstudio.api.dto.SequenceOutcomeDto;
 import org.testar.webstudio.api.dto.SequenceVerdictDto;
 import org.testar.webstudio.api.dto.ScriptlessResultsDto;
 
+// Implements WS-FUNC-RUNTIME-EXECUTION-001: supervises scriptless Generate and local Spy runtimes.
 public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
 
     private static final int MAX_CONSOLE_LINES = 250;
@@ -63,6 +65,7 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
     private int plannedSequenceCount;
     private int currentSequenceNumber;
     private boolean currentSequenceFailed;
+    private boolean spySessionCompleted;
     private String lastMessage = "Scriptless execution adapter is available";
     private final List<String> consoleLines = new ArrayList<>();
     private final List<SequenceOutcomeDto> sequenceOutcomes = new ArrayList<>();
@@ -74,6 +77,12 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
 
     @Override
     public synchronized ExecutionStatusDto status() {
+        if (currentProcess != null && currentProcess.isAlive() && spySessionCompleted) {
+            appendConsoleLine("Local Spy session completed after the SUT stopped. Cleaning up the runtime process.");
+            destroyProcessTree(currentProcess);
+            clearCurrentProcessState("Local Spy session finished after the SUT stopped");
+        }
+
         if (currentProcess != null && currentProcess.isAlive() && shouldStopCompletedButStuckRun()) {
             appendConsoleLine("Generate run reached the configured sequence count and remained idle. Forcing process shutdown.");
             destroyProcessTree(currentProcess);
@@ -81,18 +90,7 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
 
         if (currentProcess != null && !currentProcess.isAlive()) {
             int exitCode = currentProcess.exitValue();
-            lastInstallBinDirectory = currentInstallBinDirectory;
-            lastWorkspace = currentWorkspace;
-            currentProcess = null;
-            currentInstallBinDirectory = null;
-            currentWorkspace = null;
-            currentMode = null;
-            startedAtEpochMillis = 0L;
-            lastOutputEpochMillis = 0L;
-            plannedSequenceCount = 0;
-            currentSequenceNumber = 0;
-            currentSequenceFailed = false;
-            lastMessage = "Scriptless run finished with exit code " + exitCode;
+            clearCurrentProcessState("Scriptless run finished with exit code " + exitCode);
         }
 
         if (currentProcess == null) {
@@ -374,7 +372,7 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
             )) {
                 String line;
                 while ((line = reader.readLine()) != null) {
-                    appendConsoleLine(line);
+                    acceptProcessOutputLine(line);
                 }
             } catch (IOException ignored) {
                 // Ignore stream shutdown when the process exits.
@@ -407,17 +405,48 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
         plannedSequenceCount = 0;
         currentSequenceNumber = 0;
         currentSequenceFailed = false;
+        spySessionCompleted = false;
         startedAtEpochMillis = 0L;
         lastOutputEpochMillis = 0L;
     }
 
+    synchronized void acceptProcessOutputLine(String line) {
+        if (isSpySessionCompletionSignal(line)) {
+            spySessionCompleted = true;
+            return;
+        }
+
+        appendConsoleLine(line);
+    }
+
     private synchronized void appendConsoleLine(String line) {
+
         lastOutputEpochMillis = System.currentTimeMillis();
         consoleLines.add(line);
         if (consoleLines.size() > MAX_CONSOLE_LINES) {
             consoleLines.remove(0);
         }
         processSequenceLine(line);
+    }
+
+    static boolean isSpySessionCompletionSignal(String line) {
+        return ComposedProtocol.SPY_SESSION_COMPLETED_SIGNAL.equals(line == null ? "" : line.trim());
+    }
+
+    private void clearCurrentProcessState(String message) {
+        lastInstallBinDirectory = currentInstallBinDirectory;
+        lastWorkspace = currentWorkspace;
+        currentProcess = null;
+        currentInstallBinDirectory = null;
+        currentWorkspace = null;
+        currentMode = null;
+        startedAtEpochMillis = 0L;
+        lastOutputEpochMillis = 0L;
+        plannedSequenceCount = 0;
+        currentSequenceNumber = 0;
+        currentSequenceFailed = false;
+        spySessionCompleted = false;
+        lastMessage = message;
     }
 
     private synchronized String consoleOutput() {
@@ -541,7 +570,6 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
         return System.currentTimeMillis() - lastOutputEpochMillis >= COMPLETED_RUN_IDLE_GRACE_MILLIS;
     }
 
-    // Implements WS-FUNC-RUNTIME-EXECUTION-001: preserves every generated verdict for each sequence.
     private void recordSequenceOutcome(int sequenceNumber, String status, String outputPath) {
         List<SequenceVerdictDto> resolvedVerdicts = resolveSequenceVerdicts(sequenceNumber, outputPath);
         String resolvedLabel = null;
