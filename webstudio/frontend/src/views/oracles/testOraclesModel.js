@@ -242,11 +242,22 @@ export function settingBooleanValue(workspaceDocument, settingKey) {
     return settingValueByKey(workspaceDocument, settingKey).toLowerCase() === "true";
 }
 
-export function activeExtendedOracleNames(workspaceDocument) {
-    return settingValueByKey(workspaceDocument, "ExtendedOracles")
+export function activeExtendedOracleNames(workspaceDocument, testOracleInventory = null) {
+    const configuredNames = settingValueByKey(workspaceDocument, "ExtendedOracles")
         .split(",")
         .map((item) => item.trim())
         .filter(Boolean);
+
+    if (!Array.isArray(testOracleInventory?.items)) {
+        return configuredNames;
+    }
+
+    const availableNames = new Set(
+        testOracleInventory.items
+            .filter((item) => item.origin === "BUILT_IN" || item.origin === "WORKSPACE_JAVA")
+            .map((item) => item.name)
+    );
+    return configuredNames.filter((name) => availableNames.has(name));
 }
 
 export function balancedOracleNameColumns(oracleNames = []) {
@@ -836,8 +847,8 @@ export function oracleDeleteDialogForPath(path, type) {
     };
 }
 
-export function activeOracleSummaries(workspaceDocument) {
-    const extendedOracles = activeExtendedOracleNames(workspaceDocument);
+export function activeOracleSummaries(workspaceDocument, testOracleInventory = null) {
+    const extendedOracles = activeExtendedOracleNames(workspaceDocument, testOracleInventory);
 
     return [
         {

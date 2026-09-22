@@ -56,7 +56,7 @@
     export let validateRegexExpression;
     export let workspaceDocument = null;
 
-    $: oracleSummaries = activeOracleSummaries(workspaceDocument);
+    $: oracleSummaries = activeOracleSummaries(workspaceDocument, testOracleInventory);
     $: selectedPanel = TEST_ORACLE_PANELS.find((panel) => panel.id === selectedOraclePanelId) || TEST_ORACLE_PANELS[0];
     $: selectedSettingKeys = TEST_ORACLE_SETTING_KEYS[selectedOraclePanelId] || [];
     $: selectedSettingsGroupIds = selectedOraclePanelId === TEST_ORACLE_PANEL_IDS.WEBDRIVER_CONSOLE

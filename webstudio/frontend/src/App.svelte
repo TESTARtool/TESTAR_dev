@@ -1923,6 +1923,7 @@
 
         try {
             testOracleInventory = await deleteOracleDslFileRequest(loadJson, selectedWorkspaceName, path);
+            await refreshWorkspaceDocument();
             if (shouldClearOracleSourceAfterDelete(selectedOracleSourceFile, path)) {
                 resetOracleSourceSelection();
             }
@@ -1977,6 +1978,7 @@
 
         try {
             testOracleInventory = await deleteOracleJavaFileRequest(loadJson, selectedWorkspaceName, path);
+            await refreshWorkspaceDocument();
             if (shouldClearOracleSourceAfterDelete(selectedOracleSourceFile, path)) {
                 resetOracleSourceSelection();
             }

@@ -243,6 +243,21 @@ test("summarizes active oracle mechanisms without policies", () => {
     assert.equal(summaries.length, 5);
 });
 
+test("does not summarize a configured workspace oracle after it disappears from the inventory", () => {
+    const summaries = activeOracleSummaries(
+        workspaceWithSettings({ ExtendedOracles: "DeletedOracle,ExistingOracle" }),
+        {
+            items: [
+                { name: "ExistingOracle", origin: "WORKSPACE_JAVA" }
+            ]
+        }
+    );
+    const extendedSummary = summaries.find((item) => item.label === "Extended Oracles");
+
+    assert.equal(extendedSummary.detail, "1 enabled");
+    assert.deepEqual(extendedSummary.classNames, ["ExistingOracle"]);
+});
+
 test("splits enabled extended oracle names into three balanced vertical columns", () => {
     assert.deepEqual(balancedOracleNameColumns(["A", "B", "C", "D", "E"]), [
         ["A", "B"],

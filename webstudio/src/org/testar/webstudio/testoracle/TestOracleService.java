@@ -271,7 +271,15 @@ public final class TestOracleService {
         }
 
         try {
+            String sourceContent = Files.isRegularFile(file)
+                ? Files.readString(file, StandardCharsets.UTF_8)
+                : "";
+            List<String> deletedOracleNames = oracleClassNamesFromJavaSource(sourceContent);
+            if (deletedOracleNames.isEmpty()) {
+                deletedOracleNames = List.of(classNameFromJavaFile(file));
+            }
             Files.deleteIfExists(file);
+            disableOracleClassNames(workspaceName, deletedOracleNames);
             return inventory(workspaceName);
         } catch (IOException exception) {
             throw new IllegalStateException("Unable to delete Java oracle file: " + relativePath, exception);
@@ -638,6 +646,40 @@ public final class TestOracleService {
             );
         } catch (IOException exception) {
             throw new IllegalStateException("Unable to enable workspace Java oracle classes.", exception);
+        }
+    }
+
+    private void disableOracleClassNames(String workspaceName, List<String> oracleClassNames) {
+        List<String> normalizedNames = oracleClassNames.stream()
+            .map(name -> name == null ? "" : name.trim())
+            .filter(name -> !name.isBlank())
+            .distinct()
+            .collect(Collectors.toList());
+        if (normalizedNames.isEmpty()) {
+            return;
+        }
+
+        Path workspaceDirectory = workspaceService.workspaceDirectory(workspaceName);
+        Path settingsFile = workspaceDirectory.resolve(TEST_SETTINGS_FILE);
+        try {
+            if (!Files.isRegularFile(settingsFile)) {
+                return;
+            }
+
+            String content = Files.readString(settingsFile, StandardCharsets.UTF_8);
+            List<String> enabledOracles = new ArrayList<>(readActiveOracles(workspaceDirectory));
+            boolean changed = enabledOracles.removeIf(normalizedNames::contains);
+            if (!changed) {
+                return;
+            }
+
+            Files.writeString(
+                settingsFile,
+                settingsContentWithExtendedOracles(content, enabledOracles),
+                StandardCharsets.UTF_8
+            );
+        } catch (IOException exception) {
+            throw new IllegalStateException("Unable to disable deleted workspace Java oracle classes.", exception);
         }
     }
 

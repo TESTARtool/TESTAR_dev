@@ -977,6 +977,10 @@ Keep the main functional and UX specs readable. Use this file when a reader need
 - [testOraclesApi.test.js](../../webstudio/frontend/test/views/oracles/testOraclesApi.test.js)
 - [testOraclesModel.test.js](../../webstudio/frontend/test/views/oracles/testOraclesModel.test.js)
 
+**Acceptance scenarios**
+
+- [Deleting a Java Oracle Clears Enablement](./specs/test-oracles.md#ws-scenario-oracle-java-delete-001---deleting-a-java-oracle-clears-enablement)
+
 **Integration tests**
 
 - None yet.

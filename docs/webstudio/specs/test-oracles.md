@@ -53,7 +53,21 @@ Traceability: [`WS-FUNC-ORACLE-JAVA-ENABLEMENT-001`](../SPEC_TRACE.md#ws-func-or
 
 Individual oracle checks are implemented as Java or DSL-generated `Oracle` classes and enabled through `ExtendedOracles`.
 
+Deleting a Java oracle file removes its declared oracle class names from `ExtendedOracles`, so the deleted classes are no longer enabled or reported as active after the inventory is refreshed.
+
 Oracle composition customization belongs to Composition Flow and changes verdict aggregation behavior rather than individual oracle definitions.
+
+### WS-SCENARIO-ORACLE-JAVA-DELETE-001 - Deleting a Java Oracle Clears Enablement
+
+Verification: `TestOracleServiceTest.java`, `testOraclesModel.test.js`
+
+Given a workspace Java oracle class is compiled, enabled in `ExtendedOracles`, and visible in `Active Oracles`
+When the user confirms deletion of the Java oracle file
+Then the Java oracle file is deleted
+And the deleted class is removed from the `ExtendedOracles` setting
+And the deleted class is absent from `Enable Extended Oracles`
+And the deleted class is absent from `Active Oracles`
+And reloading the workspace keeps the deleted class absent from all three locations
 
 ## UX Requirements
 
@@ -82,3 +96,5 @@ The editor exposes one `Save and Generate Java-DSL` action. The feedback panel s
 Traceability: [`WS-UX-ORACLE-JAVA-ENABLEMENT-001`](../SPEC_TRACE.md#ws-ux-oracle-java-enablement-001---workspace-java-oracle-management)
 
 Workspace Java oracles show whether they are active and editable. Generated Java files appear in the Java oracle inventory after DSL generation. Enable and disable controls operate on class names and update `ExtendedOracles`.
+
+After a confirmed Java oracle deletion, the active summary and enablement list are refreshed together and do not retain the deleted class.

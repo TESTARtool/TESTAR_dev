@@ -156,6 +156,8 @@ public class TestOracleServiceTest {
             .anyMatch(item -> "generated/NewOracle.java".equals(item.path()));
 
         Assert.assertFalse(deletedFileStillListed);
+        Assert.assertFalse(inventory.activeOracles().contains("NewOracle"));
+        Assert.assertFalse(readSettings("webdriver_generic").contains("NewOracle"));
     }
 
     @Test
