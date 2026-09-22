@@ -1,4 +1,3 @@
-// Implements WS-FUNC-TEST-RESULTS-001: workspace-scoped Test Results API request paths.
 export function resultWorkspaceQuery(workspaceName) {
     return `workspace=${encodeURIComponent(workspaceName || "")}`;
 }

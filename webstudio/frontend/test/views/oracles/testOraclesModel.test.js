@@ -1,5 +1,4 @@
-// Verifies WS-FUNC-TEST-ORACLES-001, WS-UX-TEST-ORACLES-001, WS-FUNC-ORACLE-DSL-EDITOR-001,
-// WS-UX-ORACLE-DSL-EDITOR-001, WS-FUNC-ORACLE-JAVA-ENABLEMENT-001, and WS-UX-ORACLE-JAVA-ENABLEMENT-001:
+// Verifies WS-UX-TEST-ORACLES-001: Test Oracles panel and inventory state decisions.
 // Test Oracles panels, inventory grouping, enablement, DSL metadata assistance, diagnostics, and delete dialogs.
 import test from "node:test";
 import assert from "node:assert/strict";

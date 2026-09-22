@@ -1,5 +1,4 @@
 <script>
-    // Implements WS-UX-TEST-SETTINGS-001: Basic role settings page backed by the visual settings form.
     import TestSettingsView from "./TestSettingsView.svelte";
     import { BASIC_ROLE_SETTINGS_GROUP_IDS, TEST_SETTINGS_EXCLUDED_SETTING_KEYS } from "../../app/webStudioRoles.js";
 

@@ -1,5 +1,4 @@
 <script>
-    // Implements WS-FUNC-RUNTIME-EXECUTION-001: routes runtime pages to Generate, Spy, and CLI views.
     import CliModeView from "./CliModeView.svelte";
     import RunTestarView from "./RunTestarView.svelte";
     import SpyModeView from "../spy/SpyModeView.svelte";

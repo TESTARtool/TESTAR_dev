@@ -22,7 +22,6 @@ public final class RemoteSpyController {
         this.debugLog = remoteSpyService.debugLog();
     }
 
-    // Implements WS-FUNC-RUNTIME-EXECUTION-001: exposes remote Spy runtime control and widget actions.
     public SpyStateDto startRemoteSpy(String workspaceName) {
         debugLog.log("RemoteSpyController.startRemoteSpy workspace=" + workspaceName);
         return remoteSpyService.startRemoteSpy(workspaceName);

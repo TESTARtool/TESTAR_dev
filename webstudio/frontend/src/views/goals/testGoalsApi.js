@@ -1,4 +1,3 @@
-// Implements WS-FUNC-TEST-GOALS-001: workspace-scoped Test Goal API requests.
 import { testGoalApiPath } from "./testGoalsModel.js";
 
 function testGoalPathQuery(path) {

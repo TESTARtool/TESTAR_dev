@@ -1,4 +1,3 @@
-// Implements WS-FUNC-RUNTIME-EXECUTION-001: Generate, Spy, and CLI runtime API request contracts.
 function postOptions(body = null) {
     if (body === null) {
         return {

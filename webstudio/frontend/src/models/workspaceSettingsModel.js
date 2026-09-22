@@ -1,4 +1,3 @@
-// Implements WS-FUNC-TEST-SETTINGS-001: parses workspace settings and derives runtime-facing values.
 export const CLI_AGENT_SETTING_KEYS = {
     apiKeyEnvVarName: "AgentCLIApiKeyEnvVar",
     baseUrl: "AgentCLIBaseUrl",

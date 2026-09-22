@@ -1,5 +1,4 @@
-// Implements WS-FUNC-TOP-NAV-ROLES-001 and WS-UX-TOP-NAV-ROLES-001:
-// role availability, page mapping, and persisted role preference helpers.
+// Implements WS-FUNC-TOP-NAV-ROLES-001: role availability, page mapping, and persisted preferences.
 import { committedSelectChangeState } from "./committedSelectModel.js";
 
 export const WEB_STUDIO_ROLES = {

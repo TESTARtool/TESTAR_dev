@@ -1,4 +1,3 @@
-// Implements WS-FUNC-TEST-ORACLES-001, WS-FUNC-ORACLE-DSL-EDITOR-001, and WS-FUNC-ORACLE-JAVA-ENABLEMENT-001:
 // Test Oracles inventory, Java/DSL file, metadata, and generation API requests.
 export function testOracleApiPath(workspaceName, suffix = "") {
     const encodedWorkspaceName = encodeURIComponent(workspaceName || "");

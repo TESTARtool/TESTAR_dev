@@ -1,7 +1,6 @@
 export const STATE_MODEL_DEFAULT_URL = "http://localhost:8090/models";
 
-// Implements WS-FUNC-STATE-MODEL-001 and WS-UX-STATE-MODEL-001:
-// maps backend state model status/errors to dialog content and follow-up actions.
+// Maps backend state model status/errors to dialog content and follow-up actions.
 const STATE_MODEL_NOT_AVAILABLE_MESSAGE = "Dear user, before opening the analysis mode, TESTAR must execute a Generate run with the state model enabled. Currently there are no generated state models available.";
 
 export function stateModelWorkspaceDialog(selectedWorkspaceName) {

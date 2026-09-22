@@ -1,5 +1,4 @@
 <script>
-    // Implements WS-UX-RUNTIME-EXECUTION-001: Spy mode runtime status, screenshot, widget, and action panels.
     import { canStartRuntimeMode } from "../../models/runtimeModeControls.js";
 
     export let scriptlessStatus = null;

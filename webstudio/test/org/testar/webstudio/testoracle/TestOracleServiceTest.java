@@ -18,10 +18,9 @@ import org.testar.webstudio.api.dto.TestOracleItemDto;
 import org.testar.webstudio.api.dto.WorkspaceFileDto;
 import org.testar.webstudio.workspace.WorkspaceService;
 
+// Verifies WS-FUNC-TEST-ORACLES-001: workspace oracle inventory and authoring behavior.
 public class TestOracleServiceTest {
 
-    // Verifies WS-FUNC-TEST-ORACLES-001, WS-FUNC-ORACLE-DSL-EDITOR-001, and WS-FUNC-ORACLE-JAVA-ENABLEMENT-001:
-    // workspace oracle inventory, Java files, ExtendedOracles enablement, DSL metadata, validation, and generation.
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
 

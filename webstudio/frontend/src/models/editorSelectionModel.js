@@ -1,5 +1,4 @@
-// Implements WS-FUNC-WORKSPACE-SOURCE-EDITOR-001, WS-UX-SOURCE-EDITOR-001, WS-FUNC-COMPOSITION-FLOW-001, WS-UX-COMPOSITION-FLOW-001, and WS-UX-POLICIES-001:
-// keeps selected composition/policy source editors consistent while switching editors.
+// Keeps selected composition/policy source editors consistent while switching editors.
 export function clearedSourceSelectionState(state = {}) {
     return {
         ...state,

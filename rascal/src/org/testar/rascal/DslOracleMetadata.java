@@ -9,7 +9,6 @@ package org.testar.rascal;
 import java.util.List;
 import java.util.Map;
 
-// Implements WS-FUNC-ORACLE-DSL-EDITOR-001: editor metadata generated from Rascal DSL/model sources.
 public final class DslOracleMetadata {
 
     private final List<String> keywords;

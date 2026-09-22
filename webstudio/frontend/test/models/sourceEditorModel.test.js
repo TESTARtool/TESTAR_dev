@@ -1,4 +1,4 @@
-// Verifies WS-FUNC-WORKSPACE-SOURCE-EDITOR-001, WS-UX-SOURCE-EDITOR-001, WS-FUNC-COMPOSITION-FLOW-001, and WS-FUNC-POLICIES-001:
+// Verifies WS-FUNC-WORKSPACE-SOURCE-EDITOR-001 and WS-UX-SOURCE-EDITOR-001:
 // source class and reference helpers used by Java composition and policies.
 import test from "node:test";
 import assert from "node:assert/strict";

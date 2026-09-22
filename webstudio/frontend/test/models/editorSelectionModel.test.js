@@ -1,4 +1,4 @@
-// Verifies WS-FUNC-WORKSPACE-SOURCE-EDITOR-001, WS-UX-SOURCE-EDITOR-001, WS-UX-COMPOSITION-FLOW-001, and WS-UX-POLICIES-001:
+// Verifies WS-UX-SOURCE-EDITOR-001: source selection transitions clear stale editor state.
 // selected composition node and source editor state transitions.
 import test from "node:test";
 import assert from "node:assert/strict";

@@ -1,4 +1,3 @@
-// Implements WS-FUNC-TEST-SETTINGS-001: Test Settings save and regex validation API requests.
 export function testSettingsUrl(workspaceName) {
     return `/api/workspaces/${workspaceName}/test-settings`;
 }

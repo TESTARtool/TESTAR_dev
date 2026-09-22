@@ -6,8 +6,7 @@
 
 package org.testar.webstudio.api.dto;
 
-// Implements WS-FUNC-WORKSPACE-SOURCE-EDITOR-001 and WS-FUNC-ORACLE-JAVA-ENABLEMENT-001:
-// source-ranged Java compilation diagnostic contract for workspace and oracle source editors.
+// Source-ranged Java compilation diagnostic contract for workspace and oracle source editors.
 public final class WorkspaceJavaCompileDiagnosticDto {
 
     private final String fileName;

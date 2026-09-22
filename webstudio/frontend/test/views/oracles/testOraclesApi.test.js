@@ -1,4 +1,4 @@
-// Verifies WS-FUNC-TEST-ORACLES-001, WS-FUNC-ORACLE-DSL-EDITOR-001, and WS-FUNC-ORACLE-JAVA-ENABLEMENT-001:
+// Verifies WS-FUNC-TEST-ORACLES-001: Test Oracles API request contracts.
 // Test Oracles API request construction, including DSL metadata and generation endpoints.
 import test from "node:test";
 import assert from "node:assert/strict";

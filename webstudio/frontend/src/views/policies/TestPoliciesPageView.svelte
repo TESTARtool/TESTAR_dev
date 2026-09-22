@@ -1,5 +1,4 @@
 <script>
-    // Implements WS-UX-POLICIES-001: page-level Policies layout.
     import TestPoliciesView from "./TestPoliciesView.svelte";
 
     export let activePolicySourceFiles = [];

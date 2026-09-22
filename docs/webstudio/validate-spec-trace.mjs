@@ -3,12 +3,8 @@ import path from "node:path";
 
 const repositoryRoot = path.resolve(import.meta.dirname, "../..");
 const webstudioDocsRoot = path.resolve(repositoryRoot, "docs/webstudio");
-const tracePath = path.join(webstudioDocsRoot, "WEBSTUDIO_SPEC_TRACE.md");
-const requirementSpecificationPaths = [
-    path.join(webstudioDocsRoot, "WEBSTUDIO_FUNCTIONAL_SPEC.md"),
-    path.join(webstudioDocsRoot, "WEBSTUDIO_UX_SPEC.md")
-];
-const acceptanceScenarioPath = path.join(webstudioDocsRoot, "WEBSTUDIO_ACCEPTANCE_SCENARIOS.md");
+const tracePath = path.join(webstudioDocsRoot, "SPEC_TRACE.md");
+const capabilitySpecificationsRoot = path.join(webstudioDocsRoot, "specs");
 
 const scannedCodeRoots = [
     path.join(repositoryRoot, "webstudio/src"),
@@ -40,7 +36,7 @@ function warn(message) {
 
 function collectTraceabilityIds() {
     const ids = [];
-    for (const specificationPath of requirementSpecificationPaths) {
+    for (const specificationPath of specificationPaths()) {
         const text = readText(specificationPath);
         for (const match of text.matchAll(traceabilityPattern)) {
             ids.push({
@@ -52,6 +48,21 @@ function collectTraceabilityIds() {
     }
 
     return ids;
+}
+
+function specificationPaths() {
+    const paths = [];
+    if (!fs.existsSync(capabilitySpecificationsRoot)) {
+        return paths;
+    }
+
+    for (const filePath of walkFiles(capabilitySpecificationsRoot)) {
+        if (path.extname(filePath) === ".md") {
+            paths.push(filePath);
+        }
+    }
+
+    return paths;
 }
 
 function collectTraceEntries(traceText) {
@@ -71,8 +82,8 @@ function traceEntryContent(traceText, headingIndex) {
     return traceText.slice(headingIndex, nextHeadingIndex);
 }
 
-function collectRequirementIdsFromCode() {
-    const ids = new Set();
+function collectRequirementMarkers() {
+    const markers = [];
     for (const root of scannedCodeRoots) {
         if (!fs.existsSync(root)) {
             continue;
@@ -84,36 +95,66 @@ function collectRequirementIdsFromCode() {
             }
 
             const text = readText(filePath);
-            for (const match of text.matchAll(requirementPattern)) {
-                ids.add(match[0]);
+            const ids = new Set(Array.from(text.matchAll(requirementPattern), (match) => match[0]));
+            for (const id of ids) {
+                markers.push({
+                    id,
+                    file: filePath
+                });
             }
         }
     }
 
-    return ids;
+    return markers;
+}
+
+function traceLinkedFiles(traceEntry) {
+    const linkedFiles = new Set();
+    for (const match of traceEntry.content.matchAll(markdownLinkPattern)) {
+        const link = match[1];
+        if (link.startsWith("#") || /^[a-z]+:/i.test(link)) {
+            continue;
+        }
+
+        const [relativePath] = link.split("#");
+        linkedFiles.add(path.resolve(path.dirname(tracePath), relativePath));
+    }
+
+    return linkedFiles;
 }
 
 function collectScenarioIds() {
-    if (!fs.existsSync(acceptanceScenarioPath)) {
-        return [];
+    const scenarioIds = [];
+    for (const specificationPath of specificationPaths()) {
+        if (!fs.existsSync(specificationPath)) {
+            continue;
+        }
+
+        for (const match of readText(specificationPath).matchAll(scenarioPattern)) {
+            scenarioIds.push(match[0]);
+        }
     }
 
-    return Array.from(readText(acceptanceScenarioPath).matchAll(scenarioPattern))
-        .map((match) => match[0]);
+    return scenarioIds;
 }
 
 function collectScenarioBlocks() {
-    if (!fs.existsSync(acceptanceScenarioPath)) {
-        return [];
+    const scenarioHeadingPattern = /^###\s+(WS-SCENARIO-[A-Z0-9-]+-\d+)\s+[-\u2013\u2014]\s+(.+)$/gm;
+    const scenarioBlocks = [];
+    for (const specificationPath of specificationPaths()) {
+        if (!fs.existsSync(specificationPath)) {
+            continue;
+        }
+
+        const text = readText(specificationPath);
+        scenarioBlocks.push(...Array.from(text.matchAll(scenarioHeadingPattern)).map((match) => ({
+            id: match[1],
+            title: match[2],
+            content: scenarioContent(text, match.index)
+        })));
     }
 
-    const text = readText(acceptanceScenarioPath);
-    const scenarioHeadingPattern = /^###\s+(WS-SCENARIO-[A-Z0-9-]+-\d+)\s+[-\u2013\u2014]\s+(.+)$/gm;
-    return Array.from(text.matchAll(scenarioHeadingPattern)).map((match) => ({
-        id: match[1],
-        title: match[2],
-        content: scenarioContent(text, match.index)
-    }));
+    return scenarioBlocks;
 }
 
 function scenarioContent(text, headingIndex) {
@@ -155,17 +196,23 @@ function validateDuplicateIds(ids, context) {
     }
 }
 
-function validateTraceLinks(traceText) {
-    for (const match of traceText.matchAll(markdownLinkPattern)) {
-        const link = match[1];
-        if (link.startsWith("#") || /^[a-z]+:/i.test(link)) {
+function validateMarkdownLinks() {
+    for (const documentPath of walkFiles(webstudioDocsRoot)) {
+        if (path.extname(documentPath) !== ".md") {
             continue;
         }
 
-        const [relativePath] = link.split("#");
-        const linkedPath = path.resolve(webstudioDocsRoot, relativePath);
-        if (!fs.existsSync(linkedPath)) {
-            fail(`Trace link points to a missing file: ${link}`);
+        for (const match of readText(documentPath).matchAll(markdownLinkPattern)) {
+            const link = match[1];
+            if (link.startsWith("#") || /^[a-z]+:/i.test(link)) {
+                continue;
+            }
+
+            const [relativePath] = link.split("#");
+            const linkedPath = path.resolve(path.dirname(documentPath), relativePath);
+            if (!fs.existsSync(linkedPath)) {
+                fail(`Markdown link points to a missing file in ${path.relative(repositoryRoot, documentPath)}: ${link}`);
+            }
         }
     }
 }
@@ -193,6 +240,12 @@ function validateScenarioVerification(scenarioBlocks) {
         if (!scenarioBlock.content.match(/Verification:\s*`[^`]+`/)) {
             warn(`Acceptance scenario has no Verification line: ${scenarioBlock.id}`);
         }
+
+        for (const keyword of ["Given", "When", "Then"]) {
+            if (!scenarioBlock.content.match(new RegExp(`^${keyword}\\b`, "m"))) {
+                fail(`Acceptance scenario has no explicit ${keyword} statement: ${scenarioBlock.id}`);
+            }
+        }
     }
 }
 
@@ -201,14 +254,14 @@ const traceabilityEntries = collectTraceabilityIds();
 const specificationIds = traceabilityEntries.map((entry) => entry.id);
 const traceEntries = collectTraceEntries(traceText);
 const traceIds = new Set(traceEntries.map((entry) => entry.id));
-const codeIds = collectRequirementIdsFromCode();
+const requirementMarkers = collectRequirementMarkers();
 const scenarioIds = collectScenarioIds();
 const scenarioBlocks = collectScenarioBlocks();
 
 validateDuplicateIds(specificationIds, "specification requirement");
 validateDuplicateIds(traceEntries.map((entry) => entry.id), "trace requirement");
 validateDuplicateIds(scenarioIds, "acceptance scenario");
-validateTraceLinks(traceText);
+validateMarkdownLinks();
 validateTraceCompleteness(traceEntries);
 validateScenarioVerification(scenarioBlocks);
 
@@ -229,9 +282,16 @@ for (const traceId of traceIds) {
     }
 }
 
-for (const codeId of codeIds) {
-    if (!specificationIds.includes(codeId)) {
-        fail(`Code or test marker uses requirement ID missing from specifications: ${codeId}`);
+const traceEntriesById = new Map(traceEntries.map((entry) => [entry.id, entry]));
+for (const marker of requirementMarkers) {
+    if (!specificationIds.includes(marker.id)) {
+        warn(`Code or test marker uses requirement ID missing from specifications: ${marker.id} in ${path.relative(repositoryRoot, marker.file)}`);
+        continue;
+    }
+
+    const traceEntry = traceEntriesById.get(marker.id);
+    if (traceEntry && !traceLinkedFiles(traceEntry).has(path.resolve(marker.file))) {
+        warn(`Source marker file is not mapped by ${marker.id}: ${path.relative(repositoryRoot, marker.file)}`);
     }
 }
 

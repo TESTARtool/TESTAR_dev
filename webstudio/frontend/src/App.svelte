@@ -432,7 +432,6 @@
         spyState = spyResponse;
     }
 
-    // Implements WS-FUNC-WORKSPACE-SOURCE-EDITOR-001: load workspace documents and reset editor state for the selected workspace.
     async function loadWorkspace(workspaceName) {
         if (!workspaceName) {
             const emptyState = emptyWorkspaceState();
@@ -543,7 +542,6 @@
         }
     }
 
-    // Implements WS-UX-SOURCE-EDITOR-001: centralize source selection so editor views clear stale state consistently.
     async function selectSource(sourceName, editorId = null) {
         if (!selectedWorkspaceName || !sourceName) {
             selectedSourceName = "";
@@ -677,8 +675,7 @@
         }
     }
 
-    // Implements WS-FUNC-COMPOSITION-FLOW-001 and WS-FUNC-POLICIES-001:
-    // saves composition/policies properties and compiles Java configuration sources.
+    // Saves composition/policies properties and compiles Java configuration sources.
     // Workspace document persistence also covers raw settings, visual settings, policies, and profile compilation.
     async function saveWorkspaceFile(fileKind, content) {
         saving = true;
@@ -992,7 +989,6 @@
         }
     }
 
-    // Implements WS-FUNC-TOP-NAV-ROLES-001: role and menu transitions run through the shared navigation guard.
     async function changeWebStudioRole(nextRole) {
         const normalizedRole = normalizeWebStudioRole(nextRole);
         if (normalizedRole === currentRole) {
@@ -1287,8 +1283,7 @@
         return oracleSourceDirty;
     }
 
-    // Implements WS-FUNC-CONFIG-GUARD-001 and WS-UX-CONFIG-GUARD-001:
-    // coordinates dirty-state checks, guard dialogs, save/discard actions, and pending navigation.
+    // Coordinates dirty-state checks, guard dialogs, save/discard actions, and pending navigation.
     function configurationDirtyAreas() {
         return buildConfigurationDirtyAreas({
             settingsDirty: hasSettingsChanges(),
@@ -1300,7 +1295,6 @@
         });
     }
 
-    // Implements WS-FUNC-TEST-SETTINGS-001: saves either the visual settings form or raw test.settings editor.
     async function saveCurrentSettingsEditor() {
         if (selectedEditor === "settings-form") {
             return saveVisualSettings();
@@ -1683,7 +1677,6 @@
         }
     }
 
-    // Implements WS-FUNC-ORACLE-DSL-EDITOR-001: load backend-generated DSL metadata used by Monaco assistance.
     async function loadDslOracleMetadata() {
         try {
             dslOracleMetadata = await loadDslOracleMetadataRequest(loadJson);
@@ -1693,7 +1686,6 @@
         }
     }
 
-    // Implements WS-FUNC-ORACLE-JAVA-ENABLEMENT-001: write Java oracle checkbox state into ExtendedOracles.
     function updateExtendedOraclesSetting(nextValue) {
         for (const settingsGroup of workspaceDocument?.settingsGroups || []) {
             const setting = (settingsGroup.settings || []).find((item) => item.key === "ExtendedOracles");
@@ -2278,7 +2270,6 @@
         }
     }
 
-    // Implements WS-FUNC-COMPOSITION-FLOW-001: creates or opens the Java source linked to a composition node.
     async function createCompositionModuleSource(flowNode) {
         if (!selectedWorkspaceName || !flowNode?.propertyKey) {
             return;
@@ -2302,7 +2293,6 @@
         }
     }
 
-    // Implements WS-FUNC-POLICIES-001: creates Java policy source files for selected policy seams.
     async function createPolicySource(policyDefinition) {
         if (!selectedWorkspaceName || !policyDefinition?.propertyKey) {
             return;

@@ -61,7 +61,7 @@ Reason archived:
 
 - WebStudio now uses the selected shared workspace/runtime model
 - the separate TESTAR-vs-CLI runtime availability concept no longer maps to the current State Model flow
-- current expected behavior is specified in `WEBSTUDIO_FUNCTIONAL_SPEC.md`
+- current expected behavior is specified in the relevant file under `specs/`
 - current dialog behavior remains covered by `stateModelNavigation.test.js`
 
 ## List of Bugs

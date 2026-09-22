@@ -41,7 +41,6 @@ public final class ExecutionController {
         return adapter.status();
     }
 
-    // Implements WS-FUNC-RUNTIME-EXECUTION-001: dispatches Generate and CLI runtime control requests.
     public List<String> cliProfiles() {
         return cliExecutionAdapter().profiles();
     }
@@ -74,7 +73,6 @@ public final class ExecutionController {
         return cliExecutionAdapter().stopAgentSession();
     }
 
-    // Implements WS-FUNC-TEST-RESULTS-001: exposes workspace-scoped CLI and Generate result inspection.
     public ScriptlessResultsDto cliResults(String workspaceName) {
         return cliExecutionAdapter().cliResults(workspaceName);
     }

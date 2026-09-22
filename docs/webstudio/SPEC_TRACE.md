@@ -10,7 +10,7 @@ Keep the main functional and UX specs readable. Use this file when a reader need
 
 **Specification**
 
-- [Functional specification - Test Goals](./WEBSTUDIO_FUNCTIONAL_SPEC.md#test-goals)
+- [Test Goals specification](./specs/test-goals.md#ws-func-test-goals-001---workspace-scoped-test-goals)
 
 **Backend implementation**
 
@@ -41,7 +41,7 @@ Keep the main functional and UX specs readable. Use this file when a reader need
 
 **Specification**
 
-- [UX specification - Test Goals](./WEBSTUDIO_UX_SPEC.md#test-goals)
+- [Test Goals specification](./specs/test-goals.md#ws-ux-test-goals-001---test-goals-authoring-view)
 
 **Backend implementation**
 
@@ -70,7 +70,7 @@ Keep the main functional and UX specs readable. Use this file when a reader need
 
 **Specification**
 
-- [Functional specification - Workspace Management](./WEBSTUDIO_FUNCTIONAL_SPEC.md#workspace-management)
+- [Workspace Management specification](./specs/workspace-management.md#ws-func-workspace-management-001---workspace-creation-and-rename)
 
 **Backend implementation**
 
@@ -102,7 +102,7 @@ Keep the main functional and UX specs readable. Use this file when a reader need
 
 **Specification**
 
-- [UX specification - Workspace Selector UX Contract](./WEBSTUDIO_UX_SPEC.md#workspace-selector-ux-contract)
+- [Workspace Management specification](./specs/workspace-management.md#ws-ux-workspace-management-001---workspace-management-modal)
 
 **Backend implementation**
 
@@ -132,7 +132,7 @@ Keep the main functional and UX specs readable. Use this file when a reader need
 
 **Specification**
 
-- [Functional specification - Test Results](./WEBSTUDIO_FUNCTIONAL_SPEC.md#test-results)
+- [Test Results specification](./specs/test-results.md#ws-func-test-results-001---workspace-scoped-test-results)
 
 **Backend implementation**
 
@@ -171,7 +171,7 @@ Keep the main functional and UX specs readable. Use this file when a reader need
 
 **Specification**
 
-- [UX specification - Test Results UX Contract](./WEBSTUDIO_UX_SPEC.md#test-results-ux-contract)
+- [Test Results specification](./specs/test-results.md#ws-ux-test-results-001---test-results-inspection-view)
 
 **Backend implementation**
 
@@ -200,7 +200,7 @@ Keep the main functional and UX specs readable. Use this file when a reader need
 
 **Specification**
 
-- [Functional specification - State Model](./WEBSTUDIO_FUNCTIONAL_SPEC.md#state-model)
+- [State Model specification](./specs/state-model.md#ws-func-state-model-001---state-model-analysis-lifecycle)
 
 **Backend implementation**
 
@@ -233,7 +233,7 @@ Keep the main functional and UX specs readable. Use this file when a reader need
 
 **Specification**
 
-- [UX specification - State Model UX Contract](./WEBSTUDIO_UX_SPEC.md#state-model-ux-contract)
+- [State Model specification](./specs/state-model.md#ws-ux-state-model-001---state-model-dialog-and-actions)
 
 **Backend implementation**
 
@@ -263,7 +263,7 @@ Keep the main functional and UX specs readable. Use this file when a reader need
 
 **Specification**
 
-- [Functional specification - Debug Files](./WEBSTUDIO_FUNCTIONAL_SPEC.md#debug-files)
+- [Debug Files specification](./specs/debug-files.md#ws-func-debug-files-001---runtime-debug-file-inspection)
 
 **Backend implementation**
 
@@ -292,7 +292,7 @@ Keep the main functional and UX specs readable. Use this file when a reader need
 
 **Specification**
 
-- [UX specification - Debug UX Contract](./WEBSTUDIO_UX_SPEC.md#debug-ux-contract)
+- [Debug Files specification](./specs/debug-files.md#ws-ux-debug-files-001---debug-file-inspection-view)
 
 **Backend implementation**
 
@@ -321,9 +321,7 @@ Keep the main functional and UX specs readable. Use this file when a reader need
 
 **Specification**
 
-- [Functional specification - Generate Mode](./WEBSTUDIO_FUNCTIONAL_SPEC.md#generate-mode)
-- [Functional specification - Spy Mode](./WEBSTUDIO_FUNCTIONAL_SPEC.md#spy-mode)
-- [Functional specification - CLI Mode](./WEBSTUDIO_FUNCTIONAL_SPEC.md#cli-mode)
+- [Runtime Modes specification](./specs/runtime-modes.md#ws-func-runtime-execution-001---runtime-execution-modes)
 
 **Backend implementation**
 
@@ -358,7 +356,7 @@ Keep the main functional and UX specs readable. Use this file when a reader need
 
 **Specification**
 
-- [UX specification - Runtime UX Contract](./WEBSTUDIO_UX_SPEC.md#runtime-ux-contract)
+- [Runtime Modes specification](./specs/runtime-modes.md#ws-ux-runtime-execution-001---runtime-execution-pages)
 
 **Backend implementation**
 
@@ -390,8 +388,8 @@ Keep the main functional and UX specs readable. Use this file when a reader need
 
 **Specification**
 
-- [Functional specification - Settings View](./WEBSTUDIO_FUNCTIONAL_SPEC.md#settings-view)
-- [Functional specification - CLI State Projection Mode](./WEBSTUDIO_FUNCTIONAL_SPEC.md#cli-state-projection-mode)
+- [Test Settings specification](./specs/settings.md#ws-func-test-settings-001---workspace-test-settings-editor)
+- [Runtime Modes specification - CLI State Projection Mode](./specs/runtime-modes.md#cli-state-projection-mode)
 
 **Backend implementation**
 
@@ -421,7 +419,7 @@ Keep the main functional and UX specs readable. Use this file when a reader need
 
 **Acceptance scenarios**
 
-- [Test Settings scenarios](./WEBSTUDIO_ACCEPTANCE_SCENARIOS.md#test-settings)
+- [Test Settings scenarios](./specs/settings.md#acceptance-scenarios)
 
 **Related requirements**
 
@@ -434,7 +432,7 @@ Keep the main functional and UX specs readable. Use this file when a reader need
 
 **Specification**
 
-- [UX specification - Settings](./WEBSTUDIO_UX_SPEC.md#settings)
+- [Test Settings specification](./specs/settings.md#ws-ux-test-settings-001---test-settings-editor-view)
 
 **Backend implementation**
 
@@ -468,7 +466,7 @@ Keep the main functional and UX specs readable. Use this file when a reader need
 
 **Specification**
 
-- [Functional specification - Composition Views](./WEBSTUDIO_FUNCTIONAL_SPEC.md#composition-views)
+- [Composition Flow and Policies specification](./specs/composition-and-policies.md#ws-func-composition-flow-001---composition-file-and-java-flow)
 
 **Backend implementation**
 
@@ -505,7 +503,7 @@ Keep the main functional and UX specs readable. Use this file when a reader need
 
 **Specification**
 
-- [UX specification - Composition](./WEBSTUDIO_UX_SPEC.md#composition)
+- [Composition Flow and Policies specification](./specs/composition-and-policies.md#ws-ux-composition-flow-001---composition-flow-editor-view)
 
 **Backend implementation**
 
@@ -537,7 +535,7 @@ Keep the main functional and UX specs readable. Use this file when a reader need
 
 **Specification**
 
-- [Functional specification - Policies Views](./WEBSTUDIO_FUNCTIONAL_SPEC.md#policies-views)
+- [Composition Flow and Policies specification](./specs/composition-and-policies.md#ws-func-policies-001---policies-file-and-java-policies)
 
 **Backend implementation**
 
@@ -574,7 +572,7 @@ Keep the main functional and UX specs readable. Use this file when a reader need
 
 **Specification**
 
-- [UX specification - Policies](./WEBSTUDIO_UX_SPEC.md#policies)
+- [Composition Flow and Policies specification](./specs/composition-and-policies.md#ws-ux-policies-001---java-policies-editor-view)
 
 **Backend implementation**
 
@@ -606,7 +604,7 @@ Keep the main functional and UX specs readable. Use this file when a reader need
 
 **Specification**
 
-- [Functional specification - Test Configuration](./WEBSTUDIO_FUNCTIONAL_SPEC.md#test-configuration)
+- [Configuration Guard specification](./specs/configuration-guard.md#ws-func-config-guard-001---configuration-unsaved-change-protection)
 
 **Backend implementation**
 
@@ -639,7 +637,7 @@ Keep the main functional and UX specs readable. Use this file when a reader need
 
 **Specification**
 
-- [UX specification - Configuration UX Contract](./WEBSTUDIO_UX_SPEC.md#configuration-ux-contract)
+- [Configuration Guard specification](./specs/configuration-guard.md#ws-ux-config-guard-001---configuration-guard-dialogs-and-save-buttons)
 
 **Backend implementation**
 
@@ -672,7 +670,7 @@ Keep the main functional and UX specs readable. Use this file when a reader need
 
 **Specification**
 
-- [Functional specification - Test Oracles View](./WEBSTUDIO_FUNCTIONAL_SPEC.md#test-oracles-view)
+- [Functional specification - Test Oracles View](./specs/test-oracles.md#ws-func-test-oracles-001---workspace-scoped-test-oracles)
 
 **Backend implementation**
 
@@ -707,7 +705,7 @@ Keep the main functional and UX specs readable. Use this file when a reader need
 
 **Specification**
 
-- [UX specification - Test Oracles View](./WEBSTUDIO_UX_SPEC.md#test-oracles-view)
+- [UX specification - Test Oracles View](./specs/test-oracles.md#ws-ux-test-oracles-001---test-oracles-configuration-view)
 
 **Backend implementation**
 
@@ -737,8 +735,7 @@ Keep the main functional and UX specs readable. Use this file when a reader need
 
 **Specification**
 
-- [Functional specification - User Roles](./WEBSTUDIO_FUNCTIONAL_SPEC.md#user-roles)
-- [Functional specification - Page Navigation](./WEBSTUDIO_FUNCTIONAL_SPEC.md#page-navigation)
+- [WebStudio Foundations specification](./specs/foundations.md#ws-func-top-nav-roles-001---role-based-navigation)
 
 **Backend implementation**
 
@@ -771,8 +768,7 @@ Keep the main functional and UX specs readable. Use this file when a reader need
 
 **Specification**
 
-- [UX specification - Role-Based UX](./WEBSTUDIO_UX_SPEC.md#role-based-ux)
-- [UX specification - Top Navigation UX](./WEBSTUDIO_UX_SPEC.md#top-navigation-ux)
+- [WebStudio Foundations specification](./specs/foundations.md#ws-ux-top-nav-roles-001---top-navigation-and-role-selector)
 
 **Backend implementation**
 
@@ -806,7 +802,7 @@ Keep the main functional and UX specs readable. Use this file when a reader need
 
 **Specification**
 
-- [Functional specification - Editors](./WEBSTUDIO_FUNCTIONAL_SPEC.md#editors)
+- [WebStudio Foundations specification](./specs/foundations.md#ws-func-workspace-source-editor-001---workspace-document-and-source-editor-api)
 
 **Backend implementation**
 
@@ -843,7 +839,7 @@ Keep the main functional and UX specs readable. Use this file when a reader need
 
 **Specification**
 
-- [UX specification - Source Editor UX Contract](./WEBSTUDIO_UX_SPEC.md#source-editor-ux-contract)
+- [WebStudio Foundations specification](./specs/foundations.md#ws-ux-source-editor-001---source-editor-state-and-document-selection)
 
 **Backend implementation**
 
@@ -877,7 +873,7 @@ Keep the main functional and UX specs readable. Use this file when a reader need
 
 **Specification**
 
-- [Functional specification - Test Oracles View](./WEBSTUDIO_FUNCTIONAL_SPEC.md#test-oracles-view)
+- [Functional specification - Test Oracles View](./specs/test-oracles.md#ws-func-oracle-dsl-editor-001---rascal-dsl-metadata-and-diagnostics)
 
 **Backend implementation**
 
@@ -923,7 +919,7 @@ Keep the main functional and UX specs readable. Use this file when a reader need
 
 **Specification**
 
-- [UX specification - Test Oracles View](./WEBSTUDIO_UX_SPEC.md#test-oracles-view)
+- [UX specification - Test Oracles View](./specs/test-oracles.md#ws-ux-oracle-dsl-editor-001---monaco-dsl-editor-assistance)
 
 **Backend implementation**
 
@@ -956,7 +952,7 @@ Keep the main functional and UX specs readable. Use this file when a reader need
 
 **Specification**
 
-- [Functional specification - Test Oracles View](./WEBSTUDIO_FUNCTIONAL_SPEC.md#test-oracles-view)
+- [Functional specification - Test Oracles View](./specs/test-oracles.md#ws-func-oracle-java-enablement-001---workspace-java-oracles-and-extendedoracles-enablement)
 
 **Backend implementation**
 
@@ -996,7 +992,7 @@ Keep the main functional and UX specs readable. Use this file when a reader need
 
 **Specification**
 
-- [UX specification - Test Oracles View](./WEBSTUDIO_UX_SPEC.md#test-oracles-view)
+- [UX specification - Test Oracles View](./specs/test-oracles.md#ws-ux-oracle-java-enablement-001---workspace-java-oracle-management)
 
 **Backend implementation**
 

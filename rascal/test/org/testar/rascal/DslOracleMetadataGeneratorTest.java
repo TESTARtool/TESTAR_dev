@@ -10,7 +10,6 @@ import java.util.stream.Collectors;
 
 public class DslOracleMetadataGeneratorTest {
 
-    // Verifies WS-FUNC-ORACLE-DSL-EDITOR-001: editor metadata is extracted from Rascal DSL/model sources.
     private final DslOracleMetadata metadata = new DslOracleMetadataGenerator(
         Path.of("testar-oracle")
     ).generate();

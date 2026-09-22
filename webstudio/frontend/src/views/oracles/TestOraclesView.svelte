@@ -1,5 +1,5 @@
 <script>
-    // Implements WS-UX-TEST-ORACLES-001, WS-UX-ORACLE-DSL-EDITOR-001, and WS-UX-ORACLE-JAVA-ENABLEMENT-001:
+    // Implements WS-UX-TEST-ORACLES-001 and WS-UX-ORACLE-JAVA-ENABLEMENT-001:
     // Test Oracles workflow, Java enablement, Java editor, and DSL editor panels.
     import DslOracleEditor from "./DslOracleEditor.svelte";
     import TestSettingsView from "../settings/TestSettingsView.svelte";

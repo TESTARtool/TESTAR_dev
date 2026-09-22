@@ -1,5 +1,4 @@
 <script>
-    // Implements WS-UX-TEST-SETTINGS-001: Advanced Test Settings page wrapper.
     import TestSettingsView from "./TestSettingsView.svelte";
     import { TEST_SETTINGS_EXCLUDED_SETTING_KEYS, TEST_SETTINGS_GROUP_IDS } from "../../app/webStudioRoles.js";
 

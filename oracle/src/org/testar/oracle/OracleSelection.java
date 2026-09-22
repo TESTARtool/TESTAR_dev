@@ -66,7 +66,6 @@ public class OracleSelection {
 		return new ArrayList<>(oracleNames);
 	}
 
-	// Implements WS-FUNC-ORACLE-JAVA-ENABLEMENT-001: list built-in and workspace Java oracle class names.
 	public static List<String> getAvailableExtendedOracles() {
 		Set<String> oracleNames = new LinkedHashSet<>();
 		oracleNames.addAll(getAvailableBuiltInOracles());
@@ -79,7 +78,6 @@ public class OracleSelection {
 		return new ArrayList<>(oracleNames);
 	}
 
-	// Implements WS-FUNC-ORACLE-JAVA-ENABLEMENT-001: resolve ExtendedOracles names into executable Oracle instances.
 	public static List<Oracle> loadExtendedOracles(String selectedOracles) {
 		List<Oracle> oraclesList = new ArrayList<>();
 		List<String> selectedNames = parseSelectedOracleNames(selectedOracles);

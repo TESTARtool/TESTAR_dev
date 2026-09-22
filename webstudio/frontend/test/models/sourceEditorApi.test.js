@@ -1,4 +1,4 @@
-// Verifies WS-FUNC-WORKSPACE-SOURCE-EDITOR-001, WS-FUNC-COMPOSITION-FLOW-001, and WS-FUNC-POLICIES-001:
+// Verifies WS-FUNC-WORKSPACE-SOURCE-EDITOR-001: workspace source editor API request contracts.
 // workspace source, configuration property file, and compile request contracts.
 import test from "node:test";
 import assert from "node:assert/strict";

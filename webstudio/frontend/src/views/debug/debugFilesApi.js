@@ -1,4 +1,3 @@
-// Implements WS-FUNC-DEBUG-FILES-001: Debug Files list and file-content request contracts.
 export function debugFilesListUrl() {
     return "/api/debug-files";
 }

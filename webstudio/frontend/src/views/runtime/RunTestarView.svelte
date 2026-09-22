@@ -1,5 +1,4 @@
 <script>
-    // Implements WS-UX-RUNTIME-EXECUTION-001: Generate mode runtime status, controls, and console layout.
     import { tick } from "svelte";
     import { canStartRuntimeMode } from "../../models/runtimeModeControls.js";
 

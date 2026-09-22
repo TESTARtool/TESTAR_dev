@@ -21,7 +21,6 @@ import org.testar.config.TestarDirectories;
 
 public class OracleSelectionTest {
 
-    // Verifies WS-FUNC-ORACLE-JAVA-ENABLEMENT-001: workspace Java oracle discovery, loading, duplicate handling, and progress output.
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
 

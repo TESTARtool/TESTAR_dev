@@ -1,5 +1,4 @@
 <script>
-    // Implements WS-UX-RUNTIME-EXECUTION-001: CLI manual/agent controls, settings, and console layout.
     import { objectChanged } from "../../models/editorDirtyState.js";
 
     export let cliAgentSettings = null;

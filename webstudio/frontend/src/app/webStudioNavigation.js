@@ -1,7 +1,6 @@
 import { WEB_STUDIO_ROLES } from "./webStudioRoles.js";
 
-// Implements WS-FUNC-TOP-NAV-ROLES-001 and WS-UX-TOP-NAV-ROLES-001:
-// top navigation menu groups and menu action mapping.
+// Top navigation menu groups and menu action mapping.
 export const NAVIGATION_ACTIONS = {
     NONE: "none",
     BASIC_SETTINGS: "basic-settings",

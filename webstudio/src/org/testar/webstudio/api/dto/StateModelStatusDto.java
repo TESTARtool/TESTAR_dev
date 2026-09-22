@@ -6,7 +6,6 @@
 
 package org.testar.webstudio.api.dto;
 
-// Implements WS-FUNC-STATE-MODEL-001: status contract returned by state model analysis endpoints.
 public final class StateModelStatusDto {
 
     private final String status;

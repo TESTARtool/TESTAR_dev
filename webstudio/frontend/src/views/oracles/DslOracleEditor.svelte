@@ -17,7 +17,7 @@
 </script>
 
 <script>
-    // Implements WS-UX-ORACLE-DSL-EDITOR-001 and WS-UX-TEST-ORACLES-001: DSL oracle editor integration and feedback markers.
+    // Implements WS-UX-ORACLE-DSL-EDITOR-001: DSL editor assistance and backend diagnostic markers.
     import { onMount } from "svelte";
     import editorWorker from "monaco-editor/editor/editor.worker?worker";
     import {

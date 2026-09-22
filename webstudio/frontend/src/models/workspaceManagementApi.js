@@ -3,7 +3,6 @@ import {
     workspaceRenameRequest
 } from "./workspaceManagementModel.js";
 
-// Implements WS-FUNC-WORKSPACE-MANAGEMENT-001: request builders for workspace create/rename endpoints.
 function jsonRequestOptions(method, body) {
     return {
         method,

@@ -17,7 +17,6 @@ final class ResultVerdictStatus {
 
     private ResultVerdictStatus() { }
 
-    // Implements WS-FUNC-TEST-RESULTS-001: classifies generated result report filenames.
     static String forResultFile(Path path) {
         return forResultFileName(path.getFileName().toString());
     }

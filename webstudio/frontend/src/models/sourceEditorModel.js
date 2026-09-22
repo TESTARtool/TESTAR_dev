@@ -1,4 +1,4 @@
-// Implements WS-FUNC-WORKSPACE-SOURCE-EDITOR-001, WS-UX-SOURCE-EDITOR-001, WS-FUNC-COMPOSITION-FLOW-001, and WS-FUNC-POLICIES-001:
+// Implements WS-FUNC-WORKSPACE-SOURCE-EDITOR-001 and WS-UX-SOURCE-EDITOR-001:
 // source class/reference helpers used by Java composition nodes and policies.
 export function sourceClassName(sourceFile) {
     if (!sourceFile?.name) {

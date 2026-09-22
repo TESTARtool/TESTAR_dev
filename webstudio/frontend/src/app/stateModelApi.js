@@ -1,4 +1,3 @@
-// Implements WS-FUNC-STATE-MODEL-001: state model analysis endpoint request helpers.
 export function loadStateModelStatusRequest(loadJson) {
     return loadJson("/api/statemodel/status");
 }

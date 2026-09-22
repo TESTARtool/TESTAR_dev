@@ -8,7 +8,6 @@ package org.testar.webstudio.api.dto;
 
 import java.util.List;
 
-// Implements WS-FUNC-TEST-ORACLES-001: selected-workspace oracle inventory contract.
 public final class TestOracleInventoryDto {
 
     private final String workspaceName;

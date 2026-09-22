@@ -1,7 +1,6 @@
 const WORKSPACE_NAME_PATTERN = /^[A-Za-z0-9_-]+$/;
 
-// Implements WS-FUNC-WORKSPACE-MANAGEMENT-001 and WS-UX-WORKSPACE-MANAGEMENT-001:
-// validates workspace creation/rename drafts before the modal enables actions.
+// Validates workspace creation/rename drafts before the modal enables actions.
 export function defaultWorkspaceCreateDraft(workspaces, selectedWorkspaceName) {
     return {
         name: "",

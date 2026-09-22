@@ -21,12 +21,10 @@ public final class TestOracleController {
         this.testOracleService = testOracleService;
     }
 
-    // Implements WS-FUNC-TEST-ORACLES-001: exposes workspace oracle inventory and Java/DSL file operations.
     public TestOracleInventoryDto inventory(String workspaceName) {
         return testOracleService.inventory(workspaceName);
     }
 
-    // Implements WS-FUNC-ORACLE-DSL-EDITOR-001: exposes backend-generated DSL editor metadata.
     public DslOracleMetadata dslMetadata() {
         return testOracleService.dslMetadata();
     }
@@ -47,37 +45,30 @@ public final class TestOracleController {
         return testOracleService.deleteDslFile(workspaceName, relativePath);
     }
 
-    // Implements WS-FUNC-ORACLE-DSL-EDITOR-001: exposes authoritative Rascal DSL validation.
     public TestOracleDslResultDto validateDslFile(String workspaceName, String relativePath, String content) {
         return testOracleService.validateDslFile(workspaceName, relativePath, content);
     }
 
-    // Implements WS-FUNC-ORACLE-DSL-EDITOR-001: saves DSL content and generates workspace Java oracle source.
     public TestOracleDslResultDto generateJavaFromDslFile(String workspaceName, String relativePath, String content) {
         return testOracleService.generateJavaFromDslFile(workspaceName, relativePath, content);
     }
 
-    // Implements WS-FUNC-ORACLE-JAVA-ENABLEMENT-001: reads workspace Java oracle source files.
     public WorkspaceFileDto readJavaFile(String workspaceName, String relativePath) {
         return testOracleService.readJavaFile(workspaceName, relativePath);
     }
 
-    // Implements WS-FUNC-ORACLE-JAVA-ENABLEMENT-001: persists workspace Java oracle source files.
     public WorkspaceFileDto saveJavaFile(String workspaceName, String relativePath, String content) {
         return testOracleService.saveJavaFile(workspaceName, relativePath, content);
     }
 
-    // Implements WS-FUNC-ORACLE-JAVA-ENABLEMENT-001: creates workspace Java oracle files and enables new classes.
     public WorkspaceFileDto createJavaFile(String workspaceName, String relativePath) {
         return testOracleService.createJavaFile(workspaceName, relativePath);
     }
 
-    // Implements WS-FUNC-ORACLE-JAVA-ENABLEMENT-001: deletes workspace Java oracle files and refreshes inventory.
     public TestOracleInventoryDto deleteJavaFile(String workspaceName, String relativePath) {
         return testOracleService.deleteJavaFile(workspaceName, relativePath);
     }
 
-    // Implements WS-FUNC-ORACLE-JAVA-ENABLEMENT-001: compiles workspace Java oracle files and returns diagnostics.
     public WorkspaceJavaCompileResultDto compileJavaFile(String workspaceName, String relativePath, String content) {
         return testOracleService.compileJavaFile(workspaceName, relativePath, content);
     }

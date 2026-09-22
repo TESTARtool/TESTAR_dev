@@ -1,5 +1,4 @@
 <script>
-    // Implements WS-UX-COMPOSITION-FLOW-001: page-level Composition Flow layout.
     import TestCompositionView from "./TestCompositionView.svelte";
 
     export let compositionFlowNodes = [];

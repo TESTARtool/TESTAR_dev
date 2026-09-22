@@ -1,5 +1,4 @@
-// Implements WS-FUNC-WORKSPACE-SOURCE-EDITOR-001, WS-FUNC-COMPOSITION-FLOW-001, and WS-FUNC-POLICIES-001:
-// workspace source, configuration property file, and compile API requests.
+// Workspace source, configuration property file, and compile API requests.
 export function workspaceSourceUrl(workspaceName, sourceName) {
     return `/api/workspaces/${workspaceName}/sources/${encodeURIComponent(sourceName)}`;
 }

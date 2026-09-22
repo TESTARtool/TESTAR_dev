@@ -5,7 +5,6 @@ import org.junit.Test;
 
 public class DslOracleCompilerTest {
 
-    // Verifies WS-FUNC-ORACLE-DSL-EDITOR-001: Rascal validation returns normalized structured diagnostics.
     @Test
     public void validateReportsSemanticDiagnosticsFromRascalJson() {
         DslOracleCompiler compiler = new DslOracleCompiler();

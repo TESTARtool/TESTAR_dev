@@ -1,12 +1,60 @@
-# WebStudio Acceptance Scenarios
+# Test Settings
 
-This document captures user-facing workflows that are important enough to protect with automated tests.
+This specification defines the selected workspace `test.settings` editor and its visual/raw representations.
 
-Use these scenarios to complement the functional and UX specifications. Keep them short, concrete, and focused on behavior that can regress during refactors.
+## Functional Requirements
 
-## Test Settings
+### WS-FUNC-TEST-SETTINGS-001 - Workspace Test Settings Editor
 
-Related requirements: [`WS-FUNC-TEST-SETTINGS-001`](./WEBSTUDIO_SPEC_TRACE.md#ws-func-test-settings-001---workspace-test-settings-editor), [`WS-UX-TEST-SETTINGS-001`](./WEBSTUDIO_SPEC_TRACE.md#ws-ux-test-settings-001---test-settings-editor-view), [`WS-FUNC-CONFIG-GUARD-001`](./WEBSTUDIO_SPEC_TRACE.md#ws-func-config-guard-001---configuration-unsaved-change-protection)
+Traceability: [`WS-FUNC-TEST-SETTINGS-001`](../SPEC_TRACE.md#ws-func-test-settings-001---workspace-test-settings-editor)
+
+The settings editor is exposed as one `Edit Settings` entry for the selected workspace.
+
+The view has two representations of the same `test.settings` data:
+
+- visual settings form
+- raw `test.settings` text editor
+
+The visual form is the default representation. A toggle in the view header switches between representations. Both representations share one `Save Settings` action and are treated as one logical editing area for unsaved-change behavior.
+
+The selected workspace settings include `CliStateProjectionMode`, rendered as a dropdown using the available enum values.
+
+### Settings Persistence
+
+When the user saves either representation, WebStudio persists the selected workspace `test.settings` content. A successful save updates the persisted baseline used by both representations and disables `Save Settings` until a new change is made.
+
+The unsaved settings guard appears when the user leaves `Edit Settings` or toggles representations while settings are dirty. It does not appear when changing settings groups inside the visual form.
+
+Guard actions are:
+
+- `Save`: persist settings, then continue the pending action
+- `Discard`: restore the persisted settings state, then continue the pending action
+- `Cancel`: remain in the current editor and abort the pending action
+
+### Save Action Enablement
+
+`Save Settings` is enabled only when the selected workspace settings differ from the persisted settings state. The save button and unsaved-change guard use the same dirty-state calculation.
+
+## UX Requirements
+
+### WS-UX-TEST-SETTINGS-001 - Test Settings Editor View
+
+Traceability: [`WS-UX-TEST-SETTINGS-001`](../SPEC_TRACE.md#ws-ux-test-settings-001---test-settings-editor-view)
+
+The left sidebar shows one `Edit Settings` entry. The visual form is shown by default, and a compact toggle near the heading switches to the raw editor without adding another sidebar entry or resizing the layout.
+
+- settings groups remain visible in the left sidebar
+- the selected group is visually clear
+- `Search in all settings` is global to the settings view
+- setting-specific feedback appears near the corresponding setting
+- restore actions appear only for settings that support restore behavior
+- enum dropdowns contain concrete values without a leading blank option
+- both representations share `Save Settings`
+- `Save Settings` is disabled when settings match the persisted state
+- `Save Settings` is enabled when either representation changes settings
+- toggling representations while dirty uses the save/discard/cancel guard pattern
+
+## Acceptance Scenarios
 
 ### WS-SCENARIO-SETTINGS-001 - Visual Settings Save
 
@@ -99,43 +147,3 @@ When the user changes a setting value
 Then the `Save Settings` button is enabled
 When the user navigates to another non-settings view
 Then the unsaved changes guard is shown
-
-## Top Navigation
-
-Related requirements: [`WS-FUNC-TOP-NAV-ROLES-001`](./WEBSTUDIO_SPEC_TRACE.md#ws-func-top-nav-roles-001---role-based-navigation), [`WS-UX-TOP-NAV-ROLES-001`](./WEBSTUDIO_SPEC_TRACE.md#ws-ux-top-nav-roles-001---role-based-top-navigation)
-
-### WS-SCENARIO-TOP-NAV-001 - Guarded Role Selector Does Not Show Uncommitted Role
-
-Verification: `webStudioRoles.test.js`, `committedSelectModel.test.js`, `configurationGuard.test.js`
-
-Given the user is in the `Advanced` role
-And the user has unsaved settings changes
-When the user selects the `Basic` role
-Then the unsaved changes guard is shown
-And the role selector still shows `Advanced` while the role change is pending
-
-When the user clicks `Cancel`
-Then the application remains in the `Advanced` role
-And the role selector shows `Advanced`
-
-When the user accepts the guarded role change
-Then the application changes to the `Basic` role
-And the role selector shows `Basic`
-
-### WS-SCENARIO-TOP-NAV-002 - Guarded Workspace Selector Does Not Show Uncommitted Workspace
-
-Verification: `committedSelectModel.test.js`, `configurationGuard.test.js`
-
-Given the user selected workspace is `webdriver_generic`
-And the user has unsaved settings changes
-When the user selects workspace `android_generic`
-Then the unsaved changes guard is shown
-And the workspace selector still shows `webdriver_generic` while the workspace change is pending
-
-When the user clicks `Cancel`
-Then the application remains in workspace `webdriver_generic`
-And the workspace selector shows `webdriver_generic`
-
-When the user accepts the guarded workspace change
-Then the application changes to workspace `android_generic`
-And the workspace selector shows `android_generic`

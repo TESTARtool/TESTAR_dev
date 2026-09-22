@@ -1,4 +1,3 @@
-// Implements WS-FUNC-CONFIG-GUARD-001: shared dirty-state checks for save buttons and guards.
 export function contentChanged(currentContent, savedContent) {
     return (currentContent || "") !== (savedContent || "");
 }

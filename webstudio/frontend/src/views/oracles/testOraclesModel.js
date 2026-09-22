@@ -1,6 +1,4 @@
-// Implements WS-FUNC-TEST-ORACLES-001, WS-UX-TEST-ORACLES-001, WS-FUNC-ORACLE-DSL-EDITOR-001,
-// WS-UX-ORACLE-DSL-EDITOR-001, WS-FUNC-ORACLE-JAVA-ENABLEMENT-001, and WS-UX-ORACLE-JAVA-ENABLEMENT-001:
-// derives Test Oracles panels, inventory grouping, DSL metadata assistance, enablement, and editor feedback state.
+// Derives Test Oracles panels, inventory grouping, DSL metadata assistance, enablement, and editor feedback state.
 export const TEST_ORACLE_PANEL_IDS = {
     ACTIVE: "active-oracles",
     GUI_REGEX: "gui-regex-oracles",

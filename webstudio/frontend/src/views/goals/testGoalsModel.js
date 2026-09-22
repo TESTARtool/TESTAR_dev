@@ -1,5 +1,4 @@
-// Implements WS-FUNC-TEST-GOALS-001 and WS-UX-TEST-GOALS-001:
-// pure Test Goal tree, selection, and delete-dialog state decisions.
+// Pure Test Goal tree, selection, and delete-dialog state decisions.
 export function flattenTestGoalTree(node, depth = 0) {
     if (!node) {
         return [];

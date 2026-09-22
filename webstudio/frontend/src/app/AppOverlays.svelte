@@ -55,7 +55,6 @@
     onRenameDraftChange={onWorkspaceRenameDraftChange}
 />
 
-<!-- Implements WS-UX-STATE-MODEL-001: wires state model dialog actions from App state. -->
 <StateModelDialog
     dialog={stateModelDialog}
     saving={saving}

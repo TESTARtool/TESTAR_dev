@@ -32,7 +32,6 @@ import io.usethesource.vallang.IWithKeywordParameters;
 
 public final class DslOracleCompiler {
 
-    // Implements WS-FUNC-ORACLE-DSL-EDITOR-001: backend DSL validation, Java generation, and structured diagnostics.
     private static final String STATUS_ERROR = "ERROR";
     private static final String DSL_PARSE_ERROR_MESSAGE = "DSL parse error. Check the syntax near this position.";
     private static final Pattern RASCAL_PARSE_ERROR_LOCATION_PATTERN = Pattern.compile(

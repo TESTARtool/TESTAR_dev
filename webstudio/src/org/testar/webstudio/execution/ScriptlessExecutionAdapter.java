@@ -88,7 +88,6 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
         return buildStatus("running", "Running " + currentMode + " for workspace " + currentWorkspace);
     }
 
-    // Implements WS-FUNC-RUNTIME-EXECUTION-001: launches Generate and local Spy scriptless runtime processes.
     public synchronized ExecutionStatusDto startGenerate(String workspaceName, Path settingsRoot) {
         return startMode(workspaceName, settingsRoot, "Generate");
     }
@@ -163,7 +162,6 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
         return buildStatus("idle", lastMessage);
     }
 
-    // Implements WS-FUNC-TEST-RESULTS-001: loads and mutates selected workspace Generate reports.
     public synchronized ScriptlessResultsDto scriptlessResults(String workspaceName) {
         List<ResultOutputGroupDto> groups = loadResultGroups(workspaceName);
         if (groups.isEmpty()) {
