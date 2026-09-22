@@ -23,6 +23,8 @@ The view exposes:
 
 Run controls are available when a shared workspace is selected and no Generate execution is already running. Starting calls the server scriptless-generate endpoint, stopping calls the scriptless stop endpoint, and polling updates console output and sequence outcomes.
 
+Each Generate sequence outcome preserves every generated verdict report for that sequence. The sequence status remains the aggregate status used by progress and sequence indicators, while the detailed outcome list exposes one entry for each verdict report.
+
 ### Spy Mode
 
 Spy Mode supports:
@@ -86,3 +88,25 @@ The header does not shift when runtime status changes or when the SUT value is l
 Spy behavior keeps the state screenshot within the available panel, scrolls widget properties internally, keeps action panels accessible, and prevents widget selection from moving the screenshot panel.
 
 CLI behavior keeps manual controls, Agent CLI settings, and console output in stable panels. Console output scrolls internally, session start and stop do not shift panels, command buttons do not overflow horizontally, and Agent CLI settings edited in CLI mode use the same unsaved-change guard pattern as configuration settings.
+
+Generate Mode renders one detailed outcome row for every verdict report produced by a sequence, including multiple verdicts such as `V001`, `V002`, and `V003`.
+
+## Acceptance Scenarios
+
+### WS-SCENARIO-RUNTIME-GENERATE-001 - Generate Shows All Sequence Verdicts
+
+Verification: `ScriptlessSequenceVerdictTest.java`, `runtimeModel.test.js`
+
+Given Generate Mode has produced multiple verdict reports for sequence 1
+And Generate Mode has produced multiple verdict reports for sequence 2 in the same run
+And the sequence 1 reports are named `sequence_1_V001_WARNING_ACCESSIBILITY_FAULT.html`, `sequence_1_V002_WARNING_ACCESSIBILITY_FAULT.html`, `sequence_1_V003_WARNING_ACCESSIBILITY_FAULT.html`, `sequence_1_V004_WARNING_WEB_INVARIANT_FAULT.html`, and `sequence_1_V005_SUSPICIOUS_LOG.html`
+And the sequence 2 reports are named `sequence_2_V001_SUSPICIOUS_TAG.html`, `sequence_2_V002_SUSPICIOUS_TAG.html`, `sequence_2_V003_SUSPICIOUS_TAG.html`, and `sequence_2_V004_WARNING_WEB_INVARIANT_FAULT.html`
+And every listed report has a failed verdict
+When the Generate status is displayed
+Then the sequence graph shows exactly two sequence blocks numbered 1 and 2
+And both sequence blocks show the aggregate status `FAILED`
+And the Test Results Outcomes panel shows exactly nine detailed verdict entries
+And the five sequence 1 entries appear together before the four sequence 2 entries
+And every entry preserves its complete report label and individual status
+And the detailed list does not show standalone `sequence_1` or `sequence_2` entries
+And no verdict from sequence 1 is displayed under sequence 2

@@ -1,6 +1,7 @@
 <script>
     import { tick } from "svelte";
     import { canStartRuntimeMode } from "../../models/runtimeModeControls.js";
+    import { sequenceVerdicts } from "./runtimeModel.js";
 
     export let saving = false;
     export let scriptlessStatus = null;
@@ -9,34 +10,10 @@
     export let startGenerate;
     export let stopGenerate;
 
+    // Implements WS-UX-RUNTIME-EXECUTION-001: displays every verdict produced by each Generate sequence.
+
     let consoleOutputElement = null;
     let lastRenderedConsoleOutput = "";
-
-    function formatSequenceOutcomeLabel(sequenceOutcome) {
-        if (!sequenceOutcome) {
-            return "";
-        }
-
-        if (sequenceOutcome.label) {
-            return sequenceOutcome.label;
-        }
-
-        if (sequenceOutcome.outputPath) {
-            const outputPathSegments = sequenceOutcome.outputPath.split(/[\\/]/);
-            const fileName = outputPathSegments[outputPathSegments.length - 1] || "";
-            const trimmedExtension = fileName.replace(/\.html?$/i, "");
-            const sequenceIndex = trimmedExtension.indexOf("_sequence_");
-            if (sequenceIndex >= 0) {
-                return trimmedExtension.substring(sequenceIndex + 1);
-            }
-
-            if (trimmedExtension) {
-                return trimmedExtension;
-            }
-        }
-
-        return `sequence_${sequenceOutcome.sequenceNumber}`;
-    }
 
     $: completedSequenceCount = scriptlessStatus?.sequenceOutcomes?.length || 0;
     $: plannedSequenceCount = scriptlessStatus?.plannedSequenceCount || 0;
@@ -126,16 +103,18 @@
                     <section class="run-outcomes-panel">
                         <div class="run-outcome-list">
                             {#each scriptlessStatus.sequenceOutcomes as sequenceOutcome}
-                                <article
-                                    class:run-outcome-item-failed={sequenceOutcome.status === "failed"}
-                                    class:run-outcome-item-ok={sequenceOutcome.status !== "failed"}
-                                    class="run-outcome-item"
-                                >
-                                    <div class="run-outcome-item-copy">
-                                        <span>{formatSequenceOutcomeLabel(sequenceOutcome)}</span>
-                                    </div>
-                                    <span class="run-outcome-item-status">{sequenceOutcome.status === "failed" ? "FAILED" : "OK"}</span>
-                                </article>
+                                {#each sequenceVerdicts(sequenceOutcome) as sequenceVerdict}
+                                    <article
+                                        class:run-outcome-item-failed={sequenceVerdict.status === "failed"}
+                                        class:run-outcome-item-ok={sequenceVerdict.status !== "failed"}
+                                        class="run-outcome-item"
+                                    >
+                                        <div class="run-outcome-item-copy">
+                                            <span>{sequenceVerdict.label}</span>
+                                        </div>
+                                        <span class="run-outcome-item-status">{sequenceVerdict.status === "failed" ? "FAILED" : "OK"}</span>
+                                    </article>
+                                {/each}
                             {/each}
                         </div>
                     </section>

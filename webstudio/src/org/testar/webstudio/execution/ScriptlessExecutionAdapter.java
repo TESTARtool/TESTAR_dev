@@ -32,14 +32,22 @@ import org.testar.webstudio.api.dto.ResultFileDto;
 import org.testar.webstudio.api.dto.ResultFileSummaryDto;
 import org.testar.webstudio.api.dto.ResultOutputGroupDto;
 import org.testar.webstudio.api.dto.SequenceOutcomeDto;
+import org.testar.webstudio.api.dto.SequenceVerdictDto;
 import org.testar.webstudio.api.dto.ScriptlessResultsDto;
 
 public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
 
     private static final int MAX_CONSOLE_LINES = 250;
     private static final long COMPLETED_RUN_IDLE_GRACE_MILLIS = 8000L;
+    private static final Pattern SEQUENCE_START_PATTERN = Pattern.compile(
+        "Starting\\s+sequence\\s+(\\d+)\\s+\\(output\\s+as:\\s+([^\\)]+)\\)"
+    );
     private static final Pattern SEQUENCE_SUMMARY_PATTERN = Pattern.compile("_sequence_(\\d+)");
     private static final Pattern SEQUENCE_OUTPUT_PATH_PATTERN = Pattern.compile("Generate\\s+([^\\s]+_sequence_(\\d+))");
+    private static final Pattern SEQUENCE_REPORT_PATTERN = Pattern.compile(
+        "(?:.*_)?sequence_(\\d+)_V\\d+_.+\\.html?$",
+        Pattern.CASE_INSENSITIVE
+    );
     private static final Pattern HTML_RESOURCE_ATTRIBUTE_PATTERN = Pattern.compile("(\\b(?:src|href)\\s*=\\s*[\"'])([^\"']*)([\"'])");
     private static final Pattern STATIC_HTML_ASSET_PATTERN = Pattern.compile(".+\\.(?:html?|css|js|png|jpe?g|gif|svg|ico|bmp|webp|woff2?|ttf|eot)$", Pattern.CASE_INSENSITIVE);
     private static final Set<String> NON_OK_VERDICT_TITLES = buildNonOkVerdictTitles();
@@ -47,10 +55,13 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
     private Process currentProcess;
     private Path currentInstallBinDirectory;
     private String currentWorkspace;
+    private Path lastInstallBinDirectory;
+    private String lastWorkspace;
     private String currentMode;
     private long startedAtEpochMillis;
     private long lastOutputEpochMillis;
     private int plannedSequenceCount;
+    private int currentSequenceNumber;
     private boolean currentSequenceFailed;
     private String lastMessage = "Scriptless execution adapter is available";
     private final List<String> consoleLines = new ArrayList<>();
@@ -70,6 +81,8 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
 
         if (currentProcess != null && !currentProcess.isAlive()) {
             int exitCode = currentProcess.exitValue();
+            lastInstallBinDirectory = currentInstallBinDirectory;
+            lastWorkspace = currentWorkspace;
             currentProcess = null;
             currentInstallBinDirectory = null;
             currentWorkspace = null;
@@ -77,6 +90,7 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
             startedAtEpochMillis = 0L;
             lastOutputEpochMillis = 0L;
             plannedSequenceCount = 0;
+            currentSequenceNumber = 0;
             currentSequenceFailed = false;
             lastMessage = "Scriptless run finished with exit code " + exitCode;
         }
@@ -152,6 +166,7 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
             currentMode = null;
             startedAtEpochMillis = 0L;
             lastOutputEpochMillis = 0L;
+            currentSequenceNumber = 0;
             return buildStatus("idle", "No scriptless run is active");
         }
 
@@ -387,7 +402,10 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
         consoleLines.clear();
         sequenceOutcomes.clear();
         currentInstallBinDirectory = null;
+        lastInstallBinDirectory = null;
+        lastWorkspace = null;
         plannedSequenceCount = 0;
+        currentSequenceNumber = 0;
         currentSequenceFailed = false;
         startedAtEpochMillis = 0L;
         lastOutputEpochMillis = 0L;
@@ -435,9 +453,16 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
 
         boolean explicitOkSequenceLine = line != null && line.contains("No problem detected.");
 
+        Matcher startMatcher = SEQUENCE_START_PATTERN.matcher(line);
+        if (startMatcher.find()) {
+            currentSequenceNumber = Integer.parseInt(startMatcher.group(1));
+            return;
+        }
+
         Matcher pathMatcher = SEQUENCE_OUTPUT_PATH_PATTERN.matcher(line);
         if (pathMatcher.find()) {
             int sequenceNumber = Integer.parseInt(pathMatcher.group(2));
+            currentSequenceNumber = sequenceNumber;
             String outputPath = resolveSequenceOutputPath(pathMatcher.group(1));
             boolean failedSequence = explicitOkSequenceLine ? false : (currentSequenceFailed || line.contains("["));
             recordSequenceOutcome(sequenceNumber, failedSequence ? "failed" : "ok", outputPath);
@@ -455,8 +480,12 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
         }
 
         if (line.contains("End of test sequence - shutting down the SUT...")) {
-            recordSequenceOutcome(sequenceOutcomes.size() + 1, currentSequenceFailed ? "failed" : "ok", null);
+            int sequenceNumber = currentSequenceNumber > 0
+                ? currentSequenceNumber
+                : sequenceOutcomes.size() + 1;
+            recordSequenceOutcome(sequenceNumber, currentSequenceFailed ? "failed" : "ok", null);
             currentSequenceFailed = false;
+            currentSequenceNumber = 0;
         }
     }
 
@@ -512,78 +541,151 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
         return System.currentTimeMillis() - lastOutputEpochMillis >= COMPLETED_RUN_IDLE_GRACE_MILLIS;
     }
 
+    // Implements WS-FUNC-RUNTIME-EXECUTION-001: preserves every generated verdict for each sequence.
     private void recordSequenceOutcome(int sequenceNumber, String status, String outputPath) {
-        String resolvedLabel = resolveSequenceOutcomeLabel(sequenceNumber, status, outputPath);
+        List<SequenceVerdictDto> resolvedVerdicts = resolveSequenceVerdicts(sequenceNumber, outputPath);
+        String resolvedLabel = null;
+        if (!resolvedVerdicts.isEmpty()) {
+            resolvedLabel = resolvedVerdicts.get(0).label();
+        } else if (outputPath != null) {
+            resolvedLabel = fallbackSequenceOutcomeLabel(sequenceNumber);
+        }
 
         for (int index = 0; index < sequenceOutcomes.size(); index++) {
             if (sequenceOutcomes.get(index).sequenceNumber() == sequenceNumber) {
                 String existingStatus = sequenceOutcomes.get(index).status();
-                if ("failed".equals(existingStatus)) {
-                    return;
+                String resolvedOutputPath = resolvedVerdicts.isEmpty()
+                    ? outputPath
+                    : resolvedVerdicts.get(0).outputPath();
+                if (resolvedOutputPath == null) {
+                    resolvedOutputPath = sequenceOutcomes.get(index).outputPath();
                 }
 
-                String resolvedOutputPath = outputPath != null ? outputPath : sequenceOutcomes.get(index).outputPath();
                 String existingLabel = sequenceOutcomes.get(index).label();
                 String effectiveLabel = resolvedLabel != null ? resolvedLabel : existingLabel;
-                sequenceOutcomes.set(index, new SequenceOutcomeDto(sequenceNumber, status, resolvedOutputPath, effectiveLabel));
+                List<SequenceVerdictDto> existingVerdicts = sequenceOutcomes.get(index).verdicts();
+                List<SequenceVerdictDto> effectiveVerdicts = resolvedVerdicts.isEmpty() ? existingVerdicts : resolvedVerdicts;
+                if ("failed".equals(existingStatus) && outputPath == null && !existingVerdicts.isEmpty()) {
+                    return;
+                }
+                sequenceOutcomes.set(index, new SequenceOutcomeDto(
+                    sequenceNumber,
+                    status,
+                    resolvedOutputPath,
+                    effectiveLabel,
+                    effectiveVerdicts
+                ));
                 return;
             }
         }
 
-        sequenceOutcomes.add(new SequenceOutcomeDto(sequenceNumber, status, outputPath, resolvedLabel));
+        sequenceOutcomes.add(new SequenceOutcomeDto(
+            sequenceNumber,
+            status,
+            outputPath,
+            resolvedLabel,
+            resolvedVerdicts
+        ));
     }
 
-    private String resolveSequenceOutcomeLabel(int sequenceNumber, String status, String outputPath) {
-        if (outputPath == null || outputPath.isBlank()) {
-            return fallbackSequenceOutcomeLabel(sequenceNumber);
+    private List<SequenceVerdictDto> resolveSequenceVerdicts(int sequenceNumber, String outputPath) {
+        if (outputPath != null && !outputPath.isBlank()) {
+            try {
+                Path outputBasePath = Paths.get(outputPath).normalize();
+                Path runOutputDirectory = outputBasePath.getParent();
+                if (runOutputDirectory != null) {
+                    Path reportsDirectory = runOutputDirectory.resolve("reports");
+                    if (Files.isDirectory(reportsDirectory)) {
+                        String baseName = outputBasePath.getFileName() == null
+                            ? null
+                            : outputBasePath.getFileName().toString();
+                        List<ResultFileSummaryDto> files = new ArrayList<>();
+                        collectPreviewableFiles(reportsDirectory, baseName, files);
+                        if (!files.isEmpty()) {
+                            return buildSequenceVerdicts(files, sequenceNumber);
+                        }
+                    }
+                }
+            } catch (Exception ignored) {
+                // Fall back to the latest workspace output group.
+            }
         }
 
-        try {
-            Path outputBasePath = Paths.get(outputPath).normalize();
-            Path runOutputDirectory = outputBasePath.getParent();
-            if (runOutputDirectory == null) {
-                return fallbackSequenceOutcomeLabel(sequenceNumber);
-            }
-
-            Path reportsDirectory = runOutputDirectory.resolve("reports");
-            if (!Files.isDirectory(reportsDirectory)) {
-                return fallbackSequenceOutcomeLabel(sequenceNumber);
-            }
-
-            String baseName = outputBasePath.getFileName() == null ? null : outputBasePath.getFileName().toString();
-            List<ResultFileSummaryDto> files = new ArrayList<>();
-            collectPreviewableFiles(reportsDirectory, baseName, files);
-            if (files.isEmpty()) {
-                return fallbackSequenceOutcomeLabel(sequenceNumber);
-            }
-
-            files.sort(Comparator.comparing(ResultFileSummaryDto::path));
-            ResultFileSummaryDto selectedFile = selectSequenceOutcomeFile(files, status);
-            return formatSequenceOutcomeLabel(selectedFile.name(), sequenceNumber);
-        } catch (Exception ignored) {
-            return fallbackSequenceOutcomeLabel(sequenceNumber);
-        }
+        return resolveLatestSequenceVerdicts(sequenceNumber);
     }
 
-    private ResultFileSummaryDto selectSequenceOutcomeFile(List<ResultFileSummaryDto> files, String status) {
-        if ("failed".equals(status)) {
-            for (ResultFileSummaryDto file : files) {
-                if ("failed".equals(file.status())) {
-                    return file;
+    private List<SequenceVerdictDto> resolveLatestSequenceVerdicts(int sequenceNumber) {
+        Path installBinDirectory = currentInstallBinDirectory != null
+            ? currentInstallBinDirectory
+            : lastInstallBinDirectory;
+        String workspaceName = currentWorkspace != null ? currentWorkspace : lastWorkspace;
+        if (installBinDirectory == null || workspaceName == null || workspaceName.isBlank()) {
+            return List.of();
+        }
+
+        Path outputDirectory = ResultWorkspacePaths.workspaceOutputDirectory(
+            installBinDirectory,
+            workspaceName
+        );
+        if (!Files.isDirectory(outputDirectory)) {
+            return List.of();
+        }
+
+        try (var children = Files.list(outputDirectory)) {
+            List<Path> outputGroups = children
+                .filter(Files::isDirectory)
+                .filter(path -> !"graphs".equalsIgnoreCase(path.getFileName().toString()))
+                .sorted(Comparator.comparing(path -> path.getFileName().toString(), Comparator.reverseOrder()))
+                .toList();
+
+            for (Path outputGroup : outputGroups) {
+                Path reportsDirectory = outputGroup.resolve("reports");
+                if (!Files.isDirectory(reportsDirectory)) {
+                    continue;
+                }
+
+                List<ResultFileSummaryDto> files = new ArrayList<>();
+                collectPreviewableFiles(reportsDirectory, null, files);
+                List<ResultFileSummaryDto> sequenceFiles = filterSequenceVerdictFiles(files, sequenceNumber);
+                if (!sequenceFiles.isEmpty()) {
+                    return buildSequenceVerdicts(sequenceFiles, sequenceNumber);
                 }
             }
+        } catch (IOException ignored) {
+            // The output may still be in use while the sequence is finishing.
         }
 
-        for (ResultFileSummaryDto file : files) {
-            if ("ok".equals(file.status())) {
-                return file;
-            }
-        }
-
-        return files.get(0);
+        return List.of();
     }
 
-    private String formatSequenceOutcomeLabel(String fileName, int sequenceNumber) {
+    static List<ResultFileSummaryDto> filterSequenceVerdictFiles(
+        List<ResultFileSummaryDto> files,
+        int sequenceNumber
+    ) {
+        return files.stream()
+            .filter(file -> {
+                Matcher matcher = SEQUENCE_REPORT_PATTERN.matcher(file.name());
+                return matcher.matches() && Integer.parseInt(matcher.group(1)) == sequenceNumber;
+            })
+            .sorted(Comparator.comparing(ResultFileSummaryDto::path))
+            .toList();
+    }
+
+    static List<SequenceVerdictDto> buildSequenceVerdicts(
+        List<ResultFileSummaryDto> files,
+        int sequenceNumber
+    ) {
+        return filterSequenceVerdictFiles(files, sequenceNumber).stream()
+            .sorted(Comparator.comparing(ResultFileSummaryDto::path))
+            .map(file -> new SequenceVerdictDto(
+                formatSequenceOutcomeLabel(file.name(), sequenceNumber),
+                file.status(),
+                file.path()
+            ))
+            .toList();
+    }
+
+    private static String formatSequenceOutcomeLabel(String fileName, int sequenceNumber) {
         if (fileName == null || fileName.isBlank()) {
             return fallbackSequenceOutcomeLabel(sequenceNumber);
         }
@@ -597,7 +699,7 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
         return trimmedExtension;
     }
 
-    private String fallbackSequenceOutcomeLabel(int sequenceNumber) {
+    private static String fallbackSequenceOutcomeLabel(int sequenceNumber) {
         return "sequence_" + sequenceNumber;
     }
 

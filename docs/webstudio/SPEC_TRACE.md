@@ -341,6 +341,7 @@ Keep the main functional and UX specs readable. Use this file when a reader need
 - [runtimeApi.test.js](../../webstudio/frontend/test/views/runtime/runtimeApi.test.js)
 - [runtimeModel.test.js](../../webstudio/frontend/test/views/runtime/runtimeModel.test.js)
 - [runtimeModeControls.test.js](../../webstudio/frontend/test/models/runtimeModeControls.test.js)
+- [ScriptlessSequenceVerdictTest.java](../../webstudio/test/org/testar/webstudio/execution/ScriptlessSequenceVerdictTest.java)
 
 **Integration tests**
 

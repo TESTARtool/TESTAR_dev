@@ -1,4 +1,4 @@
-// Implements WS-FUNC-RUNTIME-EXECUTION-001 and WS-UX-RUNTIME-EXECUTION-001:
+// Implements WS-FUNC-RUNTIME-EXECUTION-001:
 // maps runtime actions, pages, and user-facing feedback messages.
 export const RUNTIME_ACTIONS = {
     GENERATE: "generate",
@@ -58,6 +58,49 @@ export function runtimePageForAction(action) {
 
 export function runtimeStatusReturnedError(status) {
     return status?.status === "error";
+}
+
+export function formatSequenceOutcomeLabel(sequenceOutcome) {
+    if (!sequenceOutcome) {
+        return "";
+    }
+
+    if (sequenceOutcome.label) {
+        return sequenceOutcome.label;
+    }
+
+    if (sequenceOutcome.outputPath) {
+        const outputPathSegments = sequenceOutcome.outputPath.split(/[\\/]/);
+        const fileName = outputPathSegments[outputPathSegments.length - 1] || "";
+        const trimmedExtension = fileName.replace(/\.html?$/i, "");
+        const sequenceIndex = trimmedExtension.indexOf("_sequence_");
+        if (sequenceIndex >= 0) {
+            return trimmedExtension.substring(sequenceIndex + 1);
+        }
+
+        if (trimmedExtension) {
+            return trimmedExtension;
+        }
+    }
+
+    return `sequence_${sequenceOutcome.sequenceNumber}`;
+}
+
+export function sequenceVerdicts(sequenceOutcome) {
+    if (sequenceOutcome?.verdicts?.length > 0) {
+        const aggregateLabel = `sequence_${sequenceOutcome.sequenceNumber}`;
+        const detailedVerdicts = sequenceOutcome.verdicts.filter((verdict) => {
+            return verdict.label !== aggregateLabel;
+        });
+
+        return detailedVerdicts.length > 0 ? detailedVerdicts : sequenceOutcome.verdicts;
+    }
+
+    return [{
+        label: formatSequenceOutcomeLabel(sequenceOutcome),
+        status: sequenceOutcome?.status || "ok",
+        outputPath: sequenceOutcome?.outputPath || null
+    }];
 }
 
 export function runtimeFeedbackMessage(status, fallbackMessage) {
