@@ -129,7 +129,7 @@ Status colors are meaningful and consistent, but color is not the only signal. L
 
 ## Acceptance Scenarios
 
-### WS-SCENARIO-TOP-NAV-001 - Guarded Role Selector Does Not Show Uncommitted Role
+### WS-SCENARIO-ROLE-SWITCH-001 - Guarded Role Selector Does Not Show Uncommitted Role
 
 Verification: `webStudioRoles.test.js`, `committedSelectModel.test.js`, `configurationGuard.test.js`
 

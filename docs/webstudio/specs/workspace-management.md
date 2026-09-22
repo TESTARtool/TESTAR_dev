@@ -86,7 +86,7 @@ The modal must not resize the page layout. Validation feedback appears inside th
 
 ## Acceptance Scenarios
 
-### WS-SCENARIO-TOP-NAV-002 - Guarded Workspace Selector Does Not Show Uncommitted Workspace
+### WS-SCENARIO-WORKSPACE-SWITCH-001 - Guarded Workspace Selector Does Not Show Uncommitted Workspace
 
 Verification: `committedSelectModel.test.js`, `configurationGuard.test.js`
 
