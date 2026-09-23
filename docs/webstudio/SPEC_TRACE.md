@@ -963,6 +963,7 @@ Keep the main functional and UX specs readable. Use this file when a reader need
 - [TestOracleController.java](../../webstudio/src/org/testar/webstudio/api/TestOracleController.java)
 - [TestOracleService.java](../../webstudio/src/org/testar/webstudio/testoracle/TestOracleService.java)
 - [OracleSelection.java](../../oracle/src/org/testar/oracle/OracleSelection.java)
+- [testar/build.gradle](../../testar/build.gradle)
 - [WorkspaceJavaCompileResultDto.java](../../webstudio/src/org/testar/webstudio/api/dto/WorkspaceJavaCompileResultDto.java)
 - [WorkspaceJavaCompileDiagnosticDto.java](../../webstudio/src/org/testar/webstudio/api/dto/WorkspaceJavaCompileDiagnosticDto.java)
 

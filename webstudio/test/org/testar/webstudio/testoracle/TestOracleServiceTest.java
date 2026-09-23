@@ -61,6 +61,34 @@ public class TestOracleServiceTest {
     }
 
     @Test
+    public void inventoryIsCachedUntilWorkspaceOracleInputsChange() throws Exception {
+        TestOracleService testOracleService = createServiceWithWorkspace("webdriver_generic");
+
+        TestOracleInventoryDto initialInventory = testOracleService.inventory("webdriver_generic");
+        TestOracleInventoryDto cachedInventory = testOracleService.inventory("webdriver_generic");
+
+        Assert.assertSame(initialInventory, cachedInventory);
+
+        Path existingOracle = workspaceDirectory("webdriver_generic")
+            .resolve("oracles")
+            .resolve("java")
+            .resolve("WorkspaceJavaOracle.java");
+        String additionalOracleSource = Files.readString(existingOracle, StandardCharsets.UTF_8)
+            .replace("WorkspaceJavaOracle", "AdditionalWorkspaceOracle");
+        Files.writeString(
+            existingOracle.getParent().resolve("AdditionalWorkspaceOracle.java"),
+            additionalOracleSource,
+            StandardCharsets.UTF_8
+        );
+
+        TestOracleInventoryDto refreshedInventory = testOracleService.inventory("webdriver_generic");
+
+        Assert.assertNotSame(initialInventory, refreshedInventory);
+        Assert.assertTrue(refreshedInventory.items().stream()
+            .anyMatch(item -> "AdditionalWorkspaceOracle".equals(item.name())));
+    }
+
+    @Test
     public void inventoryMarksWorkspaceJavaOracleThatOverridesBuiltInName() throws Exception {
         TestOracleService testOracleService = createServiceWithWorkspace("webdriver_generic");
         String builtInOracleName = OracleSelection.getAvailableBuiltInOracles().stream()

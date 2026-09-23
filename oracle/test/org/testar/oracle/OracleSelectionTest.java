@@ -111,6 +111,26 @@ public class OracleSelectionTest {
     }
 
     @Test
+    public void modifiedWorkspaceOraclesCompileInOneBatch() throws Exception {
+        File javaOraclesDir = new File(TestarDirectories.getWorkspaceOracleJavaDir());
+        writeWorkspaceOracle(javaOraclesDir, "SecondWorkspaceOracle");
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        PrintStream previousOut = System.out;
+
+        try {
+            System.setOut(new PrintStream(output, true, StandardCharsets.UTF_8));
+            OracleSelection.getAvailableExtendedOracles();
+        } finally {
+            System.setOut(previousOut);
+        }
+
+        String outputText = output.toString(StandardCharsets.UTF_8);
+        assertEquals(1, countOccurrences(outputText, "Compiling added or modified external oracles"));
+        assertTrue(outputText.contains("WorkspaceJavaOracle.java"));
+        assertTrue(outputText.contains("SecondWorkspaceOracle.java"));
+    }
+
+    @Test
     public void loadExtendedOraclesPrintsWorkspaceLoadingProgressWhenSourcesAreCurrent() {
         OracleSelection.loadExtendedOracles("WorkspaceJavaOracle");
 
@@ -133,6 +153,16 @@ public class OracleSelectionTest {
 
     private void writeWorkspaceOracle(File javaOraclesDir) throws Exception {
         writeWorkspaceOracle(javaOraclesDir, "WorkspaceJavaOracle");
+    }
+
+    private int countOccurrences(String value, String expected) {
+        int count = 0;
+        int offset = 0;
+        while ((offset = value.indexOf(expected, offset)) >= 0) {
+            count++;
+            offset += expected.length();
+        }
+        return count;
     }
 
     private void writeWorkspaceOracle(File javaOraclesDir, String className) throws Exception {

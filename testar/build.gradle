@@ -90,6 +90,41 @@ task prepareSettings(type: Copy) {
     into 'target/scripts/settings'
 }
 
+def bundledOracleCompileTasks = []
+file('resources/settings').listFiles()
+    ?.findAll { workspaceDirectory -> workspaceDirectory.isDirectory() }
+    ?.each { workspaceDirectory ->
+        def oracleJavaDirectory = new File(workspaceDirectory, 'oracles/java')
+        def oracleJavaSources = fileTree(oracleJavaDirectory) {
+            include '**/*.java'
+        }
+        if (oracleJavaSources.isEmpty()) {
+            return
+        }
+
+        def workspaceTaskName = workspaceDirectory.name
+            .split(/[^A-Za-z0-9]+/)
+            .findAll { part -> !part.isEmpty() }
+            .collect { part -> part.capitalize() }
+            .join('')
+        def compileTask = tasks.register("compile${workspaceTaskName}BundledOracleJava", JavaCompile) {
+            group = 'distribution'
+            description = "Compile bundled Java oracles for the ${workspaceDirectory.name} workspace."
+            dependsOn tasks.named('startScripts')
+            source oracleJavaSources
+            classpath = sourceSets.main.runtimeClasspath
+            destinationDirectory = file("target/scripts/settings/${workspaceDirectory.name}/oracles/compiled")
+            options.encoding = 'UTF-8'
+        }
+        bundledOracleCompileTasks.add(compileTask)
+    }
+
+tasks.register('compileBundledOracleJava') {
+    group = 'distribution'
+    description = 'Compile bundled workspace Java oracles before packaging TESTAR.'
+    dependsOn bundledOracleCompileTasks
+}
+
 task prepareSUTs(type: Copy) {
     from 'distributionSUTs'
     into 'target/scripts/suts'
@@ -169,6 +204,10 @@ startScripts {
 startScripts.dependsOn {
     tasks.findAll { task -> task.name.startsWith('prepare')}
 }
+
+installDist.dependsOn(tasks.named('compileBundledOracleJava'))
+distZip.dependsOn(tasks.named('compileBundledOracleJava'))
+distTar.dependsOn(tasks.named('compileBundledOracleJava'))
 
 //running testar requires the distribution to be installed.
 runTestar.dependsOn(installDist)

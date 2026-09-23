@@ -14,6 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +24,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.zip.CRC32;
 
 import javax.tools.Diagnostic;
 import javax.tools.DiagnosticCollector;
@@ -60,6 +62,7 @@ public final class TestOracleService {
     );
 
     private final WorkspaceService workspaceService;
+    private final Map<String, CachedOracleInventory> inventoryCache = new HashMap<>();
     private DslOracleCompiler dslOracleCompiler;
     private DslOracleMetadata dslOracleMetadata;
 
@@ -67,11 +70,17 @@ public final class TestOracleService {
         this.workspaceService = workspaceService;
     }
 
-    public TestOracleInventoryDto inventory(String workspaceName) {
+    public synchronized TestOracleInventoryDto inventory(String workspaceName) {
         Path workspaceDirectory = workspaceService.workspaceDirectory(workspaceName);
+        long inputFingerprint = inventoryFingerprint(workspaceDirectory);
+        CachedOracleInventory cachedInventory = inventoryCache.get(workspaceName);
+        if (cachedInventory != null && cachedInventory.fingerprint == inputFingerprint) {
+            return cachedInventory.inventory;
+        }
+
         List<String> activeOracles = readActiveOracles(workspaceDirectory);
 
-        return withWorkspaceOracleDirectories(workspaceName, () -> {
+        TestOracleInventoryDto inventory = withWorkspaceOracleDirectories(workspaceName, () -> {
             Set<String> activeOracleSet = new LinkedHashSet<>(activeOracles);
             List<String> builtInOracles = OracleSelection.getAvailableBuiltInOracles();
             Set<String> builtInOracleSet = new LinkedHashSet<>(builtInOracles);
@@ -111,6 +120,11 @@ public final class TestOracleService {
 
             return new TestOracleInventoryDto(workspaceName, activeOracles, items);
         });
+        inventoryCache.put(workspaceName, new CachedOracleInventory(
+            inventoryFingerprint(workspaceDirectory),
+            inventory
+        ));
+        return inventory;
     }
 
     public synchronized DslOracleMetadata dslMetadata() {
@@ -148,6 +162,7 @@ public final class TestOracleService {
         try {
             Files.createDirectories(file.getParent());
             Files.writeString(file, content == null ? "" : content, StandardCharsets.UTF_8);
+            invalidateInventory(workspaceName);
             return readDslFile(workspaceName, toRelativePath(dslRoot, file));
         } catch (IOException exception) {
             throw new IllegalStateException("Unable to save DSL oracle file: " + relativePath, exception);
@@ -176,6 +191,7 @@ public final class TestOracleService {
 
         try {
             Files.deleteIfExists(file);
+            invalidateInventory(workspaceName);
             return inventory(workspaceName);
         } catch (IOException exception) {
             throw new IllegalStateException("Unable to delete DSL oracle file: " + relativePath, exception);
@@ -242,6 +258,7 @@ public final class TestOracleService {
             Files.createDirectories(file.getParent());
             String sourceContent = content == null ? "" : content;
             Files.writeString(file, sourceContent, StandardCharsets.UTF_8);
+            invalidateInventory(workspaceName);
             return readJavaFile(workspaceName, toRelativePath(javaRoot, file));
         } catch (IOException exception) {
             throw new IllegalStateException("Unable to save Java oracle file: " + relativePath, exception);
@@ -280,6 +297,7 @@ public final class TestOracleService {
             }
             Files.deleteIfExists(file);
             disableOracleClassNames(workspaceName, deletedOracleNames);
+            invalidateInventory(workspaceName);
             return inventory(workspaceName);
         } catch (IOException exception) {
             throw new IllegalStateException("Unable to delete Java oracle file: " + relativePath, exception);
@@ -644,6 +662,7 @@ public final class TestOracleService {
                 settingsContentWithExtendedOracles(content, enabledOracles),
                 StandardCharsets.UTF_8
             );
+            invalidateInventory(workspaceName);
         } catch (IOException exception) {
             throw new IllegalStateException("Unable to enable workspace Java oracle classes.", exception);
         }
@@ -678,6 +697,7 @@ public final class TestOracleService {
                 settingsContentWithExtendedOracles(content, enabledOracles),
                 StandardCharsets.UTF_8
             );
+            invalidateInventory(workspaceName);
         } catch (IOException exception) {
             throw new IllegalStateException("Unable to disable deleted workspace Java oracle classes.", exception);
         }
@@ -714,6 +734,47 @@ public final class TestOracleService {
         return builder.toString();
     }
 
+    private synchronized void invalidateInventory(String workspaceName) {
+        inventoryCache.remove(workspaceName);
+    }
+
+    private long inventoryFingerprint(Path workspaceDirectory) {
+        CRC32 checksum = new CRC32();
+        List<Path> inventoryInputs = new ArrayList<>();
+        Path settingsFile = workspaceDirectory.resolve(TEST_SETTINGS_FILE);
+        if (Files.isRegularFile(settingsFile)) {
+            inventoryInputs.add(settingsFile);
+        }
+
+        Path oracleDirectory = workspaceDirectory.resolve("oracles");
+        if (Files.isDirectory(oracleDirectory)) {
+            try (Stream<Path> paths = Files.walk(oracleDirectory)) {
+                inventoryInputs.addAll(paths
+                    .filter(Files::isRegularFile)
+                    .filter(this::isOracleInventoryInput)
+                    .sorted()
+                    .collect(Collectors.toList()));
+            } catch (IOException exception) {
+                throw new IllegalStateException("Unable to fingerprint workspace oracles: " + oracleDirectory, exception);
+            }
+        }
+
+        for (Path input : inventoryInputs) {
+            try {
+                checksum.update(workspaceDirectory.relativize(input).toString().getBytes(StandardCharsets.UTF_8));
+                checksum.update(Files.readAllBytes(input));
+            } catch (IOException exception) {
+                throw new IllegalStateException("Unable to fingerprint workspace oracle input: " + input, exception);
+            }
+        }
+        return checksum.getValue();
+    }
+
+    private boolean isOracleInventoryInput(Path path) {
+        String fileName = path.getFileName().toString().toLowerCase();
+        return fileName.endsWith(".java") || fileName.endsWith(".testar");
+    }
+
     private <T> T withWorkspaceOracleDirectories(String workspaceName, WorkspaceOracleInventorySupplier<T> supplier) {
         String previousSettingsDirectory = TestarDirectories.getSettingsDir();
         String previousSelectedSse = TestarDirectories.getSelectedSse();
@@ -731,5 +792,16 @@ public final class TestOracleService {
     private interface WorkspaceOracleInventorySupplier<T> {
 
         T get();
+    }
+
+    private static final class CachedOracleInventory {
+
+        private final long fingerprint;
+        private final TestOracleInventoryDto inventory;
+
+        private CachedOracleInventory(long fingerprint, TestOracleInventoryDto inventory) {
+            this.fingerprint = fingerprint;
+            this.inventory = inventory;
+        }
     }
 }

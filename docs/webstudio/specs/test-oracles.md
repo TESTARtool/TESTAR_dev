@@ -31,6 +31,8 @@ The active Java oracle class names are stored in `ExtendedOracles`. Enablement c
 
 Workspace Java sources compile into `settings/<workspace>/oracles/compiled`. Java oracle class names must be unique inside the selected workspace.
 
+Bundled workspace Java oracles are precompiled when the TESTAR distribution is built. Runtime workspaces use lazy freshness checks: modified sources compile together when their inventory is first required, and unchanged inventories are reused until Java sources, DSL files, or enablement settings change.
+
 Java source edits use `Save and Compile`. DSL source edits use `Save and Generate Java-DSL`, which saves the source, validates it, and generates Java oracle classes into the workspace Java oracle directory.
 
 Generated Java files use the DSL file name with the `.java` extension. Generated Java oracle classes follow the same compile, enable, disable, and execution flow as manually written workspace Java oracles. New manual and generated Java oracle classes are enabled by default by adding their class names to `ExtendedOracles`.

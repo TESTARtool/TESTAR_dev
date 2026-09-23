@@ -123,6 +123,8 @@ Oracle responsibilities:
 - `java/` contains manually written Java oracles and Java files generated from DSL
 - `compiled/` contains compiled workspace oracle classes
 
+Distribution builds precompile Java oracle sources bundled with default workspaces. Runtime-created or edited workspaces retain lazy compilation: modified sources are compiled as one batch when first required, and WebStudio caches the complete workspace inventory using its oracle and settings content as the freshness boundary.
+
 The `ExtendedOracles` setting is the active list of enabled Java oracle class names.
 
 Workspace Java oracles are exposed as the editable extended oracle inventory.
