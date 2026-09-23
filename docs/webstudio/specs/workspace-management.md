@@ -21,10 +21,17 @@ The creation panel requires a new workspace name and an existing base workspace.
 
 The cloned workspace copies:
 
-- `test.settings`
+- `test.settings`, with workspace-local resource references updated for the new workspace
 - `composition.properties`
 - `policies.properties`
 - Java services, capabilities, and policies
+
+After cloning, workspace-local resource settings must reference the new workspace directory. This includes:
+
+- `CustomCompositionResource = ./settings/<new-workspace>/composition.properties`
+- `CustomPoliciesResource = ./settings/<new-workspace>/policies.properties`
+
+The cloned workspace therefore loads and edits its own composition and policies resources independently from its base workspace.
 
 The dialog provides optional copy controls for Test Goals and workspace Oracles. Both are checked by default.
 
@@ -37,6 +44,8 @@ After successful creation, WebStudio refreshes the workspace list, selects the n
 If creation fails, the dialog remains open and shows the error.
 
 The rename panel shows the current workspace name and requires a different unique safe folder name.
+
+After renaming, workspace-local resource settings in `test.settings` must reference the renamed workspace directory. `CustomCompositionResource` and `CustomPoliciesResource` must preserve their resource filenames while replacing the old workspace directory with the new workspace directory.
 
 After successful rename, WebStudio refreshes the workspace list, selects the renamed workspace, and opens `Test Settings` with `Edit Settings` as the default editor.
 
@@ -103,3 +112,26 @@ And the workspace selector shows `webdriver_generic`
 When the user accepts the guarded workspace change
 Then the application changes to workspace `android_generic`
 And the workspace selector shows `android_generic`
+
+### WS-SCENARIO-WORKSPACE-CREATE-001 - Clone Uses Its Own Composition and Policies Resources
+
+Verification: `WorkspaceServiceManagementTest.java`
+
+Given workspace `webdriver_generic` contains `composition.properties` and `policies.properties`
+And its `test.settings` contains `CustomCompositionResource = ./settings/webdriver_generic/composition.properties`
+And its `test.settings` contains `CustomPoliciesResource = ./settings/webdriver_generic/policies.properties`
+When the user creates workspace `webdriver_cloned` using `webdriver_generic` as its base
+Then `webdriver_cloned/test.settings` contains `CustomCompositionResource = ./settings/webdriver_cloned/composition.properties`
+And `webdriver_cloned/test.settings` contains `CustomPoliciesResource = ./settings/webdriver_cloned/policies.properties`
+And the cloned composition and policies files are available at those configured locations
+
+### WS-SCENARIO-WORKSPACE-RENAME-001 - Rename Updates Composition and Policies Resources
+
+Verification: `WorkspaceServiceManagementTest.java`
+
+Given workspace `webdriver_generic` contains `composition.properties` and `policies.properties`
+And its `test.settings` references those resources under `./settings/webdriver_generic`
+When the user renames the workspace to `webdriver_renamed`
+Then `webdriver_renamed/test.settings` contains `CustomCompositionResource = ./settings/webdriver_renamed/composition.properties`
+And `webdriver_renamed/test.settings` contains `CustomPoliciesResource = ./settings/webdriver_renamed/policies.properties`
+And the composition and policies files are available at those configured locations

@@ -7,11 +7,13 @@
 package org.testar.webstudio.workspace;
 
 import java.io.IOException;
+import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
@@ -49,6 +51,8 @@ public final class WorkspaceService {
     private static final String TEST_SETTINGS_FILE = "test.settings";
     private static final String COMPOSITION_FILE = "composition.properties";
     private static final String POLICIES_FILE = "policies.properties";
+    private static final String CUSTOM_COMPOSITION_RESOURCE = "CustomCompositionResource";
+    private static final String CUSTOM_POLICIES_RESOURCE = "CustomPoliciesResource";
     private static final String TEST_GOALS_DIRECTORY = "test_goals";
     private static final String ORACLES_DIRECTORY = "oracles";
     private static final String ORACLE_DSL_DIRECTORY = "dsl";
@@ -141,6 +145,13 @@ public final class WorkspaceService {
             Files.createDirectories(settingsRoot);
             copyWorkspaceDirectory(sourceDirectory, targetDirectory, copyTestGoals, copyOracles);
             ensureWorkspaceAssetDirectories(targetDirectory);
+            updateWorkspaceResourceSettings(
+                targetDirectory,
+                normalizedBaseWorkspaceName,
+                normalizedWorkspaceName,
+                sourceDirectory,
+                targetDirectory
+            );
             return listWorkspaces().stream()
                 .filter(workspace -> normalizedWorkspaceName.equals(workspace.name()))
                 .findFirst()
@@ -194,24 +205,48 @@ public final class WorkspaceService {
             throw new IllegalArgumentException("Output results already exist for workspace: " + normalizedNewWorkspaceName);
         }
 
+        boolean settingsUpdated = false;
+        boolean workspaceMoved = false;
+        boolean outputMoved = false;
         try {
+            settingsUpdated = updateWorkspaceResourceSettings(
+                sourceDirectory,
+                normalizedCurrentWorkspaceName,
+                normalizedNewWorkspaceName,
+                sourceDirectory,
+                targetDirectory
+            );
             Files.move(sourceDirectory, targetDirectory);
-            moveWorkspaceOutputDirectory(sourceOutputDirectory, targetOutputDirectory, sourceDirectory, targetDirectory);
-            return listWorkspaces().stream()
-                .filter(workspace -> normalizedNewWorkspaceName.equals(workspace.name()))
-                .findFirst()
-                .orElseGet(() -> new WorkspaceSummaryDto(
-                    normalizedNewWorkspaceName,
-                    targetDirectory.toString(),
-                    true,
-                    workspaceExists(cliSettingsRoot, normalizedNewWorkspaceName)
-                ));
+            workspaceMoved = true;
+            outputMoved = moveWorkspaceOutputDirectory(sourceOutputDirectory, targetOutputDirectory);
         } catch (IOException exception) {
+            rollbackWorkspaceRename(
+                sourceDirectory,
+                targetDirectory,
+                sourceOutputDirectory,
+                targetOutputDirectory,
+                settingsUpdated,
+                workspaceMoved,
+                outputMoved,
+                normalizedCurrentWorkspaceName,
+                normalizedNewWorkspaceName,
+                exception
+            );
             throw new IllegalStateException(
                 "Unable to rename workspace " + normalizedCurrentWorkspaceName + " to " + normalizedNewWorkspaceName,
                 exception
             );
         }
+
+        return listWorkspaces().stream()
+            .filter(workspace -> normalizedNewWorkspaceName.equals(workspace.name()))
+            .findFirst()
+            .orElseGet(() -> new WorkspaceSummaryDto(
+                normalizedNewWorkspaceName,
+                targetDirectory.toString(),
+                true,
+                workspaceExists(cliSettingsRoot, normalizedNewWorkspaceName)
+            ));
     }
 
     private Path workspaceOutputDirectory(String workspaceName) {
@@ -224,32 +259,63 @@ public final class WorkspaceService {
         return workspaceOutputDirectory;
     }
 
-    private void moveWorkspaceOutputDirectory(Path sourceOutputDirectory,
-                                              Path targetOutputDirectory,
-                                              Path sourceWorkspaceDirectory,
-                                              Path targetWorkspaceDirectory) throws IOException {
+    private boolean moveWorkspaceOutputDirectory(
+        Path sourceOutputDirectory,
+        Path targetOutputDirectory
+    ) throws IOException {
         if (!Files.exists(sourceOutputDirectory)) {
-            return;
+            return false;
         }
 
-        try {
-            Files.createDirectories(targetOutputDirectory.getParent());
-            Files.move(sourceOutputDirectory, targetOutputDirectory);
-        } catch (IOException outputMoveException) {
-            rollbackWorkspaceDirectoryRename(sourceWorkspaceDirectory, targetWorkspaceDirectory);
-            throw outputMoveException;
+        Files.createDirectories(targetOutputDirectory.getParent());
+        Files.move(sourceOutputDirectory, targetOutputDirectory);
+        return true;
+    }
+
+    private void rollbackWorkspaceRename(
+        Path sourceWorkspaceDirectory,
+        Path targetWorkspaceDirectory,
+        Path sourceOutputDirectory,
+        Path targetOutputDirectory,
+        boolean settingsUpdated,
+        boolean workspaceMoved,
+        boolean outputMoved,
+        String sourceWorkspaceName,
+        String targetWorkspaceName,
+        IOException originalException
+    ) {
+        if (outputMoved) {
+            rollbackMove(targetOutputDirectory, sourceOutputDirectory, originalException);
+        }
+
+        if (workspaceMoved) {
+            rollbackMove(targetWorkspaceDirectory, sourceWorkspaceDirectory, originalException);
+        }
+
+        if (settingsUpdated && Files.isDirectory(sourceWorkspaceDirectory)) {
+            try {
+                updateWorkspaceResourceSettings(
+                    sourceWorkspaceDirectory,
+                    targetWorkspaceName,
+                    sourceWorkspaceName,
+                    targetWorkspaceDirectory,
+                    sourceWorkspaceDirectory
+                );
+            } catch (IOException rollbackException) {
+                originalException.addSuppressed(rollbackException);
+            }
         }
     }
 
-    private void rollbackWorkspaceDirectoryRename(Path sourceWorkspaceDirectory, Path targetWorkspaceDirectory) {
-        if (Files.exists(sourceWorkspaceDirectory) || !Files.exists(targetWorkspaceDirectory)) {
+    private void rollbackMove(Path currentPath, Path originalPath, IOException originalException) {
+        if (!Files.exists(currentPath) || Files.exists(originalPath)) {
             return;
         }
 
         try {
-            Files.move(targetWorkspaceDirectory, sourceWorkspaceDirectory);
+            Files.move(currentPath, originalPath);
         } catch (IOException rollbackException) {
-            throw new IllegalStateException("Unable to rollback workspace rename after output move failure.", rollbackException);
+            originalException.addSuppressed(rollbackException);
         }
     }
 
@@ -581,6 +647,140 @@ public final class WorkspaceService {
                 }
             }
         }
+    }
+
+    private boolean updateWorkspaceResourceSettings(
+        Path workspaceDirectory,
+        String sourceWorkspaceName,
+        String targetWorkspaceName,
+        Path sourceDirectory,
+        Path targetDirectory
+    ) throws IOException {
+        Path testSettingsFile = workspaceDirectory.resolve(TEST_SETTINGS_FILE);
+        if (!Files.isRegularFile(testSettingsFile)) {
+            return false;
+        }
+
+        List<String> lines = Files.readAllLines(testSettingsFile, StandardCharsets.UTF_8);
+        List<String> updatedLines = lines.stream()
+            .map(line -> updateWorkspaceResourceSettingLine(
+                line,
+                CUSTOM_COMPOSITION_RESOURCE,
+                sourceWorkspaceName,
+                targetWorkspaceName,
+                sourceDirectory,
+                targetDirectory
+            ))
+            .map(line -> updateWorkspaceResourceSettingLine(
+                line,
+                CUSTOM_POLICIES_RESOURCE,
+                sourceWorkspaceName,
+                targetWorkspaceName,
+                sourceDirectory,
+                targetDirectory
+            ))
+            .collect(Collectors.toList());
+
+        if (!lines.equals(updatedLines)) {
+            writeSettingsAtomically(testSettingsFile, updatedLines);
+            return true;
+        }
+
+        return false;
+    }
+
+    private void writeSettingsAtomically(Path testSettingsFile, List<String> lines) throws IOException {
+        Path temporaryFile = Files.createTempFile(testSettingsFile.getParent(), "test.settings-", ".tmp");
+        try {
+            Files.write(temporaryFile, lines, StandardCharsets.UTF_8);
+            try {
+                Files.move(
+                    temporaryFile,
+                    testSettingsFile,
+                    StandardCopyOption.ATOMIC_MOVE,
+                    StandardCopyOption.REPLACE_EXISTING
+                );
+            } catch (AtomicMoveNotSupportedException exception) {
+                Files.move(temporaryFile, testSettingsFile, StandardCopyOption.REPLACE_EXISTING);
+            }
+        } finally {
+            Files.deleteIfExists(temporaryFile);
+        }
+    }
+
+    private String updateWorkspaceResourceSettingLine(
+        String line,
+        String settingName,
+        String sourceWorkspaceName,
+        String targetWorkspaceName,
+        Path sourceDirectory,
+        Path targetDirectory
+    ) {
+        int separatorIndex = line.indexOf('=');
+        if (separatorIndex < 0 || !line.substring(0, separatorIndex).trim().equals(settingName)) {
+            return line;
+        }
+
+        int valueStart = separatorIndex + 1;
+        while (valueStart < line.length() && Character.isWhitespace(line.charAt(valueStart))) {
+            valueStart++;
+        }
+
+        int valueEnd = line.length();
+        while (valueEnd > valueStart && Character.isWhitespace(line.charAt(valueEnd - 1))) {
+            valueEnd--;
+        }
+
+        String configuredValue = line.substring(valueStart, valueEnd);
+        String updatedValue = updateWorkspaceResourceValue(
+            configuredValue,
+            sourceWorkspaceName,
+            targetWorkspaceName,
+            sourceDirectory,
+            targetDirectory
+        );
+        if (configuredValue.equals(updatedValue)) {
+            return line;
+        }
+
+        return line.substring(0, valueStart)
+            + updatedValue
+            + line.substring(valueEnd);
+    }
+
+    private String updateWorkspaceResourceValue(
+        String configuredValue,
+        String sourceWorkspaceName,
+        String targetWorkspaceName,
+        Path sourceDirectory,
+        Path targetDirectory
+    ) {
+        String normalizedValue = configuredValue.replace('\\', '/');
+        String relativeSourcePrefix = "./settings/" + sourceWorkspaceName + "/";
+        if (normalizedValue.startsWith(relativeSourcePrefix)) {
+            return "./settings/" + targetWorkspaceName + "/"
+                + normalizedValue.substring(relativeSourcePrefix.length());
+        }
+
+        String settingsSourcePrefix = "settings/" + sourceWorkspaceName + "/";
+        if (normalizedValue.startsWith(settingsSourcePrefix)) {
+            return "settings/" + targetWorkspaceName + "/"
+                + normalizedValue.substring(settingsSourcePrefix.length());
+        }
+
+        Path configuredPath = Paths.get(configuredValue);
+        if (!configuredPath.isAbsolute()) {
+            return configuredValue;
+        }
+
+        Path normalizedConfiguredPath = configuredPath.toAbsolutePath().normalize();
+        Path normalizedSourceDirectory = sourceDirectory.toAbsolutePath().normalize();
+        if (!normalizedConfiguredPath.startsWith(normalizedSourceDirectory)) {
+            return configuredValue;
+        }
+
+        Path relativeResourcePath = normalizedSourceDirectory.relativize(normalizedConfiguredPath);
+        return targetDirectory.resolve(relativeResourcePath).toString();
     }
 
     private boolean shouldCopyWorkspacePath(

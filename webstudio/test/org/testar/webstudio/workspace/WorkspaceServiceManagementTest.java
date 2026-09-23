@@ -22,14 +22,22 @@ public class WorkspaceServiceManagementTest {
         Path baseWorkspace = createBaseWorkspace(roots.testarSettingsRoot);
         WorkspaceService workspaceService = new WorkspaceService(roots.testarSettingsRoot, roots.cliSettingsRoot);
 
-        workspaceService.createWorkspace("webdriver_parabank", "webdriver_generic", true, true);
+        workspaceService.createWorkspace("webdriver_cloned", "webdriver_generic", true, true);
 
-        Path clonedWorkspace = roots.testarSettingsRoot.resolve("webdriver_parabank");
+        Path clonedWorkspace = roots.testarSettingsRoot.resolve("webdriver_cloned");
         Assert.assertTrue(Files.isDirectory(clonedWorkspace));
-        Assert.assertEquals(
-            Files.readString(baseWorkspace.resolve("test.settings")),
-            Files.readString(clonedWorkspace.resolve("test.settings"))
-        );
+        String clonedSettings = Files.readString(clonedWorkspace.resolve("test.settings"));
+        Assert.assertTrue(clonedSettings.contains(
+            "CustomCompositionResource = ./settings/webdriver_cloned/composition.properties"
+        ));
+        Assert.assertTrue(clonedSettings.contains(
+            "CustomPoliciesResource = ./settings/webdriver_cloned/policies.properties"
+        ));
+        Assert.assertTrue(Files.readString(baseWorkspace.resolve("test.settings")).contains(
+            "CustomCompositionResource = ./settings/webdriver_generic/composition.properties"
+        ));
+        Assert.assertTrue(Files.isRegularFile(clonedWorkspace.resolve("composition.properties")));
+        Assert.assertTrue(Files.isRegularFile(clonedWorkspace.resolve("policies.properties")));
         Assert.assertEquals(
             Files.readString(baseWorkspace.resolve("WebdriverGenericSystemService.java")),
             Files.readString(clonedWorkspace.resolve("WebdriverGenericSystemService.java"))
@@ -107,17 +115,26 @@ public class WorkspaceServiceManagementTest {
         Files.writeString(outputFile, "<html></html>", StandardCharsets.UTF_8);
         WorkspaceService workspaceService = new WorkspaceService(roots.testarSettingsRoot, roots.cliSettingsRoot);
 
-        workspaceService.renameWorkspace("webdriver_generic", "webdriver_parabank");
+        workspaceService.renameWorkspace("webdriver_generic", "webdriver_renamed");
 
         Assert.assertFalse(Files.exists(roots.testarSettingsRoot.resolve("webdriver_generic")));
-        Assert.assertTrue(Files.isDirectory(roots.testarSettingsRoot.resolve("webdriver_parabank")));
-        Assert.assertTrue(Files.isRegularFile(roots.testarSettingsRoot.resolve("webdriver_parabank").resolve("test.settings")));
+        Assert.assertTrue(Files.isDirectory(roots.testarSettingsRoot.resolve("webdriver_renamed")));
+        Assert.assertTrue(Files.isRegularFile(roots.testarSettingsRoot.resolve("webdriver_renamed").resolve("test.settings")));
         Assert.assertTrue(Files.isRegularFile(
-            roots.testarSettingsRoot.resolve("webdriver_parabank").resolve("test_goals").resolve("login.yaml")
+            roots.testarSettingsRoot.resolve("webdriver_renamed").resolve("test_goals").resolve("login.yaml")
         ));
         Assert.assertFalse(Files.exists(roots.testarOutputRoot.resolve("webdriver_generic")));
         Assert.assertTrue(Files.isRegularFile(
-            roots.testarOutputRoot.resolve("webdriver_parabank").resolve("run").resolve("reports").resolve("sequence_1.html")
+            roots.testarOutputRoot.resolve("webdriver_renamed").resolve("run").resolve("reports").resolve("sequence_1.html")
+        ));
+        String renamedSettings = Files.readString(
+            roots.testarSettingsRoot.resolve("webdriver_renamed").resolve("test.settings")
+        );
+        Assert.assertTrue(renamedSettings.contains(
+            "CustomCompositionResource = ./settings/webdriver_renamed/composition.properties"
+        ));
+        Assert.assertTrue(renamedSettings.contains(
+            "CustomPoliciesResource = ./settings/webdriver_renamed/policies.properties"
         ));
     }
 
@@ -127,11 +144,44 @@ public class WorkspaceServiceManagementTest {
         createBaseWorkspace(roots.testarSettingsRoot);
         WorkspaceService workspaceService = new WorkspaceService(roots.testarSettingsRoot, roots.cliSettingsRoot);
 
-        workspaceService.renameWorkspace("webdriver_generic", "webdriver_parabank");
+        workspaceService.renameWorkspace("webdriver_generic", "webdriver_renamed");
 
-        Assert.assertTrue(Files.isDirectory(roots.testarSettingsRoot.resolve("webdriver_parabank")));
+        Assert.assertTrue(Files.isDirectory(roots.testarSettingsRoot.resolve("webdriver_renamed")));
         Assert.assertFalse(Files.exists(roots.testarOutputRoot.resolve("webdriver_generic")));
-        Assert.assertFalse(Files.exists(roots.testarOutputRoot.resolve("webdriver_parabank")));
+        Assert.assertFalse(Files.exists(roots.testarOutputRoot.resolve("webdriver_renamed")));
+        String renamedSettings = Files.readString(
+            roots.testarSettingsRoot.resolve("webdriver_renamed").resolve("test.settings")
+        );
+        Assert.assertTrue(renamedSettings.contains(
+            "CustomCompositionResource = ./settings/webdriver_renamed/composition.properties"
+        ));
+        Assert.assertTrue(renamedSettings.contains(
+            "CustomPoliciesResource = ./settings/webdriver_renamed/policies.properties"
+        ));
+    }
+
+    @Test
+    public void renamesWorkspaceAndPreservesCustomResourceFileNames() throws IOException {
+        TestWorkspaceRoots roots = createWorkspaceRoots();
+        createBaseWorkspace(
+            roots.testarSettingsRoot,
+            "custom-composition.properties",
+            "custom-policies.properties"
+        );
+        WorkspaceService workspaceService = new WorkspaceService(roots.testarSettingsRoot, roots.cliSettingsRoot);
+
+        workspaceService.renameWorkspace("webdriver_generic", "webdriver_renamed");
+
+        Path renamedWorkspace = roots.testarSettingsRoot.resolve("webdriver_renamed");
+        String renamedSettings = Files.readString(renamedWorkspace.resolve("test.settings"));
+        Assert.assertTrue(renamedSettings.contains(
+            "CustomCompositionResource = ./settings/webdriver_renamed/custom-composition.properties"
+        ));
+        Assert.assertTrue(renamedSettings.contains(
+            "CustomPoliciesResource = ./settings/webdriver_renamed/custom-policies.properties"
+        ));
+        Assert.assertTrue(Files.isRegularFile(renamedWorkspace.resolve("custom-composition.properties")));
+        Assert.assertTrue(Files.isRegularFile(renamedWorkspace.resolve("custom-policies.properties")));
     }
 
     @Test
@@ -198,22 +248,32 @@ public class WorkspaceServiceManagementTest {
     }
 
     private Path createBaseWorkspace(Path settingsRoot) throws IOException {
+        return createBaseWorkspace(settingsRoot, "composition.properties", "policies.properties");
+    }
+
+    private Path createBaseWorkspace(
+        Path settingsRoot,
+        String compositionFileName,
+        String policiesFileName
+    ) throws IOException {
         Path baseWorkspace = settingsRoot.resolve("webdriver_generic");
         Files.createDirectories(baseWorkspace.resolve("test_goals"));
         Files.createDirectories(baseWorkspace.resolve("oracles").resolve("java"));
         Files.createDirectories(baseWorkspace.resolve("oracles").resolve("dsl"));
         Files.writeString(
             baseWorkspace.resolve("test.settings"),
-            "SUTConnector = WEB_DRIVER\n",
+            "SUTConnector = WEB_DRIVER\n"
+                + "CustomCompositionResource = ./settings/webdriver_generic/" + compositionFileName + "\n"
+                + "CustomPoliciesResource = ./settings/webdriver_generic/" + policiesFileName + "\n",
             StandardCharsets.UTF_8
         );
         Files.writeString(
-            baseWorkspace.resolve("composition.properties"),
+            baseWorkspace.resolve(compositionFileName),
             "systemServiceClass = WebdriverGenericSystemService\n",
             StandardCharsets.UTF_8
         );
         Files.writeString(
-            baseWorkspace.resolve("policies.properties"),
+            baseWorkspace.resolve(policiesFileName),
             "clickablePolicies = WebdriverGenericClickablePolicy\n",
             StandardCharsets.UTF_8
         );
