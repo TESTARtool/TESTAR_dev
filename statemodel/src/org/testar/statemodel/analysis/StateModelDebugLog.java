@@ -40,9 +40,9 @@ public final class StateModelDebugLog {
             Path resolvedPath = resolveDebugLogPath();
             Files.createDirectories(resolvedPath.getParent());
             OutputStream fileOutputStream = Files.newOutputStream(
-                resolvedPath,
-                StandardOpenOption.CREATE,
-                StandardOpenOption.APPEND
+                    resolvedPath,
+                    StandardOpenOption.CREATE,
+                    StandardOpenOption.APPEND
             );
             PrintStream debugPrintStream = new PrintStream(fileOutputStream, true, StandardCharsets.UTF_8);
             System.setOut(debugPrintStream);
@@ -74,11 +74,11 @@ public final class StateModelDebugLog {
                 builder.append(stringWriter).append(System.lineSeparator());
             }
             Files.writeString(
-                debugLogPath,
-                builder.toString(),
-                StandardCharsets.UTF_8,
-                StandardOpenOption.CREATE,
-                StandardOpenOption.APPEND
+                    debugLogPath,
+                    builder.toString(),
+                    StandardCharsets.UTF_8,
+                    StandardOpenOption.CREATE,
+                    StandardOpenOption.APPEND
             );
         } catch (IOException ignored) {
             // Avoid recursive logging failures.

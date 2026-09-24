@@ -67,8 +67,8 @@ public class JettyServer {
         webAppContext.setWar(resourceBase);
         webAppContext.setParentLoaderPriority(true);
         webAppContext.setAttribute(
-            "org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern",
-            ".*/jakarta.servlet.jsp.jstl-api-[^/]*\\.jar$|.*/jakarta.servlet.jsp.jstl-[^/]*\\.jar$|.*/taglibs-standard-impl-[^/]*\\.jar$|.*/taglibs-standard-spec-[^/]*\\.jar$"
+                "org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern",
+                ".*/jakarta.servlet.jsp.jstl-api-[^/]*\\.jar$|.*/jakarta.servlet.jsp.jstl-[^/]*\\.jar$|.*/taglibs-standard-impl-[^/]*\\.jar$|.*/taglibs-standard-spec-[^/]*\\.jar$"
         );
         webAppContext.setConfigurations(new Configuration[]{
             new WebInfConfiguration(),

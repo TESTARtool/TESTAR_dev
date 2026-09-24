@@ -66,4 +66,3 @@ public class AbstractStateTransitionTest {
         assertFalse(transition.canBeDelayed());
     }
 }
-

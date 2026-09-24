@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 public class QueryHelper {
     /**
      * Method used for parsing simple count queries (see usages).
-     * 
+     *
      * @param output Output of the query.
      * @param field Name of the output field to parse.
      * @return Parsed query response.
