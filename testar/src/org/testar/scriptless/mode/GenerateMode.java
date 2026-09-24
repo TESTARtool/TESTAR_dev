@@ -32,7 +32,7 @@ public class GenerateMode {
             protocol.initializeTestSession();
             protocol.runtimeContext().setSequenceCount(1);
 
-            while (protocol.runtimeContext().mode() != TestarMode.Quit && protocol.stopCriteriaTestSession()) {
+            while (protocol.runtimeContext().mode() != TestarMode.Quit && !protocol.stopCriteriaTestSession()) {
                 exceptionThrown = false;
                 SUT system = null;
 
@@ -98,7 +98,7 @@ public class GenerateMode {
         protocol.runtimeContext().sessionReportingManager().addActions(actions);
         protocol.runtimeContext().stateModelManager().notifyNewStateReached(state, actions);
 
-        while (protocol.runtimeContext().mode() != TestarMode.Quit && protocol.stopCriteriaTestSequence(state)) {
+        while (protocol.runtimeContext().mode() != TestarMode.Quit && !protocol.stopCriteriaTestSequence(state)) {
             LogSerialiser.log("Obtained system state in inner loop of TESTAR...\n", LogSerialiser.LogLevel.Debug);
             protocol.runtimeContext().canvas().begin();
             Util.clear(protocol.runtimeContext().canvas());

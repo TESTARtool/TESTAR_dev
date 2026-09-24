@@ -314,7 +314,7 @@ public abstract class ComposedProtocol implements Consumer<Settings> {
      * - a specified amount of executed actions, which is specified through the SequenceLength setting, or
      * - after a specific time, that is set in the MaxTime setting
      *
-     * @return  if <code>true</code> continue generation, else stop
+     * @return <code>true</code> when the current sequence should stop
      */
     public boolean stopCriteriaTestSequence(State state) {
         Assert.notNull(state);
@@ -324,12 +324,12 @@ public abstract class ComposedProtocol implements Consumer<Settings> {
     /**
      * StopCriteria for a test session:
      *
-     * TESTAR uses this method to determine when to stop the entire test sequence
+     * TESTAR uses this method to determine when to stop the test session
      * You could stop the test after:
      * - a specified amount of sequences, which is specified through the Sequences setting, or
      * - after a specific time, that is set in the MaxTime setting
      *
-     * @return  if <code>true</code> continue test, else stop
+     * @return <code>true</code> when the test session should stop
      */
     public boolean stopCriteriaTestSession() {
         return scriptlessCapabilities.stopCriteriaCapability().stopTestSession(runtimeContext);

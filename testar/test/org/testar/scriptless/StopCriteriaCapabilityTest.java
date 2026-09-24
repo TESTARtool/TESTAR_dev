@@ -28,7 +28,7 @@ public final class StopCriteriaCapabilityTest {
         context.setActionCount(1);
         context.setStartTime(Util.time());
 
-        assertTrue(new StopCriteriaCapability().stopTestSequence(context, state(true, false, Verdict.OK)));
+        assertFalse(new StopCriteriaCapability().stopTestSequence(context, state(true, false, Verdict.OK)));
     }
 
     @Test
@@ -37,13 +37,22 @@ public final class StopCriteriaCapabilityTest {
         context.setActionCount(1);
         context.setStartTime(Util.time() - 70.0);
 
-        assertFalse(new StopCriteriaCapability().stopTestSequence(context, state(true, false, Verdict.OK)));
+        assertTrue(new StopCriteriaCapability().stopTestSequence(context, state(true, false, Verdict.OK)));
     }
 
     @Test
     public void stopsWhenSequenceLengthIsExceeded() {
         RuntimeContext context = context(true, 5, 31536000.0);
         context.setActionCount(6);
+        context.setStartTime(Util.time());
+
+        assertTrue(new StopCriteriaCapability().stopTestSequence(context, state(true, false, Verdict.OK)));
+    }
+
+    @Test
+    public void continuesAtConfiguredSequenceLength() {
+        RuntimeContext context = context(true, 5, 31536000.0);
+        context.setActionCount(5);
         context.setStartTime(Util.time());
 
         assertFalse(new StopCriteriaCapability().stopTestSequence(context, state(true, false, Verdict.OK)));
@@ -55,7 +64,7 @@ public final class StopCriteriaCapabilityTest {
         context.setActionCount(1);
         context.setStartTime(Util.time());
 
-        assertFalse(new StopCriteriaCapability().stopTestSequence(
+        assertTrue(new StopCriteriaCapability().stopTestSequence(
                 context,
                 state(true, false, new Verdict(Verdict.Severity.SUSPICIOUS_TAG, "suspicious"))));
     }
@@ -66,7 +75,7 @@ public final class StopCriteriaCapabilityTest {
         context.setActionCount(1);
         context.setStartTime(Util.time());
 
-        assertTrue(new StopCriteriaCapability().stopTestSequence(
+        assertFalse(new StopCriteriaCapability().stopTestSequence(
                 context,
                 state(true, false, new Verdict(Verdict.Severity.SUSPICIOUS_TAG, "suspicious"))));
     }
@@ -77,8 +86,44 @@ public final class StopCriteriaCapabilityTest {
         context.setActionCount(1);
         context.setStartTime(Util.time());
 
-        assertFalse(new StopCriteriaCapability().stopTestSequence(context, state(false, false, Verdict.OK)));
-        assertFalse(new StopCriteriaCapability().stopTestSequence(context, state(true, true, Verdict.OK)));
+        assertTrue(new StopCriteriaCapability().stopTestSequence(context, state(false, false, Verdict.OK)));
+        assertTrue(new StopCriteriaCapability().stopTestSequence(context, state(true, true, Verdict.OK)));
+    }
+
+    @Test
+    public void continuesSessionWhileSequenceAndTimeLimitsAreNotReached() {
+        RuntimeContext context = context(true, 5, 31536000.0);
+        context.setSequenceCount(1);
+        context.setStartTime(Util.time());
+
+        assertFalse(new StopCriteriaCapability().stopTestSession(context));
+    }
+
+    @Test
+    public void continuesSessionAtConfiguredSequenceCount() {
+        RuntimeContext context = context(true, 5, 31536000.0);
+        context.setSequenceCount(3);
+        context.setStartTime(Util.time());
+
+        assertFalse(new StopCriteriaCapability().stopTestSession(context));
+    }
+
+    @Test
+    public void stopsSessionAfterConfiguredSequenceCount() {
+        RuntimeContext context = context(true, 5, 31536000.0);
+        context.setSequenceCount(4);
+        context.setStartTime(Util.time());
+
+        assertTrue(new StopCriteriaCapability().stopTestSession(context));
+    }
+
+    @Test
+    public void stopsSessionWhenMaximumTimeIsReached() {
+        RuntimeContext context = context(true, 5, 60.0);
+        context.setSequenceCount(1);
+        context.setStartTime(Util.time() - 70.0);
+
+        assertTrue(new StopCriteriaCapability().stopTestSession(context));
     }
 
     private RuntimeContext context(boolean stopOnFault, int sequenceLength, double maxTime) {
@@ -87,6 +132,7 @@ public final class StopCriteriaCapabilityTest {
         tags.add(Pair.from(ConfigTags.SUTConnectorValue, "https://example.org"));
         tags.add(Pair.from(ConfigTags.StopGenerationOnFault, stopOnFault));
         tags.add(Pair.from(ConfigTags.SequenceLength, sequenceLength));
+        tags.add(Pair.from(ConfigTags.Sequences, 3));
         tags.add(Pair.from(ConfigTags.MaxTime, maxTime));
         Settings settings = new Settings(tags, new Properties());
 

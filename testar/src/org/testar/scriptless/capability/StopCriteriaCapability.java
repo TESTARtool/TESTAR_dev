@@ -19,6 +19,9 @@ import java.util.List;
 
 public class StopCriteriaCapability {
 
+    /**
+     * @return true when the current test sequence should stop
+     */
     public boolean stopTestSequence(RuntimeContext runtimeContext, State state) {
         Assert.notNull(runtimeContext, state);
         List<Verdict> stateVerdicts = state.get(Tags.OracleVerdicts, Collections.singletonList(Verdict.OK));
@@ -27,16 +30,19 @@ public class StopCriteriaCapability {
 
         boolean faultySequence = !Verdict.helperAreAllVerdictsOK(filteredVerdicts);
 
-        return (!runtimeContext.settings().get(ConfigTags.StopGenerationOnFault) || !faultySequence)
-                && state.get(Tags.IsRunning, false)
-                && !state.get(Tags.NotResponding, false)
-                && runtimeContext.actionCount() <= runtimeContext.settings().get(ConfigTags.SequenceLength)
-                && (Util.time() - runtimeContext.startTime()) < runtimeContext.settings().get(ConfigTags.MaxTime);
+        return (runtimeContext.settings().get(ConfigTags.StopGenerationOnFault) && faultySequence)
+                || !state.get(Tags.IsRunning, false)
+                || state.get(Tags.NotResponding, false)
+                || runtimeContext.actionCount() > runtimeContext.settings().get(ConfigTags.SequenceLength)
+                || (Util.time() - runtimeContext.startTime()) >= runtimeContext.settings().get(ConfigTags.MaxTime);
     }
 
+    /**
+     * @return true when the test session should stop
+     */
     public boolean stopTestSession(RuntimeContext runtimeContext) {
         Assert.notNull(runtimeContext);
-        return runtimeContext.sequenceCount() <= runtimeContext.settings().get(ConfigTags.Sequences)
-                && (Util.time() - runtimeContext.startTime()) < runtimeContext.settings().get(ConfigTags.MaxTime);
+        return runtimeContext.sequenceCount() > runtimeContext.settings().get(ConfigTags.Sequences)
+                || (Util.time() - runtimeContext.startTime()) >= runtimeContext.settings().get(ConfigTags.MaxTime);
     }
 }
