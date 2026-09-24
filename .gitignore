@@ -11,6 +11,7 @@ node_modules/
 */.classpath
 .settings
 build.bat
+build/
 *.sse
 *.class
 *.log
