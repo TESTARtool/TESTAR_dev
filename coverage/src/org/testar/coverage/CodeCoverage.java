@@ -8,7 +8,7 @@ package org.testar.coverage;
 
 public interface CodeCoverage {
 
-	public void getSequenceCoverage();
-	public void getActionCoverage(String actionCount);
+    public void getSequenceCoverage();
+    public void getActionCoverage(String actionCount);
 
 }

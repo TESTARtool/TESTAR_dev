@@ -28,71 +28,71 @@ import org.apache.logging.log4j.Logger;
 
 /**
  * https://github.com/jacoco/jacoco/blob/master/org.jacoco.examples/src/org/jacoco/examples/MBeanClient.java
- * 
+ *
  * This example connects to a JaCoCo agent that runs with the option
  * <code>jmx=yes</code> and requests execution data. The collected data is
  * dumped to a local file.
  */
 public final class MBeanClient {
-	private static final Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger();
 
-	private String service_url;
+    private String service_url;
 
-	public MBeanClient(String service_ip_address, int service_port) {
-		// Initialize the JMX service to connect with the Jacoco Agent
-		service_url = "service:jmx:rmi:///jndi/rmi://" + service_ip_address + ":" + service_port + "/jmxrmi";
-	}
+    public MBeanClient(String service_ip_address, int service_port) {
+        // Initialize the JMX service to connect with the Jacoco Agent
+        service_url = "service:jmx:rmi:///jndi/rmi://" + service_ip_address + ":" + service_port + "/jmxrmi";
+    }
 
-	public interface IProxy {
-		String getVersion();
+    public interface IProxy {
+        String getVersion();
 
-		String getSessionId();
+        String getSessionId();
 
-		void setSessionId(String id);
+        void setSessionId(String id);
 
-		byte[] getExecutionData(boolean reset);
+        byte[] getExecutionData(boolean reset);
 
-		void dump(boolean reset);
+        void dump(boolean reset);
 
-		void reset();
-	}
+        void reset();
+    }
 
-	/**
-	 * Use JMX service to connect with the JVM and extract one JaCoCo report file.
-	 * IF success return the string that represents the path of this jacoco.exec file,
-	 * ELSE return empty string.
-	 *
-	 * @param destFile
-	 * @throws Exception
-	 * @return string that contains extracted jacoco.exec file
-	 */
-	public String dumpJacocoReport(String destJacocoFileName) {
-		try {
-			// Open connection to the coverage agent:
-			final JMXServiceURL url = new JMXServiceURL(service_url);
-			final JMXConnector jmxc = JMXConnectorFactory.connect(url, null);
-			final MBeanServerConnection connection = jmxc.getMBeanServerConnection();
+    /**
+     * Use JMX service to connect with the JVM and extract one JaCoCo report file.
+     * IF success return the string that represents the path of this jacoco.exec file,
+     * ELSE return empty string.
+     *
+     * @param destFile
+     * @throws Exception
+     * @return string that contains extracted jacoco.exec file
+     */
+    public String dumpJacocoReport(String destJacocoFileName) {
+        try {
+            // Open connection to the coverage agent:
+            final JMXServiceURL url = new JMXServiceURL(service_url);
+            final JMXConnector jmxc = JMXConnectorFactory.connect(url, null);
+            final MBeanServerConnection connection = jmxc.getMBeanServerConnection();
 
-			final IProxy proxy = (IProxy) MBeanServerInvocationHandler
-					.newProxyInstance(connection, new ObjectName("org.jacoco:type=Runtime"), IProxy.class, false);
+            final IProxy proxy = (IProxy) MBeanServerInvocationHandler
+                    .newProxyInstance(connection, new ObjectName("org.jacoco:type=Runtime"), IProxy.class, false);
 
-			// Retrieve dump and write to file:
-			final byte[] data = proxy.getExecutionData(false);
-			final FileOutputStream localFile = new FileOutputStream(destJacocoFileName);
-			localFile.write(data);
-			localFile.close();
+            // Retrieve dump and write to file:
+            final byte[] data = proxy.getExecutionData(false);
+            final FileOutputStream localFile = new FileOutputStream(destJacocoFileName);
+            localFile.write(data);
+            localFile.close();
 
-			logger.trace("MBeanClient extracted a jacoco report exec file: " + destJacocoFileName);
+            logger.trace("MBeanClient extracted a jacoco report exec file: " + destJacocoFileName);
 
-			// Close connection:
-			jmxc.close();
+            // Close connection:
+            jmxc.close();
 
-		} catch(Exception e) {
-			logger.error("MBeanClient was not able to dump the jacoco exec file " + destJacocoFileName);
-			// return an empty string to indicate we didn't create any jacoco.exec report
-			return "";
-		}
+        } catch (Exception e) {
+            logger.error("MBeanClient was not able to dump the jacoco exec file " + destJacocoFileName);
+            // return an empty string to indicate we didn't create any jacoco.exec report
+            return "";
+        }
 
-		return destJacocoFileName;
-	}
+        return destJacocoFileName;
+    }
 }

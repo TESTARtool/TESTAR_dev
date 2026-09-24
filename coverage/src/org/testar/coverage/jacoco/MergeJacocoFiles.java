@@ -33,103 +33,103 @@ import org.jacoco.maven.AbstractJacocoMojo;
  * @since 0.6.4
  */
 public class MergeJacocoFiles extends AbstractJacocoMojo {
-	private static final Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger();
 
-	/**
-	 * Path to the output file for execution data.
-	 */
-	private File destMergedFile;
+    /**
+     * Path to the output file for execution data.
+     */
+    private File destMergedFile;
 
-	/**
-	 * Deque to track exactly two exec jacocoFiles.
-	 */
-	private Deque<String> jacocoFiles = new ArrayDeque<>(2);
+    /**
+     * Deque to track exactly two exec jacocoFiles.
+     */
+    private Deque<String> jacocoFiles = new ArrayDeque<>(2);
 
-	/**
-	 * Indicate the list of existing jacoco.exec files and the desired output merged file
-	 * 
-	 * @param jacocoFiles
-	 * @param destFile
-	 */
-	public void testarExecuteMojo(JacocoReportCSV jacocoReportCSV, String jacocoFile) {
-		// Add the new file to the deque and manage size
-		addJacocoFile(jacocoFile);
+    /**
+     * Indicate the list of existing jacoco.exec files and the desired output merged file
+     *
+     * @param jacocoFiles
+     * @param destFile
+     */
+    public void testarExecuteMojo(JacocoReportCSV jacocoReportCSV, String jacocoFile) {
+        // Add the new file to the deque and manage size
+        addJacocoFile(jacocoFile);
 
-		if (!canMergeReports()) {
-			return;
-		}
+        if (!canMergeReports()) {
+            return;
+        }
 
-		// Merge the exec files and prepare the CSV results
-		String jacocoExecMerged = jacocoFile.replace(".exec", "_merged.exec");
-		String jacocoCsvMerged = jacocoFile.replace(".exec", "_merged.csv");
-		this.destMergedFile = new File(jacocoExecMerged);
-		executeMerge();
-		jacocoReportCSV.generateCSVresults(jacocoExecMerged, jacocoCsvMerged);
+        // Merge the exec files and prepare the CSV results
+        String jacocoExecMerged = jacocoFile.replace(".exec", "_merged.exec");
+        String jacocoCsvMerged = jacocoFile.replace(".exec", "_merged.csv");
+        this.destMergedFile = new File(jacocoExecMerged);
+        executeMerge();
+        jacocoReportCSV.generateCSVresults(jacocoExecMerged, jacocoCsvMerged);
 
-		// Finally, add the merged file to the deque and manage size
-		// This is because the last merged file is the one that tracks the accumulative coverage
-		addJacocoFile(jacocoExecMerged);
-	}
+        // Finally, add the merged file to the deque and manage size
+        // This is because the last merged file is the one that tracks the accumulative coverage
+        addJacocoFile(jacocoExecMerged);
+    }
 
-	/**
-	 * Adds a new jacoco file to the deque, replacing the oldest if it already contains two elements.
-	 * @param newJacocoFile
-	 */
-	private void addJacocoFile(String newJacocoFile) {
-		// If deque already contains 2 elements, remove the oldest (from the front)
-		if (jacocoFiles.size() == 2) {
-			jacocoFiles.removeFirst();
-		}
+    /**
+     * Adds a new jacoco file to the deque, replacing the oldest if it already contains two elements.
+     * @param newJacocoFile
+     */
+    private void addJacocoFile(String newJacocoFile) {
+        // If deque already contains 2 elements, remove the oldest (from the front)
+        if (jacocoFiles.size() == 2) {
+            jacocoFiles.removeFirst();
+        }
 
-		// Add the new file to the back of the deque
-		jacocoFiles.addLast(newJacocoFile);
+        // Add the new file to the back of the deque
+        jacocoFiles.addLast(newJacocoFile);
 
-		logger.trace("Added Jacoco file: " + newJacocoFile + ", updated files: " + jacocoFiles);
-	}
+        logger.trace("Added Jacoco file: " + newJacocoFile + ", updated files: " + jacocoFiles);
+    }
 
-	private boolean canMergeReports() {
-		if (jacocoFiles.size() != 2) {
-			logger.trace("Jacoco merge is not possible, we need two jacoco files");
-			return false;
-		}
-		return true;
-	}
+    private boolean canMergeReports() {
+        if (jacocoFiles.size() != 2) {
+            logger.trace("Jacoco merge is not possible, we need two jacoco files");
+            return false;
+        }
+        return true;
+    }
 
-	private void executeMerge() {
-		final ExecFileLoader loader = new ExecFileLoader();
+    private void executeMerge() {
+        final ExecFileLoader loader = new ExecFileLoader();
 
-		load(loader);
-		save(loader);
-	}
+        load(loader);
+        save(loader);
+    }
 
-	private void load(final ExecFileLoader loader) {
-		for(final String file : jacocoFiles) {
-			final File inputFile = new File(file);
-			try {
-				logger.trace("Loading execution data file " + inputFile.getAbsolutePath());
-				loader.load(inputFile);
-			} catch (final IOException e) {
-				logger.error("Unable to read " + inputFile.getAbsolutePath());
-			}
-		}
-	}
+    private void load(final ExecFileLoader loader) {
+        for (final String file : jacocoFiles) {
+            final File inputFile = new File(file);
+            try {
+                logger.trace("Loading execution data file " + inputFile.getAbsolutePath());
+                loader.load(inputFile);
+            } catch (final IOException e) {
+                logger.error("Unable to read " + inputFile.getAbsolutePath());
+            }
+        }
+    }
 
-	private void save(final ExecFileLoader loader) {
-		if (loader.getExecutionDataStore().getContents().isEmpty()) {
-			logger.error("MergeJacocoFiles save : getExecutionDataStore().getContents().isEmpty()");
-			return;
-		}
-		logger.trace("Writing merged execution data to " + destMergedFile.getAbsolutePath());
-		try {
-			loader.save(destMergedFile, false);
-		} catch (final IOException e) {
-			logger.error("Unable to write merged file " + destMergedFile.getAbsolutePath());
-		}
-	}
+    private void save(final ExecFileLoader loader) {
+        if (loader.getExecutionDataStore().getContents().isEmpty()) {
+            logger.error("MergeJacocoFiles save : getExecutionDataStore().getContents().isEmpty()");
+            return;
+        }
+        logger.trace("Writing merged execution data to " + destMergedFile.getAbsolutePath());
+        try {
+            loader.save(destMergedFile, false);
+        } catch (final IOException e) {
+            logger.error("Unable to write merged file " + destMergedFile.getAbsolutePath());
+        }
+    }
 
-	@Override
-	protected void executeMojo() throws MojoExecutionException, MojoFailureException {
-		// Nothing, customized behavior is in testarExecuteMojo()
-	}
+    @Override
+    protected void executeMojo() throws MojoExecutionException, MojoFailureException {
+        // Nothing, customized behavior is in testarExecuteMojo()
+    }
 
 }

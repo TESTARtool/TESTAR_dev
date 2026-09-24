@@ -16,25 +16,27 @@ import org.testar.core.Pair;
 
 public class TestCodeCoverageManager {
 
-	@Rule
-	public TemporaryFolder tempFolder = new TemporaryFolder();
+    @Rule
+    public TemporaryFolder tempFolder = new TemporaryFolder();
 
-	@Test
-	public void testCoverageConstructorCreatesDirectory() {
-		// Assign the outerLoopOutputDir to the tempFolder path
-		OutputStructure.outerLoopOutputDir = tempFolder.getRoot().getPath();
+    @Test
+    public void testCoverageConstructorCreatesDirectory() {
+        // Assign the outerLoopOutputDir to the tempFolder path
+        OutputStructure.outerLoopOutputDir = tempFolder.getRoot().getPath();
 
-		// Prepare the settings required by the CodeCoverageManager constructor
-		List<Pair<?, ?>> tags = new ArrayList<Pair<?, ?>>();
-		tags.add(Pair.from(ConfigTags.JacocoCoverage, false));
-		Settings settings = new Settings(tags, new Properties());
+        // Prepare the settings required by the CodeCoverageManager constructor
+        List<Pair<?, ?>> tags = new ArrayList<Pair<?, ?>>();
+        tags.add(Pair.from(ConfigTags.JacocoCoverage, false));
+        tags.add(Pair.from(ConfigTags.SUTConnector, Settings.SUT_CONNECTOR_CMDLINE));
+        tags.add(Pair.from(ConfigTags.SUTConnectorValue, "test-command"));
+        Settings settings = new Settings(tags, new Properties());
 
-		String coverageDirectory = OutputStructure.outerLoopOutputDir + File.separator + "coverage";
-		Assert.assertFalse(new File(coverageDirectory).exists());
+        String coverageDirectory = OutputStructure.outerLoopOutputDir + File.separator + "coverage";
+        Assert.assertFalse(new File(coverageDirectory).exists());
 
-		new CodeCoverageManager(settings);
+        new CodeCoverageManager(settings);
 
-		Assert.assertTrue(new File(coverageDirectory).exists());
-	}
+        Assert.assertTrue(new File(coverageDirectory).exists());
+    }
 
 }
