@@ -50,6 +50,8 @@ public class TestLoadSettings {
         File tempFile = tempFolder.newFile("test.settings");
 
         try (FileWriter writer = new FileWriter(tempFile)) {
+            writer.write("SUTConnector = COMMAND_LINE\n");
+            writer.write("SUTConnectorValue = test-command\n");
             writer.write("Sequences = 12345\n");
             writer.write("StartupTime = 12.34\n");
             writer.write("ApplicationVersion = testversion");

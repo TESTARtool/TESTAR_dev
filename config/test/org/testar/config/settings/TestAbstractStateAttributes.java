@@ -10,6 +10,7 @@ import java.util.Properties;
 
 import org.junit.Test;
 import org.testar.config.ConfigTags;
+import org.testar.config.SettingsTestSupport;
 import org.testar.core.Assert;
 import org.testar.core.Pair;
 
@@ -25,7 +26,7 @@ public class TestAbstractStateAttributes {
         ByteArrayOutputStream outContent = new ByteArrayOutputStream();
         System.setErr(new PrintStream(outContent));
 
-        Settings settings = new Settings(tags, new Properties());
+        Settings settings = new Settings(SettingsTestSupport.withValidSutConnector(tags), new Properties());
 
         Assert.isTrue(outContent.toString().isEmpty());
 
@@ -44,7 +45,7 @@ public class TestAbstractStateAttributes {
         ByteArrayOutputStream outContent = new ByteArrayOutputStream();
         System.setErr(new PrintStream(outContent));
 
-        Settings settings = new Settings(tags, new Properties());
+        Settings settings = new Settings(SettingsTestSupport.withValidSutConnector(tags), new Properties());
 
         String warningInvalidMsg = "WARNING: Ignoring invalid AbstractStateAttributes configured! [InvalidWidgetTitlee]";
         Assert.isTrue(outContent.toString().contains(warningInvalidMsg));
@@ -64,7 +65,7 @@ public class TestAbstractStateAttributes {
         ByteArrayOutputStream outContent = new ByteArrayOutputStream();
         System.setErr(new PrintStream(outContent));
 
-        Settings settings = new Settings(tags, new Properties());
+        Settings settings = new Settings(SettingsTestSupport.withValidSutConnector(tags), new Properties());
 
         String warningResetMsg = "Reseting AbstractStateAttributes test.settings to: [WidgetControlType]";
         Assert.isTrue(outContent.toString().contains(warningResetMsg));
@@ -84,7 +85,7 @@ public class TestAbstractStateAttributes {
         ByteArrayOutputStream outContent = new ByteArrayOutputStream();
         System.setErr(new PrintStream(outContent));
 
-        Settings settings = new Settings(tags, new Properties());
+        Settings settings = new Settings(SettingsTestSupport.withValidSutConnector(tags), new Properties());
 
         String warningInvalidMsg = "WARNING: Ignoring invalid AbstractStateAttributes configured! [InvalidWidgetTitlee]";
         Assert.isTrue(outContent.toString().contains(warningInvalidMsg));

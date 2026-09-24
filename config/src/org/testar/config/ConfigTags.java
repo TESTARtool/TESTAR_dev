@@ -14,28 +14,28 @@ public final class ConfigTags {
 
     private ConfigTags() { }
 
-    public static final Tag<TestarMode> Mode = Tag.from("Mode", TestarMode.class, 
+    public static final Tag<TestarMode> Mode = Tag.from("Mode", TestarMode.class,
             "Set the mode you want TESTAR to start in: Spy, Generate");
 
-    public static final Tag<String> SUTConnector = Tag.from("SUTConnector", String.class, 
+    public static final Tag<String> SUTConnector = Tag.from("SUTConnector", String.class,
             "Indicate how you want to connect to the SUT: COMMAND_LINE, SUT_WINDOW_TITLE, SUT_PROCESS_NAME, WEB_DRIVER, ANDROID_APPIUM");
 
-    public static final Tag<String> SUTConnectorValue = Tag.from("SUTConnectorValue", String.class, 
+    public static final Tag<String> SUTConnectorValue = Tag.from("SUTConnectorValue", String.class,
             "The connector value: executable path, windows title, process name");
 
-    public static final Tag<Boolean> JavaAccessBridge = Tag.from("JavaAccessBridge", Boolean.class, 
+    public static final Tag<Boolean> JavaAccessBridge = Tag.from("JavaAccessBridge", Boolean.class,
             "Enable Java Access Bridge to test Java Swing applications");
 
-    public static final Tag<Integer> Sequences = Tag.from("Sequences", Integer.class, 
+    public static final Tag<Integer> Sequences = Tag.from("Sequences", Integer.class,
             "Number of times to repeat a test");
 
-    public static final Tag<Integer> SequenceLength = Tag.from("SequenceLength", Integer.class, 
+    public static final Tag<Integer> SequenceLength = Tag.from("SequenceLength", Integer.class,
             "For each test sequence, the number of GUI actions to perform");
 
     public static final Tag<Boolean> IgnoreDuplicatedVerdicts = Tag.from("IgnoreDuplicatedVerdicts", Boolean.class,
             "Sets whether to ignore reporting duplicate verdicts across sequences for the same protocol");
 
-    public static final Tag<String> SuspiciousTags = Tag.from("SuspiciousTags", String.class, 
+    public static final Tag<String> SuspiciousTags = Tag.from("SuspiciousTags", String.class,
             "Regular expressions ORACLE to find suspicious messages in the GUI Tags");
 
     @SuppressWarnings("unchecked")
@@ -43,19 +43,19 @@ public final class ConfigTags {
             (Class<List<String>>) (Class<?>) List.class,
             "The Tags to apply the SuspiciousTags regex expressions");
 
-    public static final Tag<Boolean> ProcessListener = Tag.from("ProcessListener", Boolean.class, 
+    public static final Tag<Boolean> ProcessListener = Tag.from("ProcessListener", Boolean.class,
             "Enable the feature to read the process buffer of the SUT (Only for desktop applications through COMMAND_LINE)");
 
-    public static final Tag<String> SuspiciousProcessOutput = Tag.from("SuspiciousProcessOutput", String.class, 
+    public static final Tag<String> SuspiciousProcessOutput = Tag.from("SuspiciousProcessOutput", String.class,
             "Regular expressions ORACLE to find suspicious messages in the process buffer of the SUT");
 
-    public static final Tag<String> ProcessLogs = Tag.from("ProcessLogs", String.class, 
+    public static final Tag<String> ProcessLogs = Tag.from("ProcessLogs", String.class,
             "Regular expressions to store execution logs coming from the processes");
 
-    public static final Tag<Boolean> LogOracle = Tag.from("LogOracle", Boolean.class, 
+    public static final Tag<Boolean> LogOracle = Tag.from("LogOracle", Boolean.class,
             "Enable the Oracle for detecting suspicious messages in log files and standard output of commands");
 
-    public static final Tag<String> LogOracleRegex = Tag.from("LogOracleRegex", String.class, 
+    public static final Tag<String> LogOracleRegex = Tag.from("LogOracleRegex", String.class,
             "Regular expressions ORACLE to find suspicious messages in the logs");
 
     @SuppressWarnings("unchecked")
@@ -68,7 +68,7 @@ public final class ConfigTags {
             (Class<List<String>>) (Class<?>) List.class,
             "A list of paths of log files to monitor");
 
-    public static final Tag<String> ClickFilter = Tag.from("ClickFilter", String.class, 
+    public static final Tag<String> ClickFilter = Tag.from("ClickFilter", String.class,
             "Regular expressions to FILTER GUI widgets");
 
     @SuppressWarnings("unchecked")
@@ -76,7 +76,7 @@ public final class ConfigTags {
             (Class<List<String>>) (Class<?>) List.class,
             "The Tags to apply the ClickFilter regex expressions");
 
-    public static final Tag<String> ProcessesToKillDuringTest = Tag.from("ProcessesToKillDuringTest", String.class, 
+    public static final Tag<String> ProcessesToKillDuringTest = Tag.from("ProcessesToKillDuringTest", String.class,
             "Regular expressions to kill processes that can start up and interfere when testing the SUT");
 
     public static final Tag<String> CompositionProfile = Tag.from("CompositionProfile", String.class,
@@ -88,10 +88,10 @@ public final class ConfigTags {
     public static final Tag<String> CustomPoliciesResource = Tag.from("CustomPoliciesResource", String.class,
             "Optional properties resource that describes additive custom scriptless policies");
 
-    public static final Tag<String> ApplicationName = Tag.from("ApplicationName", String.class, 
+    public static final Tag<String> ApplicationName = Tag.from("ApplicationName", String.class,
             "Name to identify the SUT.");
 
-    public static final Tag<String> ApplicationVersion = Tag.from("ApplicationVersion", String.class, 
+    public static final Tag<String> ApplicationVersion = Tag.from("ApplicationVersion", String.class,
             "Version to identify the SUT.");
 
     @SuppressWarnings("unchecked")
@@ -100,7 +100,7 @@ public final class ConfigTags {
             "Specify the widget attributes that you wish to use in constructing the widget and state hash strings. Use a comma separated list.");
 
     /**
-     * CLI State Projection settings 
+     * CLI State Projection settings
      */
 
     public static final Tag<CliStateProjectionMode> CliStateProjectionMode = Tag.from("CliStateProjectionMode", org.testar.config.CliStateProjectionMode.class,
@@ -141,7 +141,7 @@ public final class ConfigTags {
             "User goal sent to Agent CLI execution.");
 
     /**
-     * Large Language Models settings 
+     * Large Language Models settings
      */
 
     public static final Tag<String> LlmPlatform = Tag.from("LlmPlatform", String.class,
@@ -156,7 +156,7 @@ public final class ConfigTags {
     public static final Tag<String> LlmHostUrl = Tag.from("LlmHostUrl", String.class,
             "The Host URL on which the LLM agent is running");
 
-    public static final Tag<String> LlmAuthorizationHeader = Tag.from("LlmAuthorizationHeader", String.class, 
+    public static final Tag<String> LlmAuthorizationHeader = Tag.from("LlmAuthorizationHeader", String.class,
             "The Authorization Header required by some LLM agents");
 
     @SuppressWarnings("unchecked")
@@ -179,7 +179,7 @@ public final class ConfigTags {
             "Generates individual prompts for each action and oracle LLM conversation.");
 
     /**
-     * WebDriver settings 
+     * WebDriver settings
      */
 
     @SuppressWarnings("unchecked")
@@ -202,16 +202,16 @@ public final class ConfigTags {
             (Class<List<String>>) (Class<?>) List.class,
             "Indicate which web URL domains are allowed to explore when testing");
 
-    public static final Tag<String> WebPathsAllowed = Tag.from("WebPathsAllowed", String.class, 
+    public static final Tag<String> WebPathsAllowed = Tag.from("WebPathsAllowed", String.class,
             "Regular expressions to indicate which web URL paths are allowed to explore when testing");
 
-    public static final Tag<Boolean> FollowLinks = Tag.from("FollowLinks", Boolean.class, 
+    public static final Tag<Boolean> FollowLinks = Tag.from("FollowLinks", Boolean.class,
             "Indicate if allowing to follow links opened in new tabs");
 
-    public static final Tag<Boolean> BrowserFullScreen = Tag.from("BrowserFullScreen", Boolean.class, 
+    public static final Tag<Boolean> BrowserFullScreen = Tag.from("BrowserFullScreen", Boolean.class,
             "Indicate if perform the web testing with the browser in full screen");
 
-    public static final Tag<Boolean> SwitchNewTabs = Tag.from("SwitchNewTabs", Boolean.class, 
+    public static final Tag<Boolean> SwitchNewTabs = Tag.from("SwitchNewTabs", Boolean.class,
             "Indicate if switch to a new web tab if opened");
 
     @SuppressWarnings("unchecked")
@@ -229,24 +229,24 @@ public final class ConfigTags {
             (Class<List<String>>) (Class<?>) List.class,
             "List of web attributes that TESTAR should ignore when obtaining the web state (e.g., to reduce state high-performance workloads)");
 
-    public static final Tag<Boolean> WebConsoleErrorOracle = Tag.from("WebConsoleErrorOracle", Boolean.class, 
+    public static final Tag<Boolean> WebConsoleErrorOracle = Tag.from("WebConsoleErrorOracle", Boolean.class,
             "Enable or Disable applying ORACLES to the browser error console");
 
-    public static final Tag<String> WebConsoleErrorPattern = Tag.from("WebConsoleErrorPattern", String.class, 
+    public static final Tag<String> WebConsoleErrorPattern = Tag.from("WebConsoleErrorPattern", String.class,
             "Regular expressions ORACLE to find suspicious messages in the browser error console");
 
-    public static final Tag<Boolean> WebConsoleWarningOracle = Tag.from("WebConsoleWarningOracle", Boolean.class, 
+    public static final Tag<Boolean> WebConsoleWarningOracle = Tag.from("WebConsoleWarningOracle", Boolean.class,
             "Enable or Disable applying ORACLES to the browser warning console");
 
-    public static final Tag<String> WebConsoleWarningPattern = Tag.from("WebConsoleWarningPattern", String.class, 
+    public static final Tag<String> WebConsoleWarningPattern = Tag.from("WebConsoleWarningPattern", String.class,
             "Regular expressions ORACLE to find suspicious messages in the browser warning console");
 
     // Note: Defined the tag as string on purpose so we can leave the default value empty in the pre defined settings.
-    public static final Tag<String> OverrideWebDriverDisplayScale = Tag.from("OverrideWebDriverDisplayScale", String.class, 
+    public static final Tag<String> OverrideWebDriverDisplayScale = Tag.from("OverrideWebDriverDisplayScale", String.class,
             "Overrides the displayscale obtained from the system for web SUTs");
 
     /**
-     * Android-Appium settings 
+     * Android-Appium settings
      */
 
     public static final Tag<String> AppiumPlatformName = Tag.from("AppiumPlatformName", String.class,
@@ -308,15 +308,15 @@ public final class ConfigTags {
             "Indicate which Android className values need to be considered typeable");
 
     // 5 settings that can be used in user specified TESTAR protocols for anything:
-    public static final Tag<String> ProtocolSpecificSetting_1 = Tag.from("ProtocolSpecificSetting_1", String.class, 
+    public static final Tag<String> ProtocolSpecificSetting_1 = Tag.from("ProtocolSpecificSetting_1", String.class,
             "Settings (string) that can be used for user specified protocols");
-    public static final Tag<String> ProtocolSpecificSetting_2 = Tag.from("ProtocolSpecificSetting_2", String.class, 
+    public static final Tag<String> ProtocolSpecificSetting_2 = Tag.from("ProtocolSpecificSetting_2", String.class,
             "Settings (string) that can be used for user specified protocols");
-    public static final Tag<String> ProtocolSpecificSetting_3 = Tag.from("ProtocolSpecificSetting_3", String.class, 
+    public static final Tag<String> ProtocolSpecificSetting_3 = Tag.from("ProtocolSpecificSetting_3", String.class,
             "Settings (string) that can be used for user specified protocols");
-    public static final Tag<String> ProtocolSpecificSetting_4 = Tag.from("ProtocolSpecificSetting_4", String.class, 
+    public static final Tag<String> ProtocolSpecificSetting_4 = Tag.from("ProtocolSpecificSetting_4", String.class,
             "Settings (string) that can be used for user specified protocols");
-    public static final Tag<String> ProtocolSpecificSetting_5 = Tag.from("ProtocolSpecificSetting_5", String.class, 
+    public static final Tag<String> ProtocolSpecificSetting_5 = Tag.from("ProtocolSpecificSetting_5", String.class,
             "Settings (string) that can be used for user specified protocols");
 
     /**
@@ -326,13 +326,13 @@ public final class ConfigTags {
     public static final Tag<Boolean> JacocoCoverage = Tag.from("JacocoCoverage", Boolean.class,
             "Sets whether to extract Jacoco Coverage");
 
-    public static final Tag<String> JacocoCoverageIpAddress = Tag.from("JacocoCoverageIpAddress", String.class, 
+    public static final Tag<String> JacocoCoverageIpAddress = Tag.from("JacocoCoverageIpAddress", String.class,
             "The JMX IP Address on which the Jacoco Agent is running");
 
-    public static final Tag<Integer> JacocoCoveragePort = Tag.from("JacocoCoveragePort", Integer.class, 
+    public static final Tag<Integer> JacocoCoveragePort = Tag.from("JacocoCoveragePort", Integer.class,
             "The JMX port on which the Jacoco Agent is running");
 
-    public static final Tag<String> JacocoCoverageClasses = Tag.from("JacocoCoverageClasses", String.class, 
+    public static final Tag<String> JacocoCoverageClasses = Tag.from("JacocoCoverageClasses", String.class,
             "The SUT class files that Jacoco uses to create the CSV report");
 
     public static final Tag<Boolean> JacocoCoverageAccumulate = Tag.from("JacocoCoverageAccumulate", Boolean.class,
@@ -342,72 +342,72 @@ public final class ConfigTags {
      * Additional settings with descriptions
      */
 
-    public static final Tag<Double> ActionDuration = Tag.from("ActionDuration", Double.class, 
+    public static final Tag<Double> ActionDuration = Tag.from("ActionDuration", Double.class,
             "Sets the speed, in seconds, at which a GUI action is performed");
 
-    public static final Tag<Double> TimeToWaitAfterAction = Tag.from("TimeToWaitAfterAction", Double.class, 
+    public static final Tag<Double> TimeToWaitAfterAction = Tag.from("TimeToWaitAfterAction", Double.class,
             "Sets the delay, in seconds, between UI actions during a test");
 
-    public static final Tag<Double> StartupTime = Tag.from("StartupTime", Double.class, 
+    public static final Tag<Double> StartupTime = Tag.from("StartupTime", Double.class,
             "Sets how many seconds to wait for the SUT to be ready for testing");
 
-    public static final Tag<Double> MaxTime = Tag.from("MaxTime", Double.class, 
+    public static final Tag<Double> MaxTime = Tag.from("MaxTime", Double.class,
             "Sets a time, in seconds, after which the test run is finished (e.g. stop after an hour)");
 
-    public static final Tag<Boolean> FormFillingAction = Tag.from("FormFillingAction", Boolean.class, 
+    public static final Tag<Boolean> FormFillingAction = Tag.from("FormFillingAction", Boolean.class,
             "Enables or disables a specific web action that populate data in web forms");
 
-    public static final Tag<String> SUTProcesses = Tag.from("SUTProcesses", String.class, 
+    public static final Tag<String> SUTProcesses = Tag.from("SUTProcesses", String.class,
             "Regular expressions that indicates which processes conform the SUT");
 
-    public static final Tag<Boolean> ShowVisualSettingsDialogOnStartup = Tag.from("ShowVisualSettingsDialogOnStartup", Boolean.class, 
+    public static final Tag<Boolean> ShowVisualSettingsDialogOnStartup = Tag.from("ShowVisualSettingsDialogOnStartup", Boolean.class,
             "Sets whether to display TESTAR dialog. If false is used, then TESTAR will run in the mode of the Mode property");
 
-    public static final Tag<Boolean> ForceForeground = Tag.from("ForceForeground", Boolean.class, 
+    public static final Tag<Boolean> ForceForeground = Tag.from("ForceForeground", Boolean.class,
             "Sets whether to keep the SUTs GUI active in the screen (e.g. when its minimised or when a process is started and its UI is in front, etc.)");
 
-    public static final Tag<Integer> LogLevel = Tag.from("LogLevel", Integer.class, 
+    public static final Tag<Integer> LogLevel = Tag.from("LogLevel", Integer.class,
             "Sets the logging level to critical messages (0), information messages (1) or debug messages (2)");
 
-    public static final Tag<Boolean> OnlySaveFaultySequences = Tag.from("OnlySaveFaultySequences", Boolean.class, 
+    public static final Tag<Boolean> OnlySaveFaultySequences = Tag.from("OnlySaveFaultySequences", Boolean.class,
             "Sets whether to save test sequences without failures");
 
-    public static final Tag<Boolean> StopGenerationOnFault = Tag.from("StopGenerationOnFault", Boolean.class, 
+    public static final Tag<Boolean> StopGenerationOnFault = Tag.from("StopGenerationOnFault", Boolean.class,
             "Sets whether to finish a test in the presence of a fail (e.g. Suspicious Tag detected)");
 
-    public static final Tag<Double> TimeToFreeze = Tag.from("TimeToFreeze", Double.class, 
+    public static final Tag<Double> TimeToFreeze = Tag.from("TimeToFreeze", Double.class,
             "Sets the time window, in seconds, for which to wait for a not responding SUT. After that, the test will finish with a fail");
 
-    public static final Tag<Boolean> VisualizeActions = Tag.from("VisualizeActions", Boolean.class, 
+    public static final Tag<Boolean> VisualizeActions = Tag.from("VisualizeActions", Boolean.class,
             "Sets whether to display overlay information, inside the SPY mode, for all the UI actions derived from the test set up");
 
-    public static final Tag<Boolean> KeyBoardListener = Tag.from("KeyBoardListener", Boolean.class, 
+    public static final Tag<Boolean> KeyBoardListener = Tag.from("KeyBoardListener", Boolean.class,
             "Sets whether to listen to keyboard shortcuts during the exceution");
 
-    public static final Tag<Boolean> UseSystemActions = Tag.from("UseSystemActions", Boolean.class, 
+    public static final Tag<Boolean> UseSystemActions = Tag.from("UseSystemActions", Boolean.class,
             "ANDROID: Indicate if add system calls");
 
-    public static final Tag<Double> RefreshSpyCanvas = Tag.from("RefreshSpyCanvas", Double.class, 
+    public static final Tag<Double> RefreshSpyCanvas = Tag.from("RefreshSpyCanvas", Double.class,
             "Time in milliseconds that indicates the frequency of refreshing the screen in SPY mode");
 
-    public static final Tag<Double> MaxReward = Tag.from("MaxReward", Double.class, 
+    public static final Tag<Double> MaxReward = Tag.from("MaxReward", Double.class,
             "MaxReward value for the QLearningActionSelector");
 
-    public static final Tag<Double> Discount = Tag.from("Discount", Double.class, 
+    public static final Tag<Double> Discount = Tag.from("Discount", Double.class,
             "Discount value for the QLearningActionSelector");
 
-    public static final Tag<Boolean> CreateWidgetInfoJsonFile = Tag.from("CreateWidgetInfoJsonFile", Boolean.class, 
+    public static final Tag<Boolean> CreateWidgetInfoJsonFile = Tag.from("CreateWidgetInfoJsonFile", Boolean.class,
             "Sets whether create a JSON file with information about widgets and their location on the screenshot");
 
-    public static final Tag<String> OutputDir = Tag.from("OutputDir", String.class, 
+    public static final Tag<String> OutputDir = Tag.from("OutputDir", String.class,
             "The relative path to save TESTAR output results");
 
-    public static final Tag<String> TempDir = Tag.from("TempDir", String.class, 
+    public static final Tag<String> TempDir = Tag.from("TempDir", String.class,
             "The relative path to temporarily  save TESTAR files");
-    
+
     public static final Tag<Boolean> ReportInHTML = Tag.from("ReportInHTML", Boolean.class,
              "Sets whether to create a HTML report");
-    
+
     public static final Tag<Boolean> ReportInPlainText = Tag.from("ReportInPlainText", Boolean.class,
              "Sets whether to create a plain text report");
 

@@ -14,18 +14,18 @@ import org.testar.core.tag.TagsBase;
 
 public class ActionTags extends TagsBase  {
 
-	private ActionTags() {}
+    private ActionTags() { }
 
-	public static final Tag<Integer> SimilarityValue = from("SimilarityValue", Integer.class);
+    public static final Tag<Integer> SimilarityValue = from("SimilarityValue", Integer.class);
 
-	private static Set<Tag<Integer>> actionTags;
-	static {
-		actionTags = new HashSet<Tag<Integer>>();
-		actionTags.add(SimilarityValue);
-	}
+    private static Set<Tag<Integer>> actionTags;
+    static {
+        actionTags = new HashSet<Tag<Integer>>();
+        actionTags.add(SimilarityValue);
+    }
 
-	public static Set<Tag<Integer>> getActionTags() {
-		return actionTags;
-	}
+    public static Set<Tag<Integer>> getActionTags() {
+        return actionTags;
+    }
 
 }

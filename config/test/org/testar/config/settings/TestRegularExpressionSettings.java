@@ -7,6 +7,7 @@ import java.util.Properties;
 
 import org.junit.Test;
 import org.testar.config.ConfigTags;
+import org.testar.config.SettingsTestSupport;
 import org.testar.core.Assert;
 import org.testar.core.Pair;
 import org.testar.core.tag.Tag;
@@ -32,7 +33,7 @@ public class TestRegularExpressionSettings {
             tags.add(Pair.from(tag, ".*[aA].*|.*bc.*"));
         }
 
-        Settings settings = new Settings(tags, new Properties());
+        Settings settings = new Settings(SettingsTestSupport.withValidSutConnector(tags), new Properties());
 
         for (Tag<String> tag : regularExpressionTags) {
             System.out.println(tag + " valid regex: " + settings.get(tag, ""));
@@ -48,7 +49,7 @@ public class TestRegularExpressionSettings {
 
             String exceptionMessage = "";
             try {
-                new Settings(tags, new Properties());
+                new Settings(SettingsTestSupport.withValidSutConnector(tags), new Properties());
             } catch (IllegalStateException e) {
                 exceptionMessage = e.getMessage();
             }

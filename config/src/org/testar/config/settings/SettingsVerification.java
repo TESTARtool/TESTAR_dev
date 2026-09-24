@@ -27,8 +27,8 @@ import org.testar.core.exceptions.NoSuchTagException;
 public class SettingsVerification {
 
     /**
-     * Verify the settings provided by the user. 
-     * 
+     * Verify the settings provided by the user.
+     *
      * @param settings
      */
     public static void verifySettings(Settings settings) {
@@ -191,8 +191,8 @@ public class SettingsVerification {
     }
 
     /**
-     * Verify if filter and oracles regular expressions settings are valid. 
-     * 
+     * Verify if filter and oracles regular expressions settings are valid.
+     *
      * @param settings
      * @return
      */
@@ -231,8 +231,8 @@ public class SettingsVerification {
     }
 
     /**
-     * Escape special characters in settings that are used to write directories or files. 
-     * 
+     * Escape special characters in settings that are used to write directories or files.
+     *
      * @param settings
      * @return
      */
@@ -256,8 +256,8 @@ public class SettingsVerification {
     }
 
     /**
-     * Verify the JaCoCo coverage settings are valid. 
-     * 
+     * Verify the JaCoCo coverage settings are valid.
+     *
      * @param settings
      */
     private static void verifyJacocoCoverageSettings(Settings settings) {

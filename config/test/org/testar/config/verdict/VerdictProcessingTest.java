@@ -15,166 +15,167 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.testar.config.ConfigTags;
+import org.testar.config.SettingsTestSupport;
 import org.testar.config.TestarDirectories;
 import org.testar.config.settings.Settings;
 import org.testar.core.verdict.Verdict;
 
 public class VerdictProcessingTest {
 
-	@Rule
-	public TemporaryFolder tempFolder = new TemporaryFolder();
+    @Rule
+    public TemporaryFolder tempFolder = new TemporaryFolder();
 
-	@After
-	public void tearDown() {
-		Settings.setSettingsPath(null);
-		TestarDirectories.setSelectedWorkspaceName(null);
-	}
+    @After
+    public void tearDown() {
+        Settings.setSettingsPath(null);
+        TestarDirectories.setSelectedWorkspaceName(null);
+    }
 
-	@Test
-	public void testNullListReturnsOk() {
-		Settings settings = new Settings();
-		settings.set(ConfigTags.IgnoreDuplicatedVerdicts, false);
-		VerdictProcessing processing = new VerdictProcessing(settings);
+    @Test
+    public void testNullListReturnsOk() {
+        Settings settings = SettingsTestSupport.newSettings();
+        settings.set(ConfigTags.IgnoreDuplicatedVerdicts, false);
+        VerdictProcessing processing = new VerdictProcessing(settings);
 
-		List<Verdict> filtered = processing.filterDuplicates(null);
-		assertEquals(1, filtered.size());
-		assertEquals(Verdict.OK.severity(), filtered.get(0).severity(), 0.0);
-	}
+        List<Verdict> filtered = processing.filterDuplicates(null);
+        assertEquals(1, filtered.size());
+        assertEquals(Verdict.OK.severity(), filtered.get(0).severity(), 0.0);
+    }
 
-	@Test
-	public void testMultipleOkReturnsSingleOk() {
-		Settings settings = new Settings();
-		settings.set(ConfigTags.IgnoreDuplicatedVerdicts, false);
-		VerdictProcessing processing = new VerdictProcessing(settings);
+    @Test
+    public void testMultipleOkReturnsSingleOk() {
+        Settings settings = SettingsTestSupport.newSettings();
+        settings.set(ConfigTags.IgnoreDuplicatedVerdicts, false);
+        VerdictProcessing processing = new VerdictProcessing(settings);
 
-		List<Verdict> filtered = processing.filterDuplicates(Arrays.asList(Verdict.OK, Verdict.OK));
-		assertEquals(1, filtered.size());
-		assertEquals(Verdict.OK.severity(), filtered.get(0).severity(), 0.0);
-	}
+        List<Verdict> filtered = processing.filterDuplicates(Arrays.asList(Verdict.OK, Verdict.OK));
+        assertEquals(1, filtered.size());
+        assertEquals(Verdict.OK.severity(), filtered.get(0).severity(), 0.0);
+    }
 
-	@Test
-	public void testOkAndFailureRemovesOk() {
-		Settings settings = new Settings();
-		settings.set(ConfigTags.IgnoreDuplicatedVerdicts, false);
-		VerdictProcessing processing = new VerdictProcessing(settings);
+    @Test
+    public void testOkAndFailureRemovesOk() {
+        Settings settings = SettingsTestSupport.newSettings();
+        settings.set(ConfigTags.IgnoreDuplicatedVerdicts, false);
+        VerdictProcessing processing = new VerdictProcessing(settings);
 
-		Verdict failure = new Verdict(Verdict.Severity.SUSPICIOUS_TAG, "Issue");
-		Verdict logVerdict = new Verdict(Verdict.Severity.SUSPICIOUS_LOG, "Log exception");
-		List<Verdict> filtered = processing.filterDuplicates(Arrays.asList(Verdict.OK, failure, logVerdict));
-		assertEquals(2, filtered.size());
-		assertTrue(filtered.get(0).severity() > Verdict.OK.severity());
-		assertTrue(filtered.get(1).severity() > Verdict.OK.severity());
-	}
+        Verdict failure = new Verdict(Verdict.Severity.SUSPICIOUS_TAG, "Issue");
+        Verdict logVerdict = new Verdict(Verdict.Severity.SUSPICIOUS_LOG, "Log exception");
+        List<Verdict> filtered = processing.filterDuplicates(Arrays.asList(Verdict.OK, failure, logVerdict));
+        assertEquals(2, filtered.size());
+        assertTrue(filtered.get(0).severity() > Verdict.OK.severity());
+        assertTrue(filtered.get(1).severity() > Verdict.OK.severity());
+    }
 
-	@Test
-	public void testIgnoresKnownDuplicate() throws Exception {
-		File settingsDir = tempFolder.newFolder("settings");
-		Settings.setSettingsPath(settingsDir.getAbsolutePath());
+    @Test
+    public void testIgnoresKnownDuplicate() throws Exception {
+        File settingsDir = tempFolder.newFolder("settings");
+        Settings.setSettingsPath(settingsDir.getAbsolutePath());
 
-		File ignoreFile = new File(settingsDir, "list_of_verdicts_with_failures.txt");
-		Files.write(ignoreFile.toPath(), Collections.singletonList("duplicate message"), StandardCharsets.UTF_8);
+        File ignoreFile = new File(settingsDir, "list_of_verdicts_with_failures.txt");
+        Files.write(ignoreFile.toPath(), Collections.singletonList("duplicate message"), StandardCharsets.UTF_8);
 
-		Settings settings = new Settings();
-		settings.set(ConfigTags.IgnoreDuplicatedVerdicts, true);
-		VerdictProcessing processing = new VerdictProcessing(settings);
+        Settings settings = SettingsTestSupport.newSettings();
+        settings.set(ConfigTags.IgnoreDuplicatedVerdicts, true);
+        VerdictProcessing processing = new VerdictProcessing(settings);
 
-		Verdict duplicate = new Verdict(Verdict.Severity.SUSPICIOUS_TAG, "duplicate message");
-		List<Verdict> filtered = processing.filterDuplicates(Collections.singletonList(duplicate));
-		assertEquals(1, filtered.size());
-		assertEquals(Verdict.OK.severity(), filtered.get(0).severity(), 0.0);
-	}
+        Verdict duplicate = new Verdict(Verdict.Severity.SUSPICIOUS_TAG, "duplicate message");
+        List<Verdict> filtered = processing.filterDuplicates(Collections.singletonList(duplicate));
+        assertEquals(1, filtered.size());
+        assertEquals(Verdict.OK.severity(), filtered.get(0).severity(), 0.0);
+    }
 
-	@Test
-	public void testDoesNotIgnoreDuplicateLlmComplete() throws Exception {
-		File settingsDir = tempFolder.newFolder("settings_llm_complete");
-		Settings.setSettingsPath(settingsDir.getAbsolutePath());
+    @Test
+    public void testDoesNotIgnoreDuplicateLlmComplete() throws Exception {
+        File settingsDir = tempFolder.newFolder("settings_llm_complete");
+        Settings.setSettingsPath(settingsDir.getAbsolutePath());
 
-		File ignoreFile = new File(settingsDir, "list_of_verdicts_with_failures.txt");
-		Files.write(ignoreFile.toPath(), Collections.singletonList("goal completed by llm"), StandardCharsets.UTF_8);
+        File ignoreFile = new File(settingsDir, "list_of_verdicts_with_failures.txt");
+        Files.write(ignoreFile.toPath(), Collections.singletonList("goal completed by llm"), StandardCharsets.UTF_8);
 
-		Settings settings = new Settings();
-		settings.set(ConfigTags.IgnoreDuplicatedVerdicts, true);
-		VerdictProcessing processing = new VerdictProcessing(settings);
+        Settings settings = SettingsTestSupport.newSettings();
+        settings.set(ConfigTags.IgnoreDuplicatedVerdicts, true);
+        VerdictProcessing processing = new VerdictProcessing(settings);
 
-		Verdict llmComplete = new Verdict(Verdict.Severity.LLM_COMPLETE, "goal completed by llm");
-		List<Verdict> filtered = processing.filterDuplicates(Collections.singletonList(llmComplete));
+        Verdict llmComplete = new Verdict(Verdict.Severity.LLM_COMPLETE, "goal completed by llm");
+        List<Verdict> filtered = processing.filterDuplicates(Collections.singletonList(llmComplete));
 
-		assertEquals(1, filtered.size());
-		assertEquals(Verdict.Severity.LLM_COMPLETE.getValue(), filtered.get(0).severity(), 0.0);
-	}
+        assertEquals(1, filtered.size());
+        assertEquals(Verdict.Severity.LLM_COMPLETE.getValue(), filtered.get(0).severity(), 0.0);
+    }
 
-	@Test
-	public void testDoesNotIgnoreDuplicateLlmInvalid() throws Exception {
-		File settingsDir = tempFolder.newFolder("settings_llm_invalid");
-		Settings.setSettingsPath(settingsDir.getAbsolutePath());
+    @Test
+    public void testDoesNotIgnoreDuplicateLlmInvalid() throws Exception {
+        File settingsDir = tempFolder.newFolder("settings_llm_invalid");
+        Settings.setSettingsPath(settingsDir.getAbsolutePath());
 
-		File ignoreFile = new File(settingsDir, "list_of_verdicts_with_failures.txt");
-		Files.write(ignoreFile.toPath(), Collections.singletonList("goal invalid by llm"), StandardCharsets.UTF_8);
+        File ignoreFile = new File(settingsDir, "list_of_verdicts_with_failures.txt");
+        Files.write(ignoreFile.toPath(), Collections.singletonList("goal invalid by llm"), StandardCharsets.UTF_8);
 
-		Settings settings = new Settings();
-		settings.set(ConfigTags.IgnoreDuplicatedVerdicts, true);
-		VerdictProcessing processing = new VerdictProcessing(settings);
+        Settings settings = SettingsTestSupport.newSettings();
+        settings.set(ConfigTags.IgnoreDuplicatedVerdicts, true);
+        VerdictProcessing processing = new VerdictProcessing(settings);
 
-		Verdict llmInvalid = new Verdict(Verdict.Severity.LLM_INVALID, "goal invalid by llm");
-		List<Verdict> filtered = processing.filterDuplicates(Collections.singletonList(llmInvalid));
+        Verdict llmInvalid = new Verdict(Verdict.Severity.LLM_INVALID, "goal invalid by llm");
+        List<Verdict> filtered = processing.filterDuplicates(Collections.singletonList(llmInvalid));
 
-		assertEquals(1, filtered.size());
-		assertEquals(Verdict.Severity.LLM_INVALID.getValue(), filtered.get(0).severity(), 0.0);
-	}
+        assertEquals(1, filtered.size());
+        assertEquals(Verdict.Severity.LLM_INVALID.getValue(), filtered.get(0).severity(), 0.0);
+    }
 
-	@Test
-	public void testDoesNotIgnoreDuplicateConditionComplete() throws Exception {
-		File settingsDir = tempFolder.newFolder("settings_condition_complete");
-		Settings.setSettingsPath(settingsDir.getAbsolutePath());
+    @Test
+    public void testDoesNotIgnoreDuplicateConditionComplete() throws Exception {
+        File settingsDir = tempFolder.newFolder("settings_condition_complete");
+        Settings.setSettingsPath(settingsDir.getAbsolutePath());
 
-		File ignoreFile = new File(settingsDir, "list_of_verdicts_with_failures.txt");
-		Files.write(ignoreFile.toPath(), Collections.singletonList("all conditions completed"), StandardCharsets.UTF_8);
+        File ignoreFile = new File(settingsDir, "list_of_verdicts_with_failures.txt");
+        Files.write(ignoreFile.toPath(), Collections.singletonList("all conditions completed"), StandardCharsets.UTF_8);
 
-		Settings settings = new Settings();
-		settings.set(ConfigTags.IgnoreDuplicatedVerdicts, true);
-		VerdictProcessing processing = new VerdictProcessing(settings);
+        Settings settings = SettingsTestSupport.newSettings();
+        settings.set(ConfigTags.IgnoreDuplicatedVerdicts, true);
+        VerdictProcessing processing = new VerdictProcessing(settings);
 
-		Verdict conditionComplete = new Verdict(Verdict.Severity.CONDITION_COMPLETE, "all conditions completed");
-		List<Verdict> filtered = processing.filterDuplicates(Collections.singletonList(conditionComplete));
+        Verdict conditionComplete = new Verdict(Verdict.Severity.CONDITION_COMPLETE, "all conditions completed");
+        List<Verdict> filtered = processing.filterDuplicates(Collections.singletonList(conditionComplete));
 
-		assertEquals(1, filtered.size());
-		assertEquals(Verdict.Severity.CONDITION_COMPLETE.getValue(), filtered.get(0).severity(), 0.0);
-	}
+        assertEquals(1, filtered.size());
+        assertEquals(Verdict.Severity.CONDITION_COMPLETE.getValue(), filtered.get(0).severity(), 0.0);
+    }
 
-	@Test
-	public void testVerdictIgnoreFile_PrioritizesSSE() throws Exception {
-		File tempSettingsDir = tempFolder.newFolder("tempSettingsDir");
+    @Test
+    public void testVerdictIgnoreFile_PrioritizesSSE() throws Exception {
+        File tempSettingsDir = tempFolder.newFolder("tempSettingsDir");
         String originalWorkspacesDir = TestarDirectories.getWorkspacesDir();
-		try {
+        try {
             TestarDirectories.setWorkspacesDir(tempSettingsDir.getAbsolutePath() + File.separator);
-			TestarDirectories.setSelectedWorkspaceName("protocol_selected");
-			Settings.setSettingsPath(tempFolder.newFolder("otherProtocol").getAbsolutePath());
+            TestarDirectories.setSelectedWorkspaceName("protocol_selected");
+            Settings.setSettingsPath(tempFolder.newFolder("otherProtocol").getAbsolutePath());
 
-			File verdictIgnoreFile = VerdictProcessing.resolveVerdictIgnoreFile();
+            File verdictIgnoreFile = VerdictProcessing.resolveVerdictIgnoreFile();
             assertEquals(new File(TestarDirectories.getWorkspacesDir() + "protocol_selected", "list_of_verdicts_with_failures.txt").getAbsolutePath(),
-					verdictIgnoreFile.getAbsolutePath());
-		} finally {
+                    verdictIgnoreFile.getAbsolutePath());
+        } finally {
             TestarDirectories.setWorkspacesDir(originalWorkspacesDir); // cleanup to restore static global dir
-		}
-	}
+        }
+    }
 
-	@Test
-	public void testVerdictIgnoreFile_UsesSettingsPathWhenNoSSE() throws Exception {
-		File tempSettingsDir = tempFolder.newFolder("tempSettingsDir");
-			TestarDirectories.setSelectedWorkspaceName(null);
-		Settings.setSettingsPath(tempSettingsDir.getAbsolutePath());
+    @Test
+    public void testVerdictIgnoreFile_UsesSettingsPathWhenNoSSE() throws Exception {
+        File tempSettingsDir = tempFolder.newFolder("tempSettingsDir");
+        TestarDirectories.setSelectedWorkspaceName(null);
+        Settings.setSettingsPath(tempSettingsDir.getAbsolutePath());
 
-		File verdictIgnoreFile = VerdictProcessing.resolveVerdictIgnoreFile();
-		assertEquals(new File(tempSettingsDir, "list_of_verdicts_with_failures.txt").getAbsolutePath(),
-				verdictIgnoreFile.getAbsolutePath());
-	}
+        File verdictIgnoreFile = VerdictProcessing.resolveVerdictIgnoreFile();
+        assertEquals(new File(tempSettingsDir, "list_of_verdicts_with_failures.txt").getAbsolutePath(),
+                verdictIgnoreFile.getAbsolutePath());
+    }
 
-	@Test
-	public void testVerdictIgnoreFile_IsNullWhenNoContext() {
-		TestarDirectories.setSelectedWorkspaceName(null);
-		Settings.setSettingsPath(null);
+    @Test
+    public void testVerdictIgnoreFile_IsNullWhenNoContext() {
+        TestarDirectories.setSelectedWorkspaceName(null);
+        Settings.setSettingsPath(null);
 
-		File verdictIgnoreFile = VerdictProcessing.resolveVerdictIgnoreFile();
-		assertEquals(null, verdictIgnoreFile);
-	}
+        File verdictIgnoreFile = VerdictProcessing.resolveVerdictIgnoreFile();
+        assertEquals(null, verdictIgnoreFile);
+    }
 }

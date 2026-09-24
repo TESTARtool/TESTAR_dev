@@ -9,6 +9,7 @@ import java.util.Properties;
 
 import org.junit.Test;
 import org.testar.config.ConfigTags;
+import org.testar.config.SettingsTestSupport;
 import org.testar.core.Assert;
 import org.testar.core.Pair;
 
@@ -20,7 +21,7 @@ public class TestApplicationNameSettings {
         tags.add(Pair.from(ApplicationName, "desktop_app"));
         tags.add(Pair.from(ApplicationVersion, "v1.0.0"));
 
-        Settings settings = new Settings(tags, new Properties());
+        Settings settings = new Settings(SettingsTestSupport.withValidSutConnector(tags), new Properties());
         Assert.isTrue(settings.get(ConfigTags.ApplicationName, "").equals("desktop_app"));
         Assert.isTrue(settings.get(ConfigTags.ApplicationVersion, "").equals("v1.0.0"));
     }
@@ -31,7 +32,7 @@ public class TestApplicationNameSettings {
         tags.add(Pair.from(ApplicationName, "desktop_app_.\\./.?.:.*.\".|.>.<."));
         tags.add(Pair.from(ApplicationVersion, "v1.0.0_.\\./.?.:.*.\".|.>.<."));
 
-        Settings settings = new Settings(tags, new Properties());
+        Settings settings = new Settings(SettingsTestSupport.withValidSutConnector(tags), new Properties());
         Assert.isTrue(settings.get(ConfigTags.ApplicationName, "").equals("desktop_app_._._._._._._._._._._"));
         Assert.isTrue(settings.get(ConfigTags.ApplicationVersion, "").equals("v1.0.0_._._._._._._._._._._"));
     }
