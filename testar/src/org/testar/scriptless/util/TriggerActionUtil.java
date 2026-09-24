@@ -174,8 +174,8 @@ public final class TriggerActionUtil {
             }
         }
 
-        System.out.println("Matching widget was not found, "+tag.toString()+"=" + value);
-        printTagValuesOfWidgets(tag,state);
+        System.out.println("Matching widget was not found, " + tag.toString() + "=" + value);
+        //printTagValuesOfWidgets(tag, state);
         return false;
     }
 
@@ -328,7 +328,7 @@ public final class TriggerActionUtil {
         }
 
         System.out.println("Matching widget was not found, " + tag.toString() + "=" + value);
-        printTagValuesOfWidgets(tag,state);
+        //printTagValuesOfWidgets(tag, state);
         return false;
     }
 
@@ -482,7 +482,7 @@ public final class TriggerActionUtil {
         }
 
         System.out.println("Matching widget was not found, " + tag.toString() + "=" + value);
-        printTagValuesOfWidgets(tag,state);
+        //printTagValuesOfWidgets(tag, state);
         return false;
     }
 

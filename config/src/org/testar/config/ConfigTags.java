@@ -217,7 +217,7 @@ public final class ConfigTags {
     @SuppressWarnings("unchecked")
     public static final Tag<List<String>> WebForcedPopupClickAttributes = Tag.from("WebForcedPopupClickAttributes",
             (Class<List<String>>) (Class<?>) List.class,
-            "Widget attribute selectors in attribute=value form that TESTAR should click before default WebDriver exploration");
+            "Widget attribute selectors in attribute=value form whose click actions are forced when matching widgets appear during WebDriver exploration");
 
     @SuppressWarnings("unchecked")
     public static final Tag<List<String>> WebIgnoredTags = Tag.from("WebIgnoredTags",

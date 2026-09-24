@@ -188,7 +188,7 @@ AgentCLIPromptText = As a test agent verify that you can log in with the credent
 # FollowLinks: Indicate if allowing to follow links opened in new tabs
 # BrowserFullScreen: Indicate if perform the web testing with the browser in full screen
 # SwitchNewTabs: Indicate if switch to a new web tab if opened
-# WebForcedPopupClickAttributes: Widget attribute selectors in attribute=value form that TESTAR should click before default WebDriver exploration
+# WebForcedPopupClickAttributes: Widget attribute selectors in attribute=value form whose click actions are forced when matching widgets appear during WebDriver exploration
 #################################################################
 
 WebClickableClasses = 
@@ -199,7 +199,7 @@ WebPathsAllowed = null
 FollowLinks = false
 BrowserFullScreen = true
 SwitchNewTabs = true
-WebForcedPopupClickAttributes = id=accept-cookies;id=reject-cookies
+WebForcedPopupClickAttributes =
 
 #################################################################
 # WebDriver Browser Console Oracles

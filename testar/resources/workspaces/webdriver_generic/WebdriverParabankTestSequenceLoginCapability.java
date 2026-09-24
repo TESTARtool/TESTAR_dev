@@ -32,6 +32,9 @@ public final class WebdriverParabankTestSequenceLoginCapability extends TestSequ
     public void beginSequence(RuntimeContext runtimeContext, SUT system, State initialState) {
         delegate.beginSequence(runtimeContext, system, initialState);
 
+        // Reject Parabank cookies (if present)
+        clickMatchingWidget("id", "reject-cookies", initialState, system, runtimeContext, 1, 1.0);
+
         // Login Parabank
         typeMatchingWidget("name", "username", "john", initialState, system, runtimeContext, 5, 1.0);
         pasteMatchingWidget("name", "password", "demo", initialState, system, runtimeContext, 5, 1.0);
