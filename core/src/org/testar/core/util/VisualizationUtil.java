@@ -91,7 +91,7 @@ public class VisualizationUtil {
 
                 int MAX_ANCESTORS_PERLINE = 6;
                 double widgetInfoW = canvas.width() / 2;
-                double widgetInfoH = (1 + calculateNumberOfTagsToShow(cursorWidget, visibleTagPredicate) + Util.size(Util.ancestors(cursorWidget)) / MAX_ANCESTORS_PERLINE) * 20;
+                double widgetInfoH = (1 + countVisibleTags(cursorWidget, visibleTagPredicate) + Util.size(Util.ancestors(cursorWidget)) / MAX_ANCESTORS_PERLINE) * 20;
                 cwShape = VisualizationUtil.calculateWidgetInfoShape(canvas, cwShape, widgetInfoW, widgetInfoH);
 
                 if(showExtendedWidgetInfo) {
@@ -164,11 +164,13 @@ public class VisualizationUtil {
     }
 
     /**
-     * Calculate how many tags we need to show .
+     * Calculate how many tags satisfy the active visualization filter.
+     *
      * @param cursorWidget The widget pointed by the cursor.
+     * @param visibleTagPredicate Filter that decides whether a tag is visible.
      * @return The number of tags we need to show.
      */
-    private static int calculateNumberOfTagsToShow(Widget cursorWidget, Predicate<Tag<?>> visibleTagPredicate) {
+    static int countVisibleTags(Widget cursorWidget, Predicate<Tag<?>> visibleTagPredicate) {
         int tagsToShow = 0;
         for (Tag<?> t : cursorWidget.tags()) {
             if (shouldVisualizeTag(visibleTagPredicate, t)) {

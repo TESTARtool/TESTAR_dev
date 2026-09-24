@@ -5,12 +5,32 @@ import static org.junit.Assert.assertSame;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 import org.junit.Test;
 import org.testar.core.alayer.Canvas;
 import org.testar.core.alayer.Rect;
 import org.testar.core.alayer.Shape;
+import org.testar.core.state.Widget;
+import org.testar.core.tag.Tag;
 
 public class VisualizationUtilTest {
+
+    @Test
+    public void countVisibleTagsUsesProvidedPredicate() {
+        Widget widget = mock(Widget.class);
+        Tag<?> visibleTag = mock(Tag.class);
+        Tag<?> hiddenTag = mock(Tag.class);
+        Set<Tag<?>> tags = new LinkedHashSet<>();
+        tags.add(visibleTag);
+        tags.add(hiddenTag);
+        when(widget.tags()).thenReturn(tags);
+
+        int visibleTags = VisualizationUtil.countVisibleTags(widget, visibleTag::equals);
+
+        assertEquals(1, visibleTags);
+    }
 
     @Test
     public void repositionShape_InsideCanvas() {

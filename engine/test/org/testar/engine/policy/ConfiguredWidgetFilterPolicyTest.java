@@ -11,6 +11,7 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 import org.testar.core.alayer.Rect;
+import org.testar.core.alayer.Role;
 import org.testar.core.state.Widget;
 import org.testar.core.tag.Tag;
 import org.testar.core.tag.Tags;
@@ -54,6 +55,32 @@ public final class ConfiguredWidgetFilterPolicyTest {
         Widget widget = widgetWithHitTester(Util.TrueTester);
 
         Assert.assertTrue(policy.allows(widget));
+    }
+
+    @Test
+    public void allowsWidgetWhenNegativeFilterExcludesItsRole() {
+        ConfiguredWidgetFilterPolicy policy = new ConfiguredWidgetFilterPolicy(
+                List.of("Title", "Role"),
+                "^(?!(.*View.*|.*Scientific.*|.*MenuItem.*)$).*$"
+        );
+        Widget widget = widgetWithHitTester(Util.TrueTester);
+        widget.set(Tags.Title, "View");
+        widget.set(Tags.Role, Role.from("UIAMenuItem"));
+
+        Assert.assertTrue(policy.allows(widget));
+    }
+
+    @Test
+    public void rejectsWidgetWhenNegativeFilterMatchesItsRole() {
+        ConfiguredWidgetFilterPolicy policy = new ConfiguredWidgetFilterPolicy(
+                List.of("Title", "Role"),
+                "^(?!(.*View.*|.*Scientific.*|.*MenuItem.*)$).*$"
+        );
+        Widget widget = widgetWithHitTester(Util.TrueTester);
+        widget.set(Tags.Title, "View");
+        widget.set(Tags.Role, Role.from("UIAButton"));
+
+        Assert.assertFalse(policy.allows(widget));
     }
 
     private static Widget widgetWithHitTester(org.testar.core.alayer.HitTester hitTester) {
