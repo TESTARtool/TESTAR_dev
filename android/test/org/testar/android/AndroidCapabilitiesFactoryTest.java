@@ -2,6 +2,7 @@ package org.testar.android;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.List;
 import java.util.Properties;
 
 import org.junit.Rule;
@@ -12,6 +13,7 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.testar.config.ConfigTags;
 import org.testar.config.settings.Settings;
 import org.testar.config.settings.SettingsDefaults;
+import org.testar.core.Pair;
 
 public class AndroidCapabilitiesFactoryTest {
 
@@ -142,7 +144,14 @@ public class AndroidCapabilitiesFactoryTest {
     }
 
     private static Settings defaultSettings() {
-        return new Settings(SettingsDefaults.getSettingsDefaults(), new Properties());
+        List<Pair<?, ?>> defaults = SettingsDefaults.getSettingsDefaults();
+        for (int i = 0; i < defaults.size(); i++) {
+            if (defaults.get(i).left().equals(ConfigTags.SUTConnectorValue)) {
+                defaults.set(i, Pair.from(ConfigTags.SUTConnectorValue, "android-test"));
+                break;
+            }
+        }
+        return new Settings(defaults, new Properties());
     }
 
 }

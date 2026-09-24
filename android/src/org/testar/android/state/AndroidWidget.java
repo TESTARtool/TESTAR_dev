@@ -18,85 +18,85 @@ import java.util.List;
 import java.util.Map;
 
 public class AndroidWidget implements Widget, Serializable {
-	private static final long serialVersionUID = -1757924936831611142L;
-	
-	AndroidState root;
-	AndroidWidget parent;
-	Map<Tag<?>, Object> tags = new HashMap<>();
-	List<AndroidWidget> children = new ArrayList<>();
-	public AndroidElement element;
+    private static final long serialVersionUID = -1757924936831611142L;
 
-	public AndroidWidget(AndroidState root, AndroidWidget parent, AndroidElement element) {
-		this.parent = parent;
-		this.element = element;
-		this.root = root;
+    AndroidState root;
+    AndroidWidget parent;
+    Map<Tag<?>, Object> tags = new HashMap<>();
+    List<AndroidWidget> children = new ArrayList<>();
+    public AndroidElement element;
 
-		if (parent != null) {
-			root.connect(parent, this);
-		}
-	}
+    public AndroidWidget(AndroidState root, AndroidWidget parent, AndroidElement element) {
+        this.parent = parent;
+        this.element = element;
+        this.root = root;
 
-	final public void moveTo(Widget p, int idx) {
-		root.setParent(this, p, idx);
-	}
+        if (parent != null) {
+            root.connect(parent, this);
+        }
+    }
 
-	public final AndroidWidget addChild() {
-		return root.addChild(this, null);
-	}
+    final public void moveTo(Widget p, int idx) {
+        root.setParent(this, p, idx);
+    }
 
-	public final AndroidState root() {
-		return root;
-	}
+    public final AndroidWidget addChild() {
+        return root.addChild(this, null);
+    }
 
-	public final AndroidWidget parent() {
-		return root.getParent(this);
-	}
+    public final AndroidState root() {
+        return root;
+    }
 
-	public final AndroidWidget child(int i) {
-		return root.getChild(this, i);
-	}
+    public final AndroidWidget parent() {
+        return root.getParent(this);
+    }
 
-	public final void remove() {
-		root.remove(this);
-	}
+    public final AndroidWidget child(int i) {
+        return root.getChild(this, i);
+    }
 
-	public final int childCount() {
-		return root.childCount(this);
-	}
+    public final void remove() {
+        root.remove(this);
+    }
 
-	public final <T> T get(Tag<T> tag) {
-		return root.get(this, tag);
-	}
+    public final int childCount() {
+        return root.childCount(this);
+    }
 
-	public final <T> void set(Tag<T> tag, T value) {
-		root.setTag(this, tag, value);
-	}
+    public final <T> T get(Tag<T> tag) {
+        return root.get(this, tag);
+    }
 
-	public final <T> T get(Tag<T> tag, T defaultValue) {
-		return root.get(this, tag, defaultValue);
-	}
+    public final <T> void set(Tag<T> tag, T value) {
+        root.setTag(this, tag, value);
+    }
 
-	public final Iterable<Tag<?>> tags() {
-		return root.tags(this);
-	}
+    public final <T> T get(Tag<T> tag, T defaultValue) {
+        return root.get(this, tag, defaultValue);
+    }
 
-	public final void remove(Tag<?> tag) {
-		root.remove(this, tag);
-	}
+    public final Iterable<Tag<?>> tags() {
+        return root.tags(this);
+    }
 
-	public String getRepresentation(String tab) {
-		return "COMPLETE: AndroidWidget getRepresentation";
-	}
+    public final void remove(Tag<?> tag) {
+        root.remove(this, tag);
+    }
 
-	@Override
-	//TODO: Extend this such that when I log I get some more useful information.
-	public String toString(Tag<?>... tags) {
-		return Util.widgetDesc(this, tags);
-	}
+    public String getRepresentation(String tab) {
+        return "COMPLETE: AndroidWidget getRepresentation";
+    }
 
-	@Override
-	public Drag[] scrollDrags(double scrollArrowSize, double scrollThick) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    //TODO: Extend this such that when I log I get some more useful information.
+    public String toString(Tag<?>... tags) {
+        return Util.widgetDesc(this, tags);
+    }
+
+    @Override
+    public Drag[] scrollDrags(double scrollArrowSize, double scrollThick) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }

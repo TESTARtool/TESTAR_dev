@@ -40,7 +40,7 @@ public class AndroidTypeActionResolutionTest {
         DescriptionActionResolver resolver = new DescriptionActionResolver();
         ResolvedAction resolvedAction = resolver.resolve(
                 Collections.singleton(templateAction),
-                List.of("type", "Enter your username", "testar")
+                List.of("type", "edittext_enter_your_username", "testar")
         );
 
         Assert.assertTrue(resolvedAction.action() instanceof AndroidActionType);

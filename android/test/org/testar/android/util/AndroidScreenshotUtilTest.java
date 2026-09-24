@@ -5,16 +5,16 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 
-import java.io.IOException;
-
 import org.junit.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.testar.android.AndroidAppiumFramework;
-import org.testar.core.alayer.AWTCanvas;
 import org.testar.core.action.Action;
+import org.testar.core.alayer.AWTCanvas;
 import org.testar.core.state.State;
 import org.testar.core.util.ScreenshotUtil;
+
+import java.io.IOException;
 
 public class AndroidScreenshotUtilTest {
 
@@ -66,7 +66,9 @@ public class AndroidScreenshotUtilTest {
         Action action = mock(Action.class);
 
         try (MockedStatic<AndroidAppiumFramework> framework = Mockito.mockStatic(AndroidAppiumFramework.class)) {
-            framework.when(() -> AndroidAppiumFramework.getScreenshotAction(state, action)).thenThrow(new RuntimeException("exception"));
+            framework
+                    .when(() -> AndroidAppiumFramework.getScreenshotAction(state, action))
+                    .thenThrow(new RuntimeException("exception"));
 
             String result = AndroidScreenshotUtil.getActionshot(state, action);
             assertEquals("", result);
@@ -79,8 +81,10 @@ public class AndroidScreenshotUtilTest {
         AWTCanvas expected = mock(AWTCanvas.class);
 
         try (MockedStatic<AndroidAppiumFramework> framework = Mockito.mockStatic(AndroidAppiumFramework.class);
-             MockedStatic<ScreenshotUtil> coreUtil = Mockito.mockStatic(ScreenshotUtil.class)) {
-            framework.when(() -> AndroidAppiumFramework.getScreenshotBinary(state)).thenThrow(new IOException("exception"));
+                MockedStatic<ScreenshotUtil> coreUtil = Mockito.mockStatic(ScreenshotUtil.class)) {
+            framework
+                    .when(() -> AndroidAppiumFramework.getScreenshotBinary(state))
+                    .thenThrow(new IOException("exception"));
             coreUtil.when(() -> ScreenshotUtil.getStateshotBinary(state)).thenReturn(expected);
 
             AWTCanvas result = AndroidScreenshotUtil.getStateshotBinary(state);

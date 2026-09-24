@@ -10,43 +10,43 @@ import org.w3c.dom.Node;
 
 public final class AndroidNodeParser {
 
-	public static String getStringAttribute(Node xmlNode, String attributeName) {
-		try {
-			xmlNode.getAttributes().getNamedItem(attributeName).getNodeValue();
-		} catch(Exception e) {
-			return "";
-		}
+    public static String getStringAttribute(Node xmlNode, String attributeName) {
+        try {
+            xmlNode.getAttributes().getNamedItem(attributeName).getNodeValue();
+        } catch (Exception e) {
+            return "";
+        }
 
-		return xmlNode.getAttributes().getNamedItem(attributeName).getNodeValue(); 
-	}
+        return xmlNode.getAttributes().getNamedItem(attributeName).getNodeValue();
+    }
 
-	public static Integer getIntegerAttribute(Node xmlNode, String attributeName) {
-		try {
-			Integer.parseInt(xmlNode.getAttributes().getNamedItem(attributeName).getNodeValue());
-		} catch(Exception e) {
-			return -1;
-		}
+    public static Integer getIntegerAttribute(Node xmlNode, String attributeName) {
+        try {
+            Integer.parseInt(xmlNode.getAttributes().getNamedItem(attributeName).getNodeValue());
+        } catch (Exception e) {
+            return -1;
+        }
 
-		return Integer.parseInt(xmlNode.getAttributes().getNamedItem(attributeName).getNodeValue());
-	}
+        return Integer.parseInt(xmlNode.getAttributes().getNamedItem(attributeName).getNodeValue());
+    }
 
-	public static Double getDoubleAttribute(Node xmlNode, String attributeName) {
-		try {
-			Double.parseDouble(xmlNode.getAttributes().getNamedItem(attributeName).getNodeValue());
-		} catch(Exception e) {
-			return -1.0;
-		}
+    public static Double getDoubleAttribute(Node xmlNode, String attributeName) {
+        try {
+            Double.parseDouble(xmlNode.getAttributes().getNamedItem(attributeName).getNodeValue());
+        } catch (Exception e) {
+            return -1.0;
+        }
 
-		return Double.parseDouble(xmlNode.getAttributes().getNamedItem(attributeName).getNodeValue());
-	}
+        return Double.parseDouble(xmlNode.getAttributes().getNamedItem(attributeName).getNodeValue());
+    }
 
-	public static Boolean getBooleanAttribute(Node xmlNode, String attributeName) {
-		try {
-			Boolean.parseBoolean(xmlNode.getAttributes().getNamedItem(attributeName).getNodeValue());
-		} catch(Exception e) {
-			return false;
-		}
+    public static Boolean getBooleanAttribute(Node xmlNode, String attributeName) {
+        try {
+            Boolean.parseBoolean(xmlNode.getAttributes().getNamedItem(attributeName).getNodeValue());
+        } catch (Exception e) {
+            return false;
+        }
 
-		return Boolean.parseBoolean(xmlNode.getAttributes().getNamedItem(attributeName).getNodeValue());
-	}
+        return Boolean.parseBoolean(xmlNode.getAttributes().getNamedItem(attributeName).getNodeValue());
+    }
 }

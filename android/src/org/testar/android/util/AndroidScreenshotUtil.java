@@ -6,27 +6,26 @@
 
 package org.testar.android.util;
 
-import java.io.IOException;
-import java.util.Objects;
-
 import org.testar.android.AndroidAppiumFramework;
-import org.testar.core.alayer.AWTCanvas;
 import org.testar.core.action.Action;
+import org.testar.core.alayer.AWTCanvas;
 import org.testar.core.state.State;
 import org.testar.core.tag.Tags;
 import org.testar.core.util.ScreenshotUtil;
 
+import java.io.IOException;
+import java.util.Objects;
+
 public class AndroidScreenshotUtil {
 
-    private AndroidScreenshotUtil() {
-    }
+    private AndroidScreenshotUtil() { }
 
     public static String getActionshot(State state, Action action) {
         Objects.requireNonNull(state, "State cannot be null");
         Objects.requireNonNull(action, "Action cannot be null");
         try {
             return AndroidAppiumFramework.getScreenshotAction(state, action);
-        } catch(Exception e) {
+        } catch (Exception e) {
             System.err.println("Exception when taking action screenshot: " + e);
         }
 
@@ -37,7 +36,7 @@ public class AndroidScreenshotUtil {
         Objects.requireNonNull(state, "State cannot be null");
         try {
             return AndroidAppiumFramework.getScreenshotSpyMode(state.get(Tags.ConcreteID, "NoConcreteIdAvailable"));
-        } catch(Exception e) {
+        } catch (Exception e) {
             System.err.println("Exception occured when trying to take a screenshot of the Android emulator: " + e);
         }
 
@@ -46,6 +45,7 @@ public class AndroidScreenshotUtil {
 
     /**
      * Method returns a binary representation of a state's screenshot.
+     *
      * @param state
      * @return
      */
@@ -59,5 +59,4 @@ public class AndroidScreenshotUtil {
 
         return ScreenshotUtil.getStateshotBinary(state);
     }
-
 }

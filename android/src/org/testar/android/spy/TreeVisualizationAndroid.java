@@ -7,18 +7,25 @@
 package org.testar.android.spy;
 
 import org.testar.android.tag.AndroidTags;
-import org.testar.core.alayer.*;
+import org.testar.core.alayer.Rect;
 import org.testar.core.state.State;
 import org.testar.core.state.Widget;
 import org.testar.core.tag.Tags;
 
-import javax.swing.*;
+import javax.swing.BoxLayout;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTree;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
-import java.awt.*;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridLayout;
 
 public class TreeVisualizationAndroid extends JPanel implements TreeSelectionListener {
     private final JPanel infoPaneLeft = new JPanel();
@@ -104,7 +111,9 @@ public class TreeVisualizationAndroid extends JPanel implements TreeSelectionLis
             tempTreeNode = node;
         }
 
-        if (node == null) return;
+        if (node == null) {
+            return;
+        }
 
         // If statement making sure when the root gets clicked it does not try to obtain detailed information.
         if (!(node.equals(tree.getModel().getRoot()))) {
@@ -398,7 +407,7 @@ public class TreeVisualizationAndroid extends JPanel implements TreeSelectionLis
     }
 
     /** Method which makes sure that when a widget selected in the overlay also becomes selected in the tree */
-    public void triggerTreeClick(DefaultMutableTreeNode node){
+    public void triggerTreeClick(DefaultMutableTreeNode node) {
         this.triggeredByOverlayClick = true;
 
         // Sets the selected node path into the variable which tracks the last selected node

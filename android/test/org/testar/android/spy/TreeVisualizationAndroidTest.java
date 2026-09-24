@@ -1,11 +1,18 @@
 package org.testar.android.spy;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Before;
 import org.junit.Test;
-import org.testar.core.state.Widget;
 import org.testar.android.tag.AndroidTags;
 import org.testar.core.alayer.Rect;
 import org.testar.core.state.State;
+import org.testar.core.state.Widget;
 import org.testar.core.tag.Tags;
 import org.testar.stub.StateStub;
 import org.testar.stub.WidgetStub;
@@ -13,8 +20,6 @@ import org.testar.stub.WidgetStub;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
-
-import static org.junit.Assert.*;
 
 public class TreeVisualizationAndroidTest {
 
@@ -119,5 +124,4 @@ public class TreeVisualizationAndroidTest {
         assertNotSame("Root node should be rebuilt when structure changed", rootBefore, rootAfter);
         assertEquals("New root should have no children as in newRoot state", 0, rootAfter.getChildCount());
     }
-
 }

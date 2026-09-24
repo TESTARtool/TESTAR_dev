@@ -1,13 +1,13 @@
 package org.testar.android.policy;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.testar.android.tag.AndroidTags;
 import org.testar.stub.WidgetStub;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class TestConfigurableAndroidClickableClassPolicy {
 
@@ -51,10 +51,7 @@ public class TestConfigurableAndroidClickableClassPolicy {
 
     @Test
     public void testConfiguredClickableClassWhenMultiple() {
-        List<String> multipleClickable = Arrays.asList(
-            "android.widget.Image",
-            "android.widget.TextView",
-            "android.widget.View");
+        List<String> multipleClickable = Arrays.asList("android.widget.Image", "android.widget.TextView", "android.widget.View");
         ConfigurableAndroidClickableClassPolicy policy = new ConfigurableAndroidClickableClassPolicy(multipleClickable);
         WidgetStub widget = new WidgetStub();
         widget.set(AndroidTags.AndroidClassName, "android.widget.TextView");

@@ -12,8 +12,15 @@ import org.testar.core.alayer.Rect;
 import org.testar.core.tag.Tags;
 import org.testar.core.state.Widget;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JLayeredPane;
+import javax.swing.JTree;
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
@@ -47,13 +54,13 @@ public class OverlayVisualization extends JLayeredPane {
     }
 
     public void updateSc(String screenshotPath, JTree tree, Set<Action> derivedActions) {
-    	ImageIcon tempImageIcon = new ImageIcon(screenshotPath);
-    	originalHeight = tempImageIcon.getIconHeight();
-    	originalWidth = tempImageIcon.getIconWidth();
+        ImageIcon tempImageIcon = new ImageIcon(screenshotPath);
+        originalHeight = tempImageIcon.getIconHeight();
+        originalWidth = tempImageIcon.getIconWidth();
 
-    	Image stateImage = tempImageIcon.getImage().getScaledInstance(width, height, Image.SCALE_DEFAULT);
-    	ImageIcon stateIcon = new ImageIcon(stateImage);
-    	imageLabel.setIcon(stateIcon);
+        Image stateImage = tempImageIcon.getImage().getScaledInstance(width, height, Image.SCALE_DEFAULT);
+        ImageIcon stateIcon = new ImageIcon(stateImage);
+        imageLabel.setIcon(stateIcon);
 
         for (OverlayBox i: boxTrackSetNotDisplayed) {
             this.remove(i);
@@ -148,7 +155,7 @@ public class OverlayVisualization extends JLayeredPane {
         }
     }
 
-    public static class OverlayBox extends JLabel{
+    public static class OverlayBox extends JLabel {
         private OverlayVisualization overlay;
         public DefaultMutableTreeNode node;
         public boolean displayed = false;
@@ -180,8 +187,8 @@ public class OverlayVisualization extends JLayeredPane {
 
                 g.setColor(color);
 
-                g.drawOval((int)(getWidth()/2.0),(int)((getHeight()/2.0)-1), 12, 12);
-                g.fillOval((int)(getWidth()/2.0), (int)((getHeight()/2.0)-1), 12, 12);
+                g.drawOval((int)(getWidth() / 2.0),(int)((getHeight() / 2.0) - 1), 12, 12);
+                g.fillOval((int)(getWidth() / 2.0), (int)((getHeight() / 2.0) - 1), 12, 12);
             }
 
         }
@@ -215,18 +222,17 @@ public class OverlayVisualization extends JLayeredPane {
             Rect bounds = widget.get(AndroidTags.AndroidBounds);
             // Reduce 1 pixel of the sides of the widget that we highlight with colors
             // This will avoid opaque bounds to cover the state image
-            this.setBounds((int)((((double)overlay.width)/overlay.originalWidth)*bounds.x()) +1 ,
-                    (int)((((double)overlay.height)/overlay.originalHeight)*bounds.y()) +1 ,
-                    (int)((((double)overlay.width)/overlay.originalWidth)*bounds.width()) -1 ,
-                    (int)((((double)overlay.height)/overlay.originalHeight)*bounds.height()) -1);
+            this.setBounds((int)((((double)overlay.width) / overlay.originalWidth) * bounds.x()) + 1 ,
+                    (int)((((double)overlay.height) / overlay.originalHeight) * bounds.y()) + 1 ,
+                    (int)((((double)overlay.width) / overlay.originalWidth) * bounds.width()) - 1 ,
+                    (int)((((double)overlay.height) / overlay.originalHeight) * bounds.height()) - 1);
 
             //this.setOpaque(true);
             this.setBackground(new Color(0, 0, 255, 0));
 
             this.addMouseListener(new MouseListener() {
                 @Override
-                public void mouseClicked(MouseEvent e)
-                {
+                public void mouseClicked(MouseEvent e) {
                     if (!displayed) {
                         //instanceOverlayBox.setOpaque(true);
                         instanceOverlayBox.setBackground(new Color(0, 0, 255, 100));

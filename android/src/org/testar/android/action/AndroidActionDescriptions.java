@@ -57,9 +57,8 @@ final class AndroidActionDescriptions {
             if (!text.isEmpty()) {
                 return roleSemantic(role, text);
             }
-        } 
-        // Otherwise: content-desc > text > hint > resource-id > class > xpath
-        else {
+        } else {
+            // Otherwise: content-desc > text > hint > resource-id > class > xpath
             if (!text.isEmpty()) {
                 return roleSemantic(role, text);
             }

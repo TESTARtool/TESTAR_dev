@@ -11,7 +11,7 @@ import org.testar.core.state.Widget;
 
 public class DefaultMutableTreeNode extends javax.swing.tree.DefaultMutableTreeNode {
 
-	public DefaultMutableTreeNode() {
+    public DefaultMutableTreeNode() {
         super();
     }
 
@@ -26,11 +26,10 @@ public class DefaultMutableTreeNode extends javax.swing.tree.DefaultMutableTreeN
     @Override
     public String toString() {
         try {
-            Widget widget = (Widget)this.getUserObject();
+            Widget widget = (Widget) this.getUserObject();
             return widget.get(AndroidTags.AndroidClassName);
-        } catch(Exception e) {
+        } catch (Exception e) {
             return this.userObject == null ? "" : this.userObject.toString();
         }
-
     }
 }

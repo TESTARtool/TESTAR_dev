@@ -17,60 +17,62 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AndroidElement extends TaggableBase implements Serializable {
-	private static final long serialVersionUID = -2910535746470588590L;
-	
-	List<AndroidElement> children = new ArrayList<>();
-	AndroidElement parent;
-	public AndroidRootElement root;
-	AndroidWidget backRef;
-	
-	boolean enabled;
-	boolean ignore;
-	boolean blocked;
-	boolean isTopLevelContainer;
+    private static final long serialVersionUID = -2910535746470588590L;
 
-	double zindex;
-	
-	Rect rect;
-	Rect bounds;
-	
-	int nodeIndex;
-	String text;
-	String hint;
-	String resourceId;
-	public String className;
-	String packageName;
-	String accessibilityID;
-	String xPath;
-	String abstractActionId;
-	String activity;
-	
-	boolean checkable;
-	boolean checked;
-	boolean clickable; 
-	boolean focusable;
-	boolean focused;
-	boolean scrollable;
-	boolean longclicklable;
-	boolean password;
-	boolean selected;
-	boolean displayed;
-	
-	public AndroidElement(){ this(null); }
+    List<AndroidElement> children = new ArrayList<>();
+    AndroidElement parent;
+    public AndroidRootElement root;
+    AndroidWidget backRef;
 
-	public AndroidElement(AndroidElement parent){
-		this.parent = parent;
-		if(parent != null) {
-			root = parent.root;
-		}
-		enabled = true;
-	}
+    boolean enabled;
+    boolean ignore;
+    boolean blocked;
+    boolean isTopLevelContainer;
 
-	private void writeObject(ObjectOutputStream oos) throws IOException{
-		oos.defaultWriteObject();
-	}
+    double zindex;
 
-	private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException{
-		ois.defaultReadObject();
-	}
+    Rect rect;
+    Rect bounds;
+
+    int nodeIndex;
+    String text;
+    String hint;
+    String resourceId;
+    public String className;
+    String packageName;
+    String accessibilityID;
+    String xPath;
+    String abstractActionId;
+    String activity;
+
+    boolean checkable;
+    boolean checked;
+    boolean clickable;
+    boolean focusable;
+    boolean focused;
+    boolean scrollable;
+    boolean longclicklable;
+    boolean password;
+    boolean selected;
+    boolean displayed;
+
+    public AndroidElement() {
+        this(null);
+    }
+
+    public AndroidElement(AndroidElement parent) {
+        this.parent = parent;
+        if (parent != null) {
+            root = parent.root;
+        }
+        enabled = true;
+    }
+
+    private void writeObject(ObjectOutputStream oos) throws IOException {
+        oos.defaultWriteObject();
+    }
+
+    private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
+        ois.defaultReadObject();
+    }
 }

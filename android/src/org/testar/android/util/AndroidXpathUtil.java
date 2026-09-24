@@ -6,23 +6,21 @@
 
 package org.testar.android.util;
 
-import java.util.ArrayList;
-
 import org.testar.android.tag.AndroidTags;
 import org.testar.core.Pair;
-import org.testar.core.tag.Tags;
 import org.testar.core.state.Widget;
+import org.testar.core.tag.Tags;
+
+import java.util.ArrayList;
 
 public class AndroidXpathUtil {
 
-    private AndroidXpathUtil() {
-    }
-
+    private AndroidXpathUtil() { }
 
     // Method which constructs the hierarchy xpath (absolute path)
     // This method is needed as this is the only way to uniquely identify an GUI object if it has no accessibilityID.
     public static String constructXpath(Widget w) {
-        StringBuilder sb =  new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         Widget parentWidget = w;
 
         while (parentWidget != w.root()) {
@@ -38,10 +36,10 @@ public class AndroidXpathUtil {
             ArrayList<Pair<String, Integer>> childClasses = new ArrayList<Pair<String, Integer>>();
 
             for (int i = 0; i < parentWidget.childCount(); i++) {
-                childClasses.add(new Pair<String, Integer>(
-                    parentWidget.child(i).get(Tags.Desc, "*"), 
-                    parentWidget.child(i).get(AndroidTags.AndroidNodeIndex, -1)
-                ));
+                childClasses.add(
+                        new Pair<String, Integer>(
+                                parentWidget.child(i).get(Tags.Desc, "*"),
+                                parentWidget.child(i).get(AndroidTags.AndroidNodeIndex, -1)));
             }
 
             boolean checkDoubles = false;
@@ -55,8 +53,7 @@ public class AndroidXpathUtil {
                     if (incCounter) {
                         counterOccur++;
                     }
-                }
-                else if (leftSide.equals(classTag) && rightSide == indexNumber) {
+                } else if (leftSide.equals(classTag) && rightSide == indexNumber) {
                     incCounter = false;
                 }
             }
@@ -64,17 +61,14 @@ public class AndroidXpathUtil {
             if (checkDoubles) {
                 String xpathComponent = "/" + classTag + "[" + counterOccur + "]";
                 sb.insert(0, xpathComponent);
-            }
-            else {
+            } else {
                 String xpathComponent = "/" + classTag;
                 sb.insert(0, xpathComponent);
             }
-
         }
 
         sb.insert(0, "/hierarchy");
 
         return sb.toString();
     }
-
 }

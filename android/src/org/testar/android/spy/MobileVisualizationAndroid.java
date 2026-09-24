@@ -10,7 +10,10 @@ import org.testar.android.util.AndroidScreenshotUtil;
 import org.testar.core.action.Action;
 import org.testar.core.state.State;
 
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JSplitPane;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -67,7 +70,7 @@ public class MobileVisualizationAndroid {
 
         // Creates left and right hand side in the screen
         JSplitPane splitPane = new JSplitPane();
-        splitPane.setSize(width-10, height-10);
+        splitPane.setSize(width - 10, height - 10);
         splitPane.setDividerSize(0);
         splitPane.setDividerLocation(compWidth);
         splitPane.setOrientation(JSplitPane.HORIZONTAL_SPLIT);

@@ -8,8 +8,8 @@ package org.testar.android.action;
 
 import org.testar.android.AndroidAppiumFramework;
 import org.testar.android.alayer.AndroidRoles;
-import org.testar.core.alayer.*;
 import org.testar.core.action.Action;
+import org.testar.core.alayer.Role;
 import org.testar.core.exceptions.ActionFailedException;
 import org.testar.core.state.SUT;
 import org.testar.core.state.State;
@@ -30,7 +30,7 @@ public class AndroidBackAction extends TaggableBase implements Action {
     public void run(SUT system, State state, double duration) throws ActionFailedException {
         try {
             AndroidAppiumFramework.clickBackButton();
-        } catch(Exception e) {
+        } catch (Exception e) {
             System.err.println("Exception trying to execute : " + toShortString());
             System.err.println(e.getMessage());
             throw new ActionFailedException(toShortString());
