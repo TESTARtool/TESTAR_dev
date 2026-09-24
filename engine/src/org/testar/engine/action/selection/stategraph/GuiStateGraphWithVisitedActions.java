@@ -27,24 +27,24 @@ public class GuiStateGraphWithVisitedActions implements ActionSelectorService {
         idBasedGuiStates = new HashSet<IdBasedGuiState>();
     }
 
-    public Set<String> getAbstractIdsOfUnvisitedActions(State state){
+    public Set<String> getAbstractIdsOfUnvisitedActions(State state) {
         return getIdBasedGuiState(state.get(Tags.AbstractID)).getUnvisitedActionIds();
     }
 
     //TODO move into a new action selector:
     @Override
-    public Action selectAction(State state, Set<Action> actions){
+    public Action selectAction(State state, Set<Action> actions) {
         System.out.println("---------------------------------------------------------");
         // saving the starting node of the graph:
-        if(startingStateAbstractId==null){
-            startingStateAbstractId=state.get(Tags.AbstractID);
+        if (startingStateAbstractId == null) {
+            startingStateAbstractId = state.get(Tags.AbstractID);
         }
         // adding state transition to the graph: previous state + previous action = current state
-        if(previousStateAbstractId!=null && previousActionAbstractId != null){
+        if (previousStateAbstractId != null && previousActionAbstractId != null) {
             IdBasedGuiState previousState = getIdBasedGuiState(previousStateAbstractId);
-            if(previousState==null){
-                System.out.println(this.getClass()+": ERROR: GuiStateGraphWithVisitedActions did not find previous state!");
-            }else{
+            if (previousState == null) {
+                System.out.println(this.getClass() + ": ERROR: GuiStateGraphWithVisitedActions did not find previous state!");
+            } else {
                 idBasedGuiStates.remove(previousState);
                 previousState.addStateTransition(new GuiStateTransition(previousStateAbstractId,state.get(Tags.AbstractID),previousActionAbstractId));
                 idBasedGuiStates.add(previousState);
@@ -53,7 +53,7 @@ public class GuiStateGraphWithVisitedActions implements ActionSelectorService {
         Action returnAction = null;
         IdBasedGuiState currentIdBasedGuiState = getIdBasedGuiState(state.get(Tags.AbstractID));
 
-        if(currentIdBasedGuiState==null) { // did not contain the state ID -> a new state
+        if (currentIdBasedGuiState == null) { // did not contain the state ID -> a new state
             // new state:
             currentIdBasedGuiState = createIdBasedGuiState(state, actions);
         }
@@ -62,18 +62,18 @@ public class GuiStateGraphWithVisitedActions implements ActionSelectorService {
         //TODO implement a way to give application specific rules like: if title=="Select one or multiple files", then always select cancel and mark all actions visited
 
         // the action selection:
-        if(currentIdBasedGuiState.getUnvisitedActionIds().size()==actions.size()){
+        if (currentIdBasedGuiState.getUnvisitedActionIds().size() == actions.size()) {
             // all actions unvisited -> new state -> randomly select action:
-            System.out.println(this.getClass()+": new state, selecting randomly from "+actions.size()+" available actions");
+            System.out.println(this.getClass() + ": new state, selecting randomly from " + actions.size() + " available actions");
             returnAction = new RandomActionSelector().selectAction(state, actions);
-        }else{
+        } else {
             // already visited state
-            if(currentIdBasedGuiState.getUnvisitedActionIds().size()==0){
-                System.out.println(this.getClass()+":  all actions visited! Finding the action leading to a state with most unvisited actions");
+            if (currentIdBasedGuiState.getUnvisitedActionIds().size() == 0) {
+                System.out.println(this.getClass() + ":  all actions visited! Finding the action leading to a state with most unvisited actions");
                 String actionId = getAbstractIdOfActionLeadingToStateWithMostUnvisitedActions(currentIdBasedGuiState.getAbstractStateId());
-                returnAction =getActionWithAbstractId(actions, actionId);
-            }else{
-                System.out.println(this.getClass()+": selectAction(): existing state, ID="+currentIdBasedGuiState.getAbstractStateId()+", available action count="+actions.size()+",unvisited action count="+currentIdBasedGuiState.getUnvisitedActionIds().size());
+                returnAction = getActionWithAbstractId(actions, actionId);
+            } else {
+                System.out.println(this.getClass() + ": selectAction(): existing state, ID=" + currentIdBasedGuiState.getAbstractStateId() + ", available action count=" + actions.size() + ",unvisited action count=" + currentIdBasedGuiState.getUnvisitedActionIds().size());
                 long graphTime = System.currentTimeMillis();
                 Random rnd = new Random(graphTime);
                 ArrayList<String> unvisitedActions = new ArrayList<String>(currentIdBasedGuiState.getUnvisitedActionIds());
@@ -81,9 +81,9 @@ public class GuiStateGraphWithVisitedActions implements ActionSelectorService {
                 returnAction = getActionWithAbstractId(actions, abstractIdOfRandomUnvisitedAction);
             }
         }
-        if(returnAction==null){
+        if (returnAction == null) {
             // backup if action selection did not find an action:
-            System.out.println(this.getClass()+": selectAction(): no unvisited actions found! Getting purely random action.");
+            System.out.println(this.getClass() + ": selectAction(): no unvisited actions found! Getting purely random action.");
             returnAction = new RandomActionSelector().selectAction(state, actions);
         }
         //updating the list of states:
@@ -104,52 +104,52 @@ public class GuiStateGraphWithVisitedActions implements ActionSelectorService {
      * @param abstractActionId
      * @return
      */
-    protected Action getActionWithAbstractId(Set<Action> actions, String abstractActionId){
-        for(Action action:actions){
+    protected Action getActionWithAbstractId(Set<Action> actions, String abstractActionId) {
+        for (Action action:actions) {
             // find the action with abstractId:
-            if(action.get(Tags.AbstractID).equals(abstractActionId)){
+            if (action.get(Tags.AbstractID).equals(abstractActionId)) {
                 return action;
             }
         }
         return null;
     }
 
-    protected String getAbstractIdOfActionLeadingToStateWithMostUnvisitedActions(String currentStateId){
+    protected String getAbstractIdOfActionLeadingToStateWithMostUnvisitedActions(String currentStateId) {
         IdBasedGuiState currentState = getIdBasedGuiState(currentStateId);
-        if(currentState==null || currentState.getUnvisitedActionIds()==null){
-            System.out.println(this.getClass()+": ERROR, current state or transitions is null!");
+        if (currentState == null || currentState.getUnvisitedActionIds() == null) {
+            System.out.println(this.getClass() + ": ERROR, current state or transitions is null!");
         }
         int numberOfMostUnvisitedActions = 0;
         String returnActionId = null;
-        for(GuiStateTransition transition:currentState.getStateTransitions()){
-            if(transition==null || transition.getSourceStateAbstractId()==null){
-                System.out.println(this.getClass()+": ERROR, transition or source state id is null!");
+        for (GuiStateTransition transition:currentState.getStateTransitions()) {
+            if (transition == null || transition.getSourceStateAbstractId() == null) {
+                System.out.println(this.getClass() + ": ERROR, transition or source state id is null!");
             }
-            if(transition.getSourceStateAbstractId().equals(currentStateId)){
+            if (transition.getSourceStateAbstractId().equals(currentStateId)) {
                 //source state is the same as current id, as it should be if no errors
-                if(transition.getTargetStateAbstractId()==null){
-                    System.out.println(this.getClass()+": ERROR, target state ID is null!");
+                if (transition.getTargetStateAbstractId() == null) {
+                    System.out.println(this.getClass() + ": ERROR, target state ID is null!");
                 }
-                if(currentState.getAbstractStateId().equals(transition.getTargetStateAbstractId())){
+                if (currentState.getAbstractStateId().equals(transition.getTargetStateAbstractId())) {
                     // source state id == target state id -> no actual state transition with this action
-                    System.out.println(this.getClass()+": not actually a state transition.");
-                }else{
+                    System.out.println(this.getClass() + ": not actually a state transition.");
+                } else {
                     IdBasedGuiState targetState = getIdBasedGuiState(transition.getTargetStateAbstractId());
-                    if(targetState==null){
-                        System.out.println(this.getClass()+": ERROR, target state is null!");
+                    if (targetState == null) {
+                        System.out.println(this.getClass() + ": ERROR, target state is null!");
                     }
-                    if(targetState.getUnvisitedActionIds().size()>numberOfMostUnvisitedActions){
+                    if (targetState.getUnvisitedActionIds().size() > numberOfMostUnvisitedActions) {
                         numberOfMostUnvisitedActions = targetState.getUnvisitedActionIds().size();
-                        System.out.println(this.getClass()+": unvisited actions = "+numberOfMostUnvisitedActions);
+                        System.out.println(this.getClass() + ": unvisited actions = " + numberOfMostUnvisitedActions);
                         returnActionId = transition.getActionAbstractId();
                     }
                 }
-            }else{
-                System.out.println(this.getClass()+": ERROR in state transitions, source state id NOT same as current state id!");
+            } else {
+                System.out.println(this.getClass() + ": ERROR in state transitions, source state id NOT same as current state id!");
             }
         }
-        if(returnActionId==null){
-            System.out.println(this.getClass()+": all actions in all target states have been visited! TODO:implement more depth");
+        if (returnActionId == null) {
+            System.out.println(this.getClass() + ": all actions in all target states have been visited! TODO:implement more depth");
             //TODO implement recursive search for state with unvisited actions
             return "not found, depth=1";
         }
@@ -162,26 +162,26 @@ public class GuiStateGraphWithVisitedActions implements ActionSelectorService {
      * @param abstractStateId
      * @return
      */
-    protected IdBasedGuiState getIdBasedGuiState(String abstractStateId){
-        for(IdBasedGuiState state:idBasedGuiStates){
-            if(state.getAbstractStateId().equals(abstractStateId)){
+    protected IdBasedGuiState getIdBasedGuiState(String abstractStateId) {
+        for (IdBasedGuiState state:idBasedGuiStates) {
+            if (state.getAbstractStateId().equals(abstractStateId)) {
                 return state;
             }
         }
         return null;
     }
 
-    protected IdBasedGuiState createIdBasedGuiState(State state, Set<Action> actions){
+    protected IdBasedGuiState createIdBasedGuiState(State state, Set<Action> actions) {
         Set<String> actionIds = new HashSet<>();
-        for(Action action:actions){
+        for (Action action:actions) {
             actionIds.add(action.get(Tags.AbstractID));
         }
         return new IdBasedGuiState(state.get(Tags.AbstractID),actionIds);
     }
 
-    protected boolean containsStateId(String stateId){
-        for(IdBasedGuiState state:idBasedGuiStates){
-            if(state.getAbstractStateId().equals(stateId)){
+    protected boolean containsStateId(String stateId) {
+        for (IdBasedGuiState state:idBasedGuiStates) {
+            if (state.getAbstractStateId().equals(stateId)) {
                 return true;
             }
         }

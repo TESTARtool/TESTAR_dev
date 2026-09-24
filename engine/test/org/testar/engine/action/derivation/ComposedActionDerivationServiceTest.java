@@ -196,11 +196,14 @@ public final class ComposedActionDerivationServiceTest {
         );
 
         List<Action> actions = List.copyOf(service.deriveActions(null, state));
+        List<String> descriptions = actions.stream()
+                .map(action -> action.get(Tags.Desc))
+                .sorted()
+                .toList();
 
-        Assert.assertEquals("Type into field with hint 'Option' [within 'Question container' #1]",
-                actions.get(0).get(Tags.Desc));
-        Assert.assertEquals("Type into field with hint 'Option' [within 'Question container' #2]",
-                actions.get(1).get(Tags.Desc));
+        Assert.assertEquals(Arrays.asList(
+                "Type into field with hint 'Option' [within 'Question container' #1]",
+                "Type into field with hint 'Option' [within 'Question container' #2]"), descriptions);
     }
 
     @Test
@@ -271,13 +274,21 @@ public final class ComposedActionDerivationServiceTest {
         );
 
         List<Action> actions = List.copyOf(service.deriveActions(null, state));
+        Action dateAction = actions.stream()
+                .filter(action -> "2017-22-03".equals(action.get(Tags.InputText)))
+                .findFirst()
+                .orElseThrow();
+        Action urlAction = actions.stream()
+                .filter(action -> "www.boo.com".equals(action.get(Tags.InputText)))
+                .findFirst()
+                .orElseThrow();
 
         Assert.assertEquals(
                 "Remote scroll and type 2017-22-03 to widget input_type_your_answer_here.. [within 'Answer group' #1]",
-                actions.get(0).get(Tags.Desc));
+                dateAction.get(Tags.Desc));
         Assert.assertEquals(
                 "Remote scroll and type www.boo.com to widget input_type_your_answer_here.. [within 'Answer group' #2]",
-                actions.get(1).get(Tags.Desc));
+                urlAction.get(Tags.Desc));
     }
 
     private State createStateStub() {

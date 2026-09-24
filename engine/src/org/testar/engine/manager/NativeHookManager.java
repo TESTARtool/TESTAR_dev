@@ -17,46 +17,46 @@ import com.github.kwhat.jnativehook.NativeHookException;
 
 public class NativeHookManager {
 
-	public static void registerNativeHook(EventHandler eventHandler) {
-		if (!GraphicsEnvironment.isHeadless()) {
-			try {
-				LogSerialiser.log("Registering keyboard and mouse hooks\n", LogSerialiser.LogLevel.Debug);
-				java.util.logging.Logger logger = java.util.logging.Logger.getLogger(GlobalScreen.class.getPackage().getName());
-				logger.setLevel(Level.OFF);
-				logger.setUseParentHandlers(false);
+    public static void registerNativeHook(EventHandler eventHandler) {
+        if (!GraphicsEnvironment.isHeadless()) {
+            try {
+                LogSerialiser.log("Registering keyboard and mouse hooks\n", LogSerialiser.LogLevel.Debug);
+                java.util.logging.Logger logger = java.util.logging.Logger.getLogger(GlobalScreen.class.getPackage().getName());
+                logger.setLevel(Level.OFF);
+                logger.setUseParentHandlers(false);
 
-				if (!GlobalScreen.isNativeHookRegistered()) {
-					GlobalScreen.registerNativeHook();
-				}
+                if (!GlobalScreen.isNativeHookRegistered()) {
+                    GlobalScreen.registerNativeHook();
+                }
 
-				GlobalScreen.addNativeKeyListener(eventHandler);
-				GlobalScreen.addNativeMouseListener(eventHandler);
-				GlobalScreen.addNativeMouseMotionListener(eventHandler);
-				LogSerialiser.log("Successfully registered keyboard and mouse hooks!\n", LogSerialiser.LogLevel.Debug);
+                GlobalScreen.addNativeKeyListener(eventHandler);
+                GlobalScreen.addNativeMouseListener(eventHandler);
+                GlobalScreen.addNativeMouseMotionListener(eventHandler);
+                LogSerialiser.log("Successfully registered keyboard and mouse hooks!\n", LogSerialiser.LogLevel.Debug);
 
-			} catch (NativeHookException e) {
-				e.printStackTrace();
-			}
-		}
-	}
+            } catch (NativeHookException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
-	public static void unregisterNativeListener(EventHandler eventHandler) {
-		if (!GraphicsEnvironment.isHeadless() && GlobalScreen.isNativeHookRegistered()) {
-			LogSerialiser.log("Unregistering keyboard and mouse hooks\n", LogSerialiser.LogLevel.Debug);
-			GlobalScreen.removeNativeMouseMotionListener(eventHandler);
-			GlobalScreen.removeNativeMouseListener(eventHandler);
-			GlobalScreen.removeNativeKeyListener(eventHandler);
-		}
-	}
+    public static void unregisterNativeListener(EventHandler eventHandler) {
+        if (!GraphicsEnvironment.isHeadless() && GlobalScreen.isNativeHookRegistered()) {
+            LogSerialiser.log("Unregistering keyboard and mouse hooks\n", LogSerialiser.LogLevel.Debug);
+            GlobalScreen.removeNativeMouseMotionListener(eventHandler);
+            GlobalScreen.removeNativeMouseListener(eventHandler);
+            GlobalScreen.removeNativeKeyListener(eventHandler);
+        }
+    }
 
-	public static void unregisterNativeHook() {
-		if (!GraphicsEnvironment.isHeadless() && GlobalScreen.isNativeHookRegistered()) {
-			try {
-				LogSerialiser.log("Finishing JNativeHook\n", LogSerialiser.LogLevel.Debug);
-				GlobalScreen.unregisterNativeHook();
-			} catch (NativeHookException e) {
-				e.printStackTrace();
-			}
-		}
-	}
+    public static void unregisterNativeHook() {
+        if (!GraphicsEnvironment.isHeadless() && GlobalScreen.isNativeHookRegistered()) {
+            try {
+                LogSerialiser.log("Finishing JNativeHook\n", LogSerialiser.LogLevel.Debug);
+                GlobalScreen.unregisterNativeHook();
+            } catch (NativeHookException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }

@@ -34,22 +34,22 @@ public class InputDataManager {
     }
 
     /**
-     * Computes a random text data input from the available data types. 
-     * Number, Alphabetic, URL, Date or Email. 
+     * Computes a random text data input from the available data types.
+     * Number, Alphabetic, URL, Date or Email.
      * @return The random data input.
      */
-    public static String getRandomTextInputData(){
-        switch(new Random().nextInt(5)){
-        case 0:
-            return getRandomNumberInput();
-        case 1:
-            return getRandomAlphabeticInput(10);
-        case 2:
-            return getRandomUrlInput();
-        case 3:
-            return getRandomDateInput();
-        default:
-            return getRandomEmailInput();
+    public static String getRandomTextInputData() {
+        switch (new Random().nextInt(5)) {
+            case 0:
+                return getRandomNumberInput();
+            case 1:
+                return getRandomAlphabeticInput(10);
+            case 2:
+                return getRandomUrlInput();
+            case 3:
+                return getRandomDateInput();
+            default:
+                return getRandomEmailInput();
         }
     }
 
@@ -57,17 +57,17 @@ public class InputDataManager {
      * Computes a random number
      * @return The random number.
      */
-    public static String getRandomNumberInput(){
+    public static String getRandomNumberInput() {
         Random rnd = new Random(System.currentTimeMillis());
         return Integer.toString(rnd.nextInt());
     }
 
     /**
-     * Computes a random alphabetic. 
+     * Computes a random alphabetic.
      * @return The random alphabetic.
      */
-    public static String getRandomAlphabeticInput(int count){
-        if(count < 1) {
+    public static String getRandomAlphabeticInput(int count) {
+        if (count < 1) {
             System.err.println("Random Alphabetic Input length " + count + " cannot be less than 1. Return a random Alphabetic Input of length 10.");
             count = 10;
         }
@@ -78,10 +78,10 @@ public class InputDataManager {
      * Computes a random URL.
      * @return The random URL.
      */
-    public static String getRandomUrlInput(){
+    public static String getRandomUrlInput() {
         List<String> urls = Lists.newArrayList(
-                "www.foo.com", 
-                "www.boo.com", 
+                "www.foo.com",
+                "www.boo.com",
                 "www.fooboo.com",
                 "www.foo.org",
                 "www.boo.org",
@@ -95,7 +95,7 @@ public class InputDataManager {
      * Computes a random date.
      * @return The random date.
      */
-    public static String getRandomDateInput(){
+    public static String getRandomDateInput() {
         List<String> dates = Lists.newArrayList(
                 "22-03-2017",
                 "03-22-2017",
@@ -117,7 +117,7 @@ public class InputDataManager {
      * Computes a random email.
      * @return The random email.
      */
-    public static String getRandomEmailInput(){
+    public static String getRandomEmailInput() {
         List<String> emails = Lists.newArrayList(
                 "foo@boo.org",
                 "boo@foo.org",

@@ -50,70 +50,70 @@ public class PrioritizeNewActionsSelector extends RandomActionSelector {
         System.out.println("---------------------------------------------------------");
         Set<Action> prioritizedActions = new HashSet<Action>();
         //checking if it is the first round of actions:
-        if(previousActions==null) {
+        if (previousActions == null) {
             System.out.println("no previous actions -> all actions are new actions");
             prioritizedActions = actions;
-        }else{
+        } else {
             System.out.println("not the first round, get the new actions compared to previous state");
             prioritizedActions = ActionSelectionUtils.getSetOfNewActions(actions, previousActions);
         }
-        if((prioritizedActions.size()>0) && (selectedActions.size()>0)) {
-        	
-        	// Do not check reseted Actions, with counter == 0
-        	Set<Action> selectedActionsToCheck = new HashSet<>();
-        	for(Map.Entry<Action, Integer> entry : selectedActions.entrySet()){
-        		if(entry.getValue() > 0) {
-        			selectedActionsToCheck.add(entry.getKey());
-        		}
-        	}
+        if ((prioritizedActions.size() > 0) && (selectedActions.size() > 0)) {
+
+            // Do not check reseted Actions, with counter == 0
+            Set<Action> selectedActionsToCheck = new HashSet<>();
+            for (Map.Entry<Action, Integer> entry : selectedActions.entrySet()) {
+                if (entry.getValue() > 0) {
+                    selectedActionsToCheck.add(entry.getKey());
+                }
+            }
 
             System.out.println("there are new actions to choose from and there are selected actions, checking if they have been already selected");
             prioritizedActions = ActionSelectionUtils.getSetOfNewActions(prioritizedActions, selectedActionsToCheck);
         }
-        if(prioritizedActions.size()==0){
+        if (prioritizedActions.size() == 0) {
             System.out.println("no new and unselected actions, checking if any unselected actions");
             prioritizedActions = ActionSelectionUtils.getSetOfNewActions(actions, selectedActions.keySet());
         }
-        if(prioritizedActions.size()==0){
+        if (prioritizedActions.size() == 0) {
             System.out.println("no unselected actions, returning all actions");
             prioritizedActions = actions;
 
             System.out.println("reset selected actions, size = " + selectedActions.size());
             int numberOfCleanedActions = 0;
             // reset the action counter:
-            for(Map.Entry<Action, Integer> entry : selectedActions.entrySet()){
-            	for(Action action : actions){
-            		if(ActionSelectionUtils.areSimilarActions(entry.getKey(), action)){
-            			entry.setValue(0);
-            			numberOfCleanedActions = numberOfCleanedActions + 1;
-            		}
-            	}
+            for (Map.Entry<Action, Integer> entry : selectedActions.entrySet()) {
+                for (Action action : actions) {
+                    if (ActionSelectionUtils.areSimilarActions(entry.getKey(), action)) {
+                        entry.setValue(0);
+                        numberOfCleanedActions = numberOfCleanedActions + 1;
+                    }
+                }
             }
             System.out.println("reseted actions = " + numberOfCleanedActions);
 
         }
-        
+
         //saving the current actions for the next round:
         previousActions = actions;
         return prioritizedActions;
     }
-    
-    private void addSelectedAction(Action action){
-    	for(Map.Entry<Action, Integer> entry : selectedActions.entrySet()){
-    		if(ActionSelectionUtils.areSimilarActions(entry.getKey(), action)) {
-    			entry.setValue(entry.getValue()+1);
-    			return;
-    		}
-    	}
-    	selectedActions.put(action, 1);
+
+    private void addSelectedAction(Action action) {
+        for (Map.Entry<Action, Integer> entry : selectedActions.entrySet()) {
+            if (ActionSelectionUtils.areSimilarActions(entry.getKey(), action)) {
+                entry.setValue(entry.getValue() + 1);
+                return;
+            }
+        }
+        selectedActions.put(action, 1);
     }
 
     private int timesSelected(Action action) {
-    	for(Map.Entry<Action, Integer> entry : selectedActions.entrySet()){
-    		if(ActionSelectionUtils.areSimilarActions(entry.getKey(), action)) {
-    			return entry.getValue();
-    		}
-    	}
+        for (Map.Entry<Action, Integer> entry : selectedActions.entrySet()) {
+            if (ActionSelectionUtils.areSimilarActions(entry.getKey(), action)) {
+                return entry.getValue();
+            }
+        }
         return 0;
     }
 }

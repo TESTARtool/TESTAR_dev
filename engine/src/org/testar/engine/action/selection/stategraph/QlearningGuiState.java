@@ -9,7 +9,11 @@ package org.testar.engine.action.selection.stategraph;
 import org.testar.core.action.Action;
 import org.testar.core.tag.Tags;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class QlearningGuiState {
     protected String abstractStateId;
@@ -26,7 +30,7 @@ public class QlearningGuiState {
         this.abstractActionIdsAndQValues = abstractActionIdsAndRewards;
         //creating execution counters for each action:
         abstractActionIdsAndExecutionCounters = new HashMap<String, Integer>();
-        for(String id:abstractActionIdsAndRewards.keySet()){
+        for (String id:abstractActionIdsAndRewards.keySet()) {
             abstractActionIdsAndExecutionCounters.put(id,0);
         }
         stateTransitions = new HashSet<GuiStateTransition>();
@@ -37,12 +41,12 @@ public class QlearningGuiState {
      * @param actions
      * @return
      */
-    public double getMaxQValueOfTheState(Set<Action> actions){
+    public double getMaxQValueOfTheState(Set<Action> actions) {
         double qValue = 0;
-        for(Map.Entry<String, Double> entry:abstractActionIdsAndQValues.entrySet()){
-            if(entry.getValue()>qValue){
-                for(Action action:actions){
-                    if(action.get(Tags.AbstractID).equals(entry.getKey())){
+        for (Map.Entry<String, Double> entry:abstractActionIdsAndQValues.entrySet()) {
+            if (entry.getValue() > qValue) {
+                for (Action action:actions) {
+                    if (action.get(Tags.AbstractID).equals(entry.getKey())) {
                         qValue = entry.getValue();
                     }
                 }
@@ -51,20 +55,20 @@ public class QlearningGuiState {
         return qValue;
     }
 
-    public ArrayList<String> getActionsIdsWithMaxQvalue(Set<Action> actions){
+    public ArrayList<String> getActionsIdsWithMaxQvalue(Set<Action> actions) {
         ArrayList<String> actionIdsWithMaxQvalue = new ArrayList<String>();
         double maxQValue = getMaxQValueOfTheState(actions);
-        for(String actionId:abstractActionIdsAndQValues.keySet()){
-            if(abstractActionIdsAndQValues.get(actionId).equals(maxQValue)){
+        for (String actionId:abstractActionIdsAndQValues.keySet()) {
+            if (abstractActionIdsAndQValues.get(actionId).equals(maxQValue)) {
                 //checking that the actionID from the model is also in the list of available actions of the state:
-                for(Action action:actions){
-                    if(action.get(Tags.AbstractID).equals(actionId)){
+                for (Action action:actions) {
+                    if (action.get(Tags.AbstractID).equals(actionId)) {
                         actionIdsWithMaxQvalue.add(actionId);
                     }
                 }
             }
         }
-        System.out.println("DEBUG: max Q value of the state was "+maxQValue+", and "+actionIdsWithMaxQvalue.size()+" action with that value");
+        System.out.println("DEBUG: max Q value of the state was " + maxQValue + ", and " + actionIdsWithMaxQvalue.size() + " action with that value");
         return actionIdsWithMaxQvalue;
     }
 
@@ -73,11 +77,11 @@ public class QlearningGuiState {
      * So updating the actionIDs
      *
      */
-    public void updateActionIdsOfTheStateIntoModel(Set<Action> actions, double R_MAX){
-        for(Action action:actions){
-            if(abstractActionIdsAndQValues.containsKey(action.get(Tags.AbstractID))){
+    public void updateActionIdsOfTheStateIntoModel(Set<Action> actions, double R_MAX) {
+        for (Action action:actions) {
+            if (abstractActionIdsAndQValues.containsKey(action.get(Tags.AbstractID))) {
                 // model contains the action ID
-            }else{
+            } else {
                 abstractActionIdsAndQValues.put(action.get(Tags.AbstractID),R_MAX);
                 abstractActionIdsAndRewards.put(action.get(Tags.AbstractID),R_MAX);
                 abstractActionIdsAndExecutionCounters.put(action.get(Tags.AbstractID),0);
@@ -85,27 +89,27 @@ public class QlearningGuiState {
         }
     }
 
-    public void addStateTransition(GuiStateTransition newTransition, double gammaDiscount, double maxRMaxOfTheNewState){
+    public void addStateTransition(GuiStateTransition newTransition, double gammaDiscount, double maxRMaxOfTheNewState) {
         //updating reward and Q value for the executed action:
         updateRMaxAndQValues(newTransition.getActionAbstractId(), gammaDiscount, maxRMaxOfTheNewState);
-        if(stateTransitions.size()>0){
+        if (stateTransitions.size() > 0) {
             //if existing transitions, checking for identical ones:
-            for(GuiStateTransition guiStateTransition:stateTransitions){
-                if(guiStateTransition.getSourceStateAbstractId().equals(newTransition.getSourceStateAbstractId())){
+            for (GuiStateTransition guiStateTransition:stateTransitions) {
+                if (guiStateTransition.getSourceStateAbstractId().equals(newTransition.getSourceStateAbstractId())) {
                     // the same source state, as it should be:
-                    if(guiStateTransition.getActionAbstractId().equals(newTransition.getActionAbstractId())){
+                    if (guiStateTransition.getActionAbstractId().equals(newTransition.getActionAbstractId())) {
                         // also the action is the same:
-                        if(guiStateTransition.getTargetStateAbstractId().equals(newTransition.getTargetStateAbstractId())){
+                        if (guiStateTransition.getTargetStateAbstractId().equals(newTransition.getTargetStateAbstractId())) {
                             // also the target state is the same -> identical transition
-                            System.out.println(this.getClass()+": addStateTransition: identical transition found - no need to save again");
+                            System.out.println(this.getClass() + ": addStateTransition: identical transition found - no need to save again");
                             return;
-                        }else{
+                        } else {
                             // same source state and same action, but different target state -> some external factor or the data values affect the behaviour
-                            System.out.println(this.getClass()+": addStateTransition: WARNING: same source state, same action, but different target state!");
+                            System.out.println(this.getClass() + ": addStateTransition: WARNING: same source state, same action, but different target state!");
                         }
                     }
-                }else{
-                    System.out.println(this.getClass()+": ERROR, source state is NOT same as in other state transitions from the same state!");
+                } else {
+                    System.out.println(this.getClass() + ": ERROR, source state is NOT same as in other state transitions from the same state!");
                 }
             }
         }
@@ -114,33 +118,33 @@ public class QlearningGuiState {
         stateTransitions.add(newTransition);
     }
 
-    private void updateRMaxAndQValues(String actionAbstractId, double gammaDiscount, double maxQValueOfTheNewState){
+    private void updateRMaxAndQValues(String actionAbstractId, double gammaDiscount, double maxQValueOfTheNewState) {
         int executionCounter = abstractActionIdsAndExecutionCounters.get(actionAbstractId);
         executionCounter++;
-        System.out.println("DEBUG: execution counter for action "+actionAbstractId+" is now "+executionCounter);
+        System.out.println("DEBUG: execution counter for action " + actionAbstractId + " is now " + executionCounter);
         abstractActionIdsAndExecutionCounters.put(actionAbstractId,executionCounter);
         double reward = calculateReward(executionCounter);
-        System.out.println("DEBUG: new reward for action "+actionAbstractId+" is "+reward);
+        System.out.println("DEBUG: new reward for action " + actionAbstractId + " is " + reward);
         abstractActionIdsAndRewards.put(actionAbstractId,reward);
         double qValue = calculateQValue(reward,gammaDiscount,maxQValueOfTheNewState);
-        System.out.println("DEBUG: new Q value for action "+actionAbstractId+" is "+qValue);
+        System.out.println("DEBUG: new Q value for action " + actionAbstractId + " is " + qValue);
         abstractActionIdsAndQValues.put(actionAbstractId,qValue);
     }
 
-    private double calculateReward(int executionCounter){
-        double reward=0.0;
-        if(executionCounter==0){
+    private double calculateReward(int executionCounter) {
+        double reward = 0.0;
+        if (executionCounter == 0) {
             System.out.println("ERROR - calculating Q value for unvisited action should not be needed!");
-        }else{
-            System.out.println("DEBUG: executionCounter="+executionCounter);
-            int divider = executionCounter+1;
-            reward = 1.0/(double)divider;
-            System.out.println("DEBUG: reward="+reward);
+        } else {
+            System.out.println("DEBUG: executionCounter=" + executionCounter);
+            int divider = executionCounter + 1;
+            reward = 1.0 / (double)divider;
+            System.out.println("DEBUG: reward=" + reward);
         }
         return reward;
     }
 
-    private double calculateQValue(double reward, double gammaDiscount, double maxQValueOfTheNewState){
+    private double calculateQValue(double reward, double gammaDiscount, double maxQValueOfTheNewState) {
         return reward + gammaDiscount * maxQValueOfTheNewState;
     }
 

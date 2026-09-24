@@ -27,11 +27,11 @@ public class DerivedActions {
         return availableActions;
     }
 
-    public void addAvailableAction(Action action){
+    public void addAvailableAction(Action action) {
         availableActions.add(action);
     }
 
-    public void addFilteredAction(Action action){
+    public void addFilteredAction(Action action) {
         filteredActions.add(action);
     }
 }

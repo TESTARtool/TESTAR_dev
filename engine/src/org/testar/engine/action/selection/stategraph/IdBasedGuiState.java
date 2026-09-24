@@ -22,25 +22,25 @@ public class IdBasedGuiState {
         stateTransitions = new HashSet<GuiStateTransition>();
     }
 
-    public void addStateTransition(GuiStateTransition newTransition){
-        if(stateTransitions.size()>0){
+    public void addStateTransition(GuiStateTransition newTransition) {
+        if (stateTransitions.size() > 0) {
             //if existing transitions, checking for identical ones:
-            for(GuiStateTransition guiStateTransition:stateTransitions){
-                if(guiStateTransition.getSourceStateAbstractId().equals(newTransition.getSourceStateAbstractId())){
+            for (GuiStateTransition guiStateTransition:stateTransitions) {
+                if (guiStateTransition.getSourceStateAbstractId().equals(newTransition.getSourceStateAbstractId())) {
                     // the same source state, as it should be:
-                    if(guiStateTransition.getActionAbstractId().equals(newTransition.getActionAbstractId())){
+                    if (guiStateTransition.getActionAbstractId().equals(newTransition.getActionAbstractId())) {
                         // also the action is the same:
-                        if(guiStateTransition.getTargetStateAbstractId().equals(newTransition.getTargetStateAbstractId())){
+                        if (guiStateTransition.getTargetStateAbstractId().equals(newTransition.getTargetStateAbstractId())) {
                             // also the target state is the same -> identical transition
-                            System.out.println(this.getClass()+": addStateTransition: identical transition found - no need to save again");
+                            System.out.println(this.getClass() + ": addStateTransition: identical transition found - no need to save again");
                             return;
-                        }else{
+                        } else {
                             // same source state and same action, but different target state -> some external factor or the data values affect the behaviour
-                            System.out.println(this.getClass()+": addStateTransition: WARNING: same source state, same action, but different target state!");
+                            System.out.println(this.getClass() + ": addStateTransition: WARNING: same source state, same action, but different target state!");
                         }
                     }
-                }else{
-                    System.out.println(this.getClass()+": ERROR, source state is NOT same as in other state transitions from the same state!");
+                } else {
+                    System.out.println(this.getClass() + ": ERROR, source state is NOT same as in other state transitions from the same state!");
                 }
             }
         }
@@ -48,12 +48,12 @@ public class IdBasedGuiState {
         stateTransitions.add(newTransition);
     }
 
-    public void addVisitedAction(String abstractActionId){
-        if(unvisitedActionIds.contains(abstractActionId)){
-            System.out.println(this.getClass()+": addVisitedAction: action removed from the unvisited actions");
+    public void addVisitedAction(String abstractActionId) {
+        if (unvisitedActionIds.contains(abstractActionId)) {
+            System.out.println(this.getClass() + ": addVisitedAction: action removed from the unvisited actions");
             unvisitedActionIds.remove(abstractActionId);
-        }else{
-            System.out.println(this.getClass()+": addVisitedAction: action not found from the unvisited actions");
+        } else {
+            System.out.println(this.getClass() + ": addVisitedAction: action not found from the unvisited actions");
         }
     }
 

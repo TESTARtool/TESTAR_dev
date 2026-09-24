@@ -16,17 +16,17 @@ import java.util.Set;
 
 public class RandomActionSelector implements ActionSelectorService {
 
-	public RandomActionSelector() {
-	}
+    public RandomActionSelector() {
+    }
 
-	@Override
-	public Action selectAction(State state, Set<Action> actions) {
-		// Convert the Set to an ArrayList for easier indexing
-		ArrayList<Action> actionList = new ArrayList<>(actions);
-		// Generate a random index within the bounds of the ArrayList
-		int randomIndex = new Random().nextInt(actionList.size());
-		// Retrieve the Action at the generated index and return it
-		return actionList.get(randomIndex);
-	}
+    @Override
+    public Action selectAction(State state, Set<Action> actions) {
+        // Convert the Set to an ArrayList for easier indexing
+        ArrayList<Action> actionList = new ArrayList<>(actions);
+        // Generate a random index within the bounds of the ArrayList
+        int randomIndex = new Random().nextInt(actionList.size());
+        // Retrieve the Action at the generated index and return it
+        return actionList.get(randomIndex);
+    }
 
 }

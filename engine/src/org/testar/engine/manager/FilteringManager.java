@@ -48,174 +48,165 @@ import java.util.Set;
 /**
  * A management utility for SUT UI actions filtering.
  */
-public class FilteringManager
-{
+public class FilteringManager {
 
-  public static final String XML_UI_FILTER_VERSION = "1.0.20170515";
-  //By default it uses the root path (bin), but it's modified to the selected settings
-  public static String PROTOCOL_FILTER_FILE = "protocol_filter.xml";
+    public static final String XML_UI_FILTER_VERSION = "1.0.20170515";
+  // By default it uses the root path (bin), but it's modified to the selected settings
+    public static String PROTOCOL_FILTER_FILE = "protocol_filter.xml";
 
   // Widget filter types
-  private static final int WIDGET_ACTION_TABU_FILTER = Integer.MIN_VALUE,
-		  WIDGET_ACTION_WHITE_FILTER = Integer.MIN_VALUE + 1,
-		  PRIMITIVE_DATA_TYPE_TEXT = -1,
-		  PRIMITIVE_DATA_TYPE_NUMBER = -2,
-		  ANY_DATA_TYPE = -427,
-		  BASIC_DATA_TYPE_DATE = -13451473,
-		  BASIC_DATA_TYPE_WEBURL = -134513313,
-		  BASIC_DATA_TYPE_EMAIL = -1345133417;
+    private static final int WIDGET_ACTION_TABU_FILTER = Integer.MIN_VALUE,
+            WIDGET_ACTION_WHITE_FILTER = Integer.MIN_VALUE + 1,
+            PRIMITIVE_DATA_TYPE_TEXT = -1,
+            PRIMITIVE_DATA_TYPE_NUMBER = -2,
+            ANY_DATA_TYPE = -427,
+            BASIC_DATA_TYPE_DATE = -13451473,
+            BASIC_DATA_TYPE_WEBURL = -134513313,
+            BASIC_DATA_TYPE_EMAIL = -1345133417;
 
-  public static LinkedHashMap<String,Integer> DATA_TYPES;
-  static {
-	  DATA_TYPES = new LinkedHashMap<String,Integer>();
-	  DATA_TYPES.put("ANY",				ANY_DATA_TYPE);
-	  DATA_TYPES.put("PRIMITIVE_TEXT", 	PRIMITIVE_DATA_TYPE_TEXT);
-	  DATA_TYPES.put("PRIMITIVE_NUMBER", 	PRIMITIVE_DATA_TYPE_NUMBER);
-	  DATA_TYPES.put("BASIC_DATE", 		BASIC_DATA_TYPE_DATE);
-	  DATA_TYPES.put("BASIC_EMAIL", 		BASIC_DATA_TYPE_EMAIL);
-	  DATA_TYPES.put("BASIC_WEBURL",		BASIC_DATA_TYPE_WEBURL);
-  }
+    public static LinkedHashMap<String,Integer> DATA_TYPES;
+    static {
+        DATA_TYPES = new LinkedHashMap<String,Integer>();
+        DATA_TYPES.put("ANY",                ANY_DATA_TYPE);
+        DATA_TYPES.put("PRIMITIVE_TEXT",     PRIMITIVE_DATA_TYPE_TEXT);
+        DATA_TYPES.put("PRIMITIVE_NUMBER",   PRIMITIVE_DATA_TYPE_NUMBER);
+        DATA_TYPES.put("BASIC_DATE",         BASIC_DATA_TYPE_DATE);
+        DATA_TYPES.put("BASIC_EMAIL",        BASIC_DATA_TYPE_EMAIL);
+        DATA_TYPES.put("BASIC_WEBURL",       BASIC_DATA_TYPE_WEBURL);
+    }
 
-  private static final String XML_TAG_UI_FILTER_ROOT = "TESTAR_uifilter",
-      XML_TAG_UI_FILTERING_TYPES = "filtering_types",
-      XML_TAG_UI_FILTERS = "filters",
-      XML_TAG_UI_FILTERING = "filtering",
-      XML_TAG_UI_FILTER = "filter",
-      XML_ATTRIBUTE_CODING_TYPE = "coding",
-      XML_ATTRIBUTE_ROLE = "role",
-      XML_ATTRIBUTE_TITLE = "title",
-      XML_ATTRIBUTE_PARENT_ROLE = "p.role",
-      XML_ATTRIBUTE_PARENT_TITLE = "p.title",
-      XML_ATTRIBUTE_TREE_DEPTH = "depth",
-      XML_ATTRIBUTE_TREE_CHILDREN = "children";
+    private static final String XML_TAG_UI_FILTER_ROOT = "TESTAR_uifilter",
+            XML_TAG_UI_FILTERING_TYPES = "filtering_types",
+            XML_TAG_UI_FILTERS = "filters",
+            XML_TAG_UI_FILTERING = "filtering",
+            XML_TAG_UI_FILTER = "filter",
+            XML_ATTRIBUTE_CODING_TYPE = "coding",
+            XML_ATTRIBUTE_ROLE = "role",
+            XML_ATTRIBUTE_TITLE = "title",
+            XML_ATTRIBUTE_PARENT_ROLE = "p.role",
+            XML_ATTRIBUTE_PARENT_TITLE = "p.title",
+            XML_ATTRIBUTE_TREE_DEPTH = "depth",
+            XML_ATTRIBUTE_TREE_CHILDREN = "children";
 
-  private DocumentBuilderFactory docFactory;
-  private DocumentBuilder docBuilder;
+    private DocumentBuilderFactory docFactory;
+    private DocumentBuilder docBuilder;
 
   // rendering pens
-  private static final int PEN_ALPHA = 128;
-  private static final Pen PEN_WHITE = Pen.newPen().setColor(Color.from(128, 255, 128, PEN_ALPHA)).
-      setFillPattern(FillPattern.None).setStrokePattern(StrokePattern.Solid).build(),
-      PEN_PRECISE_WHITE = Pen.newPen().setColor(Color.from(0, 255, 0, PEN_ALPHA)).
-          setFillPattern(FillPattern.None).setStrokePattern(StrokePattern.Solid).build(),
-      PEN_BLACK = Pen.newPen().setColor(Color.from(255, 128, 128, PEN_ALPHA)).
-          setFillPattern(FillPattern.None).setStrokePattern(StrokePattern.Solid).build(),
-      PEN_PRECISE_BLACK = Pen.newPen().setColor(Color.from(255, 0, 0, PEN_ALPHA)).
-          setFillPattern(FillPattern.None).setStrokePattern(StrokePattern.Solid).build(),
-      PEN_BLUE = Pen.newPen().setColor(Color.from(128, 128, 255, PEN_ALPHA)).
-          setFillPattern(FillPattern.None).setStrokePattern(StrokePattern.Solid).build(),
-      PEN_PRECISE_BLUE = Pen.newPen().setColor(Color.from(0, 0, 255, PEN_ALPHA)).
-          setFillPattern(FillPattern.None).setStrokePattern(StrokePattern.Solid).build();
+    private static final int PEN_ALPHA = 128;
+    private static final Pen PEN_WHITE = Pen.newPen().setColor(Color.from(128, 255, 128, PEN_ALPHA)).
+            setFillPattern(FillPattern.None).setStrokePattern(StrokePattern.Solid).build(),
+            PEN_PRECISE_WHITE = Pen.newPen().setColor(Color.from(0, 255, 0, PEN_ALPHA)).
+            setFillPattern(FillPattern.None).setStrokePattern(StrokePattern.Solid).build(),
+            PEN_BLACK = Pen.newPen().setColor(Color.from(255, 128, 128, PEN_ALPHA)).
+            setFillPattern(FillPattern.None).setStrokePattern(StrokePattern.Solid).build(),
+            PEN_PRECISE_BLACK = Pen.newPen().setColor(Color.from(255, 0, 0, PEN_ALPHA)).
+            setFillPattern(FillPattern.None).setStrokePattern(StrokePattern.Solid).build(),
+            PEN_BLUE = Pen.newPen().setColor(Color.from(128, 128, 255, PEN_ALPHA)).
+            setFillPattern(FillPattern.None).setStrokePattern(StrokePattern.Solid).build(),
+            PEN_PRECISE_BLUE = Pen.newPen().setColor(Color.from(0, 0, 255, PEN_ALPHA)).
+            setFillPattern(FillPattern.None).setStrokePattern(StrokePattern.Solid).build();
 
-  private class WidgetInfo
-  {
-    String idType; // CodingManager.*ID
-    String role, parentRole;
-    String title, parentTitle;
-    Integer treeDepth, children, filterCode;
+    private class WidgetInfo {
+        String idType; // CodingManager.*ID
+        String role, parentRole;
+        String title, parentTitle;
+        Integer treeDepth, children, filterCode;
 
-    public WidgetInfo (String idType, String role, String parentRole, String title, String parentTitle,
-                       Integer treeDepth, Integer children, Integer filterCode)
-    {
-      this.idType = idType;
-      this.role = role;
-      this.parentRole = parentRole;
-      this.title = Integer.toString(title.hashCode());
-      this.parentTitle = Integer.toString(parentTitle.hashCode());
-      this.treeDepth = treeDepth;
-      this.children = children;
-      this.filterCode = filterCode;
+        public WidgetInfo (String idType, String role, String parentRole, String title, String parentTitle,
+                       Integer treeDepth, Integer children, Integer filterCode) {
+            this.idType = idType;
+            this.role = role;
+            this.parentRole = parentRole;
+            this.title = Integer.toString(title.hashCode());
+            this.parentTitle = Integer.toString(parentTitle.hashCode());
+            this.treeDepth = treeDepth;
+            this.children = children;
+            this.filterCode = filterCode;
+        }
     }
-  }
 
   // key = widget ID; value = filter type
-  private HashMap<String, WidgetInfo> widgetsFilterList = new HashMap<String, WidgetInfo>();
+    private HashMap<String, WidgetInfo> widgetsFilterList = new HashMap<String, WidgetInfo>();
 
-  public FilteringManager ()
-  {
-    try {
-      PROTOCOL_FILTER_FILE = Settings.getSettingsPath() + "/protocol_filter.xml";
-      docFactory = DocumentBuilderFactory.newInstance();
-      docBuilder = docFactory.newDocumentBuilder();
-    }
-    catch (ParserConfigurationException e) {
-      e.printStackTrace();
-    }
-  }
-
-  public void saveFilters ()
-  {
-    File f = new File(PROTOCOL_FILTER_FILE);
-    try {
-      BufferedWriter writer = new BufferedWriter(new FileWriter(f));
-      writer.write("<?xml version=\"1.0\"?>\n");
-      writer.write("<" + XML_TAG_UI_FILTER_ROOT + " version=\"" + XML_UI_FILTER_VERSION + "\">\n");
-      // coding types
-      writer.write("\t<coding_types>\n");
-      writer.write("\t\t<coding type=\"" + CodingManager.ABSTRACT_R_ID + "\" desc=\"ROLE property\"/>\n");
-      writer.write("\t\t<coding type=\"" + CodingManager.ABSTRACT_R_T_ID + "\" desc=\"ROLE and TITLE properties\"/>\n");
-      writer.write("\t\t<coding type=\"" + CodingManager.ABSTRACT_R_T_P_ID + "\" desc=\"ROLE, TITLE and PATH properties\"/>\n");
-      writer.write("\t</coding_types>\n");
-      // filterING types
-      writer.write("\t<" + XML_TAG_UI_FILTERING_TYPES + ">\n");
-      writer.write("\t\t<" + XML_TAG_UI_FILTERING + " type=\"" + WIDGET_ACTION_TABU_FILTER + "\" desc=\"TABU LIST\"/>\n");
-      writer.write("\t\t<" + XML_TAG_UI_FILTERING + " type=\"" + WIDGET_ACTION_WHITE_FILTER + "\" desc=\"WHITE LIST\"/>\n");
-      if (DATA_TYPES != null) {
-        for (String type : DATA_TYPES.keySet()) {
-          writer.write("\t\t<" + XML_TAG_UI_FILTERING + " type=\"" + DATA_TYPES.get(type).toString() + "\" desc=\"" + type + "\"/>\n");
+    public FilteringManager () {
+        try {
+            PROTOCOL_FILTER_FILE = Settings.getSettingsPath() + "/protocol_filter.xml";
+            docFactory = DocumentBuilderFactory.newInstance();
+            docBuilder = docFactory.newDocumentBuilder();
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
         }
-      }
-      writer.write("\t</" + XML_TAG_UI_FILTERING_TYPES + ">\n");
-      // filters
-      writer.write("\t<" + XML_TAG_UI_FILTERS + ">\n");
-      WidgetInfo wi;
-      for (String wid : widgetsFilterList.keySet()) {
-        wi = widgetsFilterList.get(wid);
-        writer.write("\t\t<" + XML_TAG_UI_FILTER + " wid=\"" + wid + "\"");
-        writer.write(" " + XML_TAG_UI_FILTERING + "=\"" + wi.filterCode.toString() + "\"");
-        writer.write(" " + XML_ATTRIBUTE_CODING_TYPE + "=\"" + wi.idType + "\"");
-        writer.write(" " + XML_ATTRIBUTE_ROLE + "=\"" + wi.role + "\"");
-        writer.write(" " + XML_ATTRIBUTE_PARENT_ROLE + "=\"" + wi.parentRole + "\"");
-        writer.write(" " + XML_ATTRIBUTE_TITLE + "=\"" + wi.title + "\"");
-        writer.write(" " + XML_ATTRIBUTE_PARENT_TITLE + "=\"" + wi.parentTitle + "\"");
-        writer.write(" " + XML_ATTRIBUTE_TREE_DEPTH + "=\"" + wi.treeDepth + "\"");
-        writer.write(" " + XML_ATTRIBUTE_TREE_CHILDREN + "=\"" + wi.children + "\"/>\n");
-      }
-      writer.write("\t</" + XML_TAG_UI_FILTERS + ">\n");
-      writer.write("</" + XML_TAG_UI_FILTER_ROOT + ">\n");
-      writer.close();
     }
-    catch (FileNotFoundException e) {
-      e.printStackTrace();
-    }
-    catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
 
-  public void loadFilters ()
-  {
-    File f = new File(PROTOCOL_FILTER_FILE);
-    if (f.exists()) {
-      BufferedInputStream stream = null;
-      try {
-        WidgetInfo wi;
-        String depthS, childrenS, filterCodeS;
-        stream = new BufferedInputStream(new FileInputStream(f));
-        Document doc = docBuilder.parse(stream);
-        Node node;
-        Element element;
-        NodeList nList = doc.getElementsByTagName(XML_TAG_UI_FILTER);
-        widgetsFilterList = new HashMap<String, WidgetInfo>(nList.getLength());
-        for (int nidx = 0; nidx < nList.getLength(); nidx++) {
-          node = nList.item(nidx);
-          if (node.getNodeType() == Node.ELEMENT_NODE) {
-            element = (Element) node;
-            depthS = element.getAttribute(XML_ATTRIBUTE_TREE_DEPTH);
-            childrenS = element.getAttribute(XML_ATTRIBUTE_TREE_CHILDREN);
-            filterCodeS = element.getAttribute(XML_TAG_UI_FILTERING);
-            if (filterCodeS != null && filterCodeS.length() > 0) {
-              wi = new WidgetInfo(
+    public void saveFilters () {
+        File f = new File(PROTOCOL_FILTER_FILE);
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(f));
+            writer.write("<?xml version=\"1.0\"?>\n");
+            writer.write("<" + XML_TAG_UI_FILTER_ROOT + " version=\"" + XML_UI_FILTER_VERSION + "\">\n");
+      // coding types
+            writer.write("\t<coding_types>\n");
+            writer.write("\t\t<coding type=\"" + CodingManager.ABSTRACT_R_ID + "\" desc=\"ROLE property\"/>\n");
+            writer.write("\t\t<coding type=\"" + CodingManager.ABSTRACT_R_T_ID + "\" desc=\"ROLE and TITLE properties\"/>\n");
+            writer.write("\t\t<coding type=\"" + CodingManager.ABSTRACT_R_T_P_ID + "\" desc=\"ROLE, TITLE and PATH properties\"/>\n");
+            writer.write("\t</coding_types>\n");
+      // filterING types
+            writer.write("\t<" + XML_TAG_UI_FILTERING_TYPES + ">\n");
+            writer.write("\t\t<" + XML_TAG_UI_FILTERING + " type=\"" + WIDGET_ACTION_TABU_FILTER + "\" desc=\"TABU LIST\"/>\n");
+            writer.write("\t\t<" + XML_TAG_UI_FILTERING + " type=\"" + WIDGET_ACTION_WHITE_FILTER + "\" desc=\"WHITE LIST\"/>\n");
+            if (DATA_TYPES != null) {
+                for (String type : DATA_TYPES.keySet()) {
+                    writer.write("\t\t<" + XML_TAG_UI_FILTERING + " type=\"" + DATA_TYPES.get(type).toString() + "\" desc=\"" + type + "\"/>\n");
+                }
+            }
+            writer.write("\t</" + XML_TAG_UI_FILTERING_TYPES + ">\n");
+      // filters
+            writer.write("\t<" + XML_TAG_UI_FILTERS + ">\n");
+            WidgetInfo wi;
+            for (String wid : widgetsFilterList.keySet()) {
+                wi = widgetsFilterList.get(wid);
+                writer.write("\t\t<" + XML_TAG_UI_FILTER + " wid=\"" + wid + "\"");
+                writer.write(" " + XML_TAG_UI_FILTERING + "=\"" + wi.filterCode.toString() + "\"");
+                writer.write(" " + XML_ATTRIBUTE_CODING_TYPE + "=\"" + wi.idType + "\"");
+                writer.write(" " + XML_ATTRIBUTE_ROLE + "=\"" + wi.role + "\"");
+                writer.write(" " + XML_ATTRIBUTE_PARENT_ROLE + "=\"" + wi.parentRole + "\"");
+                writer.write(" " + XML_ATTRIBUTE_TITLE + "=\"" + wi.title + "\"");
+                writer.write(" " + XML_ATTRIBUTE_PARENT_TITLE + "=\"" + wi.parentTitle + "\"");
+                writer.write(" " + XML_ATTRIBUTE_TREE_DEPTH + "=\"" + wi.treeDepth + "\"");
+                writer.write(" " + XML_ATTRIBUTE_TREE_CHILDREN + "=\"" + wi.children + "\"/>\n");
+            }
+            writer.write("\t</" + XML_TAG_UI_FILTERS + ">\n");
+            writer.write("</" + XML_TAG_UI_FILTER_ROOT + ">\n");
+            writer.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void loadFilters () {
+        File f = new File(PROTOCOL_FILTER_FILE);
+        if (f.exists()) {
+            BufferedInputStream stream = null;
+            try {
+                WidgetInfo wi;
+                String depthS, childrenS, filterCodeS;
+                stream = new BufferedInputStream(new FileInputStream(f));
+                Document doc = docBuilder.parse(stream);
+                Node node;
+                Element element;
+                NodeList nList = doc.getElementsByTagName(XML_TAG_UI_FILTER);
+                widgetsFilterList = new HashMap<String, WidgetInfo>(nList.getLength());
+                for (int nidx = 0; nidx < nList.getLength(); nidx++) {
+                    node = nList.item(nidx);
+                    if (node.getNodeType() == Node.ELEMENT_NODE) {
+                        element = (Element) node;
+                        depthS = element.getAttribute(XML_ATTRIBUTE_TREE_DEPTH);
+                        childrenS = element.getAttribute(XML_ATTRIBUTE_TREE_CHILDREN);
+                        filterCodeS = element.getAttribute(XML_TAG_UI_FILTERING);
+                        if (filterCodeS != null && filterCodeS.length() > 0) {
+                            wi = new WidgetInfo(
                       element.getAttribute(XML_ATTRIBUTE_CODING_TYPE), // id type
                       element.getAttribute(XML_ATTRIBUTE_ROLE), // role
                       element.getAttribute(XML_ATTRIBUTE_PARENT_ROLE), // parent role
@@ -224,204 +215,186 @@ public class FilteringManager
                   depthS == null || depthS == "" ? Integer.valueOf(-1) : Integer.valueOf(depthS), // tree depth
                   childrenS == null || childrenS == "" ? Integer.valueOf(-1) : Integer.valueOf(childrenS), // children count
                       Integer.valueOf(filterCodeS)); // filter code
-              widgetsFilterList.put(element.getAttribute("wid"), wi);
+                            widgetsFilterList.put(element.getAttribute("wid"), wi);
+                        } else {
+                            System.out.println("FilteringManager: WRONG FILTER");
+                        }
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (SAXException e) {
+                e.printStackTrace();
             }
-            else {
-              System.out.println("FilteringManager: WRONG FILTER");
+            if (stream != null) {
+                try {
+                    stream.close();
+                } catch (IOException e) {
+                }
             }
-          }
         }
-      }
-      catch (IOException e) {
-        e.printStackTrace();
-      }
-      catch (SAXException e) {
-        e.printStackTrace();
-      }
-      if (stream != null) {
-        try {
-          stream.close();
-        }
-        catch (IOException e) {
-        }
-      }
     }
-  }
 
-  public void filterLists (Widget w, int widgetFilter, String idType)
-  {
-    String parentRole = "null", parentTitle = "null";
-    if (w.parent() != null) {
-      Role r = w.parent().get(Tags.Role, null);
-      if (r != null) {
-        parentRole = r.toString();
-      }
-      parentTitle = w.parent().get(Tags.Title, "null");
-    }
-    WidgetInfo wi = new WidgetInfo(
-        idType,
-        w.get(Tags.Role) != null ? w.get(Tags.Role).toString() : "null", // role
-        parentRole, // parent role
-        w.get(Tags.Title, "null"), // title
-        parentTitle, // parent title
-        Integer.valueOf(Util.depth(w)), // tree depth
-        Integer.valueOf(w.childCount()), // children count
-        Integer.valueOf(widgetFilter)); // filter code
-    String widgetID = null;
-    switch (idType) {
-      case CodingManager.ABSTRACT_R_ID:
-        widgetID = w.get(Tags.Abstract_R_ID);
-        break;
-      case CodingManager.ABSTRACT_R_T_ID:
-        widgetID = w.get(Tags.Abstract_R_T_ID);
-        break;
-      case CodingManager.ABSTRACT_R_T_P_ID:
-        widgetID = w.get(Tags.Abstract_R_T_P_ID);
-        break;
-    }
-    WidgetInfo winfo = widgetsFilterList.get(widgetID);
-    switch (widgetFilter) {
-      case ANY_DATA_TYPE:
-        widgetsFilterList.remove(widgetID);
-        break;
-      case WIDGET_ACTION_TABU_FILTER: // cycle: white -> regular -> tabu
-        if (winfo != null && winfo.filterCode.intValue() == WIDGET_ACTION_WHITE_FILTER) {
-          widgetsFilterList.remove(widgetID);
+    public void filterLists (Widget w, int widgetFilter, String idType) {
+        String parentRole = "null", parentTitle = "null";
+        if (w.parent() != null) {
+            Role r = w.parent().get(Tags.Role, null);
+            if (r != null) {
+                parentRole = r.toString();
+            }
+            parentTitle = w.parent().get(Tags.Title, "null");
         }
-        else {
-          widgetsFilterList.put(widgetID, wi);
+        WidgetInfo wi = new WidgetInfo(
+                idType,
+                w.get(Tags.Role) != null ? w.get(Tags.Role).toString() : "null", // role
+                parentRole, // parent role
+                w.get(Tags.Title, "null"), // title
+                parentTitle, // parent title
+                Integer.valueOf(Util.depth(w)), // tree depth
+                Integer.valueOf(w.childCount()), // children count
+                Integer.valueOf(widgetFilter)); // filter code
+        String widgetID = null;
+        switch (idType) {
+            case CodingManager.ABSTRACT_R_ID:
+                widgetID = w.get(Tags.Abstract_R_ID);
+                break;
+            case CodingManager.ABSTRACT_R_T_ID:
+                widgetID = w.get(Tags.Abstract_R_T_ID);
+                break;
+            case CodingManager.ABSTRACT_R_T_P_ID:
+                widgetID = w.get(Tags.Abstract_R_T_P_ID);
+                break;
         }
-        break;
-      case WIDGET_ACTION_WHITE_FILTER: // cycle: tabu -> regular -> white
-        if (winfo != null && winfo.filterCode.intValue() == WIDGET_ACTION_TABU_FILTER) {
-          widgetsFilterList.remove(widgetID);
-        }
-        else {
-          widgetsFilterList.put(widgetID, wi);
-        }
-        break;
-      default:
-        if (winfo != null && winfo.filterCode.intValue() == widgetFilter) {
-          widgetsFilterList.remove(widgetID);
-        }
-        else {
-          widgetsFilterList.put(widgetID, wi);
+        WidgetInfo winfo = widgetsFilterList.get(widgetID);
+        switch (widgetFilter) {
+            case ANY_DATA_TYPE:
+                widgetsFilterList.remove(widgetID);
+                break;
+            case WIDGET_ACTION_TABU_FILTER: // cycle: white -> regular -> tabu
+                if (winfo != null && winfo.filterCode.intValue() == WIDGET_ACTION_WHITE_FILTER) {
+                    widgetsFilterList.remove(widgetID);
+                } else {
+                    widgetsFilterList.put(widgetID, wi);
+                }
+                break;
+            case WIDGET_ACTION_WHITE_FILTER: // cycle: tabu -> regular -> white
+                if (winfo != null && winfo.filterCode.intValue() == WIDGET_ACTION_TABU_FILTER) {
+                    widgetsFilterList.remove(widgetID);
+                } else {
+                    widgetsFilterList.put(widgetID, wi);
+                }
+                break;
+            default:
+                if (winfo != null && winfo.filterCode.intValue() == widgetFilter) {
+                    widgetsFilterList.remove(widgetID);
+                } else {
+                    widgetsFilterList.put(widgetID, wi);
+                }
         }
     }
-  }
 
-  private Set<Widget> getDragWidgets (State state, double[] filterArea)
-  {
-    if (state == null) {
-      return null;
-    }
-    double areaW = Math.abs(filterArea[0] - filterArea[2]);
-    double areaH = Math.abs(filterArea[1] - filterArea[3]);
-    if (areaW == 0 || areaH == 0 || areaW > 1048576 || areaH > 1048576) {
-      return null;
-    }
-    Rect r = Rect.from(filterArea[0] < filterArea[2] ? filterArea[0] : filterArea[2],
-        filterArea[1] < filterArea[3] ? filterArea[1] : filterArea[3],
-        areaW, areaH);
-    filterArea[0] = filterArea[1] = Double.MAX_VALUE;
-    filterArea[2] = filterArea[3] = Double.MIN_VALUE;
-    return Util.widgetsFromArea(state, r);
-  }
-
-  public void manageWhiteTabuLists (State state, Mouse mouse, double[] filterArea, boolean whiteTabuMode, boolean preciseCoding)
-  {
-    Set<Widget> widgets = getDragWidgets(state, filterArea);
-    if (widgets == null || widgets.isEmpty()) {
-      Widget cursorWidget = getWidgetUnderCursor(state, mouse);
-      if (cursorWidget == null) {
-        return;
-      }
-      manageWhiteTabuLists(cursorWidget, whiteTabuMode, preciseCoding);
-    }
-    else {
-      for (Widget w : widgets) {
-        manageWhiteTabuLists(w, whiteTabuMode, preciseCoding);
-      }
-    }
-  }
-
-  private void manageWhiteTabuLists (Widget w, boolean whiteTabuMode, boolean preciseCoding)
-  {
-    filterLists(w, whiteTabuMode ? WIDGET_ACTION_WHITE_FILTER : WIDGET_ACTION_TABU_FILTER,
-        preciseCoding ? CodingManager.ABSTRACT_R_T_P_ID : CodingManager.ABSTRACT_R_T_ID);
-    saveFilters();
-  }
-
-  public boolean blackListed (Widget w)
-  {
-    WidgetInfo wi = widgetsFilterList.get(w.get(Tags.Abstract_R_T_P_ID));
-    if (wi == null) {
-      wi = widgetsFilterList.get(w.get(Tags.Abstract_R_T_ID));
-    }
-    return (wi != null && wi.filterCode.intValue() == WIDGET_ACTION_TABU_FILTER);
-  }
-
-  public boolean whiteListed (Widget w)
-  {
-    WidgetInfo wi = widgetsFilterList.get(w.get(Tags.Abstract_R_T_P_ID));
-    if (wi == null) {
-      wi = widgetsFilterList.get(w.get(Tags.Abstract_R_T_ID));
-    }
-    return (wi != null && wi.filterCode.intValue() == WIDGET_ACTION_WHITE_FILTER);
-  }
-
-  public void visualizeActions (Canvas canvas, State state)
-  {
-    String wid;
-    for (Widget w : state) {
-      wid = w.get(Tags.Abstract_R_T_P_ID);
-      if (widgetsFilterList.containsKey(wid)) {
-        visualizeActions(canvas, state, w, wid, true);
-      }
-      else {
-        wid = w.get(Tags.Abstract_R_T_ID);
-        if (widgetsFilterList.containsKey(wid)) {
-          visualizeActions(canvas, state, w, wid, false);
+    private Set<Widget> getDragWidgets (State state, double[] filterArea) {
+        if (state == null) {
+            return null;
         }
-      }
+        double areaW = Math.abs(filterArea[0] - filterArea[2]);
+        double areaH = Math.abs(filterArea[1] - filterArea[3]);
+        if (areaW == 0 || areaH == 0 || areaW > 1048576 || areaH > 1048576) {
+            return null;
+        }
+        Rect r = Rect.from(filterArea[0] < filterArea[2] ? filterArea[0] : filterArea[2],
+                filterArea[1] < filterArea[3] ? filterArea[1] : filterArea[3],
+                areaW, areaH);
+        filterArea[0] = filterArea[1] = Double.MAX_VALUE;
+        filterArea[2] = filterArea[3] = Double.MIN_VALUE;
+        return Util.widgetsFromArea(state, r);
     }
-  }
 
-  private void visualizeActions (Canvas canvas, State state, Widget widget, String widgetID, boolean preciseCoding)
-  {
-    Pen pen = null;
-    int widgetFilter = widgetsFilterList.get(widgetID).filterCode;
-    switch (widgetFilter) {
-      case WIDGET_ACTION_WHITE_FILTER:
-        pen = (preciseCoding ? PEN_PRECISE_WHITE : PEN_WHITE);
-        break;
-      case WIDGET_ACTION_TABU_FILTER:
-        pen = (preciseCoding ? PEN_PRECISE_BLACK : PEN_BLACK);
-        break;
-      default:
-        pen = (preciseCoding ? PEN_PRECISE_BLUE : PEN_BLUE);
+    public void manageWhiteTabuLists (State state, Mouse mouse, double[] filterArea, boolean whiteTabuMode, boolean preciseCoding) {
+        Set<Widget> widgets = getDragWidgets(state, filterArea);
+        if (widgets == null || widgets.isEmpty()) {
+            Widget cursorWidget = getWidgetUnderCursor(state, mouse);
+            if (cursorWidget == null) {
+                return;
+            }
+            manageWhiteTabuLists(cursorWidget, whiteTabuMode, preciseCoding);
+        } else {
+            for (Widget w : widgets) {
+                manageWhiteTabuLists(w, whiteTabuMode, preciseCoding);
+            }
+        }
     }
-    Shape shape = widget.get(Tags.Shape);
-    if (preciseCoding) {
-      double width = shape.width() - 6, height = shape.height() - 6;
-      if (width < 1) {
-        width = 1;
-      }
-      if (height < 1) {
-        height = 1;
-      }
-      shape = Rect.from(shape.x() + 3, shape.y() + 3, width, height);
-    }
-    new ShapeVisualizer(pen, shape, "", 0.5, 0.5).run(state, canvas, Pen.PEN_IGNORE);
-  }
 
-  public static Widget getWidgetUnderCursor (State state, Mouse mouse)
-  {
-    if (state == null) {
-      return null;
+    private void manageWhiteTabuLists (Widget w, boolean whiteTabuMode, boolean preciseCoding) {
+        filterLists(w, whiteTabuMode ? WIDGET_ACTION_WHITE_FILTER : WIDGET_ACTION_TABU_FILTER,
+                preciseCoding ? CodingManager.ABSTRACT_R_T_P_ID : CodingManager.ABSTRACT_R_T_ID);
+        saveFilters();
     }
-    Point cursor = mouse.cursor();
-    Assert.notNull(cursor);
-    return Util.widgetFromPoint(state, cursor.x(), cursor.y(), null);
-  }
+
+    public boolean blackListed (Widget w) {
+        WidgetInfo wi = widgetsFilterList.get(w.get(Tags.Abstract_R_T_P_ID));
+        if (wi == null) {
+            wi = widgetsFilterList.get(w.get(Tags.Abstract_R_T_ID));
+        }
+        return (wi != null && wi.filterCode.intValue() == WIDGET_ACTION_TABU_FILTER);
+    }
+
+    public boolean whiteListed (Widget w) {
+        WidgetInfo wi = widgetsFilterList.get(w.get(Tags.Abstract_R_T_P_ID));
+        if (wi == null) {
+            wi = widgetsFilterList.get(w.get(Tags.Abstract_R_T_ID));
+        }
+        return (wi != null && wi.filterCode.intValue() == WIDGET_ACTION_WHITE_FILTER);
+    }
+
+    public void visualizeActions (Canvas canvas, State state) {
+        String wid;
+        for (Widget w : state) {
+            wid = w.get(Tags.Abstract_R_T_P_ID);
+            if (widgetsFilterList.containsKey(wid)) {
+                visualizeActions(canvas, state, w, wid, true);
+            } else {
+                wid = w.get(Tags.Abstract_R_T_ID);
+                if (widgetsFilterList.containsKey(wid)) {
+                    visualizeActions(canvas, state, w, wid, false);
+                }
+            }
+        }
+    }
+
+    private void visualizeActions (Canvas canvas, State state, Widget widget, String widgetID, boolean preciseCoding) {
+        Pen pen = null;
+        int widgetFilter = widgetsFilterList.get(widgetID).filterCode;
+        switch (widgetFilter) {
+            case WIDGET_ACTION_WHITE_FILTER:
+                pen = (preciseCoding ? PEN_PRECISE_WHITE : PEN_WHITE);
+                break;
+            case WIDGET_ACTION_TABU_FILTER:
+                pen = (preciseCoding ? PEN_PRECISE_BLACK : PEN_BLACK);
+                break;
+            default:
+                pen = (preciseCoding ? PEN_PRECISE_BLUE : PEN_BLUE);
+        }
+        Shape shape = widget.get(Tags.Shape);
+        if (preciseCoding) {
+            double width = shape.width() - 6, height = shape.height() - 6;
+            if (width < 1) {
+                width = 1;
+            }
+            if (height < 1) {
+                height = 1;
+            }
+            shape = Rect.from(shape.x() + 3, shape.y() + 3, width, height);
+        }
+        new ShapeVisualizer(pen, shape, "", 0.5, 0.5).run(state, canvas, Pen.PEN_IGNORE);
+    }
+
+    public static Widget getWidgetUnderCursor (State state, Mouse mouse) {
+        if (state == null) {
+            return null;
+        }
+        Point cursor = mouse.cursor();
+        Assert.notNull(cursor);
+        return Util.widgetFromPoint(state, cursor.x(), cursor.y(), null);
+    }
 }

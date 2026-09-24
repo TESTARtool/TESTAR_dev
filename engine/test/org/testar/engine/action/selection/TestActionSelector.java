@@ -35,180 +35,171 @@ import org.testar.stub.WidgetStub;
 
 public class TestActionSelector {
 
-	@Rule
-	public RepeatRule repeatRule = new RepeatRule();
+    @Rule
+    public RepeatRule repeatRule = new RepeatRule();
 
-	private static StateStub state;
-	private static Set<Action> actions;
-	private static StdActionCompiler ac = new AnnotatingActionCompiler();
+    private static StateStub state;
+    private static Set<Action> actions;
+    private static StdActionCompiler ac = new AnnotatingActionCompiler();
 
-	private static List<Action> firstSelectedActionFromPrioritizeSelector = new ArrayList<>();
-	private static List<Action> firstSelectedActionFromGuiGraphSelector = new ArrayList<>();
-	private static List<Action> firstSelectedActionFromQLearningSelector = new ArrayList<>();
+    private static List<Action> firstSelectedActionFromPrioritizeSelector = new ArrayList<>();
+    private static List<Action> firstSelectedActionFromGuiGraphSelector = new ArrayList<>();
+    private static List<Action> firstSelectedActionFromQLearningSelector = new ArrayList<>();
 
-	@BeforeClass
-	public static void setup() {
-		state = new StateStub();
-		state.set(Tags.AbstractID, "stateAbstractID");
-		actions = new HashSet<>();
+    @BeforeClass
+    public static void setup() {
+        state = new StateStub();
+        state.set(Tags.AbstractID, "stateAbstractID");
+        actions = new HashSet<>();
 
-		// First action-widget
-		WidgetStub firstWidget = new WidgetStub();
-		state.addChild(firstWidget);
-		firstWidget.setParent(state);
+        // First action-widget
+        WidgetStub firstWidget = new WidgetStub();
+        state.addChild(firstWidget);
+        firstWidget.setParent(state);
 
-		firstWidget.set(Tags.Shape, Rect.fromCoordinates(1, 1, 1, 1));
-		firstWidget.set(Tags.Role, Roles.Button);
-		firstWidget.set(Tags.Path, "[0,0,1]");
-		firstWidget.set(Tags.Desc, "firstWidget");
-		firstWidget.set(Tags.ConcreteID, "firstWidgetConcreteID");
-		firstWidget.set(Tags.AbstractID, "firstWidgetAbstractID");
+        firstWidget.set(Tags.Shape, Rect.fromCoordinates(1, 1, 1, 1));
+        firstWidget.set(Tags.Role, Roles.Button);
+        firstWidget.set(Tags.Path, "[0,0,1]");
+        firstWidget.set(Tags.Desc, "firstWidget");
+        firstWidget.set(Tags.ConcreteID, "firstWidgetConcreteID");
+        firstWidget.set(Tags.AbstractID, "firstWidgetAbstractID");
 
-		Action firstAction = ac.leftClickAt(firstWidget);
-		firstAction.set(Tags.ConcreteID, "firstActionConcreteID");
-		firstAction.set(Tags.AbstractID, "firstActionAbstractID");
-		actions.add(firstAction);
+        Action firstAction = ac.leftClickAt(firstWidget);
+        firstAction.set(Tags.ConcreteID, "firstActionConcreteID");
+        firstAction.set(Tags.AbstractID, "firstActionAbstractID");
+        actions.add(firstAction);
 
-		// Second action-widget
-		WidgetStub secondWidget = new WidgetStub();
-		state.addChild(secondWidget);
-		secondWidget.setParent(state);
+        // Second action-widget
+        WidgetStub secondWidget = new WidgetStub();
+        state.addChild(secondWidget);
+        secondWidget.setParent(state);
 
-		secondWidget.set(Tags.Shape, Rect.fromCoordinates(2, 2, 2, 2));
-		secondWidget.set(Tags.Role, Roles.Button);
-		secondWidget.set(Tags.Path, "[0,0,2]");
-		secondWidget.set(Tags.Desc, "secondWidget");
-		secondWidget.set(Tags.ConcreteID, "secondWidgetConcreteID");
-		secondWidget.set(Tags.AbstractID, "secondWidgetAbstractID");
+        secondWidget.set(Tags.Shape, Rect.fromCoordinates(2, 2, 2, 2));
+        secondWidget.set(Tags.Role, Roles.Button);
+        secondWidget.set(Tags.Path, "[0,0,2]");
+        secondWidget.set(Tags.Desc, "secondWidget");
+        secondWidget.set(Tags.ConcreteID, "secondWidgetConcreteID");
+        secondWidget.set(Tags.AbstractID, "secondWidgetAbstractID");
 
-		Action secondAction = ac.leftClickAt(secondWidget);
-		secondAction.set(Tags.ConcreteID, "secondActionConcreteID");
-		secondAction.set(Tags.AbstractID, "secondActionAbstractID");
-		actions.add(secondAction);
-	}
+        Action secondAction = ac.leftClickAt(secondWidget);
+        secondAction.set(Tags.ConcreteID, "secondActionConcreteID");
+        secondAction.set(Tags.AbstractID, "secondActionAbstractID");
+        actions.add(secondAction);
+    }
 
-	@Test
-	@Repeat( times = 100 ) // Repeat to deal with action selection randomness
-	public void testPrioritizeNewActionsSelector() {
-		ComposedActionSelectorService prioritizeSelector = ComposedActionSelectorService.compose(
-			ActionSelectorPlan.basic(new PrioritizeNewActionsSelector())
-		);
+    @Test
+    @Repeat( times = 100 ) // Repeat to deal with action selection randomness
+    public void testPrioritizeNewActionsSelector() {
+        ComposedActionSelectorService prioritizeSelector = ComposedActionSelectorService.compose(
+                ActionSelectorPlan.basic(new PrioritizeNewActionsSelector())
+        );
 
-		Action firstSelectedAction = prioritizeSelector.selectAction(state, actions);
-		assertNotNull(firstSelectedAction);
-		firstSelectedActionFromPrioritizeSelector.add(firstSelectedAction);
+        Action firstSelectedAction = prioritizeSelector.selectAction(state, actions);
+        assertNotNull(firstSelectedAction);
+        firstSelectedActionFromPrioritizeSelector.add(firstSelectedAction);
 
-		Action secondSelectedAction = prioritizeSelector.selectAction(state, actions);
-		assertNotNull(secondSelectedAction);
+        Action secondSelectedAction = prioritizeSelector.selectAction(state, actions);
+        assertNotNull(secondSelectedAction);
 
-		// Check both selected actions were not the same ones
-		assertNotEquals(firstSelectedAction.get(Tags.Desc), secondSelectedAction.get(Tags.Desc));
+        // Check both selected actions were not the same ones
+        assertNotEquals(firstSelectedAction.get(Tags.Desc), secondSelectedAction.get(Tags.Desc));
 
-		// Finally, third selection must reset the actions and return both ones again
-		Action thirdSelectedAction = prioritizeSelector.selectAction(state, actions);
-		assertNotNull(thirdSelectedAction);
-		Assert.isTrue(
-			firstSelectedAction.get(Tags.Desc).equals(thirdSelectedAction.get(Tags.Desc))
-			||
-			secondSelectedAction.get(Tags.Desc).equals(thirdSelectedAction.get(Tags.Desc))
-		);
-	}
+        // Finally, third selection must reset the actions and return both ones again
+        Action thirdSelectedAction = prioritizeSelector.selectAction(state, actions);
+        assertNotNull(thirdSelectedAction);
+        Assert.isTrue(firstSelectedAction.get(Tags.Desc).equals(thirdSelectedAction.get(Tags.Desc))
+                || secondSelectedAction.get(Tags.Desc).equals(thirdSelectedAction.get(Tags.Desc)));
+    }
 
-	@Test
-	@Repeat( times = 100 ) // Repeat to deal with action selection randomness
-	public void testGuiStateGraphWithVisitedActions() {
-		ComposedActionSelectorService guiGraphSelector = ComposedActionSelectorService.compose(
-			ActionSelectorPlan.basic(new GuiStateGraphWithVisitedActions())
-		);
+    @Test
+    @Repeat( times = 100 ) // Repeat to deal with action selection randomness
+    public void testGuiStateGraphWithVisitedActions() {
+        ComposedActionSelectorService guiGraphSelector = ComposedActionSelectorService.compose(
+                ActionSelectorPlan.basic(new GuiStateGraphWithVisitedActions())
+        );
 
-		Action firstSelectedAction = guiGraphSelector.selectAction(state, actions);
-		assertNotNull(firstSelectedAction);
-		firstSelectedActionFromGuiGraphSelector.add(firstSelectedAction);
+        Action firstSelectedAction = guiGraphSelector.selectAction(state, actions);
+        assertNotNull(firstSelectedAction);
+        firstSelectedActionFromGuiGraphSelector.add(firstSelectedAction);
 
-		Action secondSelectedAction = guiGraphSelector.selectAction(state, actions);
-		assertNotNull(secondSelectedAction);
+        Action secondSelectedAction = guiGraphSelector.selectAction(state, actions);
+        assertNotNull(secondSelectedAction);
 
-		// Check both selected actions were not the same ones
-		assertNotEquals(firstSelectedAction.get(Tags.Desc), secondSelectedAction.get(Tags.Desc));
+        // Check both selected actions were not the same ones
+        assertNotEquals(firstSelectedAction.get(Tags.Desc), secondSelectedAction.get(Tags.Desc));
 
-		// Finally, third selection must reset the actions and return both ones again
-		Action thirdSelectedAction = guiGraphSelector.selectAction(state, actions);
-		assertNotNull(thirdSelectedAction);
-		Assert.isTrue(
-			firstSelectedAction.get(Tags.Desc).equals(thirdSelectedAction.get(Tags.Desc))
-			||
-			secondSelectedAction.get(Tags.Desc).equals(thirdSelectedAction.get(Tags.Desc))
-		);
-	}
+        // Finally, third selection must reset the actions and return both ones again
+        Action thirdSelectedAction = guiGraphSelector.selectAction(state, actions);
+        assertNotNull(thirdSelectedAction);
+        Assert.isTrue(firstSelectedAction.get(Tags.Desc).equals(thirdSelectedAction.get(Tags.Desc))
+                || secondSelectedAction.get(Tags.Desc).equals(thirdSelectedAction.get(Tags.Desc)));
+    }
 
-	@Test
-	@Repeat( times = 100 ) // Repeat to deal with action selection randomness
-	public void testQLearningActionSelector() {
-		ComposedActionSelectorService qLearningSelector = ComposedActionSelectorService.compose(
-			ActionSelectorPlan.basic(new QLearningActionSelector(99, 0.5))
-		);
+    @Test
+    @Repeat( times = 100 ) // Repeat to deal with action selection randomness
+    public void testQLearningActionSelector() {
+        ComposedActionSelectorService qLearningSelector = ComposedActionSelectorService.compose(
+                ActionSelectorPlan.basic(new QLearningActionSelector(99, 0.5))
+        );
 
-		Action firstSelectedAction = qLearningSelector.selectAction(state, actions);
-		assertNotNull(firstSelectedAction);
-		firstSelectedActionFromQLearningSelector.add(firstSelectedAction);
+        Action firstSelectedAction = qLearningSelector.selectAction(state, actions);
+        assertNotNull(firstSelectedAction);
+        firstSelectedActionFromQLearningSelector.add(firstSelectedAction);
 
-		Action secondSelectedAction = qLearningSelector.selectAction(state, actions);
-		assertNotNull(secondSelectedAction);
+        Action secondSelectedAction = qLearningSelector.selectAction(state, actions);
+        assertNotNull(secondSelectedAction);
 
-		// Check both selected actions were not the same ones
-		assertNotEquals(firstSelectedAction.get(Tags.Desc), secondSelectedAction.get(Tags.Desc));
+        // Check both selected actions were not the same ones
+        assertNotEquals(firstSelectedAction.get(Tags.Desc), secondSelectedAction.get(Tags.Desc));
 
-		// Finally, third selection must reset the actions and return both ones again
-		Action thirdSelectedAction = qLearningSelector.selectAction(state, actions);
-		assertNotNull(thirdSelectedAction);
-		Assert.isTrue(
-			firstSelectedAction.get(Tags.Desc).equals(thirdSelectedAction.get(Tags.Desc))
-			||
-			secondSelectedAction.get(Tags.Desc).equals(thirdSelectedAction.get(Tags.Desc))
-		);
-	}
+        // Finally, third selection must reset the actions and return both ones again
+        Action thirdSelectedAction = qLearningSelector.selectAction(state, actions);
+        assertNotNull(thirdSelectedAction);
+        Assert.isTrue(firstSelectedAction.get(Tags.Desc).equals(thirdSelectedAction.get(Tags.Desc))
+                || secondSelectedAction.get(Tags.Desc).equals(thirdSelectedAction.get(Tags.Desc)));
+    }
 
-	@AfterClass
-	public static void testFirstActionWereRandom() {
-		// TESTAR used an internal System.currentTimeMillis method to determine the next random action to select. 
-		// This is not truly random...
+    @AfterClass
+    public static void testFirstActionWereRandom() {
+        // TESTAR used an internal System.currentTimeMillis method to determine the next random action to select.
+        // This is not truly random...
 
-		// Invoking this System.currentTimeMillis during GUI testing if OK, because the interval of time is not small...
-		// BUT invoking this System.currentTimeMillis method multiple times within a small interval of time can provoke obtain the same action repeatedly. 
+        // Invoking this System.currentTimeMillis during GUI testing if OK, because the interval of time is not small...
+        // BUT invoking this System.currentTimeMillis method multiple times within a small interval of time can provoke obtain the same action repeatedly.
 
-		// So we need to test that "random" is effectively random :)
-		// At least in these JUnit tests
+        // So we need to test that "random" is effectively random :)
+        // At least in these JUnit tests
 
-		Map<String, Integer> countPrioritizeSelector = actionListCounter(firstSelectedActionFromPrioritizeSelector, "PrioritizeSelector");
-		Assert.isTrue(countPrioritizeSelector.size() == 2);
+        Map<String, Integer> countPrioritizeSelector = actionListCounter(firstSelectedActionFromPrioritizeSelector, "PrioritizeSelector");
+        Assert.isTrue(countPrioritizeSelector.size() == 2);
 
-		Map<String, Integer> countGuiGraphSelector = actionListCounter(firstSelectedActionFromGuiGraphSelector, "GuiGraphSelector");
-		Assert.isTrue(countGuiGraphSelector.size() == 2);
+        Map<String, Integer> countGuiGraphSelector = actionListCounter(firstSelectedActionFromGuiGraphSelector, "GuiGraphSelector");
+        Assert.isTrue(countGuiGraphSelector.size() == 2);
 
-		Map<String, Integer> countQLearningSelector = actionListCounter(firstSelectedActionFromQLearningSelector, "QLearningSelector");
-		Assert.isTrue(countQLearningSelector.size() == 2);
-	}
+        Map<String, Integer> countQLearningSelector = actionListCounter(firstSelectedActionFromQLearningSelector, "QLearningSelector");
+        Assert.isTrue(countQLearningSelector.size() == 2);
+    }
 
-	private static Map<String, Integer> actionListCounter(List<Action> actionList, String actionListName) {
-		// Create a HashMap to store the counts
-		Map<String, Integer> countMap = new HashMap<>();
-		// Loop through each element in the list and update the count in the HashMap
-		for (Action action : actionList) {
-			Integer count = countMap.get(action.get(Tags.Desc, "NonDesc"));
-			if (count == null) {
-				count = 0;
-			}
-			countMap.put(action.get(Tags.Desc, "NonDesc"), count + 1);
-		}
+    private static Map<String, Integer> actionListCounter(List<Action> actionList, String actionListName) {
+        // Create a HashMap to store the counts
+        Map<String, Integer> countMap = new HashMap<>();
+        // Loop through each element in the list and update the count in the HashMap
+        for (Action action : actionList) {
+            Integer count = countMap.get(action.get(Tags.Desc, "NonDesc"));
+            if (count == null) {
+                count = 0;
+            }
+            countMap.put(action.get(Tags.Desc, "NonDesc"), count + 1);
+        }
 
-		// Print the counts
-		System.out.println(actionListName);
-		for (Map.Entry<String, Integer> entry : countMap.entrySet()) {
-			System.out.println(entry.getKey() + ": " + entry.getValue());
-		}
+        // Print the counts
+        System.out.println(actionListName);
+        for (Map.Entry<String, Integer> entry : countMap.entrySet()) {
+            System.out.println(entry.getKey() + ": " + entry.getValue());
+        }
 
-		return countMap;
-	}
+        return countMap;
+    }
 }
 
 //https://gist.github.com/fappel/8bcb2aea4b39ff9cfb6e
@@ -218,37 +209,37 @@ public class TestActionSelector {
 @Retention( java.lang.annotation.RetentionPolicy.RUNTIME )
 @Target( { java.lang.annotation.ElementType.METHOD } )
 @interface Repeat {
-	public abstract int times();
+    public abstract int times();
 }
 
 class RepeatRule implements TestRule {
 
-	private static class RepeatStatement extends Statement {
+    private static class RepeatStatement extends Statement {
 
-		private final int times;
-		private final Statement statement;
+        private final int times;
+        private final Statement statement;
 
-		private RepeatStatement( int times, Statement statement ) {
-			this.times = times;
-			this.statement = statement;
-		}
+        private RepeatStatement( int times, Statement statement ) {
+            this.times = times;
+            this.statement = statement;
+        }
 
-		@Override
-		public void evaluate() throws Throwable {
-			for( int i = 0; i < times; i++ ) {
-				statement.evaluate();
-			}
-		}
-	}
+        @Override
+        public void evaluate() throws Throwable {
+            for ( int i = 0; i < times; i++ ) {
+                statement.evaluate();
+            }
+        }
+    }
 
-	@Override
-	public Statement apply( Statement statement, Description description ) {
-		Statement result = statement;
-		Repeat repeat = description.getAnnotation( Repeat.class );
-		if( repeat != null ) {
-			int times = repeat.times();
-			result = new RepeatStatement( times, statement );
-		}
-		return result;
-	}
+    @Override
+    public Statement apply( Statement statement, Description description ) {
+        Statement result = statement;
+        Repeat repeat = description.getAnnotation( Repeat.class );
+        if ( repeat != null ) {
+            int times = repeat.times();
+            result = new RepeatStatement( times, statement );
+        }
+        return result;
+    }
 }

@@ -10,7 +10,9 @@ import org.testar.core.action.Action;
 import org.testar.core.state.State;
 import org.testar.core.tag.Tags;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 public class GuiStateGraphForQlearning {
     protected Set<QlearningGuiState> qlearningGuiStates;
@@ -22,17 +24,15 @@ public class GuiStateGraphForQlearning {
 
     public GuiStateGraphForQlearning(double R_MAX, double gammaDiscount) {
         this.R_MAX = R_MAX;
-        this.gammaDiscount=gammaDiscount;
+        this.gammaDiscount = gammaDiscount;
 
         qlearningGuiStates = new HashSet<QlearningGuiState>();
     }
 
-    /**
-     * Resetting the last action and last state to null for a new test sequence
-     */
-    public void startANewTestSequence(){
-        previousActionAbstractId=null;
-        previousStateAbstractId=null;
+    /** Resetting the last action and last state to null for a new test sequence */
+    public void startANewTestSequence() {
+        previousActionAbstractId = null;
+        previousStateAbstractId = null;
     }
 
     /**
@@ -42,10 +42,10 @@ public class GuiStateGraphForQlearning {
      * @param abstractActionId
      * @return
      */
-    protected Action getActionWithAbstractId(Set<Action> actions, String abstractActionId){
-        for(Action action:actions){
+    protected Action getActionWithAbstractId(Set<Action> actions, String abstractActionId) {
+        for (Action action : actions) {
             // find the action with abstractId:
-            if(action.get(Tags.AbstractID).equals(abstractActionId)){
+            if (action.get(Tags.AbstractID).equals(abstractActionId)) {
                 return action;
             }
         }
@@ -59,30 +59,29 @@ public class GuiStateGraphForQlearning {
      * @param abstractStateId
      * @return
      */
-    protected QlearningGuiState getStateByAbstractId(String abstractStateId){
-        for(QlearningGuiState state: qlearningGuiStates){
-            if(state.getAbstractStateId().equals(abstractStateId)){
+    protected QlearningGuiState getStateByAbstractId(String abstractStateId) {
+        for (QlearningGuiState state : qlearningGuiStates) {
+            if (state.getAbstractStateId().equals(abstractStateId)) {
                 return state;
             }
         }
         return null;
     }
 
-    protected QlearningGuiState createQlearningGuiState(State state, Set<Action> actions){
+    protected QlearningGuiState createQlearningGuiState(State state, Set<Action> actions) {
         HashMap<String, Double> actionIds = new HashMap<String, Double>();
-        for(Action action:actions){
+        for (Action action : actions) {
             actionIds.put(action.get(Tags.AbstractID), R_MAX);
         }
-        return new QlearningGuiState(state.get(Tags.AbstractID),actionIds);
+        return new QlearningGuiState(state.get(Tags.AbstractID), actionIds);
     }
 
-    protected boolean containsStateId(String stateId){
-        for(QlearningGuiState state: qlearningGuiStates){
-            if(state.getAbstractStateId().equals(stateId)){
+    protected boolean containsStateId(String stateId) {
+        for (QlearningGuiState state : qlearningGuiStates) {
+            if (state.getAbstractStateId().equals(stateId)) {
                 return true;
             }
         }
         return false;
     }
-
 }
