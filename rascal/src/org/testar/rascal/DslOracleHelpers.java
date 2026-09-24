@@ -61,7 +61,9 @@ public class DslOracleHelpers {
             if (t.startsWith("package ") && t.endsWith(";")) {
                 return t.substring("package ".length(), t.length() - 1).trim();
             }
-            if (t.startsWith("import ") || t.startsWith("public ") || t.startsWith("class ")) break;
+            if (t.startsWith("import ") || t.startsWith("public ") || t.startsWith("class ")) {
+                break;
+            }
         }
         return "";
     }

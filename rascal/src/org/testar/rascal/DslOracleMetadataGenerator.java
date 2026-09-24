@@ -23,10 +23,10 @@ import java.util.regex.Pattern;
 public final class DslOracleMetadataGenerator {
 
     private static final Pattern MODEL_RECORD_PATTERN = Pattern.compile(
-        "(?m)^\\s*([A-Za-z_][A-Za-z0-9_]*)\\s*\\{([\\s\\S]*?)^\\s*\\}"
+            "(?m)^\\s*([A-Za-z_][A-Za-z0-9_]*)\\s*\\{([\\s\\S]*?)^\\s*\\}"
     );
     private static final Pattern MODEL_FIELD_PATTERN = Pattern.compile(
-        "(?m)^\\s*([A-Za-z_][A-Za-z0-9_]*)\\s*:\\s*([^\\r\\n]+)"
+            "(?m)^\\s*([A-Za-z_][A-Za-z0-9_]*)\\s*:\\s*([^\\r\\n]+)"
     );
     private static final Pattern RASCAL_LITERAL_PATTERN = Pattern.compile("\"((?:\\\\.|[^\"])*)\"");
     private static final Pattern RESERVED_PATTERN = Pattern.compile("keyword\\s+Reserved\\s*=\\s*([\\s\\S]*?);");
@@ -98,8 +98,8 @@ public final class DslOracleMetadataGenerator {
             Matcher fieldMatcher = MODEL_FIELD_PATTERN.matcher(fieldsSource);
             while (fieldMatcher.find()) {
                 fields.add(new DslOracleModelField(
-                    fieldMatcher.group(1),
-                    normalizeType(fieldMatcher.group(2))
+                        fieldMatcher.group(1),
+                        normalizeType(fieldMatcher.group(2))
                 ));
             }
             fieldsByWidgetType.put(widgetType, List.copyOf(fields));
@@ -192,7 +192,7 @@ public final class DslOracleMetadataGenerator {
 
     private static void collectRecursiveConnectorKeywords(String syntaxBody, String syntaxName, Set<String> connectorKeywords) {
         Pattern connectorPattern = Pattern.compile(
-            "\\b" + Pattern.quote(syntaxName) + "\\b[^\\r\\n\"]*\"((?:\\\\.|[^\"])*)\"[^\\r\\n\"]*\\b" + Pattern.quote(syntaxName) + "\\b"
+                "\\b" + Pattern.quote(syntaxName) + "\\b[^\\r\\n\"]*\"((?:\\\\.|[^\"])*)\"[^\\r\\n\"]*\\b" + Pattern.quote(syntaxName) + "\\b"
         );
         Matcher connectorMatcher = connectorPattern.matcher(syntaxBody);
         while (connectorMatcher.find()) {
@@ -202,7 +202,7 @@ public final class DslOracleMetadataGenerator {
 
     private static List<String> leadingLiterals(String alternative) {
         String normalizedAlternative = alternative.stripLeading()
-            .replaceFirst("^[A-Za-z_][A-Za-z0-9_-]*:\\s*", "");
+                .replaceFirst("^[A-Za-z_][A-Za-z0-9_-]*:\\s*", "");
         List<String> literals = new ArrayList<>();
         Matcher literalMatcher = RASCAL_LITERAL_PATTERN.matcher(normalizedAlternative);
         int expectedStart = firstMeaningfulIndex(normalizedAlternative);

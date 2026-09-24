@@ -35,7 +35,7 @@ public final class DslOracleCompiler {
     private static final String STATUS_ERROR = "ERROR";
     private static final String DSL_PARSE_ERROR_MESSAGE = "DSL parse error. Check the syntax near this position.";
     private static final Pattern RASCAL_PARSE_ERROR_LOCATION_PATTERN = Pattern.compile(
-        "ParseError\\([^|]*\\|[^|]+\\|\\([^,]+,[^,]+,<([0-9]+),([0-9]+)>,<([0-9]+),([0-9]+)>\\)"
+            "ParseError\\([^|]*\\|[^|]+\\|\\([^,]+,[^,]+,<([0-9]+),([0-9]+)>,<([0-9]+),([0-9]+)>\\)"
     );
 
     private final DslOracleLoader loader;
@@ -52,7 +52,7 @@ public final class DslOracleCompiler {
         try {
             List<DslOracleDiagnostic> diagnostics = validateDslSource(sourceName, dslSource);
             boolean success = diagnostics.stream()
-                .noneMatch(diagnostic -> STATUS_ERROR.equalsIgnoreCase(diagnostic.severity()));
+                    .noneMatch(diagnostic -> STATUS_ERROR.equalsIgnoreCase(diagnostic.severity()));
             String message = success ? "DSL validation succeeded." : "DSL validation failed.";
 
             return new DslOracleOperationResult(success, message, "", diagnostics);
@@ -65,15 +65,15 @@ public final class DslOracleCompiler {
         try {
             List<DslOracleDiagnostic> diagnostics = validateDslSource(sourceName, dslSource);
             boolean hasErrors = diagnostics.stream()
-                .anyMatch(diagnostic -> STATUS_ERROR.equalsIgnoreCase(diagnostic.severity()));
+                    .anyMatch(diagnostic -> STATUS_ERROR.equalsIgnoreCase(diagnostic.severity()));
             if (hasErrors) {
                 return new DslOracleOperationResult(false, "DSL generation blocked by validation errors.", "", diagnostics);
             }
 
             ISourceLocation oracleLocation = DslOracleHelpers.writeDslToTemp(
-                loader.getValueFactory(),
-                sourceBaseName(sourceName),
-                dslSource
+                    loader.getValueFactory(),
+                    sourceBaseName(sourceName),
+                    dslSource
             );
             String javaSource = DslOracleHelpers.compileAt(loader.getEvaluator(), oracleLocation);
 
@@ -87,9 +87,9 @@ public final class DslOracleCompiler {
         IValueFactory valueFactory = loader.getValueFactory();
         Evaluator evaluator = loader.getEvaluator();
         ISourceLocation oracleLocation = DslOracleHelpers.writeDslToTemp(
-            valueFactory,
-            sourceBaseName(sourceName),
-            dslSource
+                valueFactory,
+                sourceBaseName(sourceName),
+                dslSource
         );
         Path modelPath = loader.getModulePath().resolve("lang").resolve("testar").resolve("testar.model");
         ISourceLocation modelLocation = valueFactory.sourceLocation(modelPath.toUri());
@@ -297,8 +297,8 @@ public final class DslOracleCompiler {
 
     private String sourceBaseName(String sourceName) {
         String fileName = sourceName == null || sourceName.isBlank()
-            ? "RuntimeGeneratedOracles.testar"
-            : Path.of(sourceName.replace('\\', '/')).getFileName().toString();
+                ? "RuntimeGeneratedOracles.testar"
+                : Path.of(sourceName.replace('\\', '/')).getFileName().toString();
 
         return fileName.replaceFirst("(?i)\\.testar$", "");
     }

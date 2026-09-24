@@ -57,7 +57,7 @@ public class DslOracleLoader {
             resolved = Paths.get("").toAbsolutePath().resolve("testar-oracle").normalize();
         }
         if (!Files.isDirectory(resolved)) {
-            // Resolve the installDist path 
+            // Resolve the installDist path
             resolved = resolveRascalModuleDir();
         }
         modulePath = resolved;
@@ -65,7 +65,9 @@ public class DslOracleLoader {
         // 3) Add folder (if present) to Rascal search path
         if (Files.isDirectory(modulePath)) {
             String u = modulePath.toUri().toString();
-            if (!u.endsWith("/")) u += "/";
+            if (!u.endsWith("/")) {
+                u += "/";
+            }
             eval.addRascalSearchPath(vf.sourceLocation(URI.create(u)));
         } else {
             System.err.println("[DslOracleLoader] WARNING: Rascal modules folder not found: " + modulePath);
@@ -104,7 +106,9 @@ public class DslOracleLoader {
         Path maybeAppHome = cwd.getParent();
         if (maybeAppHome != null && Files.isDirectory(maybeAppHome)) {
             Path p = maybeAppHome.resolve("rascal-modules").resolve("testar-oracle").normalize();
-            if (Files.isDirectory(p)) return p;
+            if (Files.isDirectory(p)) {
+                return p;
+            }
         }
 
         // Final fallback for local builds

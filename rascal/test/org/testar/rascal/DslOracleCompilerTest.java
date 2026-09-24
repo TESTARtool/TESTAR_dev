@@ -10,18 +10,18 @@ public class DslOracleCompilerTest {
         DslOracleCompiler compiler = new DslOracleCompiler();
 
         DslOracleOperationResult result = compiler.validate(
-            "broken.testar",
-            String.join(System.lineSeparator(),
-                "assert for all table",
-                "  it.backgroundColor spell checks in en_GB",
-                "  \"DSL: Spell checking for English table headers\"."
-            )
+                "broken.testar",
+                String.join(System.lineSeparator(),
+                        "assert for all table",
+                        "  it.backgroundColor spell checks in en_GB",
+                        "  \"DSL: Spell checking for English table headers\"."
+                )
         );
 
         DslOracleDiagnostic diagnostic = result.diagnostics().stream()
-            .filter(item -> item.message().contains("undefined field"))
-            .findFirst()
-            .orElseThrow();
+                .filter(item -> item.message().contains("undefined field"))
+                .findFirst()
+                .orElseThrow();
 
         Assert.assertFalse(result.success());
         Assert.assertEquals("ERROR", diagnostic.severity());
@@ -36,8 +36,8 @@ public class DslOracleCompilerTest {
         DslOracleCompiler compiler = new DslOracleCompiler();
 
         DslOracleOperationResult result = compiler.validate(
-            "valid.testar",
-            "assert button \"Submit\" is enabled \"Button Submit must be enabled\"."
+                "valid.testar",
+                "assert button \"Submit\" is enabled \"Button Submit must be enabled\"."
         );
 
         Assert.assertTrue(result.message(), result.success());
@@ -49,13 +49,13 @@ public class DslOracleCompilerTest {
         DslOracleCompiler compiler = new DslOracleCompiler();
 
         DslOracleOperationResult result = compiler.validate(
-            "broken_keyword.testar",
-            String.join(System.lineSeparator(),
-                "package dsl_generated.parabank_invariants;",
-                "",
-                "asser static_text \"Welcome John Demo\" is visible",
-                "\"DSL: Welcome John Demo is visible\"."
-            )
+                "broken_keyword.testar",
+                String.join(System.lineSeparator(),
+                        "package dsl_generated.parabank_invariants;",
+                        "",
+                        "asser static_text \"Welcome John Demo\" is visible",
+                        "\"DSL: Welcome John Demo is visible\"."
+                )
         );
 
         DslOracleDiagnostic diagnostic = result.diagnostics().get(0);

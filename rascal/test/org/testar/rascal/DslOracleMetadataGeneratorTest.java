@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 public class DslOracleMetadataGeneratorTest {
 
     private final DslOracleMetadata metadata = new DslOracleMetadataGenerator(
-        Path.of("testar-oracle")
+            Path.of("testar-oracle")
     ).generate();
 
     @Test
