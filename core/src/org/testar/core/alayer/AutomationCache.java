@@ -11,7 +11,7 @@ import java.util.Map;
 
 /**
  * SUT UI soft automation caching.
- * Provides capability to Delay release of cached UI automation elements. 
+ * Provides capability to Delay release of cached UI automation elements.
  */
 public abstract class AutomationCache {
 
@@ -174,16 +174,16 @@ public abstract class AutomationCache {
      * @param elementPtr
      */
     public abstract void nativeReleaseAutomationElement(long elementPtr);
-    
+
     /**
      * Retrieves the pointer to the automation element for a UI.
      * @param automationPtr
      * @param hwndPtr
      */
     public abstract long nativeGetAutomationElementFromHandle(long automationPtr, long hwndPtr);
-        
+
     /**
-     * 
+     *
      * @param cachedAutomationElementPtr
      * @param fromCache
      * @return
@@ -191,7 +191,7 @@ public abstract class AutomationCache {
     public abstract long[] nativeGetAutomationElementBoundingRectangl(long cachedAutomationElementPtr, boolean fromCache);
 
     /**
-     * Builds a cached automation element for the UI and returns a pointer to it. 
+     * Builds a cached automation element for the UI and returns a pointer to it.
      * @param automationPtr
      * @param hwndPtr
      * @param cacheRequestPtr

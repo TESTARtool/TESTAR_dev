@@ -9,14 +9,14 @@ package org.testar.core.devices;
 
 public interface IEventListener {
 
-	public abstract void keyDown(KBKeys key);
+    public abstract void keyDown(KBKeys key);
 
-	public abstract void keyUp(KBKeys key);
+    public abstract void keyUp(KBKeys key);
 
-	public abstract void mouseDown(MouseButtons btn, double x, double y);
+    public abstract void mouseDown(MouseButtons btn, double x, double y);
 
-	public abstract void mouseUp(MouseButtons btn, double x, double y);
+    public abstract void mouseUp(MouseButtons btn, double x, double y);
 
-	public abstract void mouseMoved(double x, double y);
-	
+    public abstract void mouseMoved(double x, double y);
+
 }

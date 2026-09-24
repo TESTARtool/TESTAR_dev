@@ -93,7 +93,7 @@ public final class StdAbstractor implements Abstractor {
                     maxScore = score;
                 }
             }
-            
+
             return bestCandidate;
         }
 

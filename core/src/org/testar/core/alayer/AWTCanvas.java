@@ -272,7 +272,7 @@ public class AWTCanvas implements Image, Canvas {
         adjustPen(pen);
 
         //if(angle == 0){
-        //        gr.drawString(text, (int)x, (int)y);            
+        //        gr.drawString(text, (int)x, (int)y);
         //        }else{
         TextLayout txtl = new TextLayout(text, gr.getFont(), new FontRenderContext(null, true, false));
         AffineTransform at = new AffineTransform();
@@ -404,7 +404,7 @@ public class AWTCanvas implements Image, Canvas {
         int srcHeight = (int)srcRect.height();
         BufferedImage subImage = new BufferedImage(srcWidth, srcHeight, BufferedImage.TYPE_INT_ARGB);
         subImage.getGraphics().drawImage(img.getSubimage(srcX, srcY, srcWidth, srcHeight), 0, 0, srcWidth, srcHeight, null);
-        
+
         int area[] = ((DataBufferInt)subImage.getRaster().getDataBuffer()).getData();
         canvas.image(canvas.defaultPen(), destRect.x(), destRect.y(), destRect.width(), destRect.height(), area, srcWidth, srcHeight);
     }
@@ -426,7 +426,7 @@ public class AWTCanvas implements Image, Canvas {
      * @return Similarity percentage as 0.0 (different) .. 1.0 (equal).
      */
     public float compareImage(AWTCanvas img) {
-        //long now = System.currentTimeMillis();        
+        //long now = System.currentTimeMillis();
         DataBuffer dbThis = this.img.getData().getDataBuffer(),
                 dbImg = img.img.getData().getDataBuffer();
         int sizeThis = dbThis.getSize(),

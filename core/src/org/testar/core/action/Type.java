@@ -95,7 +95,7 @@ public final class Type extends TaggableBase implements Action {
 
         throw new IllegalArgumentException("Unable to find the corresponding keycode for character '" + c + "(" + ((int)c) +  ")'!");
     }
-    
+
     public String toString() {
         return "Type text '" + this.get(Tags.InputText, this.text) + "'";
     }

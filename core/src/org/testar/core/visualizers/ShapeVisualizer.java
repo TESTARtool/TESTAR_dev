@@ -21,7 +21,7 @@ public final class ShapeVisualizer implements Visualizer {
     private final String label;
     private final double labelX, labelY;
     private final Pen pen;
-    
+
     public ShapeVisualizer(Pen pen, Shape shape, String label, double labelX, double labelY) {
         Assert.notNull(shape, pen);
         this.shape = shape;

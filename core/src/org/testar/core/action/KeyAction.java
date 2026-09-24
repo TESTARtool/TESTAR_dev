@@ -30,7 +30,7 @@ public abstract class KeyAction extends TaggableBase implements Action {
         Assert.notNull(key);
         this.key = key;
     }
-    
+
     public abstract String toString();
 
     public final void run(SUT system, State state, double duration) {

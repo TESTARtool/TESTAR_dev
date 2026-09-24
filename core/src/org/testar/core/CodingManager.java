@@ -45,7 +45,7 @@ public class CodingManager {
     public static final String ID_PREFIX_ABSTRACT_R = "R";
     public static final String ID_PREFIX_ABSTRACT_R_T = "T";
     public static final String ID_PREFIX_ABSTRACT_R_T_P = "P";
-    
+
     public static final String ID_PREFIX_STATE = "S";
     public static final String ID_PREFIX_WIDGET = "W";
     public static final String ID_PREFIX_ACTION = "A";
@@ -55,7 +55,7 @@ public class CodingManager {
     private static final Tag<?>[] TAGS_ABSTRACT_R_T_P_ID = new Tag<?>[] { Tags.Role, Tags.Title, Tags.Path };
 
     public static final Role[] ROLES_ABSTRACT_ACTION = new Role[] { // discard parameters
-        /// ActionRoles.MouseMove, 
+        /// ActionRoles.MouseMove,
         ActionRoles.Type,
         ActionRoles.KeyDown,
         ActionRoles.KeyUp
@@ -131,18 +131,18 @@ public class CodingManager {
     // ###########################################
     //  Widgets/States and Actions IDs management
     // ###########################################
-    
+
     /**
      * Builds IDs for a widget or state.
      * @param widget A widget or a State (widget-tree, or widget with children)
-     * 
+     *
      * An identifier (alphanumeric) for a state is built as: f(w1 + ... + wn),
      * where wi (i=1..n) is the identifier for a widget in the widget-tree
      * and the + operator is the concatenation of identifiers (alphanumeric).
      * The order of the widgets in f is determined by the UI structure.
      * f is a formula that converts, with low collision, a text of varying length
      * to a shorter representation: hashcode(text) + length(text) + crc32(text).
-     * 
+     *
      * An identifier (alphanumeric) for a widget is calculated based on
      * the concatenation of a set of accessibility properties (e.g. ROLE, TITLE, ENABLED and PATH).
      * An example for an enabled "ok" button could be: Buttonoktrue0,0,1 ("0,0,1" being the path in the widget-tree).
@@ -175,7 +175,7 @@ public class CodingManager {
             widget.set(Tags.Abstract_R_T_P_ID, ID_PREFIX_STATE + ID_PREFIX_ABSTRACT_R_T_P + CodingManager.lowCollisionID(abstractRoleTitlePathId.toString()));
         }
     }
-    
+
     /**
      * Builds IDs (abstract, concrete) for a set of actions.
      * @param state Current State of the SUT
@@ -251,11 +251,11 @@ public class CodingManager {
         }
         return role.toString() + roleCounter.getOrDefault(role, 999);
     }
-    
+
     // ###############
     //  STATES CODING
     // ###############
-    
+
     private static String codify(Widget state, Tag<?>... tags) {
         return lowCollisionID(getTaggedString(state, tags));
     }
@@ -280,7 +280,7 @@ public class CodingManager {
     private static String codify(String stateID, Action action, Role... discardParameters) {
         return lowCollisionID(stateID + action.toString(discardParameters));
     }
-    
+
     // ############
     //  IDS CODING
     // ############
@@ -315,5 +315,5 @@ public class CodingManager {
         hashInput.append(applicationVersion);
         return lowCollisionID(hashInput.toString());
     }
-    
+
 }

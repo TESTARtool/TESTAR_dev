@@ -14,9 +14,9 @@ import org.testar.core.visualizers.ShapeVisualizer;
 public class VerdictTest {
 
     private final ShapeVisualizer failVisualizer = new ShapeVisualizer(
-                    Pen.PEN_RED, 
-                    Rect.from(0, 0, 10, 10), 
-                    "Fail Visualizer", 
+                    Pen.PEN_RED,
+                    Rect.from(0, 0, 10, 10),
+                    "Fail Visualizer",
                     0.5, 0.5);
 
     @Test

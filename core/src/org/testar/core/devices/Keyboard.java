@@ -6,8 +6,8 @@
 
 package org.testar.core.devices;
 
-public interface Keyboard {    
+public interface Keyboard {
     void press(KBKeys k);
-    void release(KBKeys k);    
+    void release(KBKeys k);
     void paste();
 }

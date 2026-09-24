@@ -30,7 +30,7 @@ public class ScreenshotUtil {
 
     /**
      * Method returns a binary representation of a state's screenshot.
-     * 
+     *
      * @param state
      * @return
      */

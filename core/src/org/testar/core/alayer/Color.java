@@ -13,7 +13,7 @@ import org.testar.core.Assert;
 /**
  * Color objects represent a color and are used together with <code>Pen</code>'s and
  * <code>Canvas</code> objects.
- * 
+ *
  * @see Pen
  * @see Canvas
  */

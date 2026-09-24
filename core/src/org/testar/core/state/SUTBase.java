@@ -25,13 +25,13 @@ public abstract class SUTBase implements SUT {
     private Map<Tag<?>, Object> tagValues = Util.newHashMap();
     boolean allFetched;
 
-    protected AutomationCache nativeAutomationCache = null; // by urueda
+    protected AutomationCache nativeAutomationCache = null;
 
     @Override
     public AutomationCache getNativeAutomationCache() {
         return this.nativeAutomationCache;
     }
-    
+
     public final <T> T get(Tag<T> tag) throws NoSuchTagException {
         T ret = get(tag, null);
         if (ret == null) {

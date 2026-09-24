@@ -9,8 +9,8 @@ package org.testar.core.alayer;
 import java.io.Serializable;
 
 public interface HitTester extends Serializable {
-    
+
     boolean apply(double x, double y);
-    
+
     boolean apply(double x, double y, boolean obscuredByChildFeature);
 }

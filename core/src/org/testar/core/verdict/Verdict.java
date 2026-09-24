@@ -151,23 +151,23 @@ public final class Verdict implements Serializable {
         this.visualizer = visualizer;
     }
 
-	public Verdict(Severity severity, String info, Widget w) {
-		this(
-				severity,
-				info.concat(" (in widget: " + w.get(Tags.Desc, "") + ") "),
-				new ShapeVisualizer(
-						Pen.newPen()
-						.setColor(Color.Red)
-						.setFillPattern(FillPattern.None)
-						.setStrokePattern(StrokePattern.Solid)
-						.build(),
-						w.get(Tags.Shape, Rect.from(0, 0, 0, 0)),
-						info,
-						0.5,
-						0.5
-						)
-				);
-	}
+    public Verdict(Severity severity, String info, Widget w) {
+        this(
+                severity,
+                info.concat(" (in widget: " + w.get(Tags.Desc, "") + ") "),
+                new ShapeVisualizer(
+                        Pen.newPen()
+                        .setColor(Color.Red)
+                        .setFillPattern(FillPattern.None)
+                        .setStrokePattern(StrokePattern.Solid)
+                        .build(),
+                        w.get(Tags.Shape, Rect.from(0, 0, 0, 0)),
+                        info,
+                        0.5,
+                        0.5
+                        )
+        );
+    }
 
     /**
      * Returns the verdict severity value.
@@ -202,7 +202,7 @@ public final class Verdict implements Serializable {
      * This visualizer should visualize the part of the state where the problem occurred.
      * For example: If there is a suspicious control element, like f.e. a critical message box
      * than this should be framed or pointed to with a big red arrow.
-     * 
+     *
      * @return the visualizer which is guaranteed to be non-null
      */
     public Visualizer visualizer() {

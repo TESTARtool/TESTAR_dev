@@ -19,7 +19,7 @@ public final class AWTKeyboard implements Keyboard {
     }
 
     private final Robot robot;
-    
+
     private AWTKeyboard() {
         try {
             robot = new Robot();
@@ -27,7 +27,7 @@ public final class AWTKeyboard implements Keyboard {
             throw new FruitException(awte);
         }
     }
-    
+
     public String toString() {
         return "AWT Keyboard";
     }

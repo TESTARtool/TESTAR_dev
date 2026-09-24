@@ -46,7 +46,7 @@ public class KillProcess extends TaggableBase implements Action {
     public void run(SUT system, State state, double duration) throws ActionFailedException {
         Assert.notNull(system);
         Assert.isTrue(duration >= 0);
-        
+
         double start = Util.time();
         Util.pause(waitTime);
 

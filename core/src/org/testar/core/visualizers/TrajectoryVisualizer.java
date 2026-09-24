@@ -28,29 +28,29 @@ public class TrajectoryVisualizer implements Visualizer {
     public TrajectoryVisualizer(Pen pen, Position... positions) {
         this(new SplineTrajectory(10, positions), pen);
     }
-    
+
     public TrajectoryVisualizer(Function<State, Iterable<Point>> trajectory, Pen pen) {
         Assert.notNull(trajectory, pen);
         Assert.isTrue(pen.strokeWidth() != null);
         this.trajectory = trajectory;
         this.pen = pen;
     }
-    
+
     public void run(State state, Canvas canvas, Pen pen) {
         Assert.notNull(state, canvas, pen);
         pen = Pen.merge(pen, this.pen);
         Iterator<Point> iter = trajectory.apply(state).iterator();
         Point last = iter.next();
-        
+
         while (iter.hasNext()) {
             Point current = iter.next();
-            
+
             if (!iter.hasNext() && (pen.strokeCaps() == StrokeCaps._Arrow || pen.strokeCaps() == StrokeCaps.Arrow_)) {
                 Util.arrow(canvas, pen, last.x(), last.y(), current.x(), current.y(), 5 * pen.strokeWidth(), 5 * pen.strokeWidth());
             } else {
                 canvas.line(pen, last.x(), last.y(), current.x(), current.y());
             }
-            
+
             last = current;
         }
     }

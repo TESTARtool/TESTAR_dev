@@ -21,7 +21,7 @@ import org.testar.core.tag.Tags;
 
 /**
  * Actions take a system and a state as parameters and operate on the system (e.g. a left click). They
- * usually use the state to find certain values that might be necessary for their 
+ * usually use the state to find certain values that might be necessary for their
  * execution. In addition they might use a system's devices (Mouse, Keyboard, ...)
  * in order to execute a specific task.
  * For example: An action could always click on a menu item with the title
@@ -100,7 +100,7 @@ public interface Action extends Taggable, Serializable {
                 }
             }
         }
-            
+
         String desc = action.get(Tags.Desc, null);
         if (desc != null) {
             returnS[0] += tab + "DESCRIPTION = " + desc + "\n";
@@ -119,24 +119,24 @@ public interface Action extends Taggable, Serializable {
 
         return returnS;
     }
-    
+
     /**
      * Returns a short string representation for the action.
      * @return The short string.
      */
     String toShortString();
-    
+
     /**
      * Returns the parameters of the action.
      * @return A string representation of the action parameters.
      */
     String toParametersString();
-    
+
     String toString(Role... discardParameters);
 
     /**
      * Map the OriginWidget to the action
-     * 
+     *
      * @param widget
      */
     default void mapOriginWidget(Widget widget) {

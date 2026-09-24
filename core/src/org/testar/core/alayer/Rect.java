@@ -19,7 +19,7 @@ public final class Rect implements Shape {
         return !(r1.x() + r1.width() < r2.x() ||
                 r1.y() + r1.height() < r2.y() ||
                 r2.x() + r2.width() < r1.x() ||
-                r2.y() + r2.height() < r1.y()); 
+                r2.y() + r2.height() < r1.y());
     }
 
     public static boolean overlap(Rect r1, Rect r2) {
@@ -32,10 +32,10 @@ public final class Rect implements Shape {
 
     public static boolean contains(Rect r1, Rect r2) {
         Assert.notNull(r1, r2);
-        return r2.x() >= r1.x() && r2.x() + r2.width() <= r1.x() + r1.width() && 
+        return r2.x() >= r1.x() && r2.x() + r2.width() <= r1.x() + r1.width() &&
                 r2.y() >= r1.y() && r2.y() + r2.height() <= r1.y() + r1.height();
     }
-    
+
     public static double area(Rect rect) {
         Assert.notNull(rect);
         return rect.width() * rect.height();
@@ -110,7 +110,7 @@ public final class Rect implements Shape {
     public void paint(Canvas canvas, Pen pen) {
         canvas.rect(pen, x, y, width, height);
     }
-    
+
     @Override
     public boolean equals(Object o) {
         if (o == this) {

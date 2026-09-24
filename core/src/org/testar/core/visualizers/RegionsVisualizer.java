@@ -38,7 +38,7 @@ public final class RegionsVisualizer implements Visualizer {
     public void run(State state, Canvas c, Pen pen) {
         Assert.notNull(state, c, pen);
         pen = Pen.merge(pen, this.pen);
-        
+
         for (Shape shape : shapes) {
             shape.paint(c, pen);
             if (label != null) {

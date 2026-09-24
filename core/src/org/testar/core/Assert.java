@@ -11,13 +11,13 @@ import java.util.Collection;
 public final class Assert {
 
     private Assert() { }
-    
+
     public static void isTrue(boolean expression, String text) {
         if (!expression) {
             throw new IllegalArgumentException(text);
         }
     }
-    
+
     public static void isTrue(boolean expression) {
         if (!expression) {
             throw new IllegalArgumentException("You passed illegal parameters!");
@@ -35,7 +35,7 @@ public final class Assert {
             throw new IllegalArgumentException(text);
         }
     }
-        
+
     public static void notNull(Object object, String text) {
         if (object == null) {
             throw new IllegalArgumentException(text);
@@ -48,7 +48,7 @@ public final class Assert {
         }
         return object;
     }
-    
+
     public static void notNull(Object o1, Object o2) {
         if (o1 == null || o2 == null) {
             throw new IllegalArgumentException("You passed null as a parameter!");
@@ -89,7 +89,7 @@ public final class Assert {
             throw new IllegalArgumentException(message);
         }
     }
-    
+
     public static void collectionSize(Collection<String> collection, int size) {
         if (collection.size() != size) {
             String message = String.format("Collection %s has undesired size %s", collection.toString(), size);

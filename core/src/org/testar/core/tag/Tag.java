@@ -17,14 +17,14 @@ import org.testar.core.util.Util;
 
 /**
  * Tags are labels that can be attached to <code>Taggable</code> objects. They are similar to keys in <code>Map</code>'s.
- * They have a name and a type and are associated with values who must be of that type. 
+ * They have a name and a type and are associated with values who must be of that type.
  */
 public final class Tag<T> implements Serializable {
 
     private static final ConcurrentHashMap<Tag<?>, Tag<?>> existingTags = new ConcurrentHashMap<Tag<?>, Tag<?>>();
 
     /**
-     * Returns a tag object which is identified by <code>name</code> and <code>valueType</code>. 
+     * Returns a tag object which is identified by <code>name</code> and <code>valueType</code>.
      * @param name The name of the tag
      * @param valueType The type of the values that are associated with this tag.
      * @return A tag object.

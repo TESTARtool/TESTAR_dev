@@ -31,62 +31,69 @@ public class VisualizationUtil {
     private VisualizationUtil() {
     }
 
-    public static synchronized void visualizeState(boolean showExtendedWidgetInfo, Mouse mouse, Canvas canvas, State state, Predicate<Tag<?>> visibleTagPredicate){
+    public static synchronized void visualizeState(boolean showExtendedWidgetInfo, Mouse mouse, Canvas canvas, State state, Predicate<Tag<?>> visibleTagPredicate) {
         Point cursor = mouse.cursor();
         Widget cursorWidget = Util.widgetFromPoint(state, cursor.x(), cursor.y(), null);
 
-        if(cursorWidget != null){
+        if (cursorWidget != null) {
             Widget rootW = cursorWidget;
             while (rootW.parent() != null && rootW.parent() != rootW) {
                 rootW = rootW.parent();
             }
             Shape cwShape = cursorWidget.get(Tags.Shape, null);
 
-            if(cwShape != null){
+            if (cwShape != null) {
                 cwShape.paint(canvas, Pen.PEN_MARK_ALPHA);
                 cwShape.paint(canvas, Pen.PEN_MARK_BORDER);
-                if (!showExtendedWidgetInfo){
-                	// Widget properties we are going to show in Spy mode when the information is not extended
-                	String rootText = "StateID: " + rootW.get(Tags.AbstractID, "");
-                	String widgetText = "WidgetID: " + cursorWidget.get(Tags.AbstractID, "");
-                	String titleText = "Title: " + cursorWidget.get(Tags.Title, "");
-                	String roleText = "Role: " + cursorWidget.get(Tags.Role, Roles.Widget).toString();
-                	String enabledText = "Enabled: " + cursorWidget.get(Tags.Enabled, false);
-                	String shapeText = "Shape: " + cursorWidget.get(Tags.Shape, Rect.from(0, 0, 0, 0));
-                	String pathText = "Path: " + cursorWidget.get(Tags.Path, "");
+                if (!showExtendedWidgetInfo) {
+                    // Widget properties we are going to show in Spy mode when the information is not extended
+                    String rootText = "StateID: " + rootW.get(Tags.AbstractID, "");
+                    String widgetText = "WidgetID: " + cursorWidget.get(Tags.AbstractID, "");
+                    String titleText = "Title: " + cursorWidget.get(Tags.Title, "");
+                    String roleText = "Role: " + cursorWidget.get(Tags.Role, Roles.Widget).toString();
+                    String enabledText = "Enabled: " + cursorWidget.get(Tags.Enabled, false);
+                    String shapeText = "Shape: " + cursorWidget.get(Tags.Shape, Rect.from(0, 0, 0, 0));
+                    String pathText = "Path: " + cursorWidget.get(Tags.Path, "");
 
-                	// Calculate the maximum length of the widget properties strings
-                	String[] textArray = {rootText, widgetText, titleText, roleText, enabledText, shapeText, pathText};
-                	int maxLength = 0;
-                	for (String text : textArray) {
-                		maxLength = Math.max(maxLength, text.length());
-                	}
-                	double miniwidgetInfoW = maxLength * 8.0;
-                	if (miniwidgetInfoW < 256) miniwidgetInfoW = 256;
-                	double miniwidgetInfoH = 20 * textArray.length; // Each property uses a height of 20
+                    // Calculate the maximum length of the widget properties strings
+                    String[] textArray = {rootText, widgetText, titleText, roleText, enabledText, shapeText, pathText};
+                    int maxLength = 0;
+                    for (String text : textArray) {
+                        maxLength = Math.max(maxLength, text.length());
+                    }
+                    double miniwidgetInfoW = maxLength * 8.0;
+                    if (miniwidgetInfoW < 256) {
+                        miniwidgetInfoW = 256;
+                    }
+                    double miniwidgetInfoH = 20 * textArray.length; // Each property uses a height of 20
 
-                	// Create the Shape of the visual rectangles we draw in Spy mode
-                	Shape minicwShape = Rect.from(cwShape.x() + cwShape.width()/2 + 32,
-                			cwShape.y() + cwShape.height()/2 + 32,
-                			miniwidgetInfoW, miniwidgetInfoH);
-                	Shape repositionShape = VisualizationUtil.calculateWidgetInfoShape(canvas,minicwShape, miniwidgetInfoW, miniwidgetInfoH);
-                	if (repositionShape != minicwShape){
-                		double x = repositionShape.x() - repositionShape.width() - 32,
-                				y = repositionShape.y() - repositionShape.height() - 32;
-                		if (x < 0) x = 0; if (y < 0) y = 0;
-                		minicwShape = Rect.from(x,y,repositionShape.width(), repositionShape.height());
-                	}
+                    // Create the Shape of the visual rectangles we draw in Spy mode
+                    Shape minicwShape = Rect.from(cwShape.x() + cwShape.width() / 2 + 32,
+                            cwShape.y() + cwShape.height() / 2 + 32,
+                            miniwidgetInfoW, miniwidgetInfoH);
+                    Shape repositionShape = VisualizationUtil.calculateWidgetInfoShape(canvas, minicwShape, miniwidgetInfoW, miniwidgetInfoH);
+                    if (repositionShape != minicwShape) {
+                        double x = repositionShape.x() - repositionShape.width() - 32,
+                                y = repositionShape.y() - repositionShape.height() - 32;
+                        if (x < 0) {
+                            x = 0;
+                        }
+                        if (y < 0) {
+                            y = 0;
+                        }
+                        minicwShape = Rect.from(x, y, repositionShape.width(), repositionShape.height());
+                    }
 
-                	// Draw the rectangle and widget properties in the screen
-                	canvas.rect(Pen.PEN_WHITE_ALPHA, minicwShape.x(), minicwShape.y(), miniwidgetInfoW, miniwidgetInfoH);
-                	canvas.rect(Pen.PEN_BLACK, minicwShape.x(), minicwShape.y(), miniwidgetInfoW, miniwidgetInfoH);
-                	canvas.text(Pen.PEN_RED, minicwShape.x(), minicwShape.y(), 0, rootText);
-                	canvas.text(Pen.PEN_BLUE, minicwShape.x(), minicwShape.y() + 20, 0, widgetText);
-                	canvas.text(Pen.PEN_BLUE, minicwShape.x(), minicwShape.y() + 40, 0, titleText);
-                	canvas.text(Pen.PEN_BLUE, minicwShape.x(), minicwShape.y() + 60, 0, roleText);
-                	canvas.text(Pen.PEN_BLUE, minicwShape.x(), minicwShape.y() + 80, 0, enabledText);
-                	canvas.text(Pen.PEN_BLUE, minicwShape.x(), minicwShape.y() + 100, 0, shapeText);
-                	canvas.text(Pen.PEN_BLUE, minicwShape.x(), minicwShape.y() + 120, 0, pathText);
+                    // Draw the rectangle and widget properties in the screen
+                    canvas.rect(Pen.PEN_WHITE_ALPHA, minicwShape.x(), minicwShape.y(), miniwidgetInfoW, miniwidgetInfoH);
+                    canvas.rect(Pen.PEN_BLACK, minicwShape.x(), minicwShape.y(), miniwidgetInfoW, miniwidgetInfoH);
+                    canvas.text(Pen.PEN_RED, minicwShape.x(), minicwShape.y(), 0, rootText);
+                    canvas.text(Pen.PEN_BLUE, minicwShape.x(), minicwShape.y() + 20, 0, widgetText);
+                    canvas.text(Pen.PEN_BLUE, minicwShape.x(), minicwShape.y() + 40, 0, titleText);
+                    canvas.text(Pen.PEN_BLUE, minicwShape.x(), minicwShape.y() + 60, 0, roleText);
+                    canvas.text(Pen.PEN_BLUE, minicwShape.x(), minicwShape.y() + 80, 0, enabledText);
+                    canvas.text(Pen.PEN_BLUE, minicwShape.x(), minicwShape.y() + 100, 0, shapeText);
+                    canvas.text(Pen.PEN_BLUE, minicwShape.x(), minicwShape.y() + 120, 0, pathText);
                 }
 
                 int MAX_ANCESTORS_PERLINE = 6;
@@ -94,7 +101,7 @@ public class VisualizationUtil {
                 double widgetInfoH = (1 + countVisibleTags(cursorWidget, visibleTagPredicate) + Util.size(Util.ancestors(cursorWidget)) / MAX_ANCESTORS_PERLINE) * 20;
                 cwShape = VisualizationUtil.calculateWidgetInfoShape(canvas, cwShape, widgetInfoW, widgetInfoH);
 
-                if(showExtendedWidgetInfo) {
+                if (showExtendedWidgetInfo) {
                     canvas.rect(Pen.PEN_WHITE_ALPHA, cwShape.x(), cwShape.y(), widgetInfoW, widgetInfoH);
                     canvas.rect(Pen.PEN_BLACK, cwShape.x(), cwShape.y(), widgetInfoW, widgetInfoH);
 
@@ -102,19 +109,19 @@ public class VisualizationUtil {
                     StringBuilder sb = new StringBuilder();
                     sb.append("Ancestors: ");
 
-                    int i=0;
-                    for(Widget p : Util.ancestors(cursorWidget)){
+                    int i = 0;
+                    for (Widget p : Util.ancestors(cursorWidget)) {
                         sb.append("::").append(p.get(Tags.Role, Roles.Widget));
                         i++;
-                        if (i >= MAX_ANCESTORS_PERLINE){
-                            canvas.text(Pen.PEN_BLACK, cwShape.x(), cwShape.y() + (pos+=20), 0, sb.toString());
-                            i=0;
+                        if (i >= MAX_ANCESTORS_PERLINE) {
+                            canvas.text(Pen.PEN_BLACK, cwShape.x(), cwShape.y() + (pos += 20), 0, sb.toString());
+                            i = 0;
                             sb = new StringBuilder();
                             sb.append("\t");
                         }
                     }
                     if (i > 0) {
-                        canvas.text(Pen.PEN_BLACK, cwShape.x(), cwShape.y() + (pos+=20), 0, sb.toString());
+                        canvas.text(Pen.PEN_BLACK, cwShape.x(), cwShape.y() + (pos += 20), 0, sb.toString());
                     }
 
                     for (Tag<?> t : cursorWidget.tags()) {
@@ -129,25 +136,27 @@ public class VisualizationUtil {
         }
     }
 
-    public static void visualizeActions(Canvas canvas, State state, Set<Action> actions){
+    public static void visualizeActions(Canvas canvas, State state, Set<Action> actions) {
         try {
-            for(Action a : actions){
+            for (Action a : actions) {
                 Pen vp = Pen.PEN_IGNORE;
                 a.get(Tags.Visualizer, Util.NullVisualizer).run(state, canvas, vp);
             }
-        } catch(IllegalStateException ise) {
+        } catch (IllegalStateException ise) {
             System.out.println("visualizeActions : canvas visualization not available!");
-            if(ise.getMessage()!=null) { System.out.println(ise.getMessage()); }
+            if (ise.getMessage() != null) {
+                System.out.println(ise.getMessage());
+            }
         }
     }
 
-    public static void visualizeSelectedAction(Canvas canvas, double actionDuration, State state, Action action){
+    public static void visualizeSelectedAction(Canvas canvas, double actionDuration, State state, Action action) {
         Pen redPen = Pen.newPen().setColor(Color.Red).setFillPattern(FillPattern.Solid).setStrokeWidth(20).build();
         try {
             Visualizer visualizer = action.get(Tags.Visualizer, Util.NullVisualizer);
             final int BLINK_COUNT = 3;
             final double BLINK_DELAY = actionDuration / BLINK_COUNT;
-            for(int i = 0; i < BLINK_COUNT; i++){
+            for (int i = 0; i < BLINK_COUNT; i++) {
                 Util.pause(BLINK_DELAY);
                 canvas.begin();
                 visualizer.run(state, canvas, Pen.PEN_IGNORE);
@@ -157,9 +166,11 @@ public class VisualizationUtil {
                 visualizer.run(state, canvas, redPen);
                 canvas.end();
             }
-        } catch(IllegalStateException ise) {
+        } catch (IllegalStateException ise) {
             System.out.println("visualizeSelectedAction : canvas visualization not available!");
-            if(ise.getMessage()!=null) { System.out.println(ise.getMessage()); }
+            if (ise.getMessage() != null) {
+                System.out.println(ise.getMessage());
+            }
         }
     }
 

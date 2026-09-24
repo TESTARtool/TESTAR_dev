@@ -13,7 +13,7 @@ import org.testar.core.visualizers.Visualizer;
  * A Canvas is a surface onto which you can draw e.g. lines, rectangles and circles.
  * It serves as a way to visualize e.g. <code>Action</code>'s and the <code>Shape</code> of
  * <code>Widget</code>'s.
- * 
+ *
  * @see Pen
  * @see Visualizer
  */

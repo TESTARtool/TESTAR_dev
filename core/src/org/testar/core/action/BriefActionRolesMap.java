@@ -11,9 +11,6 @@ import java.util.HashMap;
 
 /**
  * ActionRoles brief map.
- * 
- * @author Urko Rueda Molina (alias: urueda)
- *
  */
 public class BriefActionRolesMap {
 

@@ -34,12 +34,12 @@ public class LogSerialiser extends Thread {
         logTimes = 0;
         alive = true;
         //ExecutorService exeSrv = Executors.newFixedThreadPool(1);
-        //exeSrv.execute(singletonLogManager);    
+        //exeSrv.execute(singletonLogManager);
         singletonLogSerialiser = new LogSerialiser();
         singletonLogSerialiser.setPriority(Thread.MIN_PRIORITY);
-        singletonLogSerialiser.start();        
+        singletonLogSerialiser.start();
     }
-    
+
     public static void finish() {
         alive = false;
     }
@@ -92,7 +92,7 @@ public class LogSerialiser extends Thread {
             log.notifyAll();
         }
     }
-    
+
     public static void log(String logS) {
         if (alive) {
             log(logS, LogLevel.Info);

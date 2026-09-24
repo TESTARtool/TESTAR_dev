@@ -300,8 +300,8 @@ public class StateManagementTags {
     public static final Tag<Boolean> WebWidgetIsDisabled = Tag.from("Web Widget Is Disabled", Boolean.class);
     public static final Tag<String> WebWidgetAriaLabel = Tag.from("Web Widget Aria Label", String.class);
     public static final Tag<String> WebWidgetAriaLabelledBy = Tag.from("Web Widget Aria Labelled By", String.class);
-    
-    
+
+
     // a set containing the tags that are available for state management
     private static Set<Tag<?>> stateManagementTags = new HashSet<Tag<?>>() {
         {
@@ -372,7 +372,7 @@ public class StateManagementTags {
             add(WidgetValuePattern);
             add(WidgetVirtualizedItemPattern);
             add(WidgetWindowPattern);
-            
+
             //Webdriver
             add(WebWidgetId);
             add(WebWidgetName);
@@ -472,7 +472,7 @@ public class StateManagementTags {
         settingsMap.put(WidgetValuePattern, "WidgetValuePattern");
         settingsMap.put(WidgetVirtualizedItemPattern, "WidgetVirtualizedItemPattern");
         settingsMap.put(WidgetWindowPattern, "WidgetWindowPattern");
-        
+
         //Webdriver
         settingsMap.put(WebWidgetId, "WebWidgetId");
         settingsMap.put(WebWidgetName, "WebWidgetName");
@@ -562,7 +562,7 @@ public class StateManagementTags {
             put(WidgetValuePattern, Group.ControlPattern);
             put(WidgetVirtualizedItemPattern, Group.ControlPattern);
             put(WidgetWindowPattern, Group.ControlPattern);
-            
+
             //Webdriver
             put(WebWidgetId, Group.WebDriver);
             put(WebWidgetName, Group.WebDriver);

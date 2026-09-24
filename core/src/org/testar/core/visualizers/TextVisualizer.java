@@ -34,11 +34,11 @@ public final class TextVisualizer implements Visualizer {
         this.text = text;
         this.pen = pen;
     }
-    
+
     public String getText() {
         return text;
     }
-    
+
     public TextVisualizer withText(String newText, Pen newPen) {
         Assert.notNull(newText, newPen);
         return new TextVisualizer(this.pos, newText, newPen);

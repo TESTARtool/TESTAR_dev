@@ -21,7 +21,7 @@ public final class AWTMouse implements Mouse {
     }
 
     private final Robot robot;
-    
+
     private double displayScale;
 
     private AWTMouse() throws FruitException {
@@ -32,7 +32,7 @@ public final class AWTMouse implements Mouse {
             throw new FruitException(awte);
         }
     }
-    
+
     public void setCursorDisplayScale(double displayScale) {
         this.displayScale = displayScale;
     }

@@ -19,7 +19,7 @@ public class IndexUtil {
 
     /**
      * Calculate the max and the min ZIndex of all the widgets in a state
-     * 
+     *
      * @param state
      */
     public static State calculateZIndices(State state) {

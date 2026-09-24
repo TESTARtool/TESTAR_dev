@@ -43,7 +43,7 @@ public class AnnotatingActionCompiler extends StdActionCompiler {
     private static final Pen TypePen = Pen.newPen().setColor(Color.Blue)
             //.setFillPattern(FillPattern.None).setStrokeWidth(3).setFontSize(26).build();
             .setFillPattern(FillPattern.None).setStrokeWidth(3).build(); // use default font size
-    
+
     public AnnotatingActionCompiler() {
         super();
     }
@@ -95,10 +95,8 @@ public class AnnotatingActionCompiler extends StdActionCompiler {
 
     @Override
     public Action leftClickAt(Widget widget, double relX, double relY) {
-        //Action ret = leftClickAt(new WidgetPosition(wf, Tags.Shape, relX, relY, true));
-        Action ret = super.leftClickAt(widget, relX, relY); // by urueda
+        Action ret = super.leftClickAt(widget, relX, relY);
         ret.set(Tags.Desc, "Left Click at '" + widget.get(Tags.Desc, "<no description>") + "'");
-        //ret.set(Tags.Targets, Util.newArrayList(wf));
         ret.mapOriginWidget(widget);
         return ret;
     }
@@ -134,10 +132,8 @@ public class AnnotatingActionCompiler extends StdActionCompiler {
 
     @Override
     public Action clickTypeInto(final Widget widget, double relX, double relY, final String text, boolean replaceText) {
-        //Action ret = clickTypeInto(new WidgetPosition(abstractor.apply(widget), Tags.Shape, relX, relY, true), text);
         Action ret = super.clickTypeInto(widget, relX, relY, text, replaceText);
-        //ret.set(Tags.Desc, "Type '" + Util.abbreviate(text, 5, "...") + "' into '" + widget.get(Tags.Desc, "<no description>" + "'"));
-        ret.set(Tags.Desc, "Type '" + Util.abbreviate(text, DISPLAY_TEXT_MAX_LENGTH, "...") + "' into '" + widget.get(Tags.Desc, "<no description>" + "'")); // by urueda
+        ret.set(Tags.Desc, "Type '" + Util.abbreviate(text, DISPLAY_TEXT_MAX_LENGTH, "...") + "' into '" + widget.get(Tags.Desc, "<no description>" + "'"));
         ret.mapOriginWidget(widget);
         return ret;
     }
@@ -149,7 +145,7 @@ public class AnnotatingActionCompiler extends StdActionCompiler {
         ret.set(Tags.Visualizer, new TextVisualizer(position, Util.abbreviate(text, DISPLAY_TEXT_MAX_LENGTH, "..."), TypePen));
         //ret.set(Tags.Desc, "Type '" + Util.abbreviate(text, 5, "...") + "' into '" + position.toString() + "'");
         ret.set(Tags.Desc, "Replace '" + Util.abbreviate(text, DISPLAY_TEXT_MAX_LENGTH, "...") + "' into '" + position.toString() + "'");
-        ret.set(Tags.Role, ActionRoles.ClickTypeInto);        
+        ret.set(Tags.Role, ActionRoles.ClickTypeInto);
         return ret;
     }
 
@@ -163,7 +159,7 @@ public class AnnotatingActionCompiler extends StdActionCompiler {
         ret.set(Tags.Role, ActionRoles.ClickTypeInto);
         return ret;
     }
-    
+
     @Override
     public Action pasteAndReplaceText(final Position position, final String text) {
         Action ret = super.pasteAndReplaceText(position, text);
@@ -196,18 +192,18 @@ public class AnnotatingActionCompiler extends StdActionCompiler {
         Action ret = super.dragFromTo(from, to);
         ret.set(Tags.Visualizer, new TrajectoryVisualizer(DragDropPen, from, new OrthogonalPosition(from, to, 0.2, 0), to));
         ret.set(Tags.Desc, "Drag " + from.toString() + " To " + to.toString());
-        ret.set(Tags.Role, ActionRoles.LeftDrag);        
+        ret.set(Tags.Role, ActionRoles.LeftDrag);
         return ret;
     }
-    
+
     @Override
     public Action hitKey(KBKeys key) {
         Action ret = super.hitKey(key);
         ret.set(Tags.Desc, "Hit Key " + key);
-        ret.set(Tags.Role, ActionRoles.HitKey);        
+        ret.set(Tags.Role, ActionRoles.HitKey);
         return ret;
     }
-    
+
     @Override
     public Action hitShortcutKey(List<KBKeys> keys) {
         Action ret = super.hitShortcutKey(keys);
@@ -216,7 +212,7 @@ public class AnnotatingActionCompiler extends StdActionCompiler {
             keysString += i != 0 ? "+" : "" + keys.get(i);
         }
         ret.set(Tags.Desc, "Hit Shortcut Key " + keysString);
-        ret.set(Tags.Role, ActionRoles.HitShortcutKey);        
+        ret.set(Tags.Role, ActionRoles.HitShortcutKey);
         return ret;
     }
 
@@ -235,14 +231,14 @@ public class AnnotatingActionCompiler extends StdActionCompiler {
         ret.set(Tags.Desc, "Kill Process with pid: " + pid + ".");
         return ret;
     }
-    
+
     @Override
     public Action killProcessByName(String name, double timeToWaitBeforeKilling) {
         Action ret = super.killProcessByName(name, timeToWaitBeforeKilling);
         ret.set(Tags.Desc, "Kill Process with name '" + name + "'");
         return ret;
     }
-    
+
     @Override
     public Action activateSystem() {
         Action ret = super.activateSystem();

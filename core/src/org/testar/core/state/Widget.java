@@ -18,7 +18,7 @@ import org.testar.core.tag.Taggable;
  * They are attached to a <code>State</code> and form a Widget Tree.
  * In fact a <code>State</code> is a Widget itself and is the root
  * of the Widget Tree.
- * 
+ *
  * @see State
  */
 public interface Widget extends Taggable, Serializable {
@@ -36,14 +36,12 @@ public interface Widget extends Taggable, Serializable {
      * @param scrollArrowSize The size of scrolling arrows.
      * @param scrollThick The scroller thickness.
      * @return 'null' for non-scrollable widgets or a set of drags, from (x1,y1) to (x2,y2), otherwise.
-     * @author: urueda
      */
     Drag[] scrollDrags(double scrollArrowSize, double scrollThick);
 
     /**
      * @param tab tabulator for indentation.
      * @return Computes a string representation for the widget.
-     * @author urueda
      */
     public String getRepresentation(String tab);
 

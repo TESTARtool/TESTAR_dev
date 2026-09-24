@@ -20,7 +20,7 @@ public final class EllipseVisualizer implements Visualizer {
     private final double width, height;
     private final Pen pen;
     private final Position position;
-    
+
     public EllipseVisualizer(Position position, Pen pen, double width, double height) {
         Assert.notNull(position, pen);
         this.width = width;
@@ -28,11 +28,11 @@ public final class EllipseVisualizer implements Visualizer {
         this.pen = pen;
         this.position = position;
     }
-    
+
     public void run(State state, Canvas canvas, Pen pen) {
         Assert.notNull(state, canvas, pen);
         pen = Pen.merge(pen, this.pen);
-        try { // by urueda
+        try {
             Point p = position.apply(state);
             canvas.ellipse(pen, p.x() - width * .5, p.y() - height * .5, width, height);
         } catch (PositionException pe) {

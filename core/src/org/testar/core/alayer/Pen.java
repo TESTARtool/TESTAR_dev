@@ -13,14 +13,14 @@ import org.testar.core.Assert;
 /**
  * A pen is used to draw on a <code>Canvas</code> object. It determines
  * attributes such as line width, color and fill pattern.
- * 
+ *
  * @see Canvas
  */
 public abstract class Pen implements Serializable {
 
     private static final long serialVersionUID = 8309231237087967825L;
 
-    public static final int DEFAULT_FONT_SIZE = 16; // by urueda
+    public static final int DEFAULT_FONT_SIZE = 16;
 
     public static final Pen PEN_IGNORE  = Pen.newPen().build();
     public static final Pen PEN_FILL    = Pen.newPen().setFillPattern(FillPattern.Solid).build();
@@ -28,9 +28,9 @@ public abstract class Pen implements Serializable {
                                                 .setFillPattern(FillPattern.None).build();
     public static final Pen PEN_DEFAULT = Pen.newPen().setStrokePattern(StrokePattern.Solid)
                                              .setFillPattern(FillPattern.None).setColor(Color.CornflowerBlue)
-                                             .setFont("Times New Roman").setFontSize(/*16*/DEFAULT_FONT_SIZE/*by urueda*/)
+                                             .setFont("Times New Roman").setFontSize(DEFAULT_FONT_SIZE)
                                              .setStrokeCaps(StrokeCaps.None).setStrokeWidth(5).build();
-    // begin by urueda
+
     public static final Pen PEN_BLUE = Pen.newPen().setColor(Color.Blue).build(),
                             PEN_RED = Pen.newPen().setColor(Color.Red).build(),
                             PEN_BLACK = Pen.newPen().setColor(Color.Black).build(),
@@ -67,11 +67,11 @@ public abstract class Pen implements Serializable {
                             PEN_MARK_BORDER = Pen.newPen().setColor(Color.from(0, 0, 0, 96)).setStrokePattern(StrokePattern.Solid).build(),
 
                             PEN_FLASH_ORACLE = Pen.newPen().setColor(Color.from(0, 0, 255, 128)).setFillPattern(FillPattern.Solid).build();
-    
+
     /**
-     * Retrieves a darker color. 
+     * Retrieves a darker color.
      * @param base The base color.
-     * @param percent The darken percent in the range 0.0 (black) .. 1.0 (base). 
+     * @param percent The darken percent in the range 0.0 (black) .. 1.0 (base).
      * @return The darker color.
      */
     public static Color darken(Color base, double percent) {
@@ -80,8 +80,6 @@ public abstract class Pen implements Serializable {
                           (int) (base.blue() * percent),
                           base.alpha());
     }
-
-    // end by urueda
 
     public static Builder newPen() {
         return new Builder(null);
