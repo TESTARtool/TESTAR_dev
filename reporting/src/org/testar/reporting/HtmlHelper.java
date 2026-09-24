@@ -32,7 +32,7 @@ public class HtmlHelper {
         scriptJoiner.add("content.style.maxHeight = null;");
         scriptJoiner.add("} else {");
         scriptJoiner.add("content.style.maxHeight = content.scrollHeight + 'px';");
-        scriptJoiner.add("}");  
+        scriptJoiner.add("}");
         scriptJoiner.add("}); }); }");
         scriptJoiner.add("document.addEventListener('DOMContentLoaded', toggleCollapsible);");
         scriptJoiner.add("");

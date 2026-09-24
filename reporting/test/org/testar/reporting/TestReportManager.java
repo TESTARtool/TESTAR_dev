@@ -71,7 +71,7 @@ public class TestReportManager {
         List<Pair<?, ?>> tags = new ArrayList<Pair<?, ?>>();
         tags.add(Pair.from(ConfigTags.ReportInHTML, false));
         tags.add(Pair.from(ConfigTags.ReportInPlainText, false));
-        Settings settings = new Settings(tags, new Properties());
+        Settings settings = settingsWithTestConnector(tags);
 
         createReportManager(settings);
 
@@ -87,7 +87,7 @@ public class TestReportManager {
         List<Pair<?, ?>> tags = new ArrayList<Pair<?, ?>>();
         tags.add(Pair.from(ConfigTags.ReportInHTML, true));
         tags.add(Pair.from(ConfigTags.ReportInPlainText, false));
-        Settings settings = new Settings(tags, new Properties());
+        Settings settings = settingsWithTestConnector(tags);
 
         // Prepare a custom output directory to create the HTML report
         OutputStructure.screenshotsOutputDir = "screenshots";
@@ -130,7 +130,7 @@ public class TestReportManager {
         List<Pair<?, ?>> tags = new ArrayList<Pair<?, ?>>();
         tags.add(Pair.from(ConfigTags.ReportInHTML, false));
         tags.add(Pair.from(ConfigTags.ReportInPlainText, true));
-        Settings settings = new Settings(tags, new Properties());
+        Settings settings = settingsWithTestConnector(tags);
 
         // Prepare a custom output directory to create the plain txt report
         OutputStructure.screenshotsOutputDir = "screenshots";
@@ -172,7 +172,7 @@ public class TestReportManager {
         List<Pair<?, ?>> tags = new ArrayList<Pair<?, ?>>();
         tags.add(Pair.from(ConfigTags.ReportInHTML, true));
         tags.add(Pair.from(ConfigTags.ReportInPlainText, false));
-        Settings settings = new Settings(tags, new Properties());
+        Settings settings = settingsWithTestConnector(tags);
 
         // Create a state without IDs, without web URL, and without ScreenshotPath
         state = new StateStub();
@@ -205,7 +205,7 @@ public class TestReportManager {
         List<Pair<?, ?>> tags = new ArrayList<Pair<?, ?>>();
         tags.add(Pair.from(ConfigTags.ReportInHTML, true));
         tags.add(Pair.from(ConfigTags.ReportInPlainText, false));
-        Settings settings = new Settings(tags, new Properties());
+        Settings settings = settingsWithTestConnector(tags);
 
         // Prepare a custom output directory to create the HTML report
         OutputStructure.screenshotsOutputDir = "screenshots";
@@ -237,6 +237,12 @@ public class TestReportManager {
         reportManager.addTestVerdicts(finalVerdicts);
         reportManager.finishReport();
         return reportManager;
+    }
+
+    private Settings settingsWithTestConnector(List<Pair<?, ?>> settings) {
+        settings.add(Pair.from(ConfigTags.SUTConnector, Settings.SUT_CONNECTOR_CMDLINE));
+        settings.add(Pair.from(ConfigTags.SUTConnectorValue, "test-command"));
+        return new Settings(settings, new Properties());
     }
 
     private boolean fileContains(String searchText, File file) {
