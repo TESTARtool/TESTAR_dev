@@ -269,6 +269,7 @@ public class SettingsFileStructure {
                 , "# FollowLinks: " + ConfigTags.FollowLinks.getDescription()
                 , "# BrowserFullScreen: " + ConfigTags.BrowserFullScreen.getDescription()
                 , "# SwitchNewTabs: " + ConfigTags.SwitchNewTabs.getDescription()
+                , "# WebForcedPopupClickAttributes: " + ConfigTags.WebForcedPopupClickAttributes.getDescription()
                 , "#################################################################"
                 , ""
                 , ConfigTags.WebClickableClasses.name() + " = "
@@ -279,6 +280,7 @@ public class SettingsFileStructure {
                 , ConfigTags.FollowLinks.name() + " = "
                 , ConfigTags.BrowserFullScreen.name() + " = "
                 , ConfigTags.SwitchNewTabs.name() + " = "
+                , ConfigTags.WebForcedPopupClickAttributes.name() + " = "
                 , ""
                 , "#################################################################"
                 , "# WebDriver advanced state fetcher configuration"

@@ -47,6 +47,7 @@ import static org.testar.config.ConfigTags.CreateWidgetInfoJsonFile;
 import static org.testar.config.ConfigTags.CustomCompositionResource;
 import static org.testar.config.ConfigTags.CustomPoliciesResource;
 import static org.testar.config.ConfigTags.WebDeniedExtensions;
+import static org.testar.config.ConfigTags.WebForcedPopupClickAttributes;
 import static org.testar.config.ConfigTags.Discount;
 import static org.testar.config.ConfigTags.ExtendedOracles;
 import static org.testar.config.ConfigTags.FollowLinks;
@@ -276,6 +277,7 @@ public class SettingsDefaults {
         defaults.add(Pair.from(FollowLinks, true));
         defaults.add(Pair.from(BrowserFullScreen, true));
         defaults.add(Pair.from(SwitchNewTabs, true));
+        defaults.add(Pair.from(WebForcedPopupClickAttributes, new ArrayList<String>()));
 
         defaults.add(Pair.from(WebIgnoredTags, new ArrayList<String>() {
             {

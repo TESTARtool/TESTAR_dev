@@ -187,6 +187,7 @@ public final class WorkspaceSettingsCatalog {
                 ConfigTags.FollowLinks,
                 ConfigTags.BrowserFullScreen,
                 ConfigTags.SwitchNewTabs,
+                ConfigTags.WebForcedPopupClickAttributes,
                 ConfigTags.WebIgnoredTags,
                 ConfigTags.WebIgnoredAttributes,
                 ConfigTags.WebConsoleErrorOracle,

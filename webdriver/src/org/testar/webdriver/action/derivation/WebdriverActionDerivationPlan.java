@@ -9,6 +9,7 @@ package org.testar.webdriver.action.derivation;
 import java.util.Collections;
 import java.util.List;
 
+import org.testar.config.ConfigTags;
 import org.testar.config.settings.Settings;
 import org.testar.engine.action.TextInputProvider;
 import org.testar.engine.action.derivation.ActionDerivationPlan;
@@ -26,7 +27,13 @@ public final class WebdriverActionDerivationPlan {
 
     public static ActionDerivationPlan create(Settings settings, TextInputProvider textInputProvider) {
         List<ActionDeriver> forcedDerivers = Collections.singletonList(
-                new WebdriverForcedActionDeriver(new WdDeniedUrlForcedActionDeriver(settings))
+                new WebdriverForcedActionDeriver(
+                        new WdDeniedUrlForcedActionDeriver(settings),
+                        new WebdriverPopupActionDeriver(settings.get(
+                                ConfigTags.WebForcedPopupClickAttributes,
+                                Collections.emptyList()
+                        ))
+                )
         );
         ActionDeriver defaultDeriver = new StateActionDeriver(
                 new WebdriverWidgetActionDeriver(textInputProvider)

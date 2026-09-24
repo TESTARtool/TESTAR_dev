@@ -215,6 +215,11 @@ public final class ConfigTags {
             "Indicate if switch to a new web tab if opened");
 
     @SuppressWarnings("unchecked")
+    public static final Tag<List<String>> WebForcedPopupClickAttributes = Tag.from("WebForcedPopupClickAttributes",
+            (Class<List<String>>) (Class<?>) List.class,
+            "Widget attribute selectors in attribute=value form that TESTAR should click before default WebDriver exploration");
+
+    @SuppressWarnings("unchecked")
     public static final Tag<List<String>> WebIgnoredTags = Tag.from("WebIgnoredTags",
             (Class<List<String>>) (Class<?>) List.class,
             "List of HTML tags that TESTAR should ignore when obtaining the web state");

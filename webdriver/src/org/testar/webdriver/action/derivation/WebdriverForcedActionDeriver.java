@@ -19,10 +19,17 @@ public final class WebdriverForcedActionDeriver implements ActionDeriver {
 
     private final ForegroundActionDeriver foregroundActionDeriver;
     private final WdDeniedUrlForcedActionDeriver deniedUrlForcedActionDeriver;
+    private final WebdriverPopupActionDeriver popupActionDeriver;
 
     public WebdriverForcedActionDeriver(WdDeniedUrlForcedActionDeriver deniedUrlForcedActionDeriver) {
+        this(deniedUrlForcedActionDeriver, new WebdriverPopupActionDeriver(java.util.Collections.emptyList()));
+    }
+
+    public WebdriverForcedActionDeriver(WdDeniedUrlForcedActionDeriver deniedUrlForcedActionDeriver,
+                                        WebdriverPopupActionDeriver popupActionDeriver) {
         this.foregroundActionDeriver = new ForegroundActionDeriver();
         this.deniedUrlForcedActionDeriver = deniedUrlForcedActionDeriver;
+        this.popupActionDeriver = popupActionDeriver;
     }
 
     @Override
@@ -32,6 +39,11 @@ public final class WebdriverForcedActionDeriver implements ActionDeriver {
             return foregroundActions;
         }
 
-        return deniedUrlForcedActionDeriver.derive(system, state, context);
+        Set<Action> deniedUrlActions = deniedUrlForcedActionDeriver.derive(system, state, context);
+        if (!deniedUrlActions.isEmpty()) {
+            return deniedUrlActions;
+        }
+
+        return popupActionDeriver.derive(system, state, context);
     }
 }
