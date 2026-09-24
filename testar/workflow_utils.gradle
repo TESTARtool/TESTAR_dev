@@ -6,7 +6,7 @@ task init_workflow_test(type: Copy) {
     group = 'test_testar_workflow'
     description ='init_workflow_test'
     from 'resources/workflow/settings'
-    into 'target/scripts/settings'
+    into 'target/scripts/workspaces'
 }
 
 // Download OrientDB 3.2.38 from the official wep page

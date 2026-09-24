@@ -24,17 +24,17 @@ public class OracleSelectionTest {
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-    private String previousSettingsDir;
+    private String previousWorkspacesDir;
     private String previousSelectedSse;
 
     @Before
     public void setup() throws Exception {
-        previousSettingsDir = TestarDirectories.getSettingsDir();
-        previousSelectedSse = TestarDirectories.getSelectedSse();
+        previousWorkspacesDir = TestarDirectories.getWorkspacesDir();
+        previousSelectedSse = TestarDirectories.getSelectedWorkspaceName();
 
-        File settingsRoot = temporaryFolder.newFolder("settings");
-        TestarDirectories.setSettingsDir(settingsRoot.getAbsolutePath() + File.separator);
-        TestarDirectories.setSelectedSse("webdriver_test");
+        File workspacesRoot = temporaryFolder.newFolder("workspaces");
+        TestarDirectories.setWorkspacesDir(workspacesRoot.getAbsolutePath() + File.separator);
+        TestarDirectories.setSelectedWorkspaceName("webdriver_test");
 
         File javaOraclesDir = new File(TestarDirectories.getWorkspaceOracleJavaDir());
         assertTrue(javaOraclesDir.mkdirs());
@@ -43,8 +43,8 @@ public class OracleSelectionTest {
 
     @After
     public void teardown() {
-        TestarDirectories.setSettingsDir(previousSettingsDir);
-        TestarDirectories.setSelectedSse(previousSelectedSse);
+        TestarDirectories.setWorkspacesDir(previousWorkspacesDir);
+        TestarDirectories.setSelectedWorkspaceName(previousSelectedSse);
     }
 
     @Test

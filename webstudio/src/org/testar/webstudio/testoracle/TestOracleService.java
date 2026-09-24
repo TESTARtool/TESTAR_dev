@@ -776,16 +776,16 @@ public final class TestOracleService {
     }
 
     private <T> T withWorkspaceOracleDirectories(String workspaceName, WorkspaceOracleInventorySupplier<T> supplier) {
-        String previousSettingsDirectory = TestarDirectories.getSettingsDir();
-        String previousSelectedSse = TestarDirectories.getSelectedSse();
+        String previousWorkspacesDirectory = TestarDirectories.getWorkspacesDir();
+        String previousSelectedWorkspaceName = TestarDirectories.getSelectedWorkspaceName();
 
         try {
-            TestarDirectories.setSettingsDir(workspaceService.settingsRoot().toString() + File.separator);
-            TestarDirectories.setSelectedSse(workspaceName);
+            TestarDirectories.setWorkspacesDir(workspaceService.workspacesRoot().toString() + File.separator);
+            TestarDirectories.setSelectedWorkspaceName(workspaceName);
             return supplier.get();
         } finally {
-            TestarDirectories.setSettingsDir(previousSettingsDirectory);
-            TestarDirectories.setSelectedSse(previousSelectedSse);
+            TestarDirectories.setWorkspacesDir(previousWorkspacesDirectory);
+            TestarDirectories.setSelectedWorkspaceName(previousSelectedWorkspaceName);
         }
     }
 

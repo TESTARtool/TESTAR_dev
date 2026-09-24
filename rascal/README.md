@@ -29,7 +29,7 @@ The intended workflow is:
 Workspace DSL and generated Java oracles should use this structure:
 
 ```text
-settings/<workspace>/oracles/
+workspaces/<workspace>/oracles/
   dsl/
   java/
   compiled/
@@ -105,7 +105,7 @@ The integration should allow users to:
 - create and edit `.testar` DSL oracle files in the selected workspace
 - provide Monaco editor assistance using generated DSL metadata
 - validate DSL files through the Rascal backend and show JSON diagnostics in the editor
-- generate Java oracle files into `settings/<workspace>/oracles/java`
+- generate Java oracle files into `workspaces/<workspace>/oracles/java`
 - inspect and edit generated Java oracle files
 - compile workspace Java oracles
 - enable or disable generated Java oracles through `ExtendedOracles`

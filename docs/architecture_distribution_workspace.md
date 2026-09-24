@@ -29,7 +29,7 @@ target/install/testar/
   bin/
     testar.bat
     testar-cli.bat
-  settings/
+  workspaces/
     webdriver_generic/
     windows_generic/
     android_generic/
@@ -92,7 +92,7 @@ Copying workspace oracles is optional and enabled by default.
 
 The objective is a cloned executable workspace while avoiding copied historical execution artifacts.
 
-WebStudio can rename an existing workspace by renaming the workspace folder under the shared settings root.
+WebStudio can rename an existing workspace by renaming the workspace folder under the shared workspaces root.
 
 Workspace rename also moves the matching generated output workspace folder when it exists:
 
@@ -108,10 +108,10 @@ After a create or rename operation, WebStudio should refresh the workspace list 
 
 ## Workspace Oracles
 
-Workspace-specific oracles live under the workspace settings folder:
+Workspace-specific oracles live under the workspace folder:
 
 ```text
-settings/<workspace>/oracles/
+workspaces/<workspace>/oracles/
   dsl/
   java/
   compiled/
@@ -250,11 +250,11 @@ Reusable Test Goals for AI guided execution modes (e.g., CLI mode) are workspace
 
 Repository defaults live under:
 
-- `testar/resources/settings/{workspace}/test_goals`
+- `testar/resources/workspaces/{workspace}/test_goals`
 
 Distribution editable goals live under:
 
-- `testar/target/install/testar/bin/settings/{workspace}/test_goals`
+- `testar/target/install/testar/bin/workspaces/{workspace}/test_goals`
 
 The distribution process should copy each workspace's Test Goals together with the rest of that workspace.
 
@@ -347,7 +347,7 @@ Therefore, policies should remain part of the shared workspace model.
 
 A unified distribution should resolve these paths from the same runtime root:
 
-- `settings`
+- `workspaces`
 - `output`
 - `.runtime`
 - local state model datastore

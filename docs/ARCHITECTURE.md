@@ -381,8 +381,8 @@ For each seam, policy composition supports:
 
 This mechanism is used by external examples such as:
 
-- `testar/resources/settings/webdriver_generic/WebdriverLinkDeniedFilterPolicy.java`
-- `testar/resources/settings/webdriver_generic/WebdriverCanvasVisiblePolicy.java`
+- `testar/resources/workspaces/webdriver_generic/WebdriverLinkDeniedFilterPolicy.java`
+- `testar/resources/workspaces/webdriver_generic/WebdriverCanvasVisiblePolicy.java`
 
 ### Resource loading rules
 

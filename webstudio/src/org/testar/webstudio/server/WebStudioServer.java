@@ -107,7 +107,7 @@ public final class WebStudioServer {
         routes.get("/api/health", context -> handle(context, () -> Map.of(
             "name", "TESTAR web studio",
             "status", "ok",
-            "settingsRoot", workspaceController.settingsRoot().toString(),
+            "workspacesRoot", workspaceController.workspacesRoot().toString(),
             "workspaceCount", workspaceController.listWorkspaces().size()
         )));
         routes.get("/api/workspaces", context -> handle(context, workspaceController::listWorkspaces));
@@ -333,11 +333,11 @@ public final class WebStudioServer {
         });
         routes.post("/api/execution/scriptless/generate/{workspace}", context -> handle(context, () -> {
             String workspace = context.pathParam("workspace");
-            return executionController.startGenerate(workspace, workspaceController.settingsRoot());
+            return executionController.startGenerate(workspace, workspaceController.workspacesRoot());
         }));
         routes.post("/api/execution/scriptless/local-spy/{workspace}", context -> handle(context, () -> {
             String workspace = context.pathParam("workspace");
-            return executionController.startLocalSpy(workspace, workspaceController.settingsRoot());
+            return executionController.startLocalSpy(workspace, workspaceController.workspacesRoot());
         }));
         routes.post("/api/execution/scriptless/stop", context -> handle(context, executionController::stopScriptlessRun));
         routes.get("/api/spy/status", context -> handle(context, remoteSpyController::remoteSpyStatus));

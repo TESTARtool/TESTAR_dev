@@ -127,7 +127,7 @@ If you want to use the agent-driven CLI execution, also install the Codex agent 
 The CLI distribution now includes a profile-aware example under:
 
 - `testar/target/install/testar/bin/testar-cli.bat`
-- `testar/target/install/testar/bin/settings`
+- `testar/target/install/testar/bin/workspaces`
 - `testar/target/install/testar/bin/output`
 
 Web Studio `Run CLI Mode` starts manual sessions against the selected workspace.

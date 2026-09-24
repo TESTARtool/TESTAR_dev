@@ -4,12 +4,15 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayOutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.io.PrintStream;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
@@ -18,6 +21,9 @@ public class TestInputDataManager {
 
 	@Rule
 	public RepeatRule repeatRule = new RepeatRule();
+
+	@Rule
+	public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
 	@Test
 	@Repeat( times = 100 )
@@ -111,11 +117,13 @@ public class TestInputDataManager {
 
 	@Test
 	@Repeat( times = 100 )
-	public void obtainFileInputData() {
+	public void obtainFileInputData() throws Exception {
 		// Redirect the error stream to assert that the file is being used by checking no error message is printed
 		ByteArrayOutputStream outContent = new ByteArrayOutputStream();
 		System.setErr(new PrintStream(outContent));
-		String fileData = InputDataManager.getRandomTextFromCustomInputDataFile(System.getProperty("user.dir") + "/resources/settings/custom_input_data.txt");
+		Path inputFile = temporaryFolder.getRoot().toPath().resolve("custom_input_data.txt");
+		Files.writeString(inputFile, "custom input data");
+		String fileData = InputDataManager.getRandomTextFromCustomInputDataFile(inputFile.toString());
 		System.out.println("test obtainFileInputData(): " + fileData);
 		assertNotNull(fileData);
 		assertTrue(!fileData.isEmpty());

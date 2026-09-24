@@ -23,11 +23,11 @@ import org.testar.webstudio.api.dto.TestGoalNodeDto;
  */
 public final class TestGoalService {
 
-    private final Path settingsRoot;
+    private final Path workspacesRoot;
 
     public TestGoalService(Path testarHomeDirectory) {
-        this.settingsRoot = testarHomeDirectory
-                .resolve("settings")
+        this.workspacesRoot = testarHomeDirectory
+                .resolve("workspaces")
                 .toAbsolutePath()
                 .normalize();
     }
@@ -209,8 +209,8 @@ public final class TestGoalService {
             throw new IllegalArgumentException("Invalid workspace name: " + workspaceName);
         }
 
-        Path workspaceRoot = settingsRoot.resolve(normalizedWorkspaceName).toAbsolutePath().normalize();
-        if (!workspaceRoot.startsWith(settingsRoot) || workspaceRoot.equals(settingsRoot)) {
+        Path workspaceRoot = workspacesRoot.resolve(normalizedWorkspaceName).toAbsolutePath().normalize();
+        if (!workspaceRoot.startsWith(workspacesRoot) || workspaceRoot.equals(workspacesRoot)) {
             throw new IllegalArgumentException("Invalid workspace name: " + workspaceName);
         }
 

@@ -128,12 +128,12 @@ public final class CliExecutionAdapter implements ExecutionAdapter {
     }
 
     public synchronized List<String> profiles() {
-        Path settingsDirectory = resolveCliInstallDirectory().resolve("settings");
-        if (!Files.isDirectory(settingsDirectory)) {
+        Path workspacesDirectory = resolveCliInstallDirectory().resolve("workspaces");
+        if (!Files.isDirectory(workspacesDirectory)) {
             return List.of();
         }
 
-        try (Stream<Path> children = Files.list(settingsDirectory)) {
+        try (Stream<Path> children = Files.list(workspacesDirectory)) {
             return children
                 .filter(Files::isDirectory)
                 .filter(path -> Files.isRegularFile(path.resolve("test.settings")))
@@ -696,7 +696,7 @@ public final class CliExecutionAdapter implements ExecutionAdapter {
         }
 
         return workspaceService.testarHomeDirectory()
-            .resolve("settings")
+            .resolve("workspaces")
             .resolve(normalizedWorkspaceName)
             .resolve("test_goals")
             .toAbsolutePath()

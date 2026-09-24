@@ -45,12 +45,12 @@ public final class ExecutionController {
         return cliExecutionAdapter().profiles();
     }
 
-    public ExecutionStatusDto startGenerate(String workspaceName, Path settingsRoot) {
-        return scriptlessExecutionAdapter().startGenerate(workspaceName, settingsRoot);
+    public ExecutionStatusDto startGenerate(String workspaceName, Path workspacesRoot) {
+        return scriptlessExecutionAdapter().startGenerate(workspaceName, workspacesRoot);
     }
 
-    public ExecutionStatusDto startLocalSpy(String workspaceName, Path settingsRoot) {
-        return scriptlessExecutionAdapter().startLocalSpy(workspaceName, settingsRoot);
+    public ExecutionStatusDto startLocalSpy(String workspaceName, Path workspacesRoot) {
+        return scriptlessExecutionAdapter().startLocalSpy(workspaceName, workspacesRoot);
     }
 
     public ExecutionStatusDto startCliManualSession(String profileName, CliManualSessionRequestDto request) {

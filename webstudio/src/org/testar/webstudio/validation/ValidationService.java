@@ -21,7 +21,7 @@ public final class ValidationService {
     }
 
     public ValidationResultDto validateWorkspace(String workspaceName) {
-        Path workspace = workspaceService.settingsRoot().resolve(workspaceName);
+        Path workspace = workspaceService.workspacesRoot().resolve(workspaceName);
         if (!Files.isDirectory(workspace)) {
             return new ValidationResultDto(false, "Workspace not found: " + workspaceName);
         }

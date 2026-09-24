@@ -10,9 +10,9 @@ Traceability: [`WS-FUNC-TEST-GOALS-001`](../SPEC_TRACE.md#ws-func-test-goals-001
 
 Test Goals are reusable goal definitions consumed by AI-guided execution modes such as CLI mode.
 
-Test Goals are workspace assets. Each workspace may contain a `test_goals` folder next to its settings, composition, policies, and Java sources.
+Test Goals are workspace assets. Each workspace may contain a `test_goals` folder beside its `test.settings`, composition, policies, and Java sources.
 
-Repository defaults live under `testar/resources/settings/{workspace}/test_goals`. The distributed editable copy lives under `testar/target/install/testar/bin/settings/{workspace}/test_goals`. WebStudio works with the distributed folder for the selected workspace and must not mix goals from different workspaces.
+Repository defaults live under `testar/resources/workspaces/{workspace}/test_goals`. The distributed editable copy lives under `testar/target/install/testar/bin/workspaces/{workspace}/test_goals`. WebStudio works with the distributed folder for the selected workspace and must not mix goals from different workspaces.
 
 ### Supported Goal Files
 

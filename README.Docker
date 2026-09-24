@@ -2,7 +2,7 @@ Hello,
 
 This is the Docker image of TESTAR. The image runs with its own Chrome on a framebuffer. There is an X-server in the image that is not accessible by default.
 Mount /testar/bin/output to a central location to gather the log files.
-Mount /testar/bin/settings to a certal location to have the settings configuration
+Mount /testar/bin/workspaces to a central location to persist workspace configuration
 
 Take care of setting ShowVisualSettingsDialog to False in the settings file as well.
 Take care of the following settings in the used settings file:
@@ -16,6 +16,6 @@ If NUNIT Output is desired set ReportingClass to NUNIT 3.0 Reporting
 
 Setup state model as required
 
-Furthermore place a .sse file in the settings root to run the specific implementation
+Furthermore place a .sse file in the workspaces root to run the specific implementation
 
 Find more information on the TESTAR wiki: https://github.com/TESTARtool/TESTAR_dev/wiki

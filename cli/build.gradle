@@ -50,8 +50,8 @@ task prepareCliDistribution(type: Sync) {
         into '.runtime/web-extension'
     }
 
-    from('resources/settings') {
-        into 'settings'
+    from('resources/workspaces') {
+        into 'workspaces'
     }
 
     from(project(':agent').file('resources/skills/testar-cli')) {

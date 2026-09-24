@@ -1,10 +1,10 @@
 #################################################################
-# Windows composition settings
+# WebDriver composition settings
 #################################################################
 
-CompositionProfile = windows_composition
-CustomCompositionResource = ./settings/windows_generic/composition.properties
-CustomPoliciesResource = ./settings/windows_generic/policies.properties
+CompositionProfile = webdriver_composition
+CustomCompositionResource = ./workspaces/webdriver_generic/composition.properties
+CustomPoliciesResource = ./workspaces/webdriver_generic/policies.properties
 
 #################################################################
 # TESTAR mode
@@ -34,16 +34,15 @@ Mode = Spy
 # Example format for the dimensions and position : 1920x1000+1680+0
 #################################################################
 
-SUTConnector = COMMAND_LINE
-SUTConnectorValue = c:\\windows\\system32\\notepad.exe
-JavaAccessBridge = false
+SUTConnector = WEB_DRIVER
+SUTConnectorValue = "https://para.testar.org/"
 
 #################################################################
 # Sequences
 # Number of sequences and the length of these sequences
 #################################################################
 
-Sequences = 8
+Sequences = 5
 SequenceLength = 10
 
 #################################################################
@@ -58,8 +57,8 @@ ReportInPlainText = false
 #################################################################
 
 ActionDuration = 0.0
-TimeToWaitAfterAction = 0.1
-StartupTime = 10.0
+TimeToWaitAfterAction = 0.5
+StartupTime = 2.0
 MaxTime = 3.1536E7
 
 #################################################################
@@ -67,15 +66,14 @@ MaxTime = 3.1536E7
 # Regular expression and Tags to apply them.
 #################################################################
 
-ClickFilter = .*[sS]istema.*|.*[sS]ystem.*|.*[cC]errar.*|.*[cC]lose.*|.*[sS]alir.*|.*[eE]xit.*|.*[mM]inimizar.*|.*[mM]inimi[zs]e.*|.*[gG]uardar.*|.*[sS]ave.*|.*[iI]mprimir.*|.*[pP]rint.*
-TagsToFilter = Title
-ProcessesToKillDuringTest =
+ClickFilter = .*admin.htm.*|.*logout.htm.*
+TagsToFilter = Title;WebName;WebTagName;WebHref
 
 #################################################################
 # Sets whether to ignore reporting with duplicate verdicts
 #################################################################
 
-IgnoreDuplicatedVerdicts = false
+IgnoreDuplicatedVerdicts = true
 
 #################################################################
 # Oracles based on suspicious tag values
@@ -83,7 +81,7 @@ IgnoreDuplicatedVerdicts = false
 #################################################################
 
 SuspiciousTags = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
-TagsForSuspiciousOracle = Title
+TagsForSuspiciousOracle = Title;WebTextContent
 
 #################################################################
 # Oracles based on Suspicious Outputs detected by Process Listeners
@@ -116,7 +114,7 @@ ProcessLogs = .*.*
 LogOracle = false
 LogOracleRegex = .*([Ee]xception|[Ee]rror).*
 LogOracleCommands =
-LogOracleFiles = test_print_exception.log;../../testar/bin/test_print_error.log
+LogOracleFiles =
 
 #################################################################
 # State identifier attributes
@@ -125,7 +123,7 @@ LogOracleFiles = test_print_exception.log;../../testar/bin/test_print_error.log
 # the widget and state hash strings. Use a comma separated list.
 #################################################################
 
-AbstractStateAttributes = WidgetControlType
+AbstractStateAttributes = WidgetControlType,WebWidgetId
 
 #################################################################
 # State model inference settings
@@ -147,20 +145,20 @@ AbstractStateAttributes = WidgetControlType
 # ResetDataStore: WARNING: Delete all existing State Models from the selected database before creating a new one
 #################################################################
 
-ApplicationName = Windows Generic
-ApplicationVersion =
+ApplicationName = webdriver_parabank
+ApplicationVersion = 1
 
 StateModelInference = false
-DataStore =
-DataStoreType = remote
-DataStoreServer =
-DataStoreDirectory =
-DataStoreDB =
-DataStoreUser =
-DataStorePassword =
-DataStoreMode = none
-ActionSelectionAlgorithm = random
-StateModelStoreWidgets = false
+DataStore = OrientDB
+DataStoreType = plocal
+DataStoreServer = 
+DataStoreDirectory = .runtime/orientdb-community-3.2.38/databases
+DataStoreDB = testar
+DataStoreUser = testar
+DataStorePassword = testar
+DataStoreMode = instant
+ActionSelectionAlgorithm = unvisited
+StateModelStoreWidgets = true
 ResetDataStore = false
 
 #################################################################
@@ -176,8 +174,61 @@ AgentCLISandboxMode = danger-full-access
 AgentCLIApprovalPolicy = never
 AgentCLIAllowNetworkAccess = false
 AgentCLISkipGitRepoCheck = true
-AgentCLIPromptTitle = Test Notepad Date
-AgentCLIPromptText = As a Notepad test agent, I want to open the Edit menu and choose the Date/Time option. Then Notepad inserts the current system date and time into the text editor.
+AgentCLIPromptTitle = Test Parabank Login
+AgentCLIPromptText = As a test agent verify that you can log in with the credentials john/demo. Then the Welcome John Smith message is shown.
+
+#################################################################
+# WebDriver features
+#
+# WebClickableClasses: Indicate which web CSS classes need to be considered clickable
+# WebTypeableClasses: Indicate which web CSS classes need to be considered typeable
+# WebDeniedExtensions: Indicate which web URL extensions need to be ignored when testing
+# WebDomainsAllowed: Indicate which web URL domains are allowed to explore when testing
+# WebPathsAllowed: Regular expressions to indicate which web URL paths are allowed to explore when testing
+# FollowLinks: Indicate if allowing to follow links opened in new tabs
+# BrowserFullScreen: Indicate if perform the web testing with the browser in full screen
+# SwitchNewTabs: Indicate if switch to a new web tab if opened
+# WebForcedPopupClickAttributes: Widget attribute selectors in attribute=value form that TESTAR should click before default WebDriver exploration
+#################################################################
+
+WebClickableClasses = 
+WebTypeableClasses =
+WebDeniedExtensions = pdf;jpg;png;pfx;xml
+WebDomainsAllowed = para.testar.org
+WebPathsAllowed = null
+FollowLinks = false
+BrowserFullScreen = true
+SwitchNewTabs = true
+WebForcedPopupClickAttributes = id=accept-cookies;id=reject-cookies
+
+#################################################################
+# WebDriver Browser Console Oracles
+#
+# WebConsoleErrorOracle: Enable or Disable applying ORACLES to the browser error console
+# WebConsoleErrorPattern: Regular expressions ORACLE to find suspicious messages in the browser error console
+# WebConsoleWarningOracle: Enable or Disable applying ORACLES to the browser warning console
+# WebConsoleWarningPattern: Regular expressions ORACLE to find suspicious messages in the browser warning console
+#################################################################
+
+WebConsoleErrorOracle = true
+WebConsoleErrorPattern = .*.*
+WebConsoleWarningOracle = true
+WebConsoleWarningPattern = .*.*
+
+#################################################################
+# Override display scale
+#
+# Overrides the displayscale obtained from the system. 
+# Can solve problems when the mouse clicks are not aligned with 
+# the elements on the screen. This can easily be detected when
+# running the spy mode. For example hover over a text element and
+# the popup window should appear with information about the 
+# element, if the popup window is not shown or when the mouse is
+# located somewhere else you can try to override the displayscale
+# Values should be provided as doubles (1.5). 
+#################################################################
+
+OverrideWebDriverDisplayScale =
 
 #################################################################
 # Settings (string) that can be used for user specified protocols
@@ -193,7 +244,7 @@ ProtocolSpecificSetting_5 =
 # Extended test oracles
 #################################################################
 
-ExtendedOracles =
+ExtendedOracles = WebAccessibilityFontSizeOracle,WebAccessibilityImagesAltOracle,WebInvariantDuplicateMenuItems,WebInvariantDuplicateSelectItems,WebInvariantDuplicatedRowsInTable,WebInvariantEmptySelectItems,WebInvariantManySelectItems,WebInvariantNumberWithLotOfDecimals,WebInvariantTextAreaWithoutLength,WebInvariantUnsortedSelectItems
 
 #################################################################
 # Other settings
@@ -202,6 +253,7 @@ ExtendedOracles =
 ShowVisualSettingsDialogOnStartup = true
 ForceForeground = true
 VisualizeActions = false
+FormFillingAction = false
 LogLevel = 1
 OnlySaveFaultySequences = false
 StopGenerationOnFault = true
@@ -210,6 +262,6 @@ UseSystemActions = false
 RefreshSpyCanvas = 1.0
 MaxReward = 9999999
 Discount = .95
-CreateWidgetInfoJsonFile = true
+CreateWidgetInfoJsonFile = false
 OutputDir = ./output
 TempDir = ./output/temp

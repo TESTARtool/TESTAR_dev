@@ -27,7 +27,7 @@ public class VerdictProcessingTest {
 	@After
 	public void tearDown() {
 		Settings.setSettingsPath(null);
-		TestarDirectories.setSelectedSse(null);
+		TestarDirectories.setSelectedWorkspaceName(null);
 	}
 
 	@Test
@@ -144,24 +144,24 @@ public class VerdictProcessingTest {
 	@Test
 	public void testVerdictIgnoreFile_PrioritizesSSE() throws Exception {
 		File tempSettingsDir = tempFolder.newFolder("tempSettingsDir");
-		String originalSettingsDir = TestarDirectories.getSettingsDir();
+        String originalWorkspacesDir = TestarDirectories.getWorkspacesDir();
 		try {
-			TestarDirectories.setSettingsDir(tempSettingsDir.getAbsolutePath() + File.separator);
-			TestarDirectories.setSelectedSse("protocol_selected");
+            TestarDirectories.setWorkspacesDir(tempSettingsDir.getAbsolutePath() + File.separator);
+			TestarDirectories.setSelectedWorkspaceName("protocol_selected");
 			Settings.setSettingsPath(tempFolder.newFolder("otherProtocol").getAbsolutePath());
 
 			File verdictIgnoreFile = VerdictProcessing.resolveVerdictIgnoreFile();
-			assertEquals(new File(TestarDirectories.getSettingsDir() + "protocol_selected", "list_of_verdicts_with_failures.txt").getAbsolutePath(),
+            assertEquals(new File(TestarDirectories.getWorkspacesDir() + "protocol_selected", "list_of_verdicts_with_failures.txt").getAbsolutePath(),
 					verdictIgnoreFile.getAbsolutePath());
 		} finally {
-			TestarDirectories.setSettingsDir(originalSettingsDir); // cleanup to restore static global dir
+            TestarDirectories.setWorkspacesDir(originalWorkspacesDir); // cleanup to restore static global dir
 		}
 	}
 
 	@Test
 	public void testVerdictIgnoreFile_UsesSettingsPathWhenNoSSE() throws Exception {
 		File tempSettingsDir = tempFolder.newFolder("tempSettingsDir");
-		TestarDirectories.setSelectedSse(null);
+			TestarDirectories.setSelectedWorkspaceName(null);
 		Settings.setSettingsPath(tempSettingsDir.getAbsolutePath());
 
 		File verdictIgnoreFile = VerdictProcessing.resolveVerdictIgnoreFile();
@@ -171,7 +171,7 @@ public class VerdictProcessingTest {
 
 	@Test
 	public void testVerdictIgnoreFile_IsNullWhenNoContext() {
-		TestarDirectories.setSelectedSse(null);
+		TestarDirectories.setSelectedWorkspaceName(null);
 		Settings.setSettingsPath(null);
 
 		File verdictIgnoreFile = VerdictProcessing.resolveVerdictIgnoreFile();

@@ -92,8 +92,8 @@ public class TestGoalServiceTest {
         service.saveFile("webdriver_generic", "login.yaml", "version: 1\n");
         service.saveFile("windows_generic", "desktop.yaml", "version: 1\n");
 
-        Assert.assertTrue(Files.isRegularFile(testarHome.resolve("settings/webdriver_generic/test_goals/login.yaml")));
-        Assert.assertTrue(Files.isRegularFile(testarHome.resolve("settings/windows_generic/test_goals/desktop.yaml")));
+        Assert.assertTrue(Files.isRegularFile(testarHome.resolve("workspaces/webdriver_generic/test_goals/login.yaml")));
+        Assert.assertTrue(Files.isRegularFile(testarHome.resolve("workspaces/windows_generic/test_goals/desktop.yaml")));
         Assert.assertFalse(Files.exists(testarHome.resolve(".agents/test_goals/login.yaml")));
         Assert.assertEquals(1, service.tree("webdriver_generic").children().size());
         Assert.assertEquals("login.yaml", service.tree("webdriver_generic").children().get(0).name());

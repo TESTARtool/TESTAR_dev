@@ -88,7 +88,7 @@ Use workspace `oracles/` when you need custom verdict checks.
 Workspace oracle layout:
 
 ```text
-settings/<workspace>/oracles/
+workspaces/<workspace>/oracles/
   dsl/
   java/
   compiled/
@@ -144,9 +144,9 @@ replaceVisiblePolicies=false
 
 Concrete workspace example:
 
-- `testar/resources/settings/webdriver_generic/policies.properties`
-- `testar/resources/settings/webdriver_generic/WebdriverCanvasVisiblePolicy.java`
-- `testar/resources/settings/webdriver_generic/WebdriverLinkDeniedFilterPolicy.java`
+- `testar/resources/workspaces/webdriver_generic/policies.properties`
+- `testar/resources/workspaces/webdriver_generic/WebdriverCanvasVisiblePolicy.java`
+- `testar/resources/workspaces/webdriver_generic/WebdriverLinkDeniedFilterPolicy.java`
 
 ### 2. Wrap a service
 
@@ -172,8 +172,8 @@ stateServiceClass=MyCustomStateService
 
 Concrete workspace examples:
 
-- `testar/resources/settings/webdriver_generic/composition.properties`
-- `testar/resources/settings/webdriver_generic/WebdriverParabankTestSequenceLoginCapability.java`
+- `testar/resources/workspaces/webdriver_generic/composition.properties`
+- `testar/resources/workspaces/webdriver_generic/WebdriverParabankTestSequenceLoginCapability.java`
 
 Those examples show:
 
@@ -198,8 +198,8 @@ Steps:
 
 Concrete workspace examples:
 
-- `testar/resources/settings/webdriver_generic/oracles/java/WebVisualLeafWidgetsOverlapOracle.java`
-- `testar/resources/settings/webdriver_generic/oracles/dsl/web_invariants.testar`
+- `testar/resources/workspaces/webdriver_generic/oracles/java/WebVisualLeafWidgetsOverlapOracle.java`
+- `testar/resources/workspaces/webdriver_generic/oracles/dsl/web_invariants.testar`
 
 ### 4. Adapt state or action identification
 
@@ -226,18 +226,18 @@ stateIdentifierServiceClass=WebdriverParabankStateIdentifierService
 
 Concrete workspace example:
 
-- `testar/resources/settings/webdriver_generic/WebdriverParabankStateIdentifierService.java`
+- `testar/resources/workspaces/webdriver_generic/WebdriverParabankStateIdentifierService.java`
 
 This seam replaces the old protocol-level customization style for state and action identification.
 
 ## Backed example workspace
 
-The shipped `testar/resources/settings/webdriver_generic` workspace now demonstrates the three main customization categories together:
+The shipped `testar/resources/workspaces/webdriver_generic` workspace now demonstrates the three main customization categories together:
 
-- policy examples in `testar/resources/settings/webdriver_generic/policies.properties`
-- service-side identification adaptation in `testar/resources/settings/webdriver_generic/WebdriverParabankStateIdentifierService.java`
-- capability and oracle composition in `testar/resources/settings/webdriver_generic/composition.properties`
-- Java and DSL oracle examples in `testar/resources/settings/webdriver_generic/oracles/`
+- policy examples in `testar/resources/workspaces/webdriver_generic/policies.properties`
+- service-side identification adaptation in `testar/resources/workspaces/webdriver_generic/WebdriverParabankStateIdentifierService.java`
+- capability and oracle composition in `testar/resources/workspaces/webdriver_generic/composition.properties`
+- Java and DSL oracle examples in `testar/resources/workspaces/webdriver_generic/oracles/`
 
 ## What not to customize first
 

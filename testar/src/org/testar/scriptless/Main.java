@@ -142,7 +142,7 @@ public class Main {
             System.out.println("Too many *.sse files - exactly one expected!");
             for (String file : files) {
                 System.out.println("Delete file <" + file + "> = "
-                        + new File(TestarDirectories.getSettingsDir() + file).delete());
+                        + new File(TestarDirectories.getWorkspacesDir() + file).delete());
             }
             files = null;
         }
@@ -150,7 +150,7 @@ public class Main {
         if (files != null && files.length == 1 && !existsSse(removeSseExtension(files[0]))) {
             System.out.println("Protocol of indicated .sse file does not exist");
             System.out.println("Delete file <" + files[0] + "> = "
-                    + new File(TestarDirectories.getSettingsDir() + files[0]).delete());
+                    + new File(TestarDirectories.getWorkspacesDir() + files[0]).delete());
             files = null;
         }
 
@@ -161,7 +161,7 @@ public class Main {
             }
         } else {
             activatedSse = removeSseExtension(files[0]);
-            TestarDirectories.setSelectedSse(activatedSse);
+            TestarDirectories.setSelectedWorkspaceName(activatedSse);
         }
     }
 
@@ -174,7 +174,7 @@ public class Main {
 
     private static void settingsSelection() {
         Set<String> sutSettings = new HashSet<>();
-        File[] files = new File(TestarDirectories.getSettingsDir()).listFiles();
+        File[] files = new File(TestarDirectories.getWorkspacesDir()).listFiles();
         if (files != null) {
             for (File file : files) {
                 File settingsFile = new File(file.getPath() + File.separator + SETTINGS_FILE);
@@ -206,16 +206,16 @@ public class Main {
 
         if (sseSelected == null) {
             activatedSse = null;
-            TestarDirectories.setSelectedSse(null);
+            TestarDirectories.setSelectedWorkspaceName(null);
             return;
         }
 
         String sseFile = sseSelected + SUT_SETTINGS_EXT;
         try {
-            File file = new File(TestarDirectories.getSettingsDir() + File.separator + sseFile);
+            File file = new File(TestarDirectories.getWorkspacesDir() + File.separator + sseFile);
             if (file.createNewFile()) {
                 activatedSse = sseSelected;
-                TestarDirectories.setSelectedSse(activatedSse);
+                TestarDirectories.setSelectedWorkspaceName(activatedSse);
                 return;
             }
         } catch (IOException exception) {
@@ -223,7 +223,7 @@ public class Main {
         }
 
         activatedSse = null;
-        TestarDirectories.setSelectedSse(null);
+        TestarDirectories.setSelectedWorkspaceName(null);
     }
 
     public static boolean startTestarDialog(Settings settings, String testSettingsFile) {
@@ -253,11 +253,11 @@ public class Main {
         String[] files = getSseFiles();
         if (files != null) {
             for (String file : files) {
-                new File(TestarDirectories.getSettingsDir() + file).delete();
+                new File(TestarDirectories.getWorkspacesDir() + file).delete();
             }
         }
 
-        String ssePath = TestarDirectories.getSettingsDir() + sseName + SUT_SETTINGS_EXT;
+        String ssePath = TestarDirectories.getWorkspacesDir() + sseName + SUT_SETTINGS_EXT;
         File sseFile = new File(ssePath);
         if (!sseFile.exists()) {
             sseFile.createNewFile();
@@ -267,14 +267,14 @@ public class Main {
     }
 
     private static boolean existsSse(String sseName) {
-        File[] files = new File(TestarDirectories.getSettingsDir()).listFiles();
+        File[] files = new File(TestarDirectories.getWorkspacesDir()).listFiles();
         if (files == null) {
             return false;
         }
 
         for (File ignored : files) {
             File settingsFile = new File(
-                    TestarDirectories.getSettingsDir() + sseName + File.separator + SETTINGS_FILE
+                    TestarDirectories.getWorkspacesDir() + sseName + File.separator + SETTINGS_FILE
             );
             if (settingsFile.exists()) {
                 return true;

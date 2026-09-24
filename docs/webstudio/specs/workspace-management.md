@@ -28,8 +28,8 @@ The cloned workspace copies:
 
 After cloning, workspace-local resource settings must reference the new workspace directory. This includes:
 
-- `CustomCompositionResource = ./settings/<new-workspace>/composition.properties`
-- `CustomPoliciesResource = ./settings/<new-workspace>/policies.properties`
+- `CustomCompositionResource = ./workspaces/<new-workspace>/composition.properties`
+- `CustomPoliciesResource = ./workspaces/<new-workspace>/policies.properties`
 
 The cloned workspace therefore loads and edits its own composition and policies resources independently from its base workspace.
 
@@ -118,11 +118,11 @@ And the workspace selector shows `android_generic`
 Verification: `WorkspaceServiceManagementTest.java`
 
 Given workspace `webdriver_generic` contains `composition.properties` and `policies.properties`
-And its `test.settings` contains `CustomCompositionResource = ./settings/webdriver_generic/composition.properties`
-And its `test.settings` contains `CustomPoliciesResource = ./settings/webdriver_generic/policies.properties`
+And its `test.settings` contains `CustomCompositionResource = ./workspaces/webdriver_generic/composition.properties`
+And its `test.settings` contains `CustomPoliciesResource = ./workspaces/webdriver_generic/policies.properties`
 When the user creates workspace `webdriver_cloned` using `webdriver_generic` as its base
-Then `webdriver_cloned/test.settings` contains `CustomCompositionResource = ./settings/webdriver_cloned/composition.properties`
-And `webdriver_cloned/test.settings` contains `CustomPoliciesResource = ./settings/webdriver_cloned/policies.properties`
+Then `webdriver_cloned/test.settings` contains `CustomCompositionResource = ./workspaces/webdriver_cloned/composition.properties`
+And `webdriver_cloned/test.settings` contains `CustomPoliciesResource = ./workspaces/webdriver_cloned/policies.properties`
 And the cloned composition and policies files are available at those configured locations
 
 ### WS-SCENARIO-WORKSPACE-RENAME-001 - Rename Updates Composition and Policies Resources
@@ -130,8 +130,8 @@ And the cloned composition and policies files are available at those configured 
 Verification: `WorkspaceServiceManagementTest.java`
 
 Given workspace `webdriver_generic` contains `composition.properties` and `policies.properties`
-And its `test.settings` references those resources under `./settings/webdriver_generic`
+And its `test.settings` references those resources under `./workspaces/webdriver_generic`
 When the user renames the workspace to `webdriver_renamed`
-Then `webdriver_renamed/test.settings` contains `CustomCompositionResource = ./settings/webdriver_renamed/composition.properties`
-And `webdriver_renamed/test.settings` contains `CustomPoliciesResource = ./settings/webdriver_renamed/policies.properties`
+Then `webdriver_renamed/test.settings` contains `CustomCompositionResource = ./workspaces/webdriver_renamed/composition.properties`
+And `webdriver_renamed/test.settings` contains `CustomPoliciesResource = ./workspaces/webdriver_renamed/policies.properties`
 And the composition and policies files are available at those configured locations

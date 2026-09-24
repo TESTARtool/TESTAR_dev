@@ -100,15 +100,15 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
         return buildStatus("running", "Running " + currentMode + " for workspace " + currentWorkspace);
     }
 
-    public synchronized ExecutionStatusDto startGenerate(String workspaceName, Path settingsRoot) {
-        return startMode(workspaceName, settingsRoot, "Generate");
+    public synchronized ExecutionStatusDto startGenerate(String workspaceName, Path workspacesRoot) {
+        return startMode(workspaceName, workspacesRoot, "Generate");
     }
 
-    public synchronized ExecutionStatusDto startLocalSpy(String workspaceName, Path settingsRoot) {
-        return startMode(workspaceName, settingsRoot, "Spy");
+    public synchronized ExecutionStatusDto startLocalSpy(String workspaceName, Path workspacesRoot) {
+        return startMode(workspaceName, workspacesRoot, "Spy");
     }
 
-    private synchronized ExecutionStatusDto startMode(String workspaceName, Path settingsRoot, String mode) {
+    private synchronized ExecutionStatusDto startMode(String workspaceName, Path workspacesRoot, String mode) {
         if (currentProcess != null && currentProcess.isAlive()) {
             return buildStatus("running", "A scriptless run is already active for workspace " + currentWorkspace);
         }
@@ -117,7 +117,7 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
         try {
             resetConsoleOutput();
             installBinDirectory = resolveInstallBinDirectory();
-            prepareWorkspaceForRun(workspaceName, settingsRoot, installBinDirectory, mode);
+            prepareWorkspaceForRun(workspaceName, workspacesRoot, installBinDirectory, mode);
             currentInstallBinDirectory = installBinDirectory;
         } catch (RuntimeException exception) {
             currentProcess = null;
@@ -272,11 +272,11 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
         throw new IllegalStateException("Unable to find testar/target/install/testar/bin. Run :testar:installDist first.");
     }
 
-    private void prepareWorkspaceForRun(String workspaceName, Path settingsRoot, Path installBinDirectory, String mode) {
-        Path sourceWorkspace = settingsRoot.resolve(workspaceName).normalize();
-        Path installSettingsDirectory = installBinDirectory.resolve("settings");
-        Path targetWorkspace = installSettingsDirectory.resolve(workspaceName);
-        Path markerFile = installSettingsDirectory.resolve(workspaceName + ".sse");
+    private void prepareWorkspaceForRun(String workspaceName, Path workspacesRoot, Path installBinDirectory, String mode) {
+        Path sourceWorkspace = workspacesRoot.resolve(workspaceName).normalize();
+        Path installWorkspacesDirectory = installBinDirectory.resolve("workspaces");
+        Path targetWorkspace = installWorkspacesDirectory.resolve(workspaceName);
+        Path markerFile = installWorkspacesDirectory.resolve(workspaceName + ".sse");
         boolean workspaceAlreadyInInstallDirectory = sourceWorkspace.equals(targetWorkspace);
 
         if (!Files.isDirectory(sourceWorkspace)) {
@@ -284,8 +284,8 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
         }
 
         try {
-            Files.createDirectories(installSettingsDirectory);
-            clearExistingMarkers(installSettingsDirectory);
+            Files.createDirectories(installWorkspacesDirectory);
+            clearExistingMarkers(installWorkspacesDirectory);
             if (!workspaceAlreadyInInstallDirectory) {
                 replaceDirectory(targetWorkspace, sourceWorkspace);
             }
@@ -297,8 +297,8 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
         }
     }
 
-    private void clearExistingMarkers(Path installSettingsDirectory) throws IOException {
-        try (var children = Files.list(installSettingsDirectory)) {
+    private void clearExistingMarkers(Path installWorkspacesDirectory) throws IOException {
+        try (var children = Files.list(installWorkspacesDirectory)) {
             for (Path child : children.filter(path -> path.getFileName().toString().endsWith(".sse")).toList()) {
                 Files.deleteIfExists(child);
             }

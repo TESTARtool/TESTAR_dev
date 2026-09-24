@@ -300,9 +300,9 @@ public class TestOracleServiceTest {
     }
 
     private TestOracleService createServiceWithWorkspace(String workspaceName) throws Exception {
-        Path settingsRoot = temporaryFolder.newFolder("settings").toPath();
-        Path cliSettingsRoot = temporaryFolder.newFolder("cli-settings").toPath();
-        Path workspaceDirectory = Files.createDirectories(settingsRoot.resolve(workspaceName));
+        Path workspacesRoot = temporaryFolder.newFolder("workspaces").toPath();
+        Path cliWorkspacesRoot = temporaryFolder.newFolder("cli-workspaces").toPath();
+        Path workspaceDirectory = Files.createDirectories(workspacesRoot.resolve(workspaceName));
 
         Files.writeString(
             workspaceDirectory.resolve("test.settings"),
@@ -316,11 +316,11 @@ public class TestOracleServiceTest {
         Path dslDir = Files.createDirectories(workspaceDirectory.resolve("oracles").resolve("dsl").resolve("flows"));
         Files.writeString(dslDir.resolve("login.testar"), "package generated;\n", StandardCharsets.UTF_8);
 
-        return new TestOracleService(new WorkspaceService(settingsRoot, cliSettingsRoot));
+        return new TestOracleService(new WorkspaceService(workspacesRoot, cliWorkspacesRoot));
     }
 
     private Path workspaceDirectory(String workspaceName) {
-        return temporaryFolder.getRoot().toPath().resolve("settings").resolve(workspaceName);
+        return temporaryFolder.getRoot().toPath().resolve("workspaces").resolve(workspaceName);
     }
 
     private String readSettings(String workspaceName) throws Exception {

@@ -102,7 +102,7 @@ public final class CliSettingsLoader {
             return;
         }
 
-        String resourcePath = "/settings/" + profileName + "/" + fileName;
+        String resourcePath = "/workspaces/" + profileName + "/" + fileName;
         try (InputStream inputStream = CliSettingsLoader.class.getResourceAsStream(resourcePath)) {
             if (inputStream == null) {
                 throw new IOException("Unable to find bundled CLI profile resource: " + resourcePath);
@@ -112,7 +112,7 @@ public final class CliSettingsLoader {
     }
 
     private static Path resolveSettingsDirectory() {
-        return RuntimePathsUtil.resolveTestarHome().resolve("settings");
+        return RuntimePathsUtil.resolveTestarHome().resolve("workspaces");
     }
 
     private static String normalizeProfileName(String profileName) {

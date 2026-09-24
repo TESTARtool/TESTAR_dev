@@ -15,7 +15,7 @@ sourceSets {
     main {
         resources {
             srcDirs = ['resources']
-            excludes = ['settings/']
+            excludes = ['workspaces/']
         }
     }
 }
@@ -85,13 +85,13 @@ dependencies {
     implementation("org.checkerframework:checker:3.49.1")
 }
 
-task prepareSettings(type: Copy) {
-    from 'resources/settings'
-    into 'target/scripts/settings'
+task prepareWorkspaces(type: Copy) {
+    from 'resources/workspaces'
+    into 'target/scripts/workspaces'
 }
 
 def bundledOracleCompileTasks = []
-file('resources/settings').listFiles()
+file('resources/workspaces').listFiles()
     ?.findAll { workspaceDirectory -> workspaceDirectory.isDirectory() }
     ?.each { workspaceDirectory ->
         def oracleJavaDirectory = new File(workspaceDirectory, 'oracles/java')
@@ -113,7 +113,7 @@ file('resources/settings').listFiles()
             dependsOn tasks.named('startScripts')
             source oracleJavaSources
             classpath = sourceSets.main.runtimeClasspath
-            destinationDirectory = file("target/scripts/settings/${workspaceDirectory.name}/oracles/compiled")
+            destinationDirectory = file("target/scripts/workspaces/${workspaceDirectory.name}/oracles/compiled")
             options.encoding = 'UTF-8'
         }
         bundledOracleCompileTasks.add(compileTask)

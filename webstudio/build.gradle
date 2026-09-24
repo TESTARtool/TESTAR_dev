@@ -4,7 +4,7 @@ apply plugin: 'application'
 buildDir = 'target'
 
 def configuredWebStudioPort = (findProperty('webstudioPort') ?: '8888').toString()
-def configuredWebStudioSettingsRoot = project(':testar').file('target/install/testar/bin/settings').absolutePath
+def configuredWebStudioWorkspacesRoot = project(':testar').file('target/install/testar/bin/workspaces').absolutePath
 def frontendDirectory = file("${projectDir}/frontend")
 def frontendSourceDirectory = file("${frontendDirectory}/src")
 def frontendGeneratedResourcesRoot = file("${buildDir}/generated/webstudio-frontend")
@@ -45,7 +45,7 @@ tasks.named('run') {
     group = 'application'
     description = 'Run TESTAR Web Studio using the currently available frontend assets.'
     dependsOn project(':cli').tasks.named('installCliIntoTestarDistribution')
-    systemProperty 'testar.webstudio.settingsRoot', configuredWebStudioSettingsRoot
+    systemProperty 'testar.webstudio.workspacesRoot', configuredWebStudioWorkspacesRoot
     systemProperty 'testar.webstudio.port', configuredWebStudioPort
 }
 
@@ -179,7 +179,7 @@ tasks.register('runWebStudioServer', JavaExec) {
     dependsOn project(':cli').tasks.named('installCliIntoTestarDistribution')
     classpath = sourceSets.main.runtimeClasspath + files(frontendGeneratedResourcesRoot)
     mainClass = application.mainClass
-    systemProperty 'testar.webstudio.settingsRoot', configuredWebStudioSettingsRoot
+    systemProperty 'testar.webstudio.workspacesRoot', configuredWebStudioWorkspacesRoot
     systemProperty 'testar.webstudio.port', configuredWebStudioPort
     standardInput = System.in
 }
@@ -192,7 +192,7 @@ tasks.register('runWebStudio', JavaExec) {
     dependsOn project(':cli').tasks.named('installCliIntoTestarDistribution')
     classpath = sourceSets.main.runtimeClasspath + files(frontendGeneratedResourcesRoot)
     mainClass = application.mainClass
-    systemProperty 'testar.webstudio.settingsRoot', configuredWebStudioSettingsRoot
+    systemProperty 'testar.webstudio.workspacesRoot', configuredWebStudioWorkspacesRoot
     systemProperty 'testar.webstudio.port', configuredWebStudioPort
     standardInput = System.in
 }

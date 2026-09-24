@@ -60,50 +60,50 @@ public final class WorkspaceService {
     private static final String ORACLE_COMPILED_DIRECTORY = "compiled";
     private static final Pattern WORKSPACE_NAME_PATTERN = Pattern.compile("[A-Za-z0-9_-]+");
 
-    private final Path settingsRoot;
-    private final Path cliSettingsRoot;
+    private final Path workspacesRoot;
+    private final Path cliWorkspacesRoot;
 
     public WorkspaceService() {
-        this(resolveDefaultSettingsRoot(), resolveDefaultCliSettingsRoot());
+        this(resolveDefaultWorkspacesRoot(), resolveDefaultCliWorkspacesRoot());
     }
 
-    public WorkspaceService(Path settingsRoot) {
-        this(settingsRoot, resolveDefaultCliSettingsRoot());
+    public WorkspaceService(Path workspacesRoot) {
+        this(workspacesRoot, resolveDefaultCliWorkspacesRoot());
     }
 
-    public WorkspaceService(Path settingsRoot, Path cliSettingsRoot) {
-        this.settingsRoot = settingsRoot;
-        this.cliSettingsRoot = cliSettingsRoot;
+    public WorkspaceService(Path workspacesRoot, Path cliWorkspacesRoot) {
+        this.workspacesRoot = workspacesRoot;
+        this.cliWorkspacesRoot = cliWorkspacesRoot;
     }
 
     public List<WorkspaceSummaryDto> listWorkspaces() {
         Map<String, WorkspaceSummaryDto> summaries = new TreeMap<>();
-        collectWorkspaceSummaries(summaries, settingsRoot, true, false);
-        collectWorkspaceSummaries(summaries, cliSettingsRoot, false, true);
+        collectWorkspaceSummaries(summaries, workspacesRoot, true, false);
+        collectWorkspaceSummaries(summaries, cliWorkspacesRoot, false, true);
         return List.copyOf(summaries.values());
     }
 
-    public Path settingsRoot() {
-        return settingsRoot;
+    public Path workspacesRoot() {
+        return workspacesRoot;
     }
 
-    public Path cliSettingsRoot() {
-        return cliSettingsRoot;
+    public Path cliWorkspacesRoot() {
+        return cliWorkspacesRoot;
     }
 
     public Path testarHomeDirectory() {
-        Path parent = settingsRoot.getParent();
+        Path parent = workspacesRoot.getParent();
         if (parent == null) {
-            throw new IllegalStateException("Unable to resolve TESTAR home from settings root: " + settingsRoot);
+            throw new IllegalStateException("Unable to resolve TESTAR home from workspaces root: " + workspacesRoot);
         }
 
         return parent.toAbsolutePath().normalize();
     }
 
     public Path cliHomeDirectory() {
-        Path parent = cliSettingsRoot.getParent();
+        Path parent = cliWorkspacesRoot.getParent();
         if (parent == null) {
-            throw new IllegalStateException("Unable to resolve TESTAR CLI home from settings root: " + cliSettingsRoot);
+            throw new IllegalStateException("Unable to resolve TESTAR CLI home from its workspace root: " + cliWorkspacesRoot);
         }
 
         return parent.toAbsolutePath().normalize();
@@ -131,18 +131,18 @@ public final class WorkspaceService {
         String normalizedWorkspaceName = normalizeNewWorkspaceName(workspaceName);
         String normalizedBaseWorkspaceName = normalizeExistingWorkspaceName(baseWorkspaceName, "Base workspace is required.");
         Path sourceDirectory = resolveWorkspaceDirectory(normalizedBaseWorkspaceName);
-        Path targetDirectory = settingsRoot.resolve(normalizedWorkspaceName).normalize();
+        Path targetDirectory = workspacesRoot.resolve(normalizedWorkspaceName).normalize();
 
-        if (!targetDirectory.startsWith(settingsRoot)) {
+        if (!targetDirectory.startsWith(workspacesRoot)) {
             throw new IllegalArgumentException("Invalid workspace name: " + normalizedWorkspaceName);
         }
 
-        if (workspaceExists(settingsRoot, normalizedWorkspaceName) || workspaceExists(cliSettingsRoot, normalizedWorkspaceName)) {
+        if (workspaceExists(workspacesRoot, normalizedWorkspaceName) || workspaceExists(cliWorkspacesRoot, normalizedWorkspaceName)) {
             throw new IllegalArgumentException("Workspace already exists: " + normalizedWorkspaceName);
         }
 
         try {
-            Files.createDirectories(settingsRoot);
+            Files.createDirectories(workspacesRoot);
             copyWorkspaceDirectory(sourceDirectory, targetDirectory, copyTestGoals, copyOracles);
             ensureWorkspaceAssetDirectories(targetDirectory);
             updateWorkspaceResourceSettings(
@@ -159,7 +159,7 @@ public final class WorkspaceService {
                     normalizedWorkspaceName,
                     targetDirectory.toString(),
                     true,
-                    workspaceExists(cliSettingsRoot, normalizedWorkspaceName)
+                    workspaceExists(cliWorkspacesRoot, normalizedWorkspaceName)
                 ));
         } catch (IOException exception) {
             throw new IllegalStateException("Unable to create workspace: " + normalizedWorkspaceName, exception);
@@ -177,19 +177,19 @@ public final class WorkspaceService {
             throw new IllegalArgumentException("New workspace name must be different from the current workspace name.");
         }
 
-        Path sourceDirectory = settingsRoot.resolve(normalizedCurrentWorkspaceName).normalize();
-        Path targetDirectory = settingsRoot.resolve(normalizedNewWorkspaceName).normalize();
+        Path sourceDirectory = workspacesRoot.resolve(normalizedCurrentWorkspaceName).normalize();
+        Path targetDirectory = workspacesRoot.resolve(normalizedNewWorkspaceName).normalize();
         Path sourceOutputDirectory = workspaceOutputDirectory(normalizedCurrentWorkspaceName);
         Path targetOutputDirectory = workspaceOutputDirectory(normalizedNewWorkspaceName);
 
-        if (!sourceDirectory.startsWith(settingsRoot) || !targetDirectory.startsWith(settingsRoot)) {
+        if (!sourceDirectory.startsWith(workspacesRoot) || !targetDirectory.startsWith(workspacesRoot)) {
             throw new IllegalArgumentException("Invalid workspace name.");
         }
 
         if (!Files.isDirectory(sourceDirectory)) {
-            if (workspaceExists(cliSettingsRoot, normalizedCurrentWorkspaceName)) {
+            if (workspaceExists(cliWorkspacesRoot, normalizedCurrentWorkspaceName)) {
                 throw new IllegalArgumentException(
-                    "Workspace cannot be renamed because it is not available in the shared settings root: "
+                    "Workspace cannot be renamed because it is not available in the shared workspaces root: "
                         + normalizedCurrentWorkspaceName
                 );
             }
@@ -197,7 +197,7 @@ public final class WorkspaceService {
             throw new IllegalArgumentException("Workspace not found: " + normalizedCurrentWorkspaceName);
         }
 
-        if (workspaceExists(settingsRoot, normalizedNewWorkspaceName) || workspaceExists(cliSettingsRoot, normalizedNewWorkspaceName)) {
+        if (workspaceExists(workspacesRoot, normalizedNewWorkspaceName) || workspaceExists(cliWorkspacesRoot, normalizedNewWorkspaceName)) {
             throw new IllegalArgumentException("Workspace already exists: " + normalizedNewWorkspaceName);
         }
 
@@ -245,7 +245,7 @@ public final class WorkspaceService {
                 normalizedNewWorkspaceName,
                 targetDirectory.toString(),
                 true,
-                workspaceExists(cliSettingsRoot, normalizedNewWorkspaceName)
+                workspaceExists(cliWorkspacesRoot, normalizedNewWorkspaceName)
             ));
     }
 
@@ -508,17 +508,17 @@ public final class WorkspaceService {
         return compileWorkspaceJava(workspaceDirectory, "profile", workspaceName);
     }
 
-    private static Path resolveDefaultSettingsRoot() {
-        String configuredSettingsRoot = System.getProperty("testar.webstudio.settingsRoot");
-        if (configuredSettingsRoot != null && !configuredSettingsRoot.isBlank()) {
-            return Paths.get(configuredSettingsRoot).toAbsolutePath().normalize();
+    private static Path resolveDefaultWorkspacesRoot() {
+        String configuredWorkspacesRoot = System.getProperty("testar.webstudio.workspacesRoot");
+        if (configuredWorkspacesRoot != null && !configuredWorkspacesRoot.isBlank()) {
+            return Paths.get(configuredWorkspacesRoot).toAbsolutePath().normalize();
         }
 
         Path workingDirectory = Paths.get(System.getProperty("user.dir")).toAbsolutePath().normalize();
         Path current = workingDirectory;
 
         while (current != null) {
-            Path candidate = current.resolve("testar").resolve("target").resolve("install").resolve("testar").resolve("bin").resolve("settings");
+            Path candidate = current.resolve("testar").resolve("target").resolve("install").resolve("testar").resolve("bin").resolve("workspaces");
             if (Files.isDirectory(candidate)) {
                 return candidate;
             }
@@ -529,7 +529,7 @@ public final class WorkspaceService {
         current = workingDirectory;
 
         while (current != null) {
-            Path candidate = current.resolve("testar").resolve("resources").resolve("settings");
+            Path candidate = current.resolve("testar").resolve("resources").resolve("workspaces");
             if (Files.isDirectory(candidate)) {
                 return candidate;
             }
@@ -537,20 +537,20 @@ public final class WorkspaceService {
             current = current.getParent();
         }
 
-        return workingDirectory.resolve("testar").resolve("target").resolve("install").resolve("testar").resolve("bin").resolve("settings");
+        return workingDirectory.resolve("testar").resolve("target").resolve("install").resolve("testar").resolve("bin").resolve("workspaces");
     }
 
-    private static Path resolveDefaultCliSettingsRoot() {
+    private static Path resolveDefaultCliWorkspacesRoot() {
         Path workingDirectory = Paths.get(System.getProperty("user.dir")).toAbsolutePath().normalize();
         Path current = workingDirectory;
 
         while (current != null) {
             Path sharedBinDirectory = current.resolve("testar").resolve("target").resolve("install").resolve("testar").resolve("bin");
-            Path sharedSettingsDirectory = sharedBinDirectory.resolve("settings");
-            if (Files.isDirectory(sharedSettingsDirectory)
+            Path sharedWorkspacesDirectory = sharedBinDirectory.resolve("workspaces");
+            if (Files.isDirectory(sharedWorkspacesDirectory)
                     && (Files.isRegularFile(sharedBinDirectory.resolve("testar-cli.bat"))
                     || Files.isRegularFile(sharedBinDirectory.resolve("testar-cli")))) {
-                return sharedSettingsDirectory;
+                return sharedWorkspacesDirectory;
             }
 
             current = current.getParent();
@@ -559,7 +559,7 @@ public final class WorkspaceService {
         current = workingDirectory;
 
         while (current != null) {
-            Path candidate = current.resolve("cli").resolve("target").resolve("install").resolve("testar-cli").resolve("settings");
+            Path candidate = current.resolve("cli").resolve("target").resolve("install").resolve("testar-cli").resolve("workspaces");
             if (Files.isDirectory(candidate)) {
                 return candidate;
             }
@@ -578,11 +578,11 @@ public final class WorkspaceService {
             current = current.getParent();
         }
 
-        return workingDirectory.resolve("cli").resolve("target").resolve("install").resolve("testar-cli").resolve("settings");
+        return workingDirectory.resolve("cli").resolve("target").resolve("install").resolve("testar-cli").resolve("workspaces");
     }
 
     private Path resolveWorkspaceDirectory(String workspaceName) {
-        for (Path root : List.of(settingsRoot, cliSettingsRoot)) {
+        for (Path root : List.of(workspacesRoot, cliWorkspacesRoot)) {
             Path workspaceDirectory = root.resolve(workspaceName).normalize();
             if (!workspaceDirectory.startsWith(root)) {
                 continue;
@@ -756,16 +756,16 @@ public final class WorkspaceService {
         Path targetDirectory
     ) {
         String normalizedValue = configuredValue.replace('\\', '/');
-        String relativeSourcePrefix = "./settings/" + sourceWorkspaceName + "/";
+        String relativeSourcePrefix = "./workspaces/" + sourceWorkspaceName + "/";
         if (normalizedValue.startsWith(relativeSourcePrefix)) {
-            return "./settings/" + targetWorkspaceName + "/"
+            return "./workspaces/" + targetWorkspaceName + "/"
                 + normalizedValue.substring(relativeSourcePrefix.length());
         }
 
-        String settingsSourcePrefix = "settings/" + sourceWorkspaceName + "/";
-        if (normalizedValue.startsWith(settingsSourcePrefix)) {
-            return "settings/" + targetWorkspaceName + "/"
-                + normalizedValue.substring(settingsSourcePrefix.length());
+        String workspacesSourcePrefix = "workspaces/" + sourceWorkspaceName + "/";
+        if (normalizedValue.startsWith(workspacesSourcePrefix)) {
+            return "workspaces/" + targetWorkspaceName + "/"
+                + normalizedValue.substring(workspacesSourcePrefix.length());
         }
 
         Path configuredPath = Paths.get(configuredValue);
@@ -816,13 +816,13 @@ public final class WorkspaceService {
     }
 
     private Path resolveWorkspaceRuntimeHomeDirectory(String workspaceName) {
-        Path testarWorkspaceDirectory = settingsRoot.resolve(workspaceName).normalize();
-        if (testarWorkspaceDirectory.startsWith(settingsRoot) && Files.isDirectory(testarWorkspaceDirectory)) {
+        Path testarWorkspaceDirectory = workspacesRoot.resolve(workspaceName).normalize();
+        if (testarWorkspaceDirectory.startsWith(workspacesRoot) && Files.isDirectory(testarWorkspaceDirectory)) {
             return testarHomeDirectory();
         }
 
-        Path cliWorkspaceDirectory = cliSettingsRoot.resolve(workspaceName).normalize();
-        if (cliWorkspaceDirectory.startsWith(cliSettingsRoot) && Files.isDirectory(cliWorkspaceDirectory)) {
+        Path cliWorkspaceDirectory = cliWorkspacesRoot.resolve(workspaceName).normalize();
+        if (cliWorkspaceDirectory.startsWith(cliWorkspacesRoot) && Files.isDirectory(cliWorkspaceDirectory)) {
             return cliHomeDirectory();
         }
 
@@ -1039,7 +1039,7 @@ public final class WorkspaceService {
                 );
             }
         } catch (IOException exception) {
-            throw new IllegalStateException("Unable to list settings workspaces under: " + root, exception);
+            throw new IllegalStateException("Unable to list workspaces under: " + root, exception);
         }
     }
 

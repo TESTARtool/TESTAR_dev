@@ -92,8 +92,8 @@ public class VerdictProcessing {
     }
 
     public static File resolveVerdictIgnoreFile() {
-        if (TestarDirectories.getSelectedSse() != null && !TestarDirectories.getSelectedSse().isEmpty()) {
-            return new File(TestarDirectories.getSettingsDir() + TestarDirectories.getSelectedSse(),
+        if (TestarDirectories.getSelectedWorkspaceName() != null && !TestarDirectories.getSelectedWorkspaceName().isEmpty()) {
+            return new File(TestarDirectories.getWorkspacesDir() + TestarDirectories.getSelectedWorkspaceName(),
                     LIST_VERDICTS_FAILURES_FILENAME);
         }
         String settingsPath = Settings.getSettingsPath();

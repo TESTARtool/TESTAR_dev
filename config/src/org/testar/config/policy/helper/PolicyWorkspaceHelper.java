@@ -95,13 +95,13 @@ public final class PolicyWorkspaceHelper {
     }
 
     public static String defaultPoliciesResource(Settings settings) {
-        String selectedSse = TestarDirectories.getSelectedSse();
-        if (selectedSse == null || selectedSse.isBlank()) {
-            selectedSse = "sut";
+        String selectedWorkspaceName = TestarDirectories.getSelectedWorkspaceName();
+        if (selectedWorkspaceName == null || selectedWorkspaceName.isBlank()) {
+            selectedWorkspaceName = "sut";
         }
 
-        return TestarDirectories.getSettingsDir()
-                + selectedSse
+        return TestarDirectories.getWorkspacesDir()
+                + selectedWorkspaceName
                 + File.separator
                 + "policies.properties";
     }

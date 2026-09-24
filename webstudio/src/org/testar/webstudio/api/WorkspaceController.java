@@ -55,8 +55,8 @@ public final class WorkspaceController {
         return workspaceService.renameWorkspace(workspaceName, request.name());
     }
 
-    public Path settingsRoot() {
-        return workspaceService.settingsRoot();
+    public Path workspacesRoot() {
+        return workspaceService.workspacesRoot();
     }
 
     public WorkspaceDocumentDto readWorkspaceDocument(String workspaceName) {

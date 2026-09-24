@@ -113,7 +113,7 @@ spec:
         volumeMounts:
         - mountPath: /mnt
           name: config
-        - mountPath: /testar/bin/settings
+        - mountPath: /testar/bin/workspaces
           name: config
         - mountPath: /testar/bin/output
           name: logs

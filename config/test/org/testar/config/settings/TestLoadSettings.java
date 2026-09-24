@@ -39,9 +39,9 @@ public class TestLoadSettings {
     @Test
     public void loadSettingsWithNonExistentFile() throws IOException {
         exception.expect(IOException.class);
-        exception.expectMessage("Settings.loadSettings: The specified file does not exist: ./settings/unknown/test.settings");
+        exception.expectMessage("Settings.loadSettings: The specified file does not exist: ./workspaces/unknown/test.settings");
 
-        Settings.loadSettings(new String[0], "./settings/unknown/test.settings");
+        Settings.loadSettings(new String[0], "./workspaces/unknown/test.settings");
     }
 
     @Test

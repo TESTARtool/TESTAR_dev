@@ -21,25 +21,25 @@ public abstract class WorkspaceOracleTestSupport {
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-    private String previousSettingsDir;
+    private String previousWorkspacesDir;
     private String previousSelectedSse;
 
     @Before
     public void setupWorkspaceOracleTest() throws Exception {
-        previousSettingsDir = TestarDirectories.getSettingsDir();
-        previousSelectedSse = TestarDirectories.getSelectedSse();
+        previousWorkspacesDir = TestarDirectories.getWorkspacesDir();
+        previousSelectedSse = TestarDirectories.getSelectedWorkspaceName();
 
-        File settingsRoot = temporaryFolder.newFolder("settings");
-        TestarDirectories.setSettingsDir(settingsRoot.getAbsolutePath() + File.separator);
-        TestarDirectories.setSelectedSse("webdriver_test");
+        File workspacesRoot = temporaryFolder.newFolder("workspaces");
+        TestarDirectories.setWorkspacesDir(workspacesRoot.getAbsolutePath() + File.separator);
+        TestarDirectories.setSelectedWorkspaceName("webdriver_test");
 
         Files.createDirectories(Path.of(TestarDirectories.getWorkspaceOracleJavaDir()));
     }
 
     @After
     public void teardownWorkspaceOracleTest() {
-        TestarDirectories.setSettingsDir(previousSettingsDir);
-        TestarDirectories.setSelectedSse(previousSelectedSse);
+        TestarDirectories.setWorkspacesDir(previousWorkspacesDir);
+        TestarDirectories.setSelectedWorkspaceName(previousSelectedSse);
     }
 
     protected Oracle loadWorkspaceOracle(String oracleClassName) {
@@ -68,7 +68,7 @@ public abstract class WorkspaceOracleTestSupport {
         Path relativePath = Path.of(
                 "testar",
                 "resources",
-                "settings",
+                "workspaces",
                 "webdriver_generic",
                 "oracles",
                 "java",

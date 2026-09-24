@@ -24,20 +24,20 @@ public final class SettingsResourceResolver {
             return resourceFile;
         }
 
-        File settingsDirectory = new File(settingsPath);
-        File workspaceRelativeFile = new File(settingsDirectory, configuredPath);
+        File workspaceDirectory = new File(settingsPath);
+        File workspaceRelativeFile = new File(workspaceDirectory, configuredPath);
         if (workspaceRelativeFile.exists()) {
             return workspaceRelativeFile;
         }
 
-        File settingsRootDirectory = settingsDirectory.getParentFile();
-        if (settingsRootDirectory != null) {
-            File settingsRootRelativeFile = new File(settingsRootDirectory, configuredPath);
-            if (settingsRootRelativeFile.exists()) {
-                return settingsRootRelativeFile;
+        File workspacesRootDirectory = workspaceDirectory.getParentFile();
+        if (workspacesRootDirectory != null) {
+            File workspacesRootRelativeFile = new File(workspacesRootDirectory, configuredPath);
+            if (workspacesRootRelativeFile.exists()) {
+                return workspacesRootRelativeFile;
             }
 
-            File runtimeRootDirectory = settingsRootDirectory.getParentFile();
+            File runtimeRootDirectory = workspacesRootDirectory.getParentFile();
             if (runtimeRootDirectory != null) {
                 File runtimeRootRelativeFile = new File(runtimeRootDirectory, configuredPath);
                 if (runtimeRootRelativeFile.exists()) {

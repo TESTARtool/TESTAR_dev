@@ -1,10 +1,10 @@
 #################################################################
-# WebDriver composition settings
+# Android composition settings
 #################################################################
 
-CompositionProfile = webdriver_composition
-CustomCompositionResource = ./settings/webdriver_generic/composition.properties
-CustomPoliciesResource = ./settings/webdriver_generic/policies.properties
+CompositionProfile = android_composition
+CustomCompositionResource = ./workspaces/android_generic/composition.properties
+CustomPoliciesResource = ./workspaces/android_generic/policies.properties
 
 #################################################################
 # TESTAR mode
@@ -15,27 +15,10 @@ Mode = Spy
 
 #################################################################
 # Connect to the System Under Test (SUT)
-#
-# Indicate how you want to connect to the SUT:
-#
-# SUTCONNECTOR = COMMAND_LINE, SUTConnectorValue property must be a command line that
-# starts the SUT.
-# It should work from a Command Prompt terminal window (e.g. java - jar SUTs/calc.jar ).
-# For web applications, follow the next format: web_browser_path SUT_URL.
-#
-# SUTCONNECTOR = SUT_WINDOW_TITLE, then SUTConnectorValue property must be the title displayed
-# in the SUT main window. The SUT must be manually started and closed.
-#
-# SUTCONNECTOR = SUT_PROCESS_NAME: SUTConnectorValue property must be the process name of the SUT.
-# The SUT must be manually started and closed.
-#
-# SUTCONNECTOR = WEB_DRIVER: SUTConnectorValue property consists of webdriver path and web url
-# Format : <path of webdriver> [optional size/position] <url of web application>
-# Example format for the dimensions and position : 1920x1000+1680+0
 #################################################################
 
-SUTConnector = WEB_DRIVER
-SUTConnectorValue = "https://para.testar.org/"
+SUTConnector = ANDROID_APPIUM
+SUTConnectorValue = 
 
 #################################################################
 # Sequences
@@ -44,6 +27,29 @@ SUTConnectorValue = "https://para.testar.org/"
 
 Sequences = 5
 SequenceLength = 10
+
+#################################################################
+# Android-Appium settings
+#################################################################
+
+AppiumPlatformName = Android
+AppiumIsApkInstalled = false
+AppiumApp = suts/ApiDemos-debug.apk
+AppiumAppPackage =
+AppiumAppActivity =
+AppiumIsEmulatorDocker = false
+AppiumIpAddress =
+AppiumDeviceName = Android Emulator
+AppiumAutomationName = UiAutomator2
+AppiumNewCommandTimeout = 600
+AppiumAutoGrantPermissions = false
+AppiumAllowInvisibleElements = false
+AppiumIgnoreHiddenApiPolicyError = false
+AppiumAdbExecTimeout = 120000
+AppiumUiautomator2ServerInstallTimeout = 120000
+AppiumUiautomator2ServerLaunchTimeout = 120000
+AndroidClickableClasses =
+AndroidTypeableClasses =
 
 #################################################################
 # Sets the type of Test Report to be created
@@ -56,8 +62,8 @@ ReportInPlainText = false
 # SUT execution timing configurations
 #################################################################
 
-ActionDuration = 0.0
-TimeToWaitAfterAction = 0.5
+ActionDuration = 0.1
+TimeToWaitAfterAction = 2.0
 StartupTime = 2.0
 MaxTime = 3.1536E7
 
@@ -66,14 +72,15 @@ MaxTime = 3.1536E7
 # Regular expression and Tags to apply them.
 #################################################################
 
-ClickFilter = .*admin.htm.*|.*logout.htm.*
-TagsToFilter = Title;WebName;WebTagName;WebHref
+ClickFilter = .*Graphics.*
+TagsToFilter = AndroidAccessibilityId;AndroidText
+ProcessesToKillDuringTest =
 
 #################################################################
 # Sets whether to ignore reporting with duplicate verdicts
 #################################################################
 
-IgnoreDuplicatedVerdicts = true
+IgnoreDuplicatedVerdicts = false
 
 #################################################################
 # Oracles based on suspicious tag values
@@ -81,7 +88,7 @@ IgnoreDuplicatedVerdicts = true
 #################################################################
 
 SuspiciousTags = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
-TagsForSuspiciousOracle = Title;WebTextContent
+TagsForSuspiciousOracle = Title
 
 #################################################################
 # Oracles based on Suspicious Outputs detected by Process Listeners
@@ -123,7 +130,7 @@ LogOracleFiles =
 # the widget and state hash strings. Use a comma separated list.
 #################################################################
 
-AbstractStateAttributes = WidgetControlType,WebWidgetId
+AbstractStateAttributes = WidgetControlType
 
 #################################################################
 # State model inference settings
@@ -145,20 +152,20 @@ AbstractStateAttributes = WidgetControlType,WebWidgetId
 # ResetDataStore: WARNING: Delete all existing State Models from the selected database before creating a new one
 #################################################################
 
-ApplicationName = webdriver_parabank
-ApplicationVersion = 1
+ApplicationName = Android Generic
+ApplicationVersion = 
 
 StateModelInference = false
-DataStore = OrientDB
-DataStoreType = plocal
-DataStoreServer = 
-DataStoreDirectory = .runtime/orientdb-community-3.2.38/databases
-DataStoreDB = testar
-DataStoreUser = testar
-DataStorePassword = testar
-DataStoreMode = instant
-ActionSelectionAlgorithm = unvisited
-StateModelStoreWidgets = true
+DataStore =
+DataStoreType = remote
+DataStoreServer =
+DataStoreDirectory =
+DataStoreDB =
+DataStoreUser =
+DataStorePassword =
+DataStoreMode = none
+ActionSelectionAlgorithm = random
+StateModelStoreWidgets = false
 ResetDataStore = false
 
 #################################################################
@@ -175,60 +182,7 @@ AgentCLIApprovalPolicy = never
 AgentCLIAllowNetworkAccess = false
 AgentCLISkipGitRepoCheck = true
 AgentCLIPromptTitle = Test Parabank Login
-AgentCLIPromptText = As a test agent verify that you can log in with the credentials john/demo. Then the Welcome John Smith message is shown.
-
-#################################################################
-# WebDriver features
-#
-# WebClickableClasses: Indicate which web CSS classes need to be considered clickable
-# WebTypeableClasses: Indicate which web CSS classes need to be considered typeable
-# WebDeniedExtensions: Indicate which web URL extensions need to be ignored when testing
-# WebDomainsAllowed: Indicate which web URL domains are allowed to explore when testing
-# WebPathsAllowed: Regular expressions to indicate which web URL paths are allowed to explore when testing
-# FollowLinks: Indicate if allowing to follow links opened in new tabs
-# BrowserFullScreen: Indicate if perform the web testing with the browser in full screen
-# SwitchNewTabs: Indicate if switch to a new web tab if opened
-# WebForcedPopupClickAttributes: Widget attribute selectors in attribute=value form that TESTAR should click before default WebDriver exploration
-#################################################################
-
-WebClickableClasses = 
-WebTypeableClasses =
-WebDeniedExtensions = pdf;jpg;png;pfx;xml
-WebDomainsAllowed = para.testar.org
-WebPathsAllowed = null
-FollowLinks = false
-BrowserFullScreen = true
-SwitchNewTabs = true
-WebForcedPopupClickAttributes = id=accept-cookies;id=reject-cookies
-
-#################################################################
-# WebDriver Browser Console Oracles
-#
-# WebConsoleErrorOracle: Enable or Disable applying ORACLES to the browser error console
-# WebConsoleErrorPattern: Regular expressions ORACLE to find suspicious messages in the browser error console
-# WebConsoleWarningOracle: Enable or Disable applying ORACLES to the browser warning console
-# WebConsoleWarningPattern: Regular expressions ORACLE to find suspicious messages in the browser warning console
-#################################################################
-
-WebConsoleErrorOracle = true
-WebConsoleErrorPattern = .*.*
-WebConsoleWarningOracle = true
-WebConsoleWarningPattern = .*.*
-
-#################################################################
-# Override display scale
-#
-# Overrides the displayscale obtained from the system. 
-# Can solve problems when the mouse clicks are not aligned with 
-# the elements on the screen. This can easily be detected when
-# running the spy mode. For example hover over a text element and
-# the popup window should appear with information about the 
-# element, if the popup window is not shown or when the mouse is
-# located somewhere else you can try to override the displayscale
-# Values should be provided as doubles (1.5). 
-#################################################################
-
-OverrideWebDriverDisplayScale =
+AgentCLIPromptText = As an Android API Demos test agent, I want to open the MediaPlayer demo screen and confirm that the Play Streaming Video button is available. 
 
 #################################################################
 # Settings (string) that can be used for user specified protocols
@@ -244,7 +198,7 @@ ProtocolSpecificSetting_5 =
 # Extended test oracles
 #################################################################
 
-ExtendedOracles = WebAccessibilityFontSizeOracle,WebAccessibilityImagesAltOracle,WebInvariantDuplicateMenuItems,WebInvariantDuplicateSelectItems,WebInvariantDuplicatedRowsInTable,WebInvariantEmptySelectItems,WebInvariantManySelectItems,WebInvariantNumberWithLotOfDecimals,WebInvariantTextAreaWithoutLength,WebInvariantUnsortedSelectItems
+ExtendedOracles =
 
 #################################################################
 # Other settings
@@ -253,7 +207,6 @@ ExtendedOracles = WebAccessibilityFontSizeOracle,WebAccessibilityImagesAltOracle
 ShowVisualSettingsDialogOnStartup = true
 ForceForeground = true
 VisualizeActions = false
-FormFillingAction = false
 LogLevel = 1
 OnlySaveFaultySequences = false
 StopGenerationOnFault = true
@@ -265,3 +218,4 @@ Discount = .95
 CreateWidgetInfoJsonFile = false
 OutputDir = ./output
 TempDir = ./output/temp
+SUTProcesses = 

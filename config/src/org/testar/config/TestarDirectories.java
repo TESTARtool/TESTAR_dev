@@ -19,11 +19,11 @@ public final class TestarDirectories {
     private static final Path BASE_DIR = Paths.get(".").toAbsolutePath().normalize();
 
     private static String testarDir = BASE_DIR.toString() + File.separator;
-    private static String settingsDir = BASE_DIR.resolve("settings").toString() + File.separator;
+    private static String workspacesDir = BASE_DIR.resolve("workspaces").toString() + File.separator;
     private static String oraclesDir = BASE_DIR.resolve("oracles").toString() + File.separator;
     private static String outputDir = BASE_DIR.resolve("output").toString() + File.separator;
     private static String tempDir = BASE_DIR.resolve("output").resolve("temp").toString() + File.separator;
-    private static String selectedSse;
+    private static String selectedWorkspaceName;
 
     private TestarDirectories() { }
 
@@ -35,12 +35,12 @@ public final class TestarDirectories {
         testarDir = directory;
     }
 
-    public static String getSettingsDir() {
-        return settingsDir;
+    public static String getWorkspacesDir() {
+        return workspacesDir;
     }
 
-    public static void setSettingsDir(String directory) {
-        settingsDir = directory;
+    public static void setWorkspacesDir(String directory) {
+        workspacesDir = directory;
     }
 
     public static String getOraclesDir() {
@@ -67,16 +67,16 @@ public final class TestarDirectories {
         tempDir = directory;
     }
 
-    public static String getSelectedSse() {
-        return selectedSse;
+    public static String getSelectedWorkspaceName() {
+        return selectedWorkspaceName;
     }
 
-    public static void setSelectedSse(String sse) {
-        selectedSse = sse;
+    public static void setSelectedWorkspaceName(String workspaceName) {
+        selectedWorkspaceName = workspaceName;
     }
 
     public static String[] getSseFiles() {
-        return new File(settingsDir).list(new FilenameFilter() {
+        return new File(workspacesDir).list(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
                 return name.endsWith(SUT_SETTINGS_EXT);
@@ -85,18 +85,18 @@ public final class TestarDirectories {
     }
 
     public static String getTestSettingsFile() {
-        return settingsDir + selectedSse + File.separator + SETTINGS_FILE;
+        return workspacesDir + selectedWorkspaceName + File.separator + SETTINGS_FILE;
     }
 
-    public static String getSelectedSettingsDir() {
-        if (selectedSse == null || selectedSse.isBlank()) {
-            return settingsDir;
+    public static String getSelectedWorkspaceDir() {
+        if (selectedWorkspaceName == null || selectedWorkspaceName.isBlank()) {
+            return workspacesDir;
         }
-        return settingsDir + selectedSse + File.separator;
+        return workspacesDir + selectedWorkspaceName + File.separator;
     }
 
     public static String getWorkspaceOraclesDir() {
-        return getSelectedSettingsDir() + "oracles" + File.separator;
+        return getSelectedWorkspaceDir() + "oracles" + File.separator;
     }
 
     public static String getWorkspaceOracleJavaDir() {

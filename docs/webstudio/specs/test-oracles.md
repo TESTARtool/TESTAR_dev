@@ -23,13 +23,13 @@ Its left-panel workflow is:
 
 `Active Oracles` is the default panel, read-only, and summarizes active or configured oracle mechanisms.
 
-Extended Oracle panels expose one workspace oracle inventory containing Java sources under `settings/<workspace>/oracles/java` and DSL source files under `settings/<workspace>/oracles/dsl`.
+Extended Oracle panels expose one workspace oracle inventory containing Java sources under `workspaces/<workspace>/oracles/java` and DSL source files under `workspaces/<workspace>/oracles/dsl`.
 
 The active Java oracle class names are stored in `ExtendedOracles`. Enablement checkboxes derive their state from that setting and use the normal `Save Settings` flow.
 
 `Enable Extended Oracles` enables or disables existing Java oracles. `Java Oracle Files` creates, edits, deletes, saves, and compiles workspace Java files. `DSL Oracle Files` creates, edits, deletes, validates, and generates Java from `.testar` files.
 
-Workspace Java sources compile into `settings/<workspace>/oracles/compiled`. Java oracle class names must be unique inside the selected workspace.
+Workspace Java sources compile into `workspaces/<workspace>/oracles/compiled`. Java oracle class names must be unique inside the selected workspace.
 
 Bundled workspace Java oracles are precompiled when the TESTAR distribution is built. Runtime workspaces use lazy freshness checks: modified sources compile together when their inventory is first required, and unchanged inventories are reused until Java sources, DSL files, or enablement settings change.
 

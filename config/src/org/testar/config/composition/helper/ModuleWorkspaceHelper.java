@@ -87,9 +87,9 @@ public final class ModuleWorkspaceHelper {
     }
 
     public static String defaultCustomCompositionResource(Settings settings) {
-        String selectedSse = TestarDirectories.getSelectedSse();
-        if (selectedSse == null || selectedSse.isBlank()) {
-            selectedSse = "sut";
+        String selectedWorkspaceName = TestarDirectories.getSelectedWorkspaceName();
+        if (selectedWorkspaceName == null || selectedWorkspaceName.isBlank()) {
+            selectedWorkspaceName = "sut";
         }
 
         String compositionProfile = CompositionProfiles.resolve(
@@ -97,8 +97,8 @@ public final class ModuleWorkspaceHelper {
                 settings.get(ConfigTags.SUTConnector, "")
         );
 
-        String folderName = compositionProfile + "_" + selectedSse;
-        return TestarDirectories.getSettingsDir()
+        String folderName = compositionProfile + "_" + selectedWorkspaceName;
+        return TestarDirectories.getWorkspacesDir()
                 + folderName
                 + File.separator
                 + "composition.properties";

@@ -207,14 +207,14 @@ public class SettingsDialog extends JFrame implements Observer {
       return;
     }
     saveCurrentSettings();
-    String settingsDir = TestarDirectories.getSettingsDir();
+    String settingsDir = TestarDirectories.getWorkspacesDir();
     new File(settingsDir + previousSSE).renameTo(new File(settingsDir + sse));
     try {
       settingsFile = settingsDir + sutSettings + File.separator + TestarDirectories.SETTINGS_FILE;
       settings = Settings.loadSettings(new String[0], settingsFile);
       populateInformation(settings);
       System.out.println("Switched to <" + settingsFile + ">");
-      TestarDirectories.setSelectedSse(sutSettings);
+      TestarDirectories.setSelectedWorkspaceName(sutSettings);
       
     } catch (IOException ioe) {
     	String msg = "Unable to switch to <" + sutSettings + "> settings!";
