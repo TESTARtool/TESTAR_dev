@@ -6,7 +6,6 @@
 
 package org.testar.windows.action.derivation;
 
-import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.junit.Assert;

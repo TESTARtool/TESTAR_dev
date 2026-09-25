@@ -2,37 +2,38 @@ package org.testar.windows.state;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 /**
  * Test to demonstrate operarion from UIRootElement object code.
  */
 public class UIARootElementTest {
 
-   private UIARootElement sut = new UIARootElement();
+    private UIARootElement sut = new UIARootElement();
 
-   @Test
-   public void at() throws Exception {
+    @Test
+    public void at() throws Exception {
 
-      try {
-         UIAElement element = sut.at(0.0, 0.0);
-         fail("Expected an exception, got " + element);
-      } catch (UnsupportedOperationException uoe) {
-         assertNotNull("A exception is expected",uoe);
-      }
+        try {
+            UIAElement element = sut.at(0.0, 0.0);
+            fail("Expected an exception, got " + element);
+        } catch (UnsupportedOperationException uoe) {
+            assertNotNull("A exception is expected", uoe);
+        }
 
-   }
+    }
 
-   @Test
-   public void visibleAt() throws Exception {
-   }
+    @Test
+    public void visibleAt() throws Exception {
+    }
 
-   @Test
-   public void visibleAt1() throws Exception {
-   }
+    @Test
+    public void visibleAt1() throws Exception {
+    }
 
-   @Test
-   public void obscuredByChildren() throws Exception {
-   }
+    @Test
+    public void obscuredByChildren() throws Exception {
+    }
 
 }

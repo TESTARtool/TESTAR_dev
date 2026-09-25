@@ -12,17 +12,21 @@ import org.testar.windows.state.UIAElement;
 public final class UIAHitTester implements HitTester {
     private static final long serialVersionUID = 1134479951851719957L;
     private final UIAElement el;
-    public UIAHitTester(UIAElement el){    this.el = el; }
-    public String toString(){ return "UIAHitTester"; }
-    public boolean apply(double x, double y) { return el.root.visibleAt(el, x, y); }
-    
-    // begin by urueda
-    
+    public UIAHitTester(UIAElement el) {
+        this.el = el;
+    }
+
+    public String toString() {
+        return "UIAHitTester";
+    }
+
+    public boolean apply(double x, double y) {
+        return el.root.visibleAt(el, x, y);
+    }
+
     @Override
     public boolean apply(double x, double y, boolean obscuredByChildFeature) {
         return el.root.visibleAt(el, x, y, obscuredByChildFeature);
     }
-    
-    // end by urueda
-    
+
 }

@@ -14,10 +14,8 @@
 #include <comutil.h>
 #include <Psapi.h>
 
- /* by ferpasri & urueda */
 #include <AccessBridgeCalls.h>
 
-// by urueda
 #ifndef uint
 #define uint unsigned int
 #endif
@@ -2036,7 +2034,6 @@ JNI_SIG(jlongArray, WINAPI_NS(IUIAutomationElement_1GetRuntimeId)) (JNIEnv * env
 }
 
 
-// begin by urueda
 /* IUIAutomationElement_GetCurrentPropertyValue */
 JNI_SIG(jobject, WINAPI_NS(IUIAutomationElement_1GetCurrentPropertyValue)) (JNIEnv * env, jclass,
 		jlong pElement, jlong propertyId, jboolean fromCache){
@@ -2071,7 +2068,6 @@ JNI_SIG(jobject, WINAPI_NS(IUIAutomationElement_1GetCurrentPropertyValue)) (JNIE
 	
 	return ret;
 }
-// end by urueda
 
 /* IUIAutomationElement_GetPropertyValueEx */
 JNI_SIG(jobject, WINAPI_NS(IUIAutomationElement_1GetPropertyValueEx)) (JNIEnv * env, jclass, 
@@ -2381,7 +2377,7 @@ JNI_SIG(void, WINAPI_NS(Gdiplus_1Bitmap_1Destroy))(JNIEnv *env, jclass, jlong pB
 
 /**
   * GetProcessMemoryInfo
-  * by urueda */
+  */
 JNI_SIG(jlong, WINAPI_NS(GetProcessMemoryInfo)) (JNIEnv *env, jclass cl, jlong processID){
 
     HANDLE hProcess;
@@ -2406,7 +2402,7 @@ JNI_SIG(jlong, WINAPI_NS(GetProcessMemoryInfo)) (JNIEnv *env, jclass cl, jlong p
 
 /**
   * GetProcessTimes
-  * by urueda */
+  */
 JNI_SIG(jlongArray, WINAPI_NS(GetProcessTimes)) (JNIEnv *env, jclass cl, jlong processID) {
 
     static HANDLE self;
@@ -2433,7 +2429,7 @@ JNI_SIG(jlongArray, WINAPI_NS(GetProcessTimes)) (JNIEnv *env, jclass cl, jlong p
 
 /**
   * InitializeAccessBridge
-  * by ferpasri & urueda */
+  */
 JNI_SIG(jboolean, WINAPI_NS(InitializeAccessBridge)) (JNIEnv * env, jclass){
 
 	MSG msg;
@@ -2455,7 +2451,7 @@ JNI_SIG(jboolean, WINAPI_NS(InitializeAccessBridge)) (JNIEnv * env, jclass){
 
 /**
   * GetAccessibleContext
-  * by urueda (based on ferpasri) */
+  */
 JNI_SIG(jlongArray, WINAPI_NS(GetAccessibleContext)) (JNIEnv * env, jclass, jlong hwnd){
 	
 	HWND window = (HWND)hwnd;
@@ -2486,7 +2482,7 @@ JNI_SIG(jlongArray, WINAPI_NS(GetAccessibleContext)) (JNIEnv * env, jclass, jlon
 
 /**
   * GetHWNDFromAccessibleContext
-  * by urueda */
+  */
 JNI_SIG(jlong, WINAPI_NS(GetHWNDFromAccessibleContext)) (JNIEnv * env, jclass, jlong vmid, jlong ac){
 
     HWND window = getHWNDFromAccessibleContext((long) vmid, (long) ac);
@@ -2497,7 +2493,7 @@ JNI_SIG(jlong, WINAPI_NS(GetHWNDFromAccessibleContext)) (JNIEnv * env, jclass, j
  
  /**
   * GetVisibleChildrenCount
-  * by urueda */
+  */
 /*JNI_SIG(jint, WINAPI_NS(GetVisibleChildrenCount)) (JNIEnv * env, jclass, jlong vmid, jlong ac){
 	
 	return (jint) getVisibleChildrenCount((long)vmid, (AccessibleContext)ac);
@@ -2506,7 +2502,7 @@ JNI_SIG(jlong, WINAPI_NS(GetHWNDFromAccessibleContext)) (JNIEnv * env, jclass, j
 
 /**
   * GetVisibleChildren
-  * by urueda */
+  */
 /*JNI_SIG(jlongArray, WINAPI_NS(GetVisibleChildren)) (JNIEnv * env, jclass, jlong vmid, jlong ac){
 
 	VisibleChildrenInfo visibleChildrenInfo;
@@ -2526,7 +2522,7 @@ JNI_SIG(jlong, WINAPI_NS(GetHWNDFromAccessibleContext)) (JNIEnv * env, jclass, j
 
 /**
   * GetAccessibleChildFromContext
-  * by urueda */
+  */
 JNI_SIG(jlong, WINAPI_NS(GetAccessibleChildFromContext)) (JNIEnv * env, jclass, jlong vmid, jlong ac, jint i){
 
 	AccessibleContext child = GetAccessibleChildFromContext(vmid, ac, (int)i);
@@ -2534,9 +2530,7 @@ JNI_SIG(jlong, WINAPI_NS(GetAccessibleChildFromContext)) (JNIEnv * env, jclass, 
 	return (jlong) child;
 
 }
-
-/**
-  * by urueda */			   
+		   
 char* wchart2String(JNIEnv * env, wchar_t *value){
 
 	char bf[sizeof(value)/sizeof(wchar_t)];
@@ -2546,9 +2540,7 @@ char* wchart2String(JNIEnv * env, wchar_t *value){
 	return bf;
 	
 }
-
-/**
-  * by urueda */			   
+			   
 char* jint2String(JNIEnv * env, jint value){
 
 	char bf[64];
@@ -2561,7 +2553,7 @@ char* jint2String(JNIEnv * env, jint value){
 
 /**
   * GetAccessibleContextProperties
-  * by urueda */
+  */
 JNI_SIG(jobjectArray, WINAPI_NS(GetAccessibleContextProperties)) (JNIEnv * env, jclass, jlong vmid, jlong ac){
 	
 	jobjectArray ret = 0;
@@ -2592,7 +2584,7 @@ JNI_SIG(jobjectArray, WINAPI_NS(GetAccessibleContextProperties)) (JNIEnv * env, 
 
 /**
   * GetProcessNameFromHWND
-  * by urueda */
+  */
 JNI_SIG(jstring, WINAPI_NS(GetProcessNameFromHWND)) (JNIEnv * env, jclass, jlong hwnd){
 
 	HWND window = (HWND) hwnd;

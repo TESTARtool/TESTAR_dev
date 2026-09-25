@@ -23,33 +23,36 @@ public class UIAElement extends TaggableBase implements Serializable {
     public UIARootElement root;
     UIAWidget backRef;
     boolean blocked, enabled, ignore, isModal,
-        isContentElement, isControlElement,
-        hasKeyboardFocus, isKeyboardFocusable,
-        isTopmostWnd, isTopLevelContainer,
-        scrollPattern, hScroll, vScroll; // by urueda
+            isContentElement, isControlElement,
+            hasKeyboardFocus, isKeyboardFocusable,
+            isTopmostWnd, isTopLevelContainer,
+            scrollPattern, hScroll, vScroll;
     long ctrlId, culture, orientation, windowHandle, wndInteractionState, wndVisualState;
     Rect rect;
     String name, helpText, automationId, className, providerDesc, frameworkId,
-        acceleratorKey, accessKey;
+            acceleratorKey, accessKey;
     String valuePattern;
 
     double zindex,
-        hScrollViewSize, vScrollViewSize, hScrollPercent, vScrollPercent; // by urueda
+            hScrollViewSize, vScrollViewSize, hScrollPercent, vScrollPercent;
 
-    public UIAElement(){ this(null); }
+    public UIAElement() {
+        this(null);
+    }
 
-    public UIAElement(UIAElement parent){
+    public UIAElement(UIAElement parent) {
         this.parent = parent;
-        if(parent != null)
+        if (parent != null) {
             root = parent.root;
+        }
         enabled = true;
     }
 
-    private void writeObject(ObjectOutputStream oos) throws IOException{
+    private void writeObject(ObjectOutputStream oos) throws IOException {
         oos.defaultWriteObject();
     }
 
-    private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException{
+    private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
         ois.defaultReadObject();
     }
 }

@@ -21,7 +21,7 @@ public final class UIATags extends TagsBase {
 
     protected static final Set<Tag<?>> uiaTags = new HashSet<>();
 
-    private UIATags() {}
+    private UIATags() { }
 
     /////////////// GENERAL PROPERTIES ///////////
 
@@ -39,7 +39,7 @@ public final class UIATags extends TagsBase {
      * Default value: empty string
      */
     public static final Tag<String> UIALocalizedControlType = from("UIALocalizedControlType", String.class);
-    
+
     /**
      * UIA Type name of a widget. From the UIA documentation:
      *
@@ -89,7 +89,7 @@ public final class UIATags extends TagsBase {
      * Default value: empty string
      */
     public static final Tag<String> UIAClassName = from("UIAClassName", String.class);
-    
+
     /**
      * Help text of a widget. From the UIA documentation:
      *
@@ -100,7 +100,7 @@ public final class UIATags extends TagsBase {
      * Default value: empty string
      */
     public static final Tag<String> UIAHelpText = from("UIAHelpText", String.class);
-    
+
     /**
      * Title or name of a widget.
      * From the UIA documentation:
@@ -116,7 +116,7 @@ public final class UIATags extends TagsBase {
      * Default value: empty string
      */
     public static final Tag<String> UIAName = from("UIAName", String.class);
-    
+
     /**
      * UIA Control Type Identifier of a widget/UIAelement. From the UIA documentation:
      *
@@ -127,7 +127,7 @@ public final class UIATags extends TagsBase {
      * Use the default value only if the automation element represents a completely new type of control.
      */
     public static final Tag<Long> UIAControlType = from("UIAControlType", Long.class);
-    
+
     /**
      * UIA Culture Identifier of a widget/UIAelement. From the UIA documentation:
      *
@@ -138,7 +138,7 @@ public final class UIATags extends TagsBase {
      * Default value: 0
      */
     public static final Tag<Long> UIACulture = from("UIACulture", Long.class);
-    
+
     /**
      * If the widget is a Win32 widget, this will be its native handle
      *
@@ -160,9 +160,9 @@ public final class UIATags extends TagsBase {
      * Default value: 0 (OrientationType_None)
      */
     public static final Tag<Long> UIAOrientation = from("UIAOrientation", Long.class);
-    
 
-    
+
+
     /**
      * Id of the process that this widget belongs to
      * From the UIA documentation:
@@ -173,7 +173,7 @@ public final class UIATags extends TagsBase {
      * Default value: 0
      */
     public static final Tag<Long> UIAProcessId = from("UIAProcessId", Long.class);
-    
+
     /**
      * Id of the framework that this widget/UIAelement belongs to (e.g. Win32, Swing, Flash, ...)
      * From the UIA documentation:
@@ -206,7 +206,7 @@ public final class UIATags extends TagsBase {
      * Default value: VT_EMPTY
      */
     public static final Tag<long[]> UIARuntimeId = from("UIARuntimeId", long[].class);
-    
+
     /**
      * Whether a widget is a content uiaElement. From the UIA documentation:
      *
@@ -219,7 +219,7 @@ public final class UIATags extends TagsBase {
      * Default value: TRUE
      */
     public static final Tag<Boolean> UIAIsContentElement = from("UIAIsContentElement", Boolean.class);
-    
+
     /**
      * Whether a widget is a control uiaElement. From the UIA documentation:
      *
@@ -228,7 +228,7 @@ public final class UIATags extends TagsBase {
      * Default value: TRUE
      */
     public static final Tag<Boolean> UIAIsControlElement = from("UIAIsControlElement", Boolean.class);
-    
+
     /**
      * If the widget is a window, this tells whether it is the top-most window
      */
@@ -240,7 +240,7 @@ public final class UIATags extends TagsBase {
     public static final Tag<Boolean> UIAIsWindowModal = from("UIAIsWindowModal", Boolean.class);
     public static final Tag<Long> UIAWindowInteractionState = from("UIAWindowInteractionState", Long.class);
     public static final Tag<Long> UIAWindowVisualState = from("UIAWindowVisualState", Long.class);
-    
+
     /**
      * Bounding rectangle of a widget/UIAelement. From the UIA documentation:
      * Identifies the BoundingRectangle property, which specifies the coordinates of the rectangle that completely encloses the automation element. The rectangle is expressed in physical screen coordinates. It can contain points that are not clickable if the shape or clickable region of the UI item is irregular, or if the item is obscured by other UI elements.
@@ -250,7 +250,7 @@ public final class UIATags extends TagsBase {
      * This property is NULL if the item is not currently displaying a UI.
      */
     public static final Tag<Rect> UIABoundingRectangle = from("UIABoundingRectangle", Rect.class);
-    
+
     /**
      * Whether this widget is currently enabled or disabled (e.g. "greyed out")
      * From the UIA documentation:
@@ -261,7 +261,7 @@ public final class UIATags extends TagsBase {
      * Default value: FALSE
      */
     public static final Tag<Boolean> UIAIsEnabled = from("UIAIsEnabled", Boolean.class);
-    
+
     /**
      * Whether this widget has keyboard focus (i.e. will receive keyboard input)
      * From the UIA documentation:
@@ -271,7 +271,7 @@ public final class UIATags extends TagsBase {
      * Default value: FALSE
      */
     public static final Tag<Boolean> UIAHasKeyboardFocus = from("UIAHasKeyboardFocus", Boolean.class);
-    
+
     /**
      * Whether this widget is currently visible on the screen. From the UIA documentation:
      *
@@ -283,7 +283,7 @@ public final class UIATags extends TagsBase {
      * Default value: FALSE
      */
     public static final Tag<Boolean> UIAIsOffscreen = from("UIAIsOffscreen", Boolean.class);
-    
+
     /**
      * Whether this widget can be focused, such that it will receive keyboard input
      * From the UIA documentation:
@@ -303,7 +303,7 @@ public final class UIATags extends TagsBase {
      * Default value: empty string
      */
     public static final Tag<String> UIAAcceleratorKey = from("UIAAcceleratorKey", String.class);
-    
+
     /**
      * Access key of a widget. From the UIA documentation:
      *
@@ -588,7 +588,7 @@ public final class UIATags extends TagsBase {
     Default value: VT_EMPTY
 
      */
-    
+
     ////////// PATTERN AVAILABILITY PROPERTIES ////////////
     public static final Tag<Boolean> UIAIsAnnotationPatternAvailable = from("UIAIsAnnotationPatternAvailable", Boolean.class);
     public static final Tag<Boolean> UIAIsDockPatternAvailable = from("UIAIsDockPatternAvailable", Boolean.class);

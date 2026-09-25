@@ -15,13 +15,155 @@ import org.testar.windows.Windows;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.testar.core.StateManagementTags.*;
+import static org.testar.core.StateManagementTags.WidgetAccelatorKey;
+import static org.testar.core.StateManagementTags.WidgetAccessKey;
+import static org.testar.core.StateManagementTags.WidgetAnnotationAnnotationTypeId;
+import static org.testar.core.StateManagementTags.WidgetAnnotationAnnotationTypeName;
+import static org.testar.core.StateManagementTags.WidgetAnnotationAuthor;
+import static org.testar.core.StateManagementTags.WidgetAnnotationDateTime;
+import static org.testar.core.StateManagementTags.WidgetAnnotationPattern;
+import static org.testar.core.StateManagementTags.WidgetAnnotationTarget;
+import static org.testar.core.StateManagementTags.WidgetAriaProperties;
+import static org.testar.core.StateManagementTags.WidgetAriaRole;
+import static org.testar.core.StateManagementTags.WidgetAutomationId;
+import static org.testar.core.StateManagementTags.WidgetBoundary;
+import static org.testar.core.StateManagementTags.WidgetClassName;
+import static org.testar.core.StateManagementTags.WidgetControlType;
+import static org.testar.core.StateManagementTags.WidgetDockDockPosition;
+import static org.testar.core.StateManagementTags.WidgetDockPattern;
+import static org.testar.core.StateManagementTags.WidgetDragDropEffect;
+import static org.testar.core.StateManagementTags.WidgetDragDropEffects;
+import static org.testar.core.StateManagementTags.WidgetDragGrabbedItems;
+import static org.testar.core.StateManagementTags.WidgetDragIsGrabbed;
+import static org.testar.core.StateManagementTags.WidgetDragPattern;
+import static org.testar.core.StateManagementTags.WidgetDropTargetDropTargetEffect;
+import static org.testar.core.StateManagementTags.WidgetDropTargetDropTargetEffects;
+import static org.testar.core.StateManagementTags.WidgetDropTargetPattern;
+import static org.testar.core.StateManagementTags.WidgetExpandCollapseExpandCollapseState;
+import static org.testar.core.StateManagementTags.WidgetExpandCollapsePattern;
+import static org.testar.core.StateManagementTags.WidgetFrameworkId;
+import static org.testar.core.StateManagementTags.WidgetGridColumnCount;
+import static org.testar.core.StateManagementTags.WidgetGridItemColumn;
+import static org.testar.core.StateManagementTags.WidgetGridItemColumnSpan;
+import static org.testar.core.StateManagementTags.WidgetGridItemContainingGrid;
+import static org.testar.core.StateManagementTags.WidgetGridItemPattern;
+import static org.testar.core.StateManagementTags.WidgetGridItemRow;
+import static org.testar.core.StateManagementTags.WidgetGridItemRowSpan;
+import static org.testar.core.StateManagementTags.WidgetGridPattern;
+import static org.testar.core.StateManagementTags.WidgetGridRowCount;
+import static org.testar.core.StateManagementTags.WidgetGroupLevel;
+import static org.testar.core.StateManagementTags.WidgetHasKeyboardFocus;
+import static org.testar.core.StateManagementTags.WidgetHelpText;
+import static org.testar.core.StateManagementTags.WidgetHorizontallyScrollable;
+import static org.testar.core.StateManagementTags.WidgetInvokePattern;
+import static org.testar.core.StateManagementTags.WidgetIsContentElement;
+import static org.testar.core.StateManagementTags.WidgetIsControlElement;
+import static org.testar.core.StateManagementTags.WidgetIsDialog;
+import static org.testar.core.StateManagementTags.WidgetIsEnabled;
+import static org.testar.core.StateManagementTags.WidgetIsKeyboardFocusable;
+import static org.testar.core.StateManagementTags.WidgetIsOffscreen;
+import static org.testar.core.StateManagementTags.WidgetIsPassword;
+import static org.testar.core.StateManagementTags.WidgetIsPeripheral;
+import static org.testar.core.StateManagementTags.WidgetIsRequiredForForm;
+import static org.testar.core.StateManagementTags.WidgetItemContainerPattern;
+import static org.testar.core.StateManagementTags.WidgetItemStatus;
+import static org.testar.core.StateManagementTags.WidgetItemType;
+import static org.testar.core.StateManagementTags.WidgetLandmarkType;
+import static org.testar.core.StateManagementTags.WidgetLegacyIAccessibleChildId;
+import static org.testar.core.StateManagementTags.WidgetLegacyIAccessibleDefaultAction;
+import static org.testar.core.StateManagementTags.WidgetLegacyIAccessibleDescription;
+import static org.testar.core.StateManagementTags.WidgetLegacyIAccessibleHelp;
+import static org.testar.core.StateManagementTags.WidgetLegacyIAccessibleKeyboardShortcut;
+import static org.testar.core.StateManagementTags.WidgetLegacyIAccessibleName;
+import static org.testar.core.StateManagementTags.WidgetLegacyIAccessiblePattern;
+import static org.testar.core.StateManagementTags.WidgetLegacyIAccessibleRole;
+import static org.testar.core.StateManagementTags.WidgetLegacyIAccessibleSelection;
+import static org.testar.core.StateManagementTags.WidgetLegacyIAccessibleState;
+import static org.testar.core.StateManagementTags.WidgetLegacyIAccessibleValue;
+import static org.testar.core.StateManagementTags.WidgetLiveSetting;
+import static org.testar.core.StateManagementTags.WidgetMultipleViewCurrentView;
+import static org.testar.core.StateManagementTags.WidgetMultipleViewPattern;
+import static org.testar.core.StateManagementTags.WidgetMultipleViewSupportedViews;
+import static org.testar.core.StateManagementTags.WidgetObjectModelPattern;
+import static org.testar.core.StateManagementTags.WidgetOrientationId;
+import static org.testar.core.StateManagementTags.WidgetPath;
+import static org.testar.core.StateManagementTags.WidgetRangeValueIsReadOnly;
+import static org.testar.core.StateManagementTags.WidgetRangeValueLargeChange;
+import static org.testar.core.StateManagementTags.WidgetRangeValueMaximum;
+import static org.testar.core.StateManagementTags.WidgetRangeValueMinimum;
+import static org.testar.core.StateManagementTags.WidgetRangeValuePattern;
+import static org.testar.core.StateManagementTags.WidgetRangeValueSmallChange;
+import static org.testar.core.StateManagementTags.WidgetRangeValueValue;
+import static org.testar.core.StateManagementTags.WidgetRotation;
+import static org.testar.core.StateManagementTags.WidgetScrollHorizontalPercent;
+import static org.testar.core.StateManagementTags.WidgetScrollHorizontalViewSize;
+import static org.testar.core.StateManagementTags.WidgetScrollItemPattern;
+import static org.testar.core.StateManagementTags.WidgetScrollPattern;
+import static org.testar.core.StateManagementTags.WidgetScrollVerticalPercent;
+import static org.testar.core.StateManagementTags.WidgetScrollVerticalViewSize;
+import static org.testar.core.StateManagementTags.WidgetSelectionCanSelectMultiple;
+import static org.testar.core.StateManagementTags.WidgetSelectionIsSelectionRequired;
+import static org.testar.core.StateManagementTags.WidgetSelectionItemIsSelected;
+import static org.testar.core.StateManagementTags.WidgetSelectionItemPattern;
+import static org.testar.core.StateManagementTags.WidgetSelectionItemSelectionContainer;
+import static org.testar.core.StateManagementTags.WidgetSelectionPattern;
+import static org.testar.core.StateManagementTags.WidgetSelectionSelection;
+import static org.testar.core.StateManagementTags.WidgetSetPosition;
+import static org.testar.core.StateManagementTags.WidgetSetSize;
+import static org.testar.core.StateManagementTags.WidgetSpreadsheetItemAnnotationObjects;
+import static org.testar.core.StateManagementTags.WidgetSpreadsheetItemAnnotationTypes;
+import static org.testar.core.StateManagementTags.WidgetSpreadsheetItemFormula;
+import static org.testar.core.StateManagementTags.WidgetSpreadsheetItemPattern;
+import static org.testar.core.StateManagementTags.WidgetSpreadsheetPattern;
+import static org.testar.core.StateManagementTags.WidgetStylesExtendedProperties;
+import static org.testar.core.StateManagementTags.WidgetStylesFillColor;
+import static org.testar.core.StateManagementTags.WidgetStylesFillPatternColor;
+import static org.testar.core.StateManagementTags.WidgetStylesFillPatternStyle;
+import static org.testar.core.StateManagementTags.WidgetStylesPattern;
+import static org.testar.core.StateManagementTags.WidgetStylesShape;
+import static org.testar.core.StateManagementTags.WidgetStylesStyleId;
+import static org.testar.core.StateManagementTags.WidgetStylesStyleName;
+import static org.testar.core.StateManagementTags.WidgetSynchronizedInputPattern;
+import static org.testar.core.StateManagementTags.WidgetTableColumnHeaders;
+import static org.testar.core.StateManagementTags.WidgetTableItemColumnHeaderItems;
+import static org.testar.core.StateManagementTags.WidgetTableItemPattern;
+import static org.testar.core.StateManagementTags.WidgetTableItemRowHeaderItems;
+import static org.testar.core.StateManagementTags.WidgetTablePattern;
+import static org.testar.core.StateManagementTags.WidgetTableRowHeaders;
+import static org.testar.core.StateManagementTags.WidgetTableRowOrColumnMajor;
+import static org.testar.core.StateManagementTags.WidgetTextChildPattern;
+import static org.testar.core.StateManagementTags.WidgetTextPattern;
+import static org.testar.core.StateManagementTags.WidgetTextPattern2;
+import static org.testar.core.StateManagementTags.WidgetTitle;
+import static org.testar.core.StateManagementTags.WidgetTogglePattern;
+import static org.testar.core.StateManagementTags.WidgetToggleToggleState;
+import static org.testar.core.StateManagementTags.WidgetTransform2CanZoom;
+import static org.testar.core.StateManagementTags.WidgetTransform2ZoomLevel;
+import static org.testar.core.StateManagementTags.WidgetTransform2ZoomMaximum;
+import static org.testar.core.StateManagementTags.WidgetTransform2ZoomMinimum;
+import static org.testar.core.StateManagementTags.WidgetTransformCanMove;
+import static org.testar.core.StateManagementTags.WidgetTransformCanResize;
+import static org.testar.core.StateManagementTags.WidgetTransformCanRotate;
+import static org.testar.core.StateManagementTags.WidgetTransformPattern;
+import static org.testar.core.StateManagementTags.WidgetTransformPattern2;
+import static org.testar.core.StateManagementTags.WidgetValueIsReadOnly;
+import static org.testar.core.StateManagementTags.WidgetValuePattern;
+import static org.testar.core.StateManagementTags.WidgetValueValue;
+import static org.testar.core.StateManagementTags.WidgetVerticallyScrollable;
+import static org.testar.core.StateManagementTags.WidgetVirtualizedItemPattern;
+import static org.testar.core.StateManagementTags.WidgetWindowCanMaximize;
+import static org.testar.core.StateManagementTags.WidgetWindowCanMinimize;
+import static org.testar.core.StateManagementTags.WidgetWindowHandle;
+import static org.testar.core.StateManagementTags.WidgetWindowIsModal;
+import static org.testar.core.StateManagementTags.WidgetWindowIsTopmost;
+import static org.testar.core.StateManagementTags.WidgetWindowPattern;
+import static org.testar.core.StateManagementTags.WidgetWindowWindowInteractionState;
+import static org.testar.core.StateManagementTags.WidgetWindowWindowVisualState;
 
 public class UIAMapping {
 
     // a mapping from the state management tags to windows automation tags
-    private static Map<Tag<?>, Tag<?>> stateTagMappingWindows = new HashMap<Tag<?>, Tag<?>>()
-    {
+    private static Map<Tag<?>, Tag<?>> stateTagMappingWindows = new HashMap<Tag<?>, Tag<?>>() {
         {
             put(WidgetControlType, UIATags.UIAControlType);
             put(WidgetWindowHandle, UIATags.UIANativeWindowHandle);
@@ -183,7 +325,7 @@ public class UIAMapping {
      */
     @SuppressWarnings("unchecked")
     public static <T> Tag<T> getMappedStateTag(Tag<T> mappedTag) {
-    	return (Tag<T>) stateTagMappingWindows.getOrDefault(mappedTag, null);
+        return (Tag<T>) stateTagMappingWindows.getOrDefault(mappedTag, null);
     }
 
     // a mapping from tags to their UIA id and vice versa

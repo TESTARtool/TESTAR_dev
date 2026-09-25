@@ -33,20 +33,27 @@ public final class UIAStateBuilder implements StateBuilder {
     boolean javaAccessBridge;
     String SUTProcesses; // regex
 
-    public UIAStateBuilder(){ this(10/*seconds*/,false,"");    }
+    public UIAStateBuilder() {
+        this(10/*seconds*/,false,"");
+    }
 
-    public UIAStateBuilder(double timeOut, boolean javaAccessBridge, String SUTProcesses){ // seconds
+    public UIAStateBuilder(double timeOut, boolean javaAccessBridge, String SUTProcesses) { // seconds
         Assert.isTrue(timeOut > 0);
         this.timeOut = timeOut;
         initialize();
         this.javaAccessBridge = javaAccessBridge;
         this.SUTProcesses = SUTProcesses;
-        if (javaAccessBridge)
-            new Thread(){ public void run(){ Windows.InitializeAccessBridge(); } }.start();
+        if (javaAccessBridge) {
+            new Thread() {
+                public void run() {
+                    Windows.InitializeAccessBridge();
+                }
+            }.start();
+        }
         executor = Executors.newFixedThreadPool(1);
     }
 
-    private void initialize(){
+    private void initialize() {
 
         Windows.CoInitializeEx(0, Windows.COINIT_MULTITHREADED);
 
@@ -144,8 +151,8 @@ public final class UIAStateBuilder implements StateBuilder {
 
     }
 
-    public void release(){
-        if(automationPointer != 0){
+    public void release() {
+        if (automationPointer != 0) {
             Windows.IUnknown_Release(treeFilterConditionPointer);
             Windows.IUnknown_Release(cacheRequestPointer);
             Windows.IUnknown_Release(automationPointer);
@@ -155,7 +162,9 @@ public final class UIAStateBuilder implements StateBuilder {
         }
     }
 
-    public void finalize(){ release(); }
+    public void finalize() {
+        release();
+    }
 
     public UIAState apply(SUT system) throws StateBuildException {
         try {

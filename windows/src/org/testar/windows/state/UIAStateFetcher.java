@@ -7,7 +7,8 @@
 package org.testar.windows.state;
 
 import org.testar.core.util.Util;
-import org.testar.core.alayer.*;
+import org.testar.core.alayer.Rect;
+import org.testar.core.alayer.Roles;
 import org.testar.core.state.SUT;
 import org.testar.core.state.Widget;
 import org.testar.core.tag.Tag;
@@ -17,7 +18,12 @@ import org.testar.windows.jab.AccessBridgeControlTypes;
 import org.testar.windows.tag.UIAMapping;
 import org.testar.windows.tag.UIATags;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Deque;
+import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -27,45 +33,47 @@ import java.util.stream.Stream;
  * Create new UIAElements iteratively and assign the pair (property, value) to them.
  * And finally create the UIAWidget-tree based on these UIAElements.
  */
-public class UIAStateFetcher implements Callable<UIAState>{
-    
+public class UIAStateFetcher implements Callable<UIAState> {
+
     private final SUT system;
 
     transient long automationPointer, cacheRequestPointer;
 
     private boolean releaseCachedAutomatinElement;
-    
+
     private boolean javaAccessBridge;
-    
+
     private static Pattern sutProcessesMatcher;
-    
-    public UIAStateFetcher(SUT system, long automationPointer, long cacheRequestPointer, boolean javaAccessBridge, String SUTProcesses){
+
+    public UIAStateFetcher(SUT system, long automationPointer, long cacheRequestPointer, boolean javaAccessBridge, String SUTProcesses) {
         this.system = system;
         this.automationPointer = automationPointer;
         this.cacheRequestPointer = cacheRequestPointer;
         this.javaAccessBridge = javaAccessBridge;
-        if (SUTProcesses == null || SUTProcesses.isEmpty())
+        if (SUTProcesses == null || SUTProcesses.isEmpty()) {
             UIAStateFetcher.sutProcessesMatcher = null;
-        else
+        } else {
             UIAStateFetcher.sutProcessesMatcher = Pattern.compile(SUTProcesses, Pattern.UNICODE_CHARACTER_CLASS);
+        }
     }
-    
-    public static UIARootElement buildRoot(SUT system){
+
+    public static UIARootElement buildRoot(SUT system) {
         UIARootElement uiaRoot = new UIARootElement();
         uiaRoot.isRunning = system.isRunning();
 
         long[] coordinates = Windows.GetMonitorInfo(Windows.GetPrimaryMonitorHandle());
-        if(coordinates[3] - coordinates[1] >= 0 && coordinates[4] - coordinates[2] >= 0)
+        if (coordinates[3] - coordinates[1] >= 0 && coordinates[4] - coordinates[2] >= 0) {
             uiaRoot.rect = Rect.fromCoordinates(coordinates[1], coordinates[2], coordinates[3], coordinates[4]);
+        }
         uiaRoot.timeStamp = System.currentTimeMillis();
         uiaRoot.hasStandardKeyboard = system.get(Tags.StandardKeyboard, null) != null;
-        uiaRoot.hasStandardMouse = system.get(Tags.StandardMouse, null) != null;        
-        
+        uiaRoot.hasStandardMouse = system.get(Tags.StandardMouse, null) != null;
+
         return uiaRoot;
     }
 
     public UIAState call() throws Exception {
-        Windows.CoInitializeEx(0, Windows.COINIT_MULTITHREADED);        
+        Windows.CoInitializeEx(0, Windows.COINIT_MULTITHREADED);
 
         // first build the UIAElement skeleton.
         // this means fetching information from the Windows Automation API about all the elements in the Automation Tree
@@ -80,13 +88,15 @@ public class UIAStateFetcher implements Callable<UIAState>{
         root.set(Tags.Desc, system.get(Tags.Desc, ""));
         root.set(Tags.Representation, generateXmlRepresentation(root, 0));
 
-        for (Widget w : root)
+        for (Widget w : root) {
             w.set(Tags.Path,Util.indexString(w));
-        if (system != null && (root == null || root.childCount() == 0) && system.getNativeAutomationCache() != null)
+        }
+        if (system != null && (root == null || root.childCount() == 0) && system.getNativeAutomationCache() != null) {
             system.getNativeAutomationCache().releaseCachedAutomationElements(); // prevent SUT UI not ready due to caching
+        }
 
         Windows.CoUninitialize();
-        
+
         return root;
     }
 
@@ -122,41 +132,44 @@ public class UIAStateFetcher implements Callable<UIAState>{
 
         return system.get(Tags.Desc, "");
     }
-    
+
     /**
      * Checks whether a window conforms to the SUT.
      * @param hwnd A window.
      * @return true if the window conforms to the SUT, false otherwise.
      */
-    private boolean isSUTProcess(long hwnd){
-        if (UIAStateFetcher.sutProcessesMatcher == null)
+    private boolean isSUTProcess(long hwnd) {
+        if (UIAStateFetcher.sutProcessesMatcher == null) {
             return false;
-        
+        }
+
         String processName = Windows.GetProcessNameFromHWND(hwnd);
-        
-        if (processName != null && !(processName.isEmpty()) && UIAStateFetcher.sutProcessesMatcher.matcher(processName).matches())
+
+        if (processName != null && !(processName.isEmpty()) && UIAStateFetcher.sutProcessesMatcher.matcher(processName).matches()) {
             return true;
-        else
+        } else {
             return false;
+        }
     }
 
     /**
-     * 
+     *
      * @param system
      * @return
      */
-    private UIARootElement buildSkeleton(SUT system){
+    private UIARootElement buildSkeleton(SUT system) {
         UIARootElement uiaRoot = buildRoot(system);
 
-        if(!uiaRoot.isRunning)
+        if (!uiaRoot.isRunning) {
             return uiaRoot;
+        }
 
         uiaRoot.pid = system.get(Tags.PID);
         //uiaRoot.isForeground = WinProcess.isForeground(uiaRoot.pid);
-        
+
         // find all visible top level windows on the desktop
         Iterable<Long> visibleTopLevelWindowHandles = this.getVisibleTopLevelWindowHandles();
-        
+
         UIAElement modalElement = null;
 
         // descend the root windows which belong to our process, using UIAutomation
@@ -164,38 +177,40 @@ public class UIAStateFetcher implements Callable<UIAState>{
         boolean isOwnedWindow;
         long windowProcessId;
         List<Long> ownedWindows = new ArrayList<Long>();
-        for(long windowHandle : visibleTopLevelWindowHandles){
+        for (long windowHandle : visibleTopLevelWindowHandles) {
             isOwnedWindow = Windows.GetWindow(windowHandle, Windows.GW_OWNER) != 0;
             windowProcessId = Windows.GetWindowProcessId(windowHandle);
 
             // check if the window process id matches our SUT process id or if it is a sub-process of the SUT process
-            if (windowProcessId == uiaRoot.pid || isSUTProcess(windowHandle)){
+            if (windowProcessId == uiaRoot.pid || isSUTProcess(windowHandle)) {
                 uiaRoot.isForeground = uiaRoot.isForeground || WinProcess.isForeground(windowProcessId); // ( SUT as a set of windows/processes )
-                if(!isOwnedWindow){
+                if (!isOwnedWindow) {
                     //uiaDescend(uiaCacheWindowTree(windowHandle), uiaRoot);
                     modalElement = this.javaAccessBridge ? abDescend(windowHandle, uiaCacheWindowTree(windowHandle), uiaRoot, 0, 0) :
                                                               uiaDescend(windowHandle, uiaCacheWindowTree(windowHandle), uiaRoot);
-                } else
+                } else {
                     ownedWindows.add(windowHandle);
+                }
             }
         }
-        
+
         // if UIAutomation missed an owned window, we'll collect it here
-        for(long windowHandle : ownedWindows){
-            if(!uiaRoot.windowHandleMap.containsKey(windowHandle)){
+        for (long windowHandle : ownedWindows) {
+            if (!uiaRoot.windowHandleMap.containsKey(windowHandle)) {
                 //uiaDescend(uiaCacheWindowTree(windowHandle), uiaRoot);
                 UIAElement modalE;
 
                 if ((modalE = this.javaAccessBridge ? abDescend(windowHandle, uiaCacheWindowTree(windowHandle), uiaRoot, 0, 0) :
-                                                         uiaDescend(windowHandle, uiaCacheWindowTree(windowHandle), uiaRoot)) != null)
+                                                         uiaDescend(windowHandle, uiaCacheWindowTree(windowHandle), uiaRoot)) != null) {
                     modalElement = modalE;
+                }
 
             }
         }
 
         // set z-indices for the windows
         int z = 0;
-        for(long windowHandle : visibleTopLevelWindowHandles){
+        for (long windowHandle : visibleTopLevelWindowHandles) {
             //long exStyle = Windows.GetWindowLong(windowHandle, Windows.GWL_EXSTYLE);
             //if((exStyle & Windows.WS_EX_NOACTIVATE) != 0)
             //    System.out.println(windowHandle  + "   " + Windows.GetWindowText(windowHandle) + "   " + Windows.GetClassName(windowHandle));
@@ -213,88 +228,95 @@ public class UIAStateFetcher implements Callable<UIAState>{
                 if (windowTitle != null && Objects.equals(windowTitle, "Testar - Spy window")) {
                     continue;
                 }*/
-            
-            if(window == null){
+
+            if (window == null) {
                 window = new UIAElement(uiaRoot);
                 uiaRoot.children.add(window);
                 window.ignore = true;
                 window.windowHandle = windowHandle;
                 long r[] = Windows.GetWindowRect(windowHandle);
-                if(r[2] - r[0] >= 0 && r[3] - r[1] >= 0)
+                if (r[2] - r[0] >= 0 && r[3] - r[1] >= 0) {
                     window.rect = Rect.fromCoordinates(r[0], r[1], r[2], r[3]);
+                }
                 window.ctrlId = Windows.UIA_WindowControlTypeId;
                 uiaRoot.windowHandleMap.put(windowHandle, window);
             }
-                        
+
             window.zindex = z++;
-                        
-            if(window.ctrlId == Windows.UIA_MenuControlTypeId || window.ctrlId == Windows.UIA_WindowControlTypeId || window.parent == uiaRoot)
+
+            if (window.ctrlId == Windows.UIA_MenuControlTypeId || window.ctrlId == Windows.UIA_WindowControlTypeId || window.parent == uiaRoot) {
                 window.isTopLevelContainer = true;
-                
+            }
+
         }
-        
+
         calculateZIndices(uiaRoot);
         buildTLCMap(uiaRoot);
         markBlockedElements(uiaRoot);
 
-        markBlockedElements(uiaRoot,modalElement);    
+        markBlockedElements(uiaRoot,modalElement);
 
         return uiaRoot;
     }
 
     /* lists all visible top level windows in ascending z-order (foreground window last) */
-    private Iterable<Long> getVisibleTopLevelWindowHandles(){
+    private Iterable<Long> getVisibleTopLevelWindowHandles() {
         Deque<Long> ret = new ArrayDeque<Long>();
         long windowHandle = Windows.GetWindow(Windows.GetDesktopWindow(), Windows.GW_CHILD);
 
-        while(windowHandle != 0){
-            if(Windows.IsWindowVisible(windowHandle)){
+        while (windowHandle != 0) {
+            if (Windows.IsWindowVisible(windowHandle)) {
                 long exStyle = Windows.GetWindowLong(windowHandle, Windows.GWL_EXSTYLE);
-                if((exStyle & Windows.WS_EX_TRANSPARENT) == 0 && (exStyle & Windows.WS_EX_NOACTIVATE) == 0){
+                if ((exStyle & Windows.WS_EX_TRANSPARENT) == 0 && (exStyle & Windows.WS_EX_NOACTIVATE) == 0) {
                     ret.addFirst(windowHandle);
                     if (System.getProperty("DEBUG_WINDOWS_PROCESS_NAMES") != null) {
                         System.out.println("PID <" + Windows.GetWindowProcessId(windowHandle) + ">  Process name <" + Windows.GetProcessNameFromHWND(windowHandle) + ">" + " Window handle <" + windowHandle + ">");
                     }
-                }                
+                }
             }
             windowHandle = Windows.GetNextWindow(windowHandle, Windows.GW_HWNDNEXT);
         }
-        
+
         System.clearProperty("DEBUG_WINDOWS_PROCESS_NAMES");
-        
+
         return ret;
     }
-    
+
     /* fire up the cache request */
-    private long uiaCacheWindowTree(long windowHandle){
+    private long uiaCacheWindowTree(long windowHandle) {
         long aep = Long.MIN_VALUE;
-        if (system.getNativeAutomationCache() != null)
+        if (system.getNativeAutomationCache() != null) {
             aep = system.getNativeAutomationCache().getCachedAutomationElement(windowHandle, automationPointer, cacheRequestPointer);
+        }
         releaseCachedAutomatinElement = (aep == Long.MIN_VALUE);
-        if (releaseCachedAutomatinElement) // cache miss
+        if (releaseCachedAutomatinElement) { // cache miss
             return Windows.IUIAutomation_ElementFromHandleBuildCache(automationPointer, windowHandle, cacheRequestPointer);
-        else
+        } else {
             return aep;
+        }
     }
 
-    private void buildTLCMap(UIARootElement root){
+    private void buildTLCMap(UIARootElement root) {
         UIAElementMap.Builder builder = UIAElementMap.newBuilder();
         buildTLCMap(builder, root);
         root.elementMap = builder.build();
     }
 
-    private void buildTLCMap(UIAElementMap.Builder builder, UIAElement el){
-        if(el.isTopLevelContainer)
-            builder.addElement(el);            
+    private void buildTLCMap(UIAElementMap.Builder builder, UIAElement el) {
+        if (el.isTopLevelContainer) {
+            builder.addElement(el);
+        }
 
-        for(int i = 0; i < el.children.size(); i++)
+        for (int i = 0; i < el.children.size(); i++) {
             buildTLCMap(builder, el.children.get(i));
+        }
     }
 
-    private UIAElement uiaDescend(long hwnd, long uiaCachePointer, UIAElement parent){ // (returns a modal widget if detected)
-        if(uiaCachePointer == 0)
+    private UIAElement uiaDescend(long hwnd, long uiaCachePointer, UIAElement parent) { // (returns a modal widget if detected)
+        if (uiaCachePointer == 0) {
             //return;
             return null;
+        }
 
         UIAElement modalElement = null;
 
@@ -308,8 +330,9 @@ public class UIAStateFetcher implements Callable<UIAState>{
 
         // bounding rectangle
         long r[] = Windows.IUIAutomationElement_get_BoundingRectangle(uiaCachePointer, true);
-        if(r != null && r[2] - r[0] >= 0 && r[3] - r[1] >= 0)
+        if (r != null && r[2] - r[0] >= 0 && r[3] - r[1] >= 0) {
             uiaElement.rect = Rect.fromCoordinates(r[0], r[1], r[2], r[3]);
+        }
 
         uiaElement.enabled = Windows.IUIAutomationElement_get_IsEnabled(uiaCachePointer, true);
         uiaElement.name = Windows.IUIAutomationElement_get_Name(uiaCachePointer, true);
@@ -330,10 +353,10 @@ public class UIAStateFetcher implements Callable<UIAState>{
         parent.root.windowHandleMap.put(uiaElement.windowHandle, uiaElement);
 
         // get extra infos from windows
-        if(uiaElement.ctrlId == Windows.UIA_WindowControlTypeId){
+        if (uiaElement.ctrlId == Windows.UIA_WindowControlTypeId) {
             //long uiaWndPtr = Windows.IUIAutomationElement_GetPattern(uiaPtr, Windows.UIA_WindowPatternId, true);
             long uiaWindowPointer = Windows.IUIAutomationElement_GetPattern(uiaCachePointer, Windows.UIA_WindowPatternId, true);
-            if(uiaWindowPointer != 0){
+            if (uiaWindowPointer != 0) {
                 uiaElement.wndInteractionState = Windows.IUIAutomationWindowPattern_get_WindowInteractionState(uiaWindowPointer, true);
                 uiaElement.blocked = isElementBlocked(uiaElement);
                 uiaElement.isTopmostWnd = Windows.IUIAutomationWindowPattern_get_IsTopmost(uiaWindowPointer, true);
@@ -351,7 +374,7 @@ public class UIAStateFetcher implements Callable<UIAState>{
 
         // check if we missed detection of a modal window
         if (!uiaElement.isModal && uiaElement.automationId != null &&
-                (uiaElement.automationId.contains("messagebox") || uiaElement.automationId.contains("window"))){ // try to detect potential modal window!
+                (uiaElement.automationId.contains("messagebox") || uiaElement.automationId.contains("window"))) { // try to detect potential modal window!
             modalElement = markModal(uiaElement);
         }
 
@@ -369,10 +392,11 @@ public class UIAStateFetcher implements Callable<UIAState>{
                     if (patternPropertyTag.equals(UIATags.UIAValueValue)) {
                         // this property for some reason cannot be retrieved using the getCurrentPropertyValue method
                         // that is why we use the value that was directly received
-                        if(uiaElement.valuePattern != null)
+                        if (uiaElement.valuePattern != null) {
                             uiaElement.set(UIATags.UIAValueValue, uiaElement.valuePattern);
-                        else
+                        } else {
                             uiaElement.set(UIATags.UIAValueValue, "");
+                        }
                     }
                     Object propertyObject = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer, UIAMapping.getPatternPropertyIdentifier(patternPropertyTag), true);
                     if (propertyObject != null) {
@@ -392,7 +416,7 @@ public class UIAStateFetcher implements Callable<UIAState>{
         // get some non-cached property values for elements implementing the scroll pattern
         Object obj;
         uiaElement.scrollPattern = uiaElement.get(UIATags.UIAIsScrollPatternAvailable);
-        if (uiaElement.scrollPattern){
+        if (uiaElement.scrollPattern) {
             //el.scrollbarInfo = Windows.GetScrollBarInfo((int)el.windowHandle,Windows.OBJID_CLIENT);
             //el.scrollbarInfoH = Windows.GetScrollBarInfo((int)el.windowHandle,Windows.OBJID_HSCROLL);
             //el.scrollbarInfoV = Windows.GetScrollBarInfo((int)el.windowHandle,Windows.OBJID_VSCROLL);
@@ -486,18 +510,19 @@ public class UIAStateFetcher implements Callable<UIAState>{
             Windows.IUnknown_Release(uiaCachePointer);
         }
 
-        if(uiaChildrenPointer != 0){
+        if (uiaChildrenPointer != 0) {
             long nrOfChildren = Windows.IUIAutomationElementArray_get_Length(uiaChildrenPointer);
 
-            if(nrOfChildren > 0){
+            if (nrOfChildren > 0) {
                 uiaElement.children = new ArrayList<UIAElement>((int)nrOfChildren);
 
-                for(int i = 0; i < nrOfChildren; i++){
+                for (int i = 0; i < nrOfChildren; i++) {
                     long childPointer = Windows.IUIAutomationElementArray_GetElement(uiaChildrenPointer, i);
-                    if(childPointer != 0){
+                    if (childPointer != 0) {
                         UIAElement modalE = uiaDescend(hwnd, childPointer, uiaElement);
-                        if (modalE != null && modalElement == null) // parent-modal is preferred to child-modal
-                            modalElement = modalE;                            
+                        if (modalE != null && modalElement == null) { // parent-modal is preferred to child-modal
+                            modalElement = modalE;
+                        }
                     }
                 }
             }
@@ -523,22 +548,24 @@ public class UIAStateFetcher implements Callable<UIAState>{
     }
 
     // (through AccessBridge)
-    private UIAElement abDescend(long hwnd, long uiaCachePointer, UIAElement parent, long vmid, long ac){
-        if(uiaCachePointer == 0)
+    private UIAElement abDescend(long hwnd, long uiaCachePointer, UIAElement parent, long vmid, long ac) {
+        if (uiaCachePointer == 0) {
             return null;
-        
+        }
+
         UIAElement modalElement = null;
 
         parent.set(Tags.HWND, hwnd);
-        
+
         long[] vmidAC;
-        if (vmid == 0)
+        if (vmid == 0) {
             vmidAC = Windows.GetAccessibleContext(hwnd);
-        else
+        } else {
             vmidAC = new long[]{ vmid,ac };
-        if (vmidAC != null){            
+        }
+        if (vmidAC != null) {
             Object[] props = Windows.GetAccessibleContextProperties(vmidAC[0],vmidAC[1]);
-            if (props != null){
+            if (props != null) {
                 String name = (String) props[0];
                 String description = (String) props[1];
                 String role = (String) props[2];
@@ -559,7 +586,7 @@ public class UIAStateFetcher implements Callable<UIAState>{
                 try {
                     rect = Rect.from(Double.valueOf(x).doubleValue(), Double.valueOf(y).doubleValue(),
                             Double.valueOf(width).doubleValue(), Double.valueOf(height).doubleValue());
-                } catch (Exception e){
+                } catch (Exception e) {
                     return null;
                 }
 
@@ -571,18 +598,19 @@ public class UIAStateFetcher implements Callable<UIAState>{
                 //el.windowHandle = Windows.GetHWNDFromAccessibleContext(vmidAC[0],vmidAC[1]);
                 el.windowHandle = Windows.IUIAutomationElement_get_NativeWindowHandle(uiaCachePointer, true);
 
-                if(isJavaSwingTopLevelContainer(role, el)) {
+                if (isJavaSwingTopLevelContainer(role, el)) {
                     el.isTopLevelContainer = true;
                     modalElement = el;
                 }
 
-                el.ctrlId = AccessBridgeControlTypes.toUIA(role);                
-                if (el.ctrlId == Windows.UIA_MenuControlTypeId) // || el.ctrlId == Windows.UIA_WindowControlTypeId)
+                el.ctrlId = AccessBridgeControlTypes.toUIA(role);
+                if (el.ctrlId == Windows.UIA_MenuControlTypeId) { // || el.ctrlId == Windows.UIA_WindowControlTypeId)
                     el.isTopLevelContainer = true;
-                else if (el.ctrlId == Windows.UIA_EditControlTypeId)
+                } else if (el.ctrlId == Windows.UIA_EditControlTypeId) {
                     el.isKeyboardFocusable = true;
+                }
 
-                el.name = name;                
+                el.name = name;
                 el.helpText = description;
                 el.automationId = role;
                 el.enabled = accesibleStateSet.contains("enabled");
@@ -591,13 +619,13 @@ public class UIAStateFetcher implements Callable<UIAState>{
                 parent.root.windowHandleMap.put(el.windowHandle, el);
 
                 // Detect duplicated menu item and combo box panels to ignore them
-                if(isNonDesiredMenuItem(role, el)) {
+                if (isNonDesiredMenuItem(role, el)) {
                     parent.parent.ignore = true;
                 }
 
                 long childAC;
                 el.children = new ArrayList<UIAElement>(childrenCount);
-                for (int i=0; i<childrenCount; i++){
+                for (int i = 0; i < childrenCount; i++) {
                     childAC =  Windows.GetAccessibleChildFromContext(vmidAC[0],vmidAC[1],i);
                     abDescend(hwnd,uiaCachePointer,el,vmidAC[0],childAC);
                 }
@@ -614,12 +642,12 @@ public class UIAStateFetcher implements Callable<UIAState>{
      */
     private boolean isJavaSwingTopLevelContainer(String role, UIAElement el) {
         // JDialog are by default top level containers
-        if (role.equals(AccessBridgeControlTypes.ACCESSIBLE_DIALOG)){
+        if (role.equals(AccessBridgeControlTypes.ACCESSIBLE_DIALOG)) {
             return true;
         }
         // Usually the JFrame element that descend directly from the root process
         // are also top level containers
-        if(role.equals(AccessBridgeControlTypes.ACCESSIBLE_FRAME) 
+        if (role.equals(AccessBridgeControlTypes.ACCESSIBLE_FRAME)
                 && el.parent != null && (el.parent instanceof UIARootElement)) {
             return true;
         }
@@ -632,70 +660,74 @@ public class UIAStateFetcher implements Callable<UIAState>{
     private boolean isNonDesiredMenuItem(String role, UIAElement el) {
         UIAElement parent = el.parent;
         return (role.equals("menu item") || role.equals("radio button") || role.equals("check box"))
-                && parent != null && parent.parent != null 
+                && parent != null && parent.parent != null
                 && parent.automationId.equals("popup menu") && parent.parent.automationId.equals("panel");
     }
 
     // (mark a proper widget as modal)
-    private UIAElement markModal(UIAElement element){
-        if (element == null)
+    private UIAElement markModal(UIAElement element) {
+        if (element == null) {
             return null; // no proper widget found to mark as modal
-        else if (element.ctrlId != Windows.UIA_WindowControlTypeId && element.ctrlId != Windows.UIA_PaneControlTypeId &&
-                element.ctrlId != Windows.UIA_GroupControlTypeId){
+        } else if (element.ctrlId != Windows.UIA_WindowControlTypeId && element.ctrlId != Windows.UIA_PaneControlTypeId &&
+                element.ctrlId != Windows.UIA_GroupControlTypeId) {
             return markModal(element.parent);
-        }
-        else {
+        } else {
             element.isModal = true;
             return element;
         }
     }
 
-    private void markBlockedElements(UIAElement element){
-        for(UIAElement c : element.children){
-            if(element.blocked && !(c.ctrlId == Windows.UIA_WindowControlTypeId && c.blocked == false))
+    private void markBlockedElements(UIAElement element) {
+        for (UIAElement c : element.children) {
+            if (element.blocked && !(c.ctrlId == Windows.UIA_WindowControlTypeId && c.blocked == false)) {
                 c.blocked = true;
+            }
             markBlockedElements(c);
         }
     }
 
-    private void markBlockedElements(UIAElement element, UIAElement modalElement){
-        if (modalElement != null){
-            for(UIAElement c : element.children){
-                if (c != modalElement){
+    private void markBlockedElements(UIAElement element, UIAElement modalElement) {
+        if (modalElement != null) {
+            for (UIAElement c : element.children) {
+                if (c != modalElement) {
                     c.blocked = true;
                     markBlockedElements(c,modalElement);
                 }
-            }                
+            }
         }
     }
 
-    private void calculateZIndices(UIAElement el){
-        if (el.parent != null){
-            if (this.javaAccessBridge) // TLC are not exposed as visible desktop controls
+    private void calculateZIndices(UIAElement el) {
+        if (el.parent != null) {
+            if (this.javaAccessBridge) { // TLC are not exposed as visible desktop controls
                 el.zindex = el.parent.zindex + (el.parent.isTopLevelContainer ? 1 : 0);
-            else if (!el.isTopLevelContainer)        
+            } else if (!el.isTopLevelContainer) {
                 el.zindex = el.parent.zindex;
+            }
         }
-                                    
-        for(int i = 0; i < el.children.size(); i++)
+
+        for (int i = 0; i < el.children.size(); i++) {
             calculateZIndices(el.children.get(i));
+        }
     }
 
-    private UIAState createWidgetTree(UIARootElement root){
+    private UIAState createWidgetTree(UIARootElement root) {
         UIAState state = new UIAState(root);
         root.backRef = state;
-        for(UIAElement childElement : root.children){
-            if(!childElement.ignore)
+        for (UIAElement childElement : root.children) {
+            if (!childElement.ignore) {
                 createWidgetTree(state, childElement);
+            }
         }
         return state;
     }
 
-    private void createWidgetTree(UIAWidget parent, UIAElement element){
+    private void createWidgetTree(UIAWidget parent, UIAElement element) {
         UIAWidget w = parent.root().addChild(parent, element);
         element.backRef = w;
-        for(UIAElement child : element.children)
+        for (UIAElement child : element.children) {
             createWidgetTree(w, child);
+        }
     }
 
     public String generateXmlRepresentation(Widget widget, int indentLevel) {
@@ -747,7 +779,9 @@ public class UIAStateFetcher implements Callable<UIAState>{
     }
 
     public String sanitizeTagName(String role) {
-        if (role == null) return "Widget";
+        if (role == null) {
+            return "Widget";
+        }
         String tag = role.replaceAll("[^a-zA-Z0-9_]", "");
         return tag.isEmpty() ? "Widget" : tag;
     }
@@ -762,18 +796,18 @@ public class UIAStateFetcher implements Callable<UIAState>{
     @SuppressWarnings("unchecked")
     private <T> void setConvertedObjectValue(Tag<T> tag, Object object, UIAElement uiaElement) {
         Stream<Tag<?>> tagsToWatch = Stream.of(
-            UIATags.UIADropTargetDropTargetEffects,
-            UIATags.UIALegacyIAccessibleSelection,
-            UIATags.UIAMultipleViewSupportedViews,
-            UIATags.UIASelectionSelection,
-            UIATags.UIASpreadsheetItemAnnotationObjects,
-            UIATags.UIASpreadsheetItemAnnotationTypes,
-            UIATags.UIATableColumnHeaders,
-            UIATags.UIATableRowHeaders,
-            UIATags.UIATableItemColumnHeaderItems,
-            UIATags.UIATableItemRowHeaderItems,
-            UIATags.UIADragDropEffects,
-            UIATags.UIADragGrabbedItems);
+                UIATags.UIADropTargetDropTargetEffects,
+                UIATags.UIALegacyIAccessibleSelection,
+                UIATags.UIAMultipleViewSupportedViews,
+                UIATags.UIASelectionSelection,
+                UIATags.UIASpreadsheetItemAnnotationObjects,
+                UIATags.UIASpreadsheetItemAnnotationTypes,
+                UIATags.UIATableColumnHeaders,
+                UIATags.UIATableRowHeaders,
+                UIATags.UIATableItemColumnHeaderItems,
+                UIATags.UIATableItemRowHeaderItems,
+                UIATags.UIADragDropEffects,
+                UIATags.UIADragGrabbedItems);
 
         tagsToWatch.forEach(tagToWatch -> {
             if (tagToWatch.equals(tag)) {
@@ -788,79 +822,65 @@ public class UIAStateFetcher implements Callable<UIAState>{
             // array of strings...convert to a single string
             if (object instanceof String[]) {
                 uiaElement.set(tag, (T)String.join(", ", (String[])object));
-            }
-            else if (object instanceof String) {
+            } else if (object instanceof String) {
                 uiaElement.set(tag, (T) object);
             }
-        }
-        else if (tag.equals(UIATags.UIADragGrabbedItems)) {
+        } else if (tag.equals(UIATags.UIADragGrabbedItems)) {
             // not sure what vt_unknown will translate into, so we just leave it as object for now
             if (object != null) {
                 uiaElement.set(tag, (T) object);
             }
-        }
-        else if (tag.equals(UIATags.UIADropTargetDropTargetEffects)) {
+        } else if (tag.equals(UIATags.UIADropTargetDropTargetEffects)) {
             // array of strings...convert to a single string
             if (object instanceof String[]) {
                 uiaElement.set(tag, (T)String.join(", ", (String[])object));
-            }
-            else if (object instanceof String) {
+            } else if (object instanceof String) {
                 uiaElement.set(tag, (T) object);
             }
-        }
-        else if (tag.equals(UIATags.UIALegacyIAccessibleSelection)) {
+        } else if (tag.equals(UIATags.UIALegacyIAccessibleSelection)) {
             // not sure what vt_unknown will translate into, so we just leave it as object for now
             if (object != null) {
                 uiaElement.set(tag, (T) object);
             }
-        }
-        else if (tag.equals(UIATags.UIAMultipleViewSupportedViews)) {
+        } else if (tag.equals(UIATags.UIAMultipleViewSupportedViews)) {
             if (object instanceof Long[]) {
                 uiaElement.set(tag, (T) Arrays.stream((Long[])object).map(Object::toString).reduce("", (base, string) -> base.equals("") ? string : base + ", " + string));
             }
-        }
-        else if (tag.equals(UIATags.UIASelectionSelection)) {
+        } else if (tag.equals(UIATags.UIASelectionSelection)) {
             // not sure what vt_unknown will translate into, so we just leave it as object for now
             if (object != null) {
                 uiaElement.set(tag, (T) object);
             }
-        }
-        else if (tag.equals(UIATags.UIASpreadsheetItemAnnotationObjects)) {
+        } else if (tag.equals(UIATags.UIASpreadsheetItemAnnotationObjects)) {
             // not sure what vt_unknown will translate into, so we just leave it as object for now
             if (object != null) {
                 uiaElement.set(tag, (T) object);
             }
-        }
-        else if (tag.equals(UIATags.UIASpreadsheetItemAnnotationTypes)) {
+        } else if (tag.equals(UIATags.UIASpreadsheetItemAnnotationTypes)) {
             if (object instanceof Long[]) {
                 uiaElement.set(tag, (T) Arrays.stream((Long[])object).map(Object::toString).reduce("", (base, string) -> base.equals("") ? string : base + ", " + string));
             }
-        }
-        else if (tag.equals(UIATags.UIATableColumnHeaders)) {
+        } else if (tag.equals(UIATags.UIATableColumnHeaders)) {
             // not sure what vt_unknown will translate into, so we just leave it as object for now
             if (object != null) {
                 uiaElement.set(tag, (T) object);
             }
-        }
-        else if (tag.equals(UIATags.UIATableRowHeaders)) {
+        } else if (tag.equals(UIATags.UIATableRowHeaders)) {
             // not sure what vt_unknown will translate into, so we just leave it as object for now
             if (object != null) {
                 uiaElement.set(tag, (T) object);
             }
-        }
-        else if (tag.equals(UIATags.UIATableItemColumnHeaderItems)) {
+        } else if (tag.equals(UIATags.UIATableItemColumnHeaderItems)) {
             // not sure what vt_unknown will translate into, so we just leave it as object for now
             if (object != null) {
                 uiaElement.set(tag, (T) object);
             }
-        }
-        else if (tag.equals(UIATags.UIATableItemRowHeaderItems)) {
+        } else if (tag.equals(UIATags.UIATableItemRowHeaderItems)) {
             // not sure what vt_unknown will translate into, so we just leave it as object for now
             if (object != null) {
                 uiaElement.set(tag, (T) object);
             }
-        }
-        else {
+        } else {
             if (object != null) {
                 uiaElement.set(tag, (T) object);
             }

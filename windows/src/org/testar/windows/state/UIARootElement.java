@@ -14,59 +14,58 @@ import java.util.Map;
 import org.testar.core.util.Util;
 
 public final class UIARootElement extends UIAElement {
-	private static final long serialVersionUID = -2561441199642411403L;
-	long pid, timeStamp;
-	boolean isRunning, isForeground, hasStandardMouse, hasStandardKeyboard;	
-	transient Map<Long, UIAElement> windowHandleMap;
-	UIAElementMap elementMap;
+    private static final long serialVersionUID = -2561441199642411403L;
+    long pid, timeStamp;
+    boolean isRunning, isForeground, hasStandardMouse, hasStandardKeyboard;
+    transient Map<Long, UIAElement> windowHandleMap;
+    UIAElementMap elementMap;
 
-	public UIARootElement(){
-		super(null);
-		root = this;
-		windowHandleMap = Util.newHashMap();
-		elementMap = UIAElementMap.newBuilder().build();
-		isForeground = false; // by urueda
-	}
+    public UIARootElement() {
+        super(null);
+        root = this;
+        windowHandleMap = Util.newHashMap();
+        elementMap = UIAElementMap.newBuilder().build();
+        isForeground = false;
+    }
 
-	public UIAElement at(double x, double y){
-		throw new UnsupportedOperationException();
-	}
+    public UIAElement at(double x, double y) {
+        throw new UnsupportedOperationException();
+    }
 
-	public boolean visibleAt(UIAElement el, double x, double y){		
-		if(el.rect == null || !el.rect.contains(x, y) || !this.rect.contains(x, y))
-			return false;
-		
-		UIAElement topLevelContainer = elementMap.at(x, y);
-		return (topLevelContainer == null || topLevelContainer.zindex <= el.zindex) && !obscuredByChildren(el, x, y);
-	}
+    public boolean visibleAt(UIAElement el, double x, double y) {
+        if (el.rect == null || !el.rect.contains(x, y) || !this.rect.contains(x, y)) {
+            return false;
+        }
 
-	// begin by urueda
-	
-	public boolean visibleAt(UIAElement el, double x, double y, boolean obscuredByChildFeature){		
-		if(el.rect == null || !el.rect.contains(x, y) || !this.rect.contains(x, y))
-			return false;
-				
-		UIAElement topLevelContainer = elementMap.at(x, y);
-		return (topLevelContainer == null || topLevelContainer.zindex <= el.zindex ||
-				!obscuredByChildFeature || !obscuredByChildren(el, x, y));
-	}
-	
-	// end by urueda
+        UIAElement topLevelContainer = elementMap.at(x, y);
+        return (topLevelContainer == null || topLevelContainer.zindex <= el.zindex) && !obscuredByChildren(el, x, y);
+    }
 
-	boolean obscuredByChildren(UIAElement el, double x, double y){		
-		for(int i = 0; i < el.children.size(); i++){
-			UIAElement child = el.children.get(i);
-			if(child.rect != null && child.rect.contains(x, y) && child.zindex >= el.zindex)
-				return true;
-		}
-		return false;
-	}
+    public boolean visibleAt(UIAElement el, double x, double y, boolean obscuredByChildFeature) {
+        if (el.rect == null || !el.rect.contains(x, y) || !this.rect.contains(x, y)) {
+            return false;
+        }
 
-	private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException{
-		ois.defaultReadObject();
-	}
+        UIAElement topLevelContainer = elementMap.at(x, y);
+        return (topLevelContainer == null || topLevelContainer.zindex <= el.zindex ||
+                !obscuredByChildFeature || !obscuredByChildren(el, x, y));
+    }
 
-	private void writeObject(ObjectOutputStream oos) throws IOException{
-		oos.defaultWriteObject();
-	}
+    boolean obscuredByChildren(UIAElement el, double x, double y) {
+        for (int i = 0; i < el.children.size(); i++) {
+            UIAElement child = el.children.get(i);
+            if (child.rect != null && child.rect.contains(x, y) && child.zindex >= el.zindex) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
+        ois.defaultReadObject();
+    }
+
+    private void writeObject(ObjectOutputStream oos) throws IOException {
+        oos.defaultWriteObject();
+    }
 }

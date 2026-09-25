@@ -35,7 +35,7 @@ public final class GDIScreenCanvas implements Canvas {
     Color color;
     long pPen, pBrush, pFont, pFontFamily;
 
-    public static GDIScreenCanvas fromPrimaryMonitor(){
+    public static GDIScreenCanvas fromPrimaryMonitor() {
         return fromPrimaryMonitor(Pen.PEN_DEFAULT);
     }
 
@@ -43,7 +43,7 @@ public final class GDIScreenCanvas implements Canvas {
      * Creates a ScreenCanvas for the system's primary monitor
      * @return ScreenCanvas for the primary monitor
      */
-    public static GDIScreenCanvas fromPrimaryMonitor(Pen defaultPen){
+    public static GDIScreenCanvas fromPrimaryMonitor(Pen defaultPen) {
         long handle = Windows.GetPrimaryMonitorHandle();
         long mi[] = Windows.GetMonitorInfo(handle);
         long x = mi[1];
@@ -53,7 +53,7 @@ public final class GDIScreenCanvas implements Canvas {
         return new GDIScreenCanvas(x, y, width, height, defaultPen);
     }
 
-    private class BackgroundThread implements Runnable{
+    private class BackgroundThread implements Runnable {
         public void run() {
 
             blendOp = 0;
@@ -62,13 +62,13 @@ public final class GDIScreenCanvas implements Canvas {
             blendAlphaFormat = (int)Windows.AC_SRC_ALPHA;
 
             // create overlay window
-            hwnd = Windows.CreateWindowEx(Windows.WS_EX_LAYERED | Windows.WS_EX_TRANSPARENT  | Windows.WS_EX_TOOLWINDOW | 
+            hwnd = Windows.CreateWindowEx(Windows.WS_EX_LAYERED | Windows.WS_EX_TRANSPARENT  | Windows.WS_EX_TOOLWINDOW |
                     Windows.WS_EX_TOPMOST |    Windows.WS_EX_NOACTIVATE, null,    "OverlayWindow", Windows.WS_OVERLAPPEDWINDOW,
-                    (int)x, (int)y, width, height, 0,    0, Windows.GetCurrentModule(),    0);        
+                    (int)x, (int)y, width, height, 0,    0, Windows.GetCurrentModule(),    0);
 
             gdiplusToken = Windows.GdiplusStartup();
-            hScreen = Windows.GetDC(0);            
-            hDC = Windows.CreateCompatibleDC(hScreen);            
+            hScreen = Windows.GetDC(0);
+            hDC = Windows.CreateCompatibleDC(hScreen);
             hBitmap = Windows.CreateCompatibleBitmap(hScreen, width, height);
             Windows.SelectObject(hDC, hBitmap);
             pGraphics = Windows.Gdiplus_Graphics_FromHDC(hDC);
@@ -77,8 +77,8 @@ public final class GDIScreenCanvas implements Canvas {
 
             long[] hMsg;
 
-            while(running){
-                while((hMsg = Windows.PeekMessage(hwnd, 0, 0, Windows.PM_NOREMOVE)) != null){
+            while (running) {
+                while ((hMsg = Windows.PeekMessage(hwnd, 0, 0, Windows.PM_NOREMOVE)) != null) {
                     Windows.GetMessage(hwnd, 0, 0 );
                     Windows.TranslateMessage(hMsg);
                     Windows.DispatchMessage(hMsg);
@@ -89,14 +89,14 @@ public final class GDIScreenCanvas implements Canvas {
         }
     }
 
-    public GDIScreenCanvas(long x, long y, long width, long height){
+    public GDIScreenCanvas(long x, long y, long width, long height) {
         this(x, y, width, height, Pen.PEN_DEFAULT);
     }
-    
+
     /**
      * Create a ScreenCanvas with the given dimensions.
      */
-    public GDIScreenCanvas(double x, double y, long width, long height, Pen defaultPen){
+    public GDIScreenCanvas(double x, double y, long width, long height, Pen defaultPen) {
         Assert.notNull(defaultPen);
         Assert.isTrue(width >= 0 && height >= 0);
 
@@ -110,59 +110,91 @@ public final class GDIScreenCanvas implements Canvas {
         bgt.setDaemon(true);  // we want the VM to shutdown even if our background thread is still running
         bgt.start();
 
-        while(!running)
+        while (!running) {
             Util.pause(0.01);
-        
+        }
+
         pPen = Windows.Gdiplus_Pen_Create(0, 0, 0, 0, 1);
         pBrush = Windows.Gdiplus_SolidBrush_Create(0, 0, 0, 0);
-        
+
         adjustPen(defaultPen);
     }
 
-    public void release(){
-        if(!running)
+    public void release() {
+        if (!running) {
             return;
+        }
         running = false;
-        
-        try { bgt.join();}
-        catch (InterruptedException e) { e.printStackTrace(); }
 
-        if(pFont != 0)
+        try {
+            bgt.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        if (pFont != 0) {
             Windows.Gdiplus_Font_Destroy(pFont);
-        if(pFontFamily != 0)
+        }
+        if (pFontFamily != 0) {
             Windows.Gdiplus_FontFamily_Destroy(pFontFamily);
-        if(pPen != 0)
+        }
+        if (pPen != 0) {
             Windows.Gdiplus_Pen_Destroy(pPen);
-        if(pBrush != 0)
+        }
+        if (pBrush != 0) {
             Windows.Gdiplus_SolidBrush_Destroy(pBrush);
-        if(hClearBrush != 0)
+        }
+        if (hClearBrush != 0) {
             Windows.Gdiplus_SolidBrush_Destroy(hClearBrush);
-        if(gdiplusToken != 0)
+        }
+        if (gdiplusToken != 0) {
             Windows.GdiplusShutdown(gdiplusToken);
+        }
     }
 
-    public void finalize(){ release(); }
+    public void finalize() {
+        release();
+    }
 
-    private void check(){
-        if(!running)
+    private void check() {
+        if (!running) {
             throw new IllegalStateException("GDIScreenCanvas window is not running!");
+        }
     }
 
-    public double width() { return width; }
-    public double height() { return height; }
-    public double x() { return x; }
-    public double y() { return y; }
-    public void begin() { check(); }
-    public Pen defaultPen() { return defaultPen; }
-    public void paintBatch() { /* Not implemented in Windows */}
+    public double width() {
+        return width;
+    }
+
+    public double height() {
+        return height;
+    }
+
+    public double x() {
+        return x;
+    }
+
+    public double y() {
+        return y;
+    }
+
+    public void begin() {
+        check();
+    }
+
+    public Pen defaultPen() {
+        return defaultPen;
+    }
+
+    public void paintBatch() { /* Not implemented in Windows */ }
 
     public void end() {
         check();
-        Windows.UpdateLayeredWindow(hwnd, hScreen, (int)x, (int)y, width, height, hDC, 0, 0, 0, 
-                blendOp, blendFlags, blendSourceConstantAlpha, blendAlphaFormat, 
+        Windows.UpdateLayeredWindow(hwnd, hScreen, (int)x, (int)y, width, height, hDC, 0, 0, 0,
+                blendOp, blendFlags, blendSourceConstantAlpha, blendAlphaFormat,
                 Windows.ULW_ALPHA);
     }
-    
+
     public void line(Pen pen, double x1, double y1, double x2, double y2) {
         check();
         adjustPen(pen);
@@ -190,81 +222,92 @@ public final class GDIScreenCanvas implements Canvas {
     public void ellipse(Pen pen, double x, double y, double width, double height) {
         check();
         adjustPen(pen);
-        if(fillPattern == FillPattern.Solid)
-            Windows.Gdiplus_Graphics_FillEllipse(pGraphics, pBrush, x - this.x, y - this.y, width, height);        
-        else
+        if (fillPattern == FillPattern.Solid) {
+            Windows.Gdiplus_Graphics_FillEllipse(pGraphics, pBrush, x - this.x, y - this.y, width, height);
+        } else {
             Windows.Gdiplus_Graphics_DrawEllipse(pGraphics, pPen, x - this.x, y - this.y, width, height);
+        }
     }
 
     public void rect(Pen pen, double x, double y, double width, double height) {
         check();
         adjustPen(pen);
-        if(fillPattern == FillPattern.Solid)
+        if (fillPattern == FillPattern.Solid) {
             Windows.Gdiplus_Graphics_FillRectangle(pGraphics, pBrush, x - this.x, y - this.y, width, height);
-        else
+        } else {
             Windows.Gdiplus_Graphics_DrawRectangle(pGraphics, pPen, x - this.x, y - this.y, width, height);
+        }
     }
-    
+
     public Pair<Double, Double> textMetrics(Pen pen, String text) {
         Assert.notNull(pen, text);
         return Pair.from(text.length() * 2., 20.);
     }
-    
-    private void adjustPen(Pen pen){
-        Double tstrokeWidth = pen.strokeWidth();
-        if(tstrokeWidth == null)
-            tstrokeWidth = defaultPen.strokeWidth();
-        
-        StrokePattern tstrokePattern = pen.strokePattern();
-        if(tstrokePattern == null)
-            tstrokePattern = defaultPen.strokePattern();
-        
-        StrokeCaps tstrokeCaps = pen.strokeCaps();
-        if(tstrokeCaps == null)
-            tstrokeCaps = defaultPen.strokeCaps();
 
-        if(!tstrokeWidth.equals(strokeWidth) || tstrokePattern != strokePattern || tstrokeCaps != strokeCaps){
+    private void adjustPen(Pen pen) {
+        Double tstrokeWidth = pen.strokeWidth();
+        if (tstrokeWidth == null) {
+            tstrokeWidth = defaultPen.strokeWidth();
+        }
+
+        StrokePattern tstrokePattern = pen.strokePattern();
+        if (tstrokePattern == null) {
+            tstrokePattern = defaultPen.strokePattern();
+        }
+
+        StrokeCaps tstrokeCaps = pen.strokeCaps();
+        if (tstrokeCaps == null) {
+            tstrokeCaps = defaultPen.strokeCaps();
+        }
+
+        if (!tstrokeWidth.equals(strokeWidth) || tstrokePattern != strokePattern || tstrokeCaps != strokeCaps) {
             strokePattern = tstrokePattern;
             strokeWidth = tstrokeWidth;
             strokeCaps = tstrokeCaps;
             Windows.Gdiplus_Pen_SetWidth(pPen, strokeWidth);
         }
-        
+
         Color tcolor = pen.color();
-        if(tcolor == null)
+        if (tcolor == null) {
             tcolor = defaultPen.color();
-                
-        if(!tcolor.equals(color)){
+        }
+
+        if (!tcolor.equals(color)) {
             color = tcolor;
             Windows.Gdiplus_Pen_SetColor(pPen, color.alpha(), color.red(), color.green(), color.blue());
             Windows.Gdiplus_SolidBrush_SetColor(pBrush, Math.min(color.alpha(), 254), color.red(), color.green(), color.blue());
         }
-        
+
         String tfont = pen.font();
-        if(tfont == null)
+        if (tfont == null) {
             tfont = defaultPen.font();
-        
+        }
+
         Double tfontSize = pen.fontSize();
-        if(tfontSize == null)
+        if (tfontSize == null) {
             tfontSize = defaultPen.fontSize();
-        
-        if(!tfont.equals(font) || !tfontSize.equals(fontSize)){
+        }
+
+        if (!tfont.equals(font) || !tfontSize.equals(fontSize)) {
             font = tfont;
             fontSize = tfontSize;
-            if(pFont != 0)
+            if (pFont != 0) {
                 Windows.Gdiplus_Font_Destroy(pFont);
-            if(pFontFamily != 0)
+            }
+            if (pFontFamily != 0) {
                 Windows.Gdiplus_FontFamily_Destroy(pFontFamily);
-            
+            }
+
             pFontFamily = Windows.Gdiplus_FontFamily_Create(font);
             pFont = Windows.Gdiplus_Font_Create(pFontFamily, fontSize, Windows.Gdiplus_FontStyleRegular, Windows.Gdiplus_UnitPixel);
         }
-        
+
         FillPattern tfillPattern = pen.fillPattern();
-        if(tfillPattern == null)
+        if (tfillPattern == null) {
             tfillPattern = defaultPen.fillPattern();
-        
-        if(tfillPattern != fillPattern){
+        }
+
+        if (tfillPattern != fillPattern) {
             fillPattern = tfillPattern;
         }
     }

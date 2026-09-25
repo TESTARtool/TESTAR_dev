@@ -29,7 +29,7 @@ public class AccessBridgeControlTypes {
      */
     public static final String ACCESSIBLE_COLUMN_HEADER = "column header";
 
-    /** 
+    /**
      * Object that can be drawn into and is used to trap
      * events.
      * see ACCESSIBLE_FRAME
@@ -38,22 +38,22 @@ public class AccessBridgeControlTypes {
      */
     public static final String ACCESSIBLE_CANVAS = "canvas";
 
-    /** 
-     * A list of choices the user can select from.  Also optionally 
+    /**
+     * A list of choices the user can select from.  Also optionally
      * allows the user to enter a choice of their own.
      */
     public static final String ACCESSIBLE_COMBO_BOX = "combo box";
 
-    /** 
+    /**
      * An iconified internal frame in a DESKTOP_PANE.
      * see ACCESSIBLE_DESKTOP_PANE
      * see ACCESSIBLE_INTERNAL_FRAME
      */
     public static final String ACCESSIBLE_DESKTOP_ICON = "desktop icon";
 
-    /** 
+    /**
      * A frame-like object that is clipped by a desktop pane.  The
-     * desktop pane, internal frame, and desktop icon objects are 
+     * desktop pane, internal frame, and desktop icon objects are
      * often used to create multiple document interfaces within an
      * application.
      * see ACCESSIBLE_DESKTOP_ICON
@@ -63,20 +63,20 @@ public class AccessBridgeControlTypes {
     public static final String ACCESSIBLE_INTERNAL_FRAME = "internal frame";
 
     /**
-     * A pane that supports internal frames and 
+     * A pane that supports internal frames and
      * iconified versions of those internal frames.
      * see ACCESSIBLE_DESKTOP_ICON
      * see ACCESSIBLE_INTERNAL_FRAME
      */
     public static final String ACCESSIBLE_DESKTOP_PANE = "desktop pane";
 
-    /** 
+    /**
      * A specialized pane whose primary use is inside a DIALOG
      * see ACCESSIBLE_DIALOG
      */
     public static final String ACCESSIBLE_OPTION_PANE = "option pane";
 
-    /** 
+    /**
      * A top level window with no title or border.
      * see ACCESSIBLE_FRAME
      * see ACCESSIBLE_DIALOG
@@ -92,9 +92,9 @@ public class AccessBridgeControlTypes {
      */
     public static final String ACCESSIBLE_FRAME = "frame";
 
-    /** 
-     * A top level window with title bar and a border.  A dialog is similar 
-     * to a frame, but it has fewer properties and is often used as a 
+    /**
+     * A top level window with title bar and a border.  A dialog is similar
+     * to a frame, but it has fewer properties and is often used as a
      * secondary window for an application.
      * see ACCESSIBLE_FRAME
      * see ACCESSIBLE_WINDOW
@@ -108,7 +108,7 @@ public class AccessBridgeControlTypes {
 
 
     /**
-     * A pane that allows the user to navigate through 
+     * A pane that allows the user to navigate through
      * and select the contents of a directory.  May be used
      * by a file chooser.
      * see ACCESSIBLE_FILE_CHOOSER
@@ -124,7 +124,7 @@ public class AccessBridgeControlTypes {
      */
     public static final String ACCESSIBLE_FILE_CHOOSER = "file chooser";
 
-    /** 
+    /**
      * An object that fills up space in a user interface.  It is often
      * used in interfaces to tweak the spacing between components,
      * but serves no other purpose.
@@ -141,7 +141,7 @@ public class AccessBridgeControlTypes {
      */
     public static final String ACCESSIBLE_ICON = "icon";
 
-    /** 
+    /**
      * An object used to present an icon or short string in an interface.
      */
     public static final String ACCESSIBLE_LABEL = "label";
@@ -162,7 +162,7 @@ public class AccessBridgeControlTypes {
      */
     public static final String ACCESSIBLE_GLASS_PANE = "glass pane";
 
-    /** 
+    /**
      * A specialized pane that allows its children to be drawn in layers,
      * providing a form of stacking order.  This is usually the pane that
      * holds the menu bar as well as the pane that contains most of the
@@ -200,8 +200,8 @@ public class AccessBridgeControlTypes {
      */
     public static final String ACCESSIBLE_MENU_BAR = "menu bar";
 
-    /** 
-     * A temporary window that is usually used to offer the user a 
+    /**
+     * A temporary window that is usually used to offer the user a
      * list of choices, and then hides when the user selects one of
      * those choices.
      * see ACCESSIBLE_MENU
@@ -209,12 +209,12 @@ public class AccessBridgeControlTypes {
      */
     public static final String ACCESSIBLE_POPUP_MENU = "popup menu";
 
-    /** 
+    /**
      * An object usually found inside a menu bar that contains a list
      * of actions the user can choose from.  A menu can have any object
      * as its children, but most often they are menu items, other menus,
      * or rudimentary objects such as radio buttons, check boxes, or
-     * separators.  For example, an application may have an "Edit" menu 
+     * separators.  For example, an application may have an "Edit" menu
      * that contains menu items for "Cut" and "Paste."
      * see ACCESSIBLE_MENU_BAR
      * see ACCESSIBLE_MENU_ITEM
@@ -222,11 +222,11 @@ public class AccessBridgeControlTypes {
      * see ACCESSIBLE_RADIO_BUTTON
      * see ACCESSIBLE_CHECK_BOX
      * see ACCESSIBLE_POPUP_MENU
-     */    
+     */
     public static final String ACCESSIBLE_MENU = "menu";
 
     /**
-     * An object usually contained in a menu that presents an action 
+     * An object usually contained in a menu that presents an action
      * the user can choose.  For example, the "Cut" menu item in an
      * "Edit" menu would be an action the user can select to cut the
      * selected area of text in a document.
@@ -248,8 +248,8 @@ public class AccessBridgeControlTypes {
     public static final String ACCESSIBLE_SEPARATOR = "separator";
 
     /**
-     * An object that presents a series of panels (or page tabs), one at a 
-     * time, through some mechanism provided by the object.  The most common 
+     * An object that presents a series of panels (or page tabs), one at a
+     * time, through some mechanism provided by the object.  The most common
      * mechanism is a list of tabs at the top of the panel.  The children of
      * a page tab list are all page tabs.
      * see ACCESSIBLE_PAGE_TAB
@@ -258,7 +258,7 @@ public class AccessBridgeControlTypes {
 
     /**
      * An object that is a child of a page tab list.  Its sole child is
-     * the panel that is to be presented to the user when the user 
+     * the panel that is to be presented to the user when the user
      * selects the page tab from the list of tabs in the page tab list.
      * see ACCESSIBLE_PAGE_TAB_LIST
      */
@@ -275,7 +275,7 @@ public class AccessBridgeControlTypes {
     public static final String ACCESSIBLE_PROGRESS_BAR = "progress bar";
 
     /**
-     * A text object used for passwords, or other places where the 
+     * A text object used for passwords, or other places where the
      * text contents is not shown visibly to the user
      */
     public static final String ACCESSIBLE_PASSWORD_TEXT = "password text";
@@ -299,7 +299,7 @@ public class AccessBridgeControlTypes {
     public static final String ACCESSIBLE_TOGGLE_BUTTON = "toggle button";
 
     /**
-     * A choice that can be checked or unchecked and provides a 
+     * A choice that can be checked or unchecked and provides a
      * separate indicator for the current state.
      * see ACCESSIBLE_PUSH_BUTTON
      * see ACCESSIBLE_TOGGLE_BUTTON
@@ -309,7 +309,7 @@ public class AccessBridgeControlTypes {
 
     /**
      * A specialized check box that will cause other radio buttons in the
-     * same group to become unchecked when this one is checked.  
+     * same group to become unchecked when this one is checked.
      * see ACCESSIBLE_PUSH_BUTTON
      * see ACCESSIBLE_TOGGLE_BUTTON
      * see ACCESSIBLE_CHECK_BOX
@@ -329,7 +329,7 @@ public class AccessBridgeControlTypes {
      */
     public static final String ACCESSIBLE_SCROLL_PANE = "scroll pane";
 
-    /** 
+    /**
      * An object usually used to allow a user to incrementally view a
      * large amount of data.  Usually used only by a scroll pane.
      * see ACCESSIBLE_SCROLL_PANE
@@ -337,8 +337,8 @@ public class AccessBridgeControlTypes {
     public static final String ACCESSIBLE_SCROLL_BAR = "scroll bar";
 
     /**
-     * An object usually used in a scroll pane.  It represents the portion 
-     * of the entire data that the user can see.  As the user manipulates 
+     * An object usually used in a scroll pane.  It represents the portion
+     * of the entire data that the user can see.  As the user manipulates
      * the scroll bars, the contents of the viewport can change.
      * see ACCESSIBLE_SCROLL_PANE
      */
@@ -347,7 +347,7 @@ public class AccessBridgeControlTypes {
     /**
      * An object that allows the user to select from a bounded range.  For
      * example, a slider might be used to select a number between 0 and 100.
-     */    
+     */
     public static final String ACCESSIBLE_SLIDER = "slider";
 
     /**
@@ -384,10 +384,10 @@ public class AccessBridgeControlTypes {
      */
     public static final String ACCESSIBLE_TOOL_BAR = "tool bar";
 
-    /** 
-     * An object that provides information about another object.  The 
-     * accessibleDescription property of the tool tip is often displayed 
-     * to the user in a small = "help bubble" when the user causes the 
+    /**
+     * An object that provides information about another object.  The
+     * accessibleDescription property of the tool tip is often displayed
+     * to the user in a small = "help bubble" when the user causes the
      * mouse to hover over the object associated with the tool tip.
      */
     public static final String ACCESSIBLE_TOOL_TIP = "tool tip";
@@ -472,92 +472,93 @@ public class AccessBridgeControlTypes {
     public static final String ACCESSIBLE_EDITBAR = "editbar";
 
     /**
-     * A role indicating the object monitors the progress 
+     * A role indicating the object monitors the progress
      * of some operation.
      */
     public static final String PROGRESS_MONITOR = "progress monitor";
 
-    private static final Map<String,Long> MAP_2_UIA = new HashMap<String,Long>(){
+    private static final Map<String,Long> MAP_2_UIA = new HashMap<String,Long>() {
         private static final long serialVersionUID = 617334006202177665L;
-    {
-        put(AccessBridgeControlTypes.ACCESSIBLE_ALERT, Long.valueOf(Windows.UIA_ControlTypePropertyId));
-        put(AccessBridgeControlTypes.ACCESSIBLE_AWT_COMPONENT, Long.valueOf(Windows.UIA_CustomControlTypeId));
-        put(AccessBridgeControlTypes.ACCESSIBLE_CANVAS, Long.valueOf(Windows.UIA_PaneControlTypeId));
-        put(AccessBridgeControlTypes.ACCESSIBLE_CHECK_BOX, Long.valueOf(Windows.UIA_CheckBoxControlTypeId));
-        put(AccessBridgeControlTypes.ACCESSIBLE_COLOR_CHOOSER, Long.valueOf(Windows.UIA_CustomControlTypeId));
-        put(AccessBridgeControlTypes.ACCESSIBLE_COLUMN_HEADER, Long.valueOf(Windows.UIA_HeaderControlTypeId));
-        put(AccessBridgeControlTypes.ACCESSIBLE_COMBO_BOX, Long.valueOf(Windows.UIA_ComboBoxControlTypeId));
-        put(AccessBridgeControlTypes.ACCESSIBLE_DATE_EDITOR, Long.valueOf(Windows.UIA_CustomControlTypeId));
-        put(AccessBridgeControlTypes.ACCESSIBLE_DESKTOP_ICON, Long.valueOf(Windows.UIA_ImageControlTypeId));
-        put(AccessBridgeControlTypes.ACCESSIBLE_DESKTOP_PANE, Long.valueOf(Windows.UIA_PaneControlTypeId));
-        put(AccessBridgeControlTypes.ACCESSIBLE_DIALOG, Long.valueOf(Windows.UIA_WindowControlTypeId));
-        put(AccessBridgeControlTypes.ACCESSIBLE_DIRECTORY_PANE, Long.valueOf(Windows.UIA_PaneControlTypeId));
-        put(AccessBridgeControlTypes.ACCESSIBLE_EDITBAR, Long.valueOf(Windows.UIA_ToolBarControlTypeId));
-        put(AccessBridgeControlTypes.ACCESSIBLE_FILE_CHOOSER, Long.valueOf(Windows.UIA_WindowControlTypeId));
-        put(AccessBridgeControlTypes.ACCESSIBLE_FILLER, Long.valueOf(Windows.UIA_SeparatorControlTypeId));
-        put(AccessBridgeControlTypes.ACCESSIBLE_FONT_CHOOSER, Long.valueOf(Windows.UIA_CustomControlTypeId));
-        put(AccessBridgeControlTypes.ACCESSIBLE_FOOTER, Long.valueOf(Windows.UIA_CustomControlTypeId));
-        put(AccessBridgeControlTypes.ACCESSIBLE_FRAME, Long.valueOf(Windows.UIA_WindowControlTypeId));
-        put(AccessBridgeControlTypes.ACCESSIBLE_GLASS_PANE, Long.valueOf(Windows.UIA_PaneControlTypeId));
-        put(AccessBridgeControlTypes.ACCESSIBLE_GROUP_BOX, Long.valueOf(Windows.UIA_GroupControlTypeId));
-        put(AccessBridgeControlTypes.ACCESSIBLE_HEADER, Long.valueOf(Windows.UIA_HeaderControlTypeId));
-        put(AccessBridgeControlTypes.ACCESSIBLE_HYPERLINK, Long.valueOf(Windows.UIA_HyperlinkControlTypeId));
-        put(AccessBridgeControlTypes.ACCESSIBLE_ICON, Long.valueOf(Windows.UIA_ImageControlTypeId));
-        put(AccessBridgeControlTypes.ACCESSIBLE_INTERNAL_FRAME, Long.valueOf(Windows.UIA_WindowControlTypeId));
-        put(AccessBridgeControlTypes.ACCESSIBLE_LABEL, Long.valueOf(Windows.UIA_TextControlTypeId));
-        put(AccessBridgeControlTypes.ACCESSIBLE_LAYERED_PANE, Long.valueOf(Windows.UIA_PaneControlTypeId));
-        put(AccessBridgeControlTypes.ACCESSIBLE_LIST, Long.valueOf(Windows.UIA_ListControlTypeId));
-        put(AccessBridgeControlTypes.ACCESSIBLE_LIST_ITEM, Long.valueOf(Windows.UIA_ListItemControlTypeId));
-        put(AccessBridgeControlTypes.ACCESSIBLE_MENU, Long.valueOf(Windows.UIA_MenuControlTypeId));
-        put(AccessBridgeControlTypes.ACCESSIBLE_MENU_BAR, Long.valueOf(Windows.UIA_MenuBarControlTypeId));
-        put(AccessBridgeControlTypes.ACCESSIBLE_MENU_ITEM, Long.valueOf(Windows.UIA_MenuItemControlTypeId));
-        put(AccessBridgeControlTypes.ACCESSIBLE_OPTION_PANE, Long.valueOf(Windows.UIA_PaneControlTypeId));
-        put(AccessBridgeControlTypes.ACCESSIBLE_PAGE_TAB, Long.valueOf(Windows.UIA_TabItemControlTypeId));
-        put(AccessBridgeControlTypes.ACCESSIBLE_PAGE_TAB_LIST, Long.valueOf(Windows.UIA_TabControlTypeId));
-        put(AccessBridgeControlTypes.ACCESSIBLE_PANEL, Long.valueOf(Windows.UIA_PaneControlTypeId));
-        put(AccessBridgeControlTypes.ACCESSIBLE_PARAGRAPH, Long.valueOf(Windows.UIA_TextControlTypeId));
-        put(AccessBridgeControlTypes.ACCESSIBLE_PASSWORD_TEXT, Long.valueOf(Windows.UIA_EditControlTypeId));
-        put(AccessBridgeControlTypes.ACCESSIBLE_POPUP_MENU, Long.valueOf(Windows.UIA_MenuControlTypeId));
-        put(AccessBridgeControlTypes.ACCESSIBLE_PROGRESS_BAR, Long.valueOf(Windows.UIA_ProgressBarControlTypeId));
-        put(AccessBridgeControlTypes.ACCESSIBLE_PUSH_BUTTON, Long.valueOf(Windows.UIA_ButtonControlTypeId));
-        put(AccessBridgeControlTypes.ACCESSIBLE_RADIO_BUTTON, Long.valueOf(Windows.UIA_RadioButtonControlTypeId));
-        put(AccessBridgeControlTypes.ACCESSIBLE_ROOT_PANE, Long.valueOf(Windows.UIA_PaneControlTypeId));
-        put(AccessBridgeControlTypes.ACCESSIBLE_ROW_HEADER, Long.valueOf(Windows.UIA_HeaderControlTypeId));
-        put(AccessBridgeControlTypes.ACCESSIBLE_RULER, Long.valueOf(Windows.UIA_CustomControlTypeId));
-        put(AccessBridgeControlTypes.ACCESSIBLE_SCROLL_BAR, Long.valueOf(Windows.UIA_ScrollBarControlTypeId));
-        put(AccessBridgeControlTypes.ACCESSIBLE_SCROLL_PANE, Long.valueOf(Windows.UIA_PaneControlTypeId));
-        put(AccessBridgeControlTypes.ACCESSIBLE_SEPARATOR, Long.valueOf(Windows.UIA_SeparatorControlTypeId));
-        put(AccessBridgeControlTypes.ACCESSIBLE_SLIDER, Long.valueOf(Windows.UIA_SliderControlTypeId));
-        put(AccessBridgeControlTypes.ACCESSIBLE_SPIN_BOX, Long.valueOf(Windows.UIA_SpinnerControlTypeId));
-        put(AccessBridgeControlTypes.ACCESSIBLE_SPLIT_PANE, Long.valueOf(Windows.UIA_SplitButtonControlTypeId));
-        put(AccessBridgeControlTypes.ACCESSIBLE_STATUS_BAR, Long.valueOf(Windows.UIA_StatusBarControlTypeId));
-        put(AccessBridgeControlTypes.ACCESSIBLE_SWING_COMPONENT, Long.valueOf(Windows.UIA_CustomControlTypeId));
-        put(AccessBridgeControlTypes.ACCESSIBLE_TABLE, Long.valueOf(Windows.UIA_TableControlTypeId));
-        put(AccessBridgeControlTypes.ACCESSIBLE_TEXT, Long.valueOf(Windows.UIA_EditControlTypeId));
-        put(AccessBridgeControlTypes.ACCESSIBLE_TOGGLE_BUTTON, Long.valueOf(Windows.UIA_ButtonControlTypeId));
-        put(AccessBridgeControlTypes.ACCESSIBLE_TOOL_BAR, Long.valueOf(Windows.UIA_ToolBarControlTypeId));
-        put(AccessBridgeControlTypes.ACCESSIBLE_TOOL_TIP, Long.valueOf(Windows.UIA_ToolTipControlTypeId));
-        put(AccessBridgeControlTypes.ACCESSIBLE_TREE, Long.valueOf(Windows.UIA_TreeControlTypeId));
-        put(AccessBridgeControlTypes.ACCESSIBLE_UNKNOWN, Long.valueOf(Windows.UIA_CustomControlTypeId));
-        put(AccessBridgeControlTypes.ACCESSIBLE_VIEWPORT, Long.valueOf(Windows.UIA_PaneControlTypeId));
-        put(AccessBridgeControlTypes.ACCESSIBLE_WINDOW, Long.valueOf(Windows.UIA_WindowControlTypeId));
-    }};
-    
+            {
+            put(AccessBridgeControlTypes.ACCESSIBLE_ALERT, Long.valueOf(Windows.UIA_ControlTypePropertyId));
+            put(AccessBridgeControlTypes.ACCESSIBLE_AWT_COMPONENT, Long.valueOf(Windows.UIA_CustomControlTypeId));
+            put(AccessBridgeControlTypes.ACCESSIBLE_CANVAS, Long.valueOf(Windows.UIA_PaneControlTypeId));
+            put(AccessBridgeControlTypes.ACCESSIBLE_CHECK_BOX, Long.valueOf(Windows.UIA_CheckBoxControlTypeId));
+            put(AccessBridgeControlTypes.ACCESSIBLE_COLOR_CHOOSER, Long.valueOf(Windows.UIA_CustomControlTypeId));
+            put(AccessBridgeControlTypes.ACCESSIBLE_COLUMN_HEADER, Long.valueOf(Windows.UIA_HeaderControlTypeId));
+            put(AccessBridgeControlTypes.ACCESSIBLE_COMBO_BOX, Long.valueOf(Windows.UIA_ComboBoxControlTypeId));
+            put(AccessBridgeControlTypes.ACCESSIBLE_DATE_EDITOR, Long.valueOf(Windows.UIA_CustomControlTypeId));
+            put(AccessBridgeControlTypes.ACCESSIBLE_DESKTOP_ICON, Long.valueOf(Windows.UIA_ImageControlTypeId));
+            put(AccessBridgeControlTypes.ACCESSIBLE_DESKTOP_PANE, Long.valueOf(Windows.UIA_PaneControlTypeId));
+            put(AccessBridgeControlTypes.ACCESSIBLE_DIALOG, Long.valueOf(Windows.UIA_WindowControlTypeId));
+            put(AccessBridgeControlTypes.ACCESSIBLE_DIRECTORY_PANE, Long.valueOf(Windows.UIA_PaneControlTypeId));
+            put(AccessBridgeControlTypes.ACCESSIBLE_EDITBAR, Long.valueOf(Windows.UIA_ToolBarControlTypeId));
+            put(AccessBridgeControlTypes.ACCESSIBLE_FILE_CHOOSER, Long.valueOf(Windows.UIA_WindowControlTypeId));
+            put(AccessBridgeControlTypes.ACCESSIBLE_FILLER, Long.valueOf(Windows.UIA_SeparatorControlTypeId));
+            put(AccessBridgeControlTypes.ACCESSIBLE_FONT_CHOOSER, Long.valueOf(Windows.UIA_CustomControlTypeId));
+            put(AccessBridgeControlTypes.ACCESSIBLE_FOOTER, Long.valueOf(Windows.UIA_CustomControlTypeId));
+            put(AccessBridgeControlTypes.ACCESSIBLE_FRAME, Long.valueOf(Windows.UIA_WindowControlTypeId));
+            put(AccessBridgeControlTypes.ACCESSIBLE_GLASS_PANE, Long.valueOf(Windows.UIA_PaneControlTypeId));
+            put(AccessBridgeControlTypes.ACCESSIBLE_GROUP_BOX, Long.valueOf(Windows.UIA_GroupControlTypeId));
+            put(AccessBridgeControlTypes.ACCESSIBLE_HEADER, Long.valueOf(Windows.UIA_HeaderControlTypeId));
+            put(AccessBridgeControlTypes.ACCESSIBLE_HYPERLINK, Long.valueOf(Windows.UIA_HyperlinkControlTypeId));
+            put(AccessBridgeControlTypes.ACCESSIBLE_ICON, Long.valueOf(Windows.UIA_ImageControlTypeId));
+            put(AccessBridgeControlTypes.ACCESSIBLE_INTERNAL_FRAME, Long.valueOf(Windows.UIA_WindowControlTypeId));
+            put(AccessBridgeControlTypes.ACCESSIBLE_LABEL, Long.valueOf(Windows.UIA_TextControlTypeId));
+            put(AccessBridgeControlTypes.ACCESSIBLE_LAYERED_PANE, Long.valueOf(Windows.UIA_PaneControlTypeId));
+            put(AccessBridgeControlTypes.ACCESSIBLE_LIST, Long.valueOf(Windows.UIA_ListControlTypeId));
+            put(AccessBridgeControlTypes.ACCESSIBLE_LIST_ITEM, Long.valueOf(Windows.UIA_ListItemControlTypeId));
+            put(AccessBridgeControlTypes.ACCESSIBLE_MENU, Long.valueOf(Windows.UIA_MenuControlTypeId));
+            put(AccessBridgeControlTypes.ACCESSIBLE_MENU_BAR, Long.valueOf(Windows.UIA_MenuBarControlTypeId));
+            put(AccessBridgeControlTypes.ACCESSIBLE_MENU_ITEM, Long.valueOf(Windows.UIA_MenuItemControlTypeId));
+            put(AccessBridgeControlTypes.ACCESSIBLE_OPTION_PANE, Long.valueOf(Windows.UIA_PaneControlTypeId));
+            put(AccessBridgeControlTypes.ACCESSIBLE_PAGE_TAB, Long.valueOf(Windows.UIA_TabItemControlTypeId));
+            put(AccessBridgeControlTypes.ACCESSIBLE_PAGE_TAB_LIST, Long.valueOf(Windows.UIA_TabControlTypeId));
+            put(AccessBridgeControlTypes.ACCESSIBLE_PANEL, Long.valueOf(Windows.UIA_PaneControlTypeId));
+            put(AccessBridgeControlTypes.ACCESSIBLE_PARAGRAPH, Long.valueOf(Windows.UIA_TextControlTypeId));
+            put(AccessBridgeControlTypes.ACCESSIBLE_PASSWORD_TEXT, Long.valueOf(Windows.UIA_EditControlTypeId));
+            put(AccessBridgeControlTypes.ACCESSIBLE_POPUP_MENU, Long.valueOf(Windows.UIA_MenuControlTypeId));
+            put(AccessBridgeControlTypes.ACCESSIBLE_PROGRESS_BAR, Long.valueOf(Windows.UIA_ProgressBarControlTypeId));
+            put(AccessBridgeControlTypes.ACCESSIBLE_PUSH_BUTTON, Long.valueOf(Windows.UIA_ButtonControlTypeId));
+            put(AccessBridgeControlTypes.ACCESSIBLE_RADIO_BUTTON, Long.valueOf(Windows.UIA_RadioButtonControlTypeId));
+            put(AccessBridgeControlTypes.ACCESSIBLE_ROOT_PANE, Long.valueOf(Windows.UIA_PaneControlTypeId));
+            put(AccessBridgeControlTypes.ACCESSIBLE_ROW_HEADER, Long.valueOf(Windows.UIA_HeaderControlTypeId));
+            put(AccessBridgeControlTypes.ACCESSIBLE_RULER, Long.valueOf(Windows.UIA_CustomControlTypeId));
+            put(AccessBridgeControlTypes.ACCESSIBLE_SCROLL_BAR, Long.valueOf(Windows.UIA_ScrollBarControlTypeId));
+            put(AccessBridgeControlTypes.ACCESSIBLE_SCROLL_PANE, Long.valueOf(Windows.UIA_PaneControlTypeId));
+            put(AccessBridgeControlTypes.ACCESSIBLE_SEPARATOR, Long.valueOf(Windows.UIA_SeparatorControlTypeId));
+            put(AccessBridgeControlTypes.ACCESSIBLE_SLIDER, Long.valueOf(Windows.UIA_SliderControlTypeId));
+            put(AccessBridgeControlTypes.ACCESSIBLE_SPIN_BOX, Long.valueOf(Windows.UIA_SpinnerControlTypeId));
+            put(AccessBridgeControlTypes.ACCESSIBLE_SPLIT_PANE, Long.valueOf(Windows.UIA_SplitButtonControlTypeId));
+            put(AccessBridgeControlTypes.ACCESSIBLE_STATUS_BAR, Long.valueOf(Windows.UIA_StatusBarControlTypeId));
+            put(AccessBridgeControlTypes.ACCESSIBLE_SWING_COMPONENT, Long.valueOf(Windows.UIA_CustomControlTypeId));
+            put(AccessBridgeControlTypes.ACCESSIBLE_TABLE, Long.valueOf(Windows.UIA_TableControlTypeId));
+            put(AccessBridgeControlTypes.ACCESSIBLE_TEXT, Long.valueOf(Windows.UIA_EditControlTypeId));
+            put(AccessBridgeControlTypes.ACCESSIBLE_TOGGLE_BUTTON, Long.valueOf(Windows.UIA_ButtonControlTypeId));
+            put(AccessBridgeControlTypes.ACCESSIBLE_TOOL_BAR, Long.valueOf(Windows.UIA_ToolBarControlTypeId));
+            put(AccessBridgeControlTypes.ACCESSIBLE_TOOL_TIP, Long.valueOf(Windows.UIA_ToolTipControlTypeId));
+            put(AccessBridgeControlTypes.ACCESSIBLE_TREE, Long.valueOf(Windows.UIA_TreeControlTypeId));
+            put(AccessBridgeControlTypes.ACCESSIBLE_UNKNOWN, Long.valueOf(Windows.UIA_CustomControlTypeId));
+            put(AccessBridgeControlTypes.ACCESSIBLE_VIEWPORT, Long.valueOf(Windows.UIA_PaneControlTypeId));
+            put(AccessBridgeControlTypes.ACCESSIBLE_WINDOW, Long.valueOf(Windows.UIA_WindowControlTypeId));
+            }};
+
     /**
      * Retrieves the corresponding UIA automation control type.
      * @param accessibleRole An AccessBridge accessible role.
      * @return The UIA automation control type, or MISSING_UIA if not equivalent found.
      */
-    public static long toUIA(String accessibleRole){
-        if (accessibleRole == null || accessibleRole.isEmpty()){
+    public static long toUIA(String accessibleRole) {
+        if (accessibleRole == null || accessibleRole.isEmpty()) {
             return MISSING_UIA;
         }
-        
-        Long uia = MAP_2_UIA.get(accessibleRole);
-        if (uia != null)
-            return uia.longValue();
 
-        return MISSING_UIA;        
+        Long uia = MAP_2_UIA.get(accessibleRole);
+        if (uia != null) {
+            return uia.longValue();
+        }
+
+        return MISSING_UIA;
     }
 
 }
