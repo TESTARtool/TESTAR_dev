@@ -126,7 +126,7 @@ final class CliDaemonClient {
                     CliDaemonConfig.CONNECT_TIMEOUT_MS
             );
             try (DataOutputStream output = new DataOutputStream(socket.getOutputStream());
-                 DataInputStream input = new DataInputStream(socket.getInputStream())) {
+                    DataInputStream input = new DataInputStream(socket.getInputStream())) {
                 output.writeUTF(request.getCommand().name());
                 output.writeInt(request.getArguments().size());
                 for (String argument : request.getArguments()) {

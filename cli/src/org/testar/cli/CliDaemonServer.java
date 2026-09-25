@@ -74,7 +74,7 @@ final class CliDaemonServer {
 
     private void handle(Socket socket) throws IOException {
         try (DataInputStream input = new DataInputStream(socket.getInputStream());
-             DataOutputStream output = new DataOutputStream(socket.getOutputStream())) {
+                DataOutputStream output = new DataOutputStream(socket.getOutputStream())) {
             CliCommand command = CliCommand.valueOf(input.readUTF());
             int argumentCount = input.readInt();
             List<String> arguments = new ArrayList<>(argumentCount);
