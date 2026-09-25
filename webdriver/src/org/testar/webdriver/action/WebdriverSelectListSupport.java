@@ -9,6 +9,7 @@ package org.testar.webdriver.action;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -89,14 +90,40 @@ public final class WebdriverSelectListSupport {
     }
 
     public static String mapInputToOptionValue(Widget widget, String input) {
-        String normalizedInput = normalize(input);
-        for (SelectOption option : extractOptions(widget)) {
-            if (normalize(option.label()).equals(normalizedInput)
-                    || normalize(option.value()).equals(normalizedInput)) {
-                return option.value();
+        List<SelectOption> options = extractOptions(widget);
+        SelectOption exactMatch = findUniqueMatch(options, input, false);
+        if (exactMatch != null) {
+            return exactMatch.value();
+        }
+
+        SelectOption caseInsensitiveMatch = findUniqueMatch(options, input, true);
+        if (caseInsensitiveMatch != null) {
+            return caseInsensitiveMatch.value();
+        }
+
+        return input;
+    }
+
+    private static SelectOption findUniqueMatch(List<SelectOption> options, String input, boolean caseInsensitive) {
+        SelectOption match = null;
+        for (SelectOption option : options) {
+            boolean labelMatches = valuesMatch(option.label(), input, caseInsensitive);
+            boolean valueMatches = valuesMatch(option.value(), input, caseInsensitive);
+            if (labelMatches || valueMatches) {
+                if (match != null && match != option) {
+                    return null;
+                }
+                match = option;
             }
         }
-        return input;
+        return match;
+    }
+
+    private static boolean valuesMatch(String optionText, String input, boolean caseInsensitive) {
+        if (!caseInsensitive) {
+            return Objects.equals(optionText, input);
+        }
+        return normalize(optionText).equals(normalize(input));
     }
 
     private static SelectTarget resolveTarget(Widget widget) {

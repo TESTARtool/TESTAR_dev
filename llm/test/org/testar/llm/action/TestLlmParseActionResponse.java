@@ -282,7 +282,7 @@ public class TestLlmParseActionResponse {
             String widgetAbstractId, String actionConcreteId, String actionAbstractId, String value) {
         WidgetStub widget = createWebWidget(parentState, WdRoles.WdSELECT, description, webId, widgetConcreteId, widgetAbstractId);
         widget.set(WdTags.WebTagName, "select");
-        widget.set(WdTags.WebInnerHTML, "<option value=\"volvo\">Volvo</option><option value=\"saab\">Saab</option>");
+        widget.set(WdTags.WebInnerHTML, "<option value=\"volvo\">Volvo</option><option value=\"Saab\">Saab</option>");
         Action action = new WdSelectListAction(webId, value, widget, WdSelectListAction.JsTargetMethod.ID);
         action.set(Tags.ConcreteID, actionConcreteId);
         action.set(Tags.AbstractID, actionAbstractId);
