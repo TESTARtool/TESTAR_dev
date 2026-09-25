@@ -10,8 +10,8 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 
 public interface WdBrowserManager {
 
-	public String resolveBinary(String browserPathCandidate);
+    public String resolveBinary(String browserPathCandidate);
 
-	public RemoteWebDriver createWebDriver(String binaryPath, String extensionPath);
+    public RemoteWebDriver createWebDriver(String binaryPath, String extensionPath);
 
 }

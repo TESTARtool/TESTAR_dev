@@ -13,45 +13,48 @@ import org.testar.core.state.SUT;
 import org.testar.core.state.StateBuilder;
 import org.testar.core.tag.Tags;
 
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 public class WdStateBuilder implements StateBuilder {
-  private static final long serialVersionUID = -8640937524707589772L;
+    private static final long serialVersionUID = -8640937524707589772L;
 
-  private static final int defaultThreadPoolCount = 1;
+    private static final int defaultThreadPoolCount = 1;
 
-  private final double timeOut;
-  private transient ExecutorService executor;
+    private final double timeOut;
+    private transient ExecutorService executor;
 
-  public WdStateBuilder(double timeOut) {
-    Assert.isTrue(timeOut > 0);
-    this.timeOut = timeOut;
+    public WdStateBuilder(double timeOut) {
+        Assert.isTrue(timeOut > 0);
+        this.timeOut = timeOut;
 
-    // Needed to be able to schedule asynchronous tasks conveniently.
-    executor = Executors.newFixedThreadPool(defaultThreadPoolCount);
-  }
-
-  @Override
-  public WdState apply(SUT system) throws StateBuildException {
-    try {
-      Future<WdState> future = executor.submit(new WdStateFetcher(system));
-      WdState state = future.get((long) (timeOut), TimeUnit.SECONDS);
-      // When the SUT has a valid windowHandle store it in the state, it's required to create well aligned screenshots.
-      if (system.get(Tags.HWND, null) != null){
-        state.set(Tags.HWND, system.get(Tags.HWND));
-      }
-      return state;
+        // Needed to be able to schedule asynchronous tasks conveniently.
+        executor = Executors.newFixedThreadPool(defaultThreadPoolCount);
     }
-    catch (InterruptedException | ExecutionException e) {
-    	e.printStackTrace();
-      throw new StateBuildException(e.getMessage());
+
+    @Override
+    public WdState apply(SUT system) throws StateBuildException {
+        try {
+            Future<WdState> future = executor.submit(new WdStateFetcher(system));
+            WdState state = future.get((long) (timeOut), TimeUnit.SECONDS);
+            // When the SUT has a valid windowHandle store it in the state, it's required to create well aligned screenshots.
+            if (system.get(Tags.HWND, null) != null) {
+                state.set(Tags.HWND, system.get(Tags.HWND));
+            }
+            return state;
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+            throw new StateBuildException(e.getMessage());
+        } catch (TimeoutException e) {
+            WdRootElement wdRootElement = WdStateFetcher.buildRoot(system);
+            WdState wdState = new WdState(wdRootElement);
+            wdState.set(Tags.Role, Roles.Process);
+            wdState.set(Tags.NotResponding, true);
+            return wdState;
+        }
     }
-    catch (TimeoutException e) {
-      WdRootElement wdRootElement = WdStateFetcher.buildRoot(system);
-      WdState wdState = new WdState(wdRootElement);
-      wdState.set(Tags.Role, Roles.Process);
-      wdState.set(Tags.NotResponding, true);
-      return wdState;
-    }
-  }
 }

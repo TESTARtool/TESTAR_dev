@@ -7,13 +7,16 @@
 package org.testar.webdriver.util;
 
 import java.awt.Color;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public final class ColorUtil {
 
-    private ColorUtil() {}
+    private ColorUtil() { }
 
     /**
      * Converts an "rgb(r, g, b)" string to a Color object.
@@ -62,22 +65,28 @@ public final class ColorUtil {
 
     /** Returns a human-friendly color name for a Color. */
     public static String colorToName(Color c) {
-        if (c == null) return null;
-        if (c.getAlpha() == 0) return "transparent";
+        if (c == null) {
+            return null;
+        }
+        if (c.getAlpha() == 0) {
+            return "transparent";
+        }
 
         // Drop alpha for naming; compare on RGB only
         int r = c.getRed(), g = c.getGreen(), b = c.getBlue();
 
         // 1) Exact match first
         String exact = EXACT_LOOKUP.get((r << 16) | (g << 8) | b);
-        if (exact != null) return exact;
+        if (exact != null) {
+            return exact;
+        }
 
         // 2) Otherwise nearest neighbor in RGB space
         NamedColor nearest = null;
         int bestDistSq = Integer.MAX_VALUE;
         for (NamedColor nc : NAMED_COLORS) {
             int dr = r - nc.r, dg = g - nc.g, db = b - nc.b;
-            int distSq = dr*dr + dg*dg + db*db;
+            int distSq = dr * dr + dg * dg + db * db;
             if (distSq < bestDistSq) {
                 bestDistSq = distSq;
                 nearest = nc;
@@ -114,9 +123,15 @@ public final class ColorUtil {
         final String name;
         final int r, g, b;
         NamedColor(String name, int r, int g, int b) {
-            this.name = name; this.r = r; this.g = g; this.b = b;
+            this.name = name;
+            this.r = r;
+            this.g = g;
+            this.b = b;
         }
-        int key() { return (r << 16) | (g << 8) | b; }
+
+        int key() {
+            return (r << 16) | (g << 8) | b;
+        }
     }
 
     // Curated set of common/CSS color names.

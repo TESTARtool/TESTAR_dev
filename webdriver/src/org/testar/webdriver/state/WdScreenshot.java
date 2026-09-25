@@ -22,29 +22,27 @@ import java.io.File;
  */
 public class WdScreenshot extends AWTCanvas {
 
-  private WdScreenshot() {
-    // Dimensions are irrelevant
-    super(1, 1, 1, 1);
-  }
-
-  public static WdScreenshot fromScreenshot(Rect r, long windowHandle)
-      throws StateBuildException {
-    WdScreenshot wdScreenshot = new WdScreenshot();
-    RemoteWebDriver webDriver = WdDriver.getRemoteWebDriver();
-
-    try {
-      File screenshot = webDriver.getScreenshotAs(OutputType.FILE);
-      BufferedImage fullImg = ImageIO.read(screenshot);
-      double displayScale = Environment.getInstance().getDisplayScale(windowHandle);
-      int x = (int) Math.max(0, r.x() * displayScale);
-      int y = (int) Math.max(0, r.y() * displayScale);
-      int width = (int) Math.min(fullImg.getWidth(), r.width() * displayScale);
-      int height = (int) Math.min(fullImg.getHeight(), r.height() * displayScale);
-      wdScreenshot.img = fullImg.getSubimage(x, y, width, height);
+    private WdScreenshot() {
+        // Dimensions are irrelevant
+        super(1, 1, 1, 1);
     }
-    catch (Exception ignored) {
 
+    public static WdScreenshot fromScreenshot(Rect r, long windowHandle) throws StateBuildException {
+        WdScreenshot wdScreenshot = new WdScreenshot();
+        RemoteWebDriver webDriver = WdDriver.getRemoteWebDriver();
+
+        try {
+            File screenshot = webDriver.getScreenshotAs(OutputType.FILE);
+            BufferedImage fullImg = ImageIO.read(screenshot);
+            double displayScale = Environment.getInstance().getDisplayScale(windowHandle);
+            int x = (int) Math.max(0, r.x() * displayScale);
+            int y = (int) Math.max(0, r.y() * displayScale);
+            int width = (int) Math.min(fullImg.getWidth(), r.width() * displayScale);
+            int height = (int) Math.min(fullImg.getHeight(), r.height() * displayScale);
+            wdScreenshot.img = fullImg.getSubimage(x, y, width, height);
+        } catch (Exception ignored) {
+
+        }
+        return wdScreenshot;
     }
-    return wdScreenshot;
-  }
 }

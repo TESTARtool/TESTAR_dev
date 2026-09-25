@@ -10,7 +10,7 @@ import org.testar.webdriver.state.WdDriver;
 
 public final class WdProcessActivator implements Runnable {
 
-  public void run() {
-    WdDriver.activate();
-  }
+    public void run() {
+        WdDriver.activate();
+    }
 }

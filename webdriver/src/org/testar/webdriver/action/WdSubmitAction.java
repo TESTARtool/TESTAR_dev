@@ -8,10 +8,12 @@ package org.testar.webdriver.action;
 
 import org.testar.core.exceptions.ActionFailedException;
 import org.testar.webdriver.state.WdDriver;
-import org.testar.core.action.*;
-import org.testar.core.alayer.*;
-import org.testar.core.state.*;
-import org.testar.core.tag.*;
+import org.testar.core.action.Action;
+import org.testar.core.alayer.Role;
+import org.testar.core.state.SUT;
+import org.testar.core.state.State;
+import org.testar.core.tag.TaggableBase;
+import org.testar.core.tag.Tags;
 
 public class WdSubmitAction extends TaggableBase implements Action {
     private static final long serialVersionUID = 9102753249877445289L;
@@ -31,16 +33,15 @@ public class WdSubmitAction extends TaggableBase implements Action {
             WdDriver.executeScript(String.format("%s.submit();", form));
         } catch (Exception wde) {
             String message = "";
-            if(wde.getMessage() != null) {
+            if (wde.getMessage() != null) {
                 message = wde.getMessage();
             }
             // The form can not be found by id, let's try by name
             if (message.contains("Cannot read property 'submit' of null") || message.contains("Cannot read properties of null (reading 'submit')")) {
                 form = String.format("document.getElementsByName('%s')[0]", formId);
                 WdDriver.executeScript(String.format("%s.submit();", form));
-            }
-            // Let's try by clicking on the submit button
-            else if (message.contains("submit is not a function")) {
+            } else if (message.contains("submit is not a function")) {
+                // Let's try by clicking on the submit button
                 WdDriver.executeScript(String.format( "%s.querySelector('input[type=\"submit\"]').click();", form));
             }
         }

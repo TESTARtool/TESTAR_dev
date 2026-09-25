@@ -10,7 +10,10 @@ import org.testar.core.devices.Mouse;
 import org.testar.core.devices.MouseButtons;
 import org.testar.core.exceptions.FruitException;
 
-import java.awt.*;
+import java.awt.AWTException;
+import java.awt.MouseInfo;
+import java.awt.PointerInfo;
+import java.awt.Robot;
 
 /*
  * This is a clone of the AWTMouse class for the WebDriver layer.
@@ -22,67 +25,66 @@ import java.awt.*;
  * Positions are relative to the viewport.
  */
 public class WdMouse implements Mouse {
-  private static String INFO_MESSAGE =
-      "MouseInfo.getPointerInfo() returned null! " + System.lineSeparator() +
-      "This seeems to be undocumented Java library behavior... " + System.lineSeparator() +
-      "Consider using a platform specific Mouse Implementation instead of WdMouse!";
+    private static String INFO_MESSAGE =
+            "MouseInfo.getPointerInfo() returned null! " + System.lineSeparator() +
+            "This seeems to be undocumented Java library behavior... " + System.lineSeparator() +
+            "Consider using a platform specific Mouse Implementation instead of WdMouse!";
 
-  private final Robot robot;
-  
-  private double displayScale;
+    private final Robot robot;
 
-  public static WdMouse build() throws FruitException {
-    return new WdMouse();
-  }
+    private double displayScale;
 
-  private WdMouse() throws FruitException {
-    try {
-      robot = new Robot();
-      this.displayScale = 1.0;
+    public static WdMouse build() throws FruitException {
+        return new WdMouse();
     }
-    catch (AWTException awte) {
-      throw new FruitException(awte);
+
+    private WdMouse() throws FruitException {
+        try {
+            robot = new Robot();
+            this.displayScale = 1.0;
+        } catch (AWTException awte) {
+            throw new FruitException(awte);
+        }
     }
-  }
-  
-  public void setCursorDisplayScale(double displayScale) {
-	  this.displayScale = displayScale;
-  }
 
-  public String toString() {
-    return "WD Mouse";
-  }
-
-  public void press(MouseButtons k) {
-    robot.mousePress(k.code());
-  }
-
-  public void release(MouseButtons k) {
-    robot.mouseRelease(k.code());
-  }
-
-  public void setCursor(double x, double y) {
-    double canvasX = Math.min(Math.max(0, x), WdCanvasDimensions.getInnerWidth());
-    double canvasY = Math.min(Math.max(0, y), WdCanvasDimensions.getInnerHeight());
-    
-    canvasX += WdCanvasDimensions.getCanvasX();
-    canvasY += WdCanvasDimensions.getCanvasY();
-    
-    canvasX = canvasX * displayScale;
-    canvasY = canvasY * displayScale;
-
-    robot.mouseMove((int)canvasX, (int)canvasY);
-  }
-
-  public org.testar.core.alayer.Point cursor() {
-    PointerInfo info = MouseInfo.getPointerInfo();
-    if (info == null) {
-      throw new RuntimeException(INFO_MESSAGE);
+    public void setCursorDisplayScale(double displayScale) {
+        this.displayScale = displayScale;
     }
-    java.awt.Point p = info.getLocation();
 
-    int viewportX = (int) ((p.x/ displayScale) - WdCanvasDimensions.getCanvasX());
-    int viewportY = (int) ((p.y/ displayScale) - WdCanvasDimensions.getCanvasY());
-    return org.testar.core.alayer.Point.from(viewportX, viewportY);
-  }
+    public String toString() {
+        return "WD Mouse";
+    }
+
+    public void press(MouseButtons k) {
+        robot.mousePress(k.code());
+    }
+
+    public void release(MouseButtons k) {
+        robot.mouseRelease(k.code());
+    }
+
+    public void setCursor(double x, double y) {
+        double canvasX = Math.min(Math.max(0, x), WdCanvasDimensions.getInnerWidth());
+        double canvasY = Math.min(Math.max(0, y), WdCanvasDimensions.getInnerHeight());
+
+        canvasX += WdCanvasDimensions.getCanvasX();
+        canvasY += WdCanvasDimensions.getCanvasY();
+
+        canvasX = canvasX * displayScale;
+        canvasY = canvasY * displayScale;
+
+        robot.mouseMove((int)canvasX, (int)canvasY);
+    }
+
+    public org.testar.core.alayer.Point cursor() {
+        PointerInfo info = MouseInfo.getPointerInfo();
+        if (info == null) {
+            throw new RuntimeException(INFO_MESSAGE);
+        }
+        java.awt.Point p = info.getLocation();
+
+        int viewportX = (int) ((p.x / displayScale) - WdCanvasDimensions.getCanvasX());
+        int viewportY = (int) ((p.y / displayScale) - WdCanvasDimensions.getCanvasY());
+        return org.testar.core.alayer.Point.from(viewportX, viewportY);
+    }
 }

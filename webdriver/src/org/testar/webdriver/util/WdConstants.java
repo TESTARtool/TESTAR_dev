@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 public class WdConstants {
 
-    private WdConstants() {}
+    private WdConstants() { }
 
     // List of default HTML tags that getStateTreeTestar should ignore
     // no widgets can be found here

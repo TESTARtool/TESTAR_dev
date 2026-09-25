@@ -14,8 +14,8 @@ public class TestWebNavigationUtil {
     @Test
     public void emptyLinkIsAllowed() {
         Assert.assertFalse(
-            "Link is not denied because widget link does not exist",
-            WebNavigationUtil.isLinkDenied(
+                "Link is not denied because widget link does not exist",
+                WebNavigationUtil.isLinkDenied(
                 settingsWithDomains(List.of("para.testar.org")),
                 "",
                 "https://para.testar.org"

@@ -6,10 +6,17 @@
 
 package org.testar.webdriver.action;
 
-import org.testar.core.action.*;
-import org.testar.core.alayer.*;
-import org.testar.core.state.*;
-import org.testar.core.tag.*;
+import org.testar.core.action.Action;
+import org.testar.core.action.CompoundAction;
+import org.testar.core.action.NOP;
+import org.testar.core.action.StdActionCompiler;
+import org.testar.core.alayer.Roles;
+import org.testar.core.alayer.Role;
+import org.testar.core.state.SUT;
+import org.testar.core.state.State;
+import org.testar.core.state.Widget;
+import org.testar.core.tag.TaggableBase;
+import org.testar.core.tag.Tags;
 import org.testar.core.exceptions.ActionFailedException;
 import org.testar.webdriver.state.WdDriver;
 import org.testar.webdriver.state.WdElement;
@@ -104,38 +111,38 @@ public class WdFillFormAction extends TaggableBase implements Action {
         String uriPath = "";
         try {
             uriPath = WdDriver.getCurrentUrl();
-            uriPath = uriPath.substring(uriPath.indexOf("//")+2);
+            uriPath = uriPath.substring(uriPath.indexOf("//") + 2);
         } catch (Exception e) {
             System.out.println("ERROR: Exception obtaining URI, using empty path");
         }
-        logger.debug("uriPath="+uriPath);
-        if(uriPath.contains(";")){
+        logger.debug("uriPath=" + uriPath);
+        if (uriPath.contains(";")) {
             logger.debug("Removing everything after ;");
             uriPath = uriPath.substring(0, uriPath.indexOf(";"));
-            logger.debug("uriPath="+uriPath);
+            logger.debug("uriPath=" + uriPath);
         }
-        if(uriPath.contains("?")){
+        if (uriPath.contains("?")) {
             logger.debug("Removing everything after ?");
             uriPath = uriPath.substring(0, uriPath.indexOf("?"));
-            logger.debug("uriPath="+uriPath);
+            logger.debug("uriPath=" + uriPath);
         }
 
         // WebName is sometimes empty, then the generated XML file has URL and web id or widget path as its name
         String formName = widget.get(WdTags.WebName, "");
         String path = uriPath;
-        if(formName.length()>0){
-            if(useOnlyWebNameForXmlFileName){
+        if (formName.length() > 0) {
+            if (useOnlyWebNameForXmlFileName) {
                 path = formName;
-                logger.debug("Only form name used for path="+path);
-            }else{
+                logger.debug("Only form name used for path=" + path);
+            } else {
                 path = uriPath + "_" + formName;
-                logger.debug("URL and form name used for path="+path);
+                logger.debug("URL and form name used for path=" + path);
             }
-        }else if(widget.get(WdTags.WebId, "").length()>0){
+        } else if (widget.get(WdTags.WebId, "").length() > 0) {
             path = uriPath + "_" + widget.get(WdTags.WebId, "");
-            logger.debug("Form name empty, using URL and web id used for path="+path);
+            logger.debug("Form name empty, using URL and web id used for path=" + path);
             // System.out.println("DEBUG: Derive FillForm Action : look for file " + path);
-        }else{
+        } else {
             // Form name and ID are empty, using TESTAR widget path for the filename
             // How to find an element that does not have name or ID? We want xPath from Selenium
             // TODO xPath for form element without attributes, instead of TESTAR widget path
@@ -143,14 +150,14 @@ public class WdFillFormAction extends TaggableBase implements Action {
             // 2 forms without name or id would be using the same XML filename even if one of the them has more fields
             // Therefore, we add TESTAR widget path into the filename:
             path = uriPath + "_" + widget.get(Tags.Path, "");
-            logger.debug("Form name and ID are empty, using URL and TESTAR widget path used for path="+path);
+            logger.debug("Form name and ID are empty, using URL and TESTAR widget path used for path=" + path);
         }
         path = path.replaceAll("[\\/?:*\"|><]", "_") + ".xml";
         String file_path = "settings\\" + this.formFileFolder + "\\" + path;
-        logger.debug("file_path="+file_path);
+        logger.debug("file_path=" + file_path);
         //Updating action description:
-        this.set(Tags.Desc, "Fill a form based on XML file: "+file_path);
-        logger.debug("Form action Desc="+this.get(Tags.Desc, ""));
+        this.set(Tags.Desc, "Fill a form based on XML file: " + file_path);
+        logger.debug("Form action Desc=" + this.get(Tags.Desc, ""));
         File f = new File(file_path);
         Map<String, String> fields = new HashMap<>();
         Boolean storeFile = true;
@@ -176,10 +183,10 @@ public class WdFillFormAction extends TaggableBase implements Action {
                 // If the form does not contains a name property, derive a GUI click action
                 // in the first submit widget of the form
                 Widget input = findSubmitButtonOfForm(widget);
-                if(input!=null){
+                if (input != null) {
                     formBuilder.add(ac.leftClickAt(input), 2);
                     logger.debug("Storing the file and creating leftClickAt on the found submit button of the form");
-                }else{
+                } else {
                     logger.error("Could not find submit button of the form, so the action does not click submit.");
                 }
             }
@@ -189,14 +196,14 @@ public class WdFillFormAction extends TaggableBase implements Action {
                 // If we found a form with a name property, use this property to execute a script submit action
                 formBuilder.add(new WdSubmitAction(formName), 2);
                 logger.debug("File existed already, creating WdSubmitAction with form name");
-            } else if(submit.contains("true")) {
+            } else if (submit.contains("true")) {
                 // If the form does not contains a name property, derive a GUI click action
                 // in the first submit widget of the form
                 Widget input = findSubmitButtonOfForm(widget);
-                if(input!=null){
+                if (input != null) {
                     formBuilder.add(ac.leftClickAt(input), 2);
                     logger.debug("File existed already, creating leftClickAt on the found submit button of the form");
-                }else{
+                } else {
                     logger.error("Could not find submit button of the form, so the action does not click submit.");
                 }
             }
@@ -219,19 +226,19 @@ public class WdFillFormAction extends TaggableBase implements Action {
         return formAction;
     }
 
-    private static Boolean isSubmitButton(Widget submit_widget){
+    private static Boolean isSubmitButton(Widget submit_widget) {
         Role[] roles = new Role[]{WdRoles.WdINPUT, WdRoles.WdBUTTON};
         return Role.isOneOf(submit_widget.get(Tags.Role, Roles.Widget), roles) && submit_widget.get(WdTags.WebType,"").equalsIgnoreCase("submit");
     }
 
     private Widget findSubmitButtonOfForm(Widget form) {
         Widget child = null;
-        for(int i = 0; i < form.childCount(); i++) {
-            if(isSubmitButton(form.child(i))) {
+        for (int i = 0; i < form.childCount(); i++) {
+            if (isSubmitButton(form.child(i))) {
                 return form.child(i);
             } else {
                 child = findSubmitButtonOfForm(form.child(i));
-                if(child != null) {
+                if (child != null) {
                     return child;
                 }
             }
@@ -268,12 +275,12 @@ public class WdFillFormAction extends TaggableBase implements Action {
         String defaultValue = "write-random-genenerated-value";
         if (isTypeable(widget)) {
             if (storeFile) {
-                if(element.name.length()>0){
+                if (element.name.length() > 0) {
                     fields.put(element.name, defaultValue);
-                }else if(element.id.length()>0){
+                } else if (element.id.length() > 0) {
                     fields.put(element.id, defaultValue);
                     element.name = element.id;
-                }else{
+                } else {
                     // System.out.println("DEBUG: name and id are empty!");
                 }
             }
@@ -289,12 +296,12 @@ public class WdFillFormAction extends TaggableBase implements Action {
 
             if (isTypeable(w)) {
                 if (storeFile) {
-                    if(element.name.length()>0){
+                    if (element.name.length() > 0) {
                         fields.put(element.name, defaultValue);
-                    }else if(element.id.length()>0){
+                    } else if (element.id.length() > 0) {
                         fields.put(element.id, defaultValue);
                         element.name = element.id;
-                    }else{
+                    } else {
                         // System.out.println("DEBUG: name and id are empty!");
                     }
                 }
@@ -344,7 +351,7 @@ public class WdFillFormAction extends TaggableBase implements Action {
             for (int content = 0; content < dataNodeList.getLength(); content++) {
                 Node item = dataNodeList.item(content);
                 Element node = (Element) item;
-                if(node.getNodeName().equals("weight")) {
+                if (node.getNodeName().equals("weight")) {
                     total += Integer.valueOf(node.getTextContent());
                 }
             }
@@ -352,7 +359,7 @@ public class WdFillFormAction extends TaggableBase implements Action {
 
         // Randomly select a number between 0 and the total sum of weight values
         // To randomly select a data node with values
-        int random = new Random().nextInt((total)+1);
+        int random = new Random().nextInt((total) + 1);
 
         int sum = 0;
         // Then iterate through the data elements to find the randomly selected data node
@@ -362,10 +369,10 @@ public class WdFillFormAction extends TaggableBase implements Action {
             for (int content = 0; content < dataNodeList.getLength(); content++) {
                 Node item = dataNodeList.item(content);
                 Element node = (Element) item;
-                if(node.getNodeName().equals("weight")) {
+                if (node.getNodeName().equals("weight")) {
                     sum += Integer.valueOf(node.getTextContent());
                 }
-                if(sum >= random) {
+                if (sum >= random) {
                     // Returning the node values of the data node
                     return node.getParentNode().getChildNodes();
                 }
@@ -385,7 +392,7 @@ public class WdFillFormAction extends TaggableBase implements Action {
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
             writer.write(result);
-            logger.debug("Form file created, file name: "+fileName);
+            logger.debug("Form file created, file name: " + fileName);
         } catch (Exception e) {
             e.printStackTrace();
         }

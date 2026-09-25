@@ -46,7 +46,7 @@ public class WdSelectListAction extends TaggableBase implements Action {
         Widget originWidget = get(Tags.OriginWidget, null);
         WebElement fallbackElement = originWidget == null ? null : originWidget.get(WdTags.WebElementSelenium, null);
 
-        switch(targetMethod) {
+        switch (targetMethod) {
             case ID:
                 WdDriver.executeScript(
                         "const field = document.getElementById(arguments[0]);"

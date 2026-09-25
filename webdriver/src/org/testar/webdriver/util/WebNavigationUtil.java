@@ -39,8 +39,8 @@ public final class WebNavigationUtil {
         for (String webDomainAllowed : settings.get(ConfigTags.WebDomainsAllowed)) {
             if (!initialConfiguredDomains.contains(webDomainAllowed)) {
                 System.out.println(String.format(
-                    "WEBDRIVER INFO: Automatically adding %s Web domain to WebDomainsAllowed List",
-                    webDomainAllowed
+                        "WEBDRIVER INFO: Automatically adding %s Web domain to WebDomainsAllowed List",
+                        webDomainAllowed
                 ));
             }
         }

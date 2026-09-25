@@ -25,100 +25,101 @@ import io.github.bonigarcia.wdm.WebDriverManager;
 
 public class WdChromeManager implements WdBrowserManager {
 
-	protected static final Logger logger = LogManager.getLogger();
+    protected static final Logger logger = LogManager.getLogger();
 
-	@Override
-	public String resolveBinary(String chromePathCandidate) {
-		File file = new File(chromePathCandidate);
-		if (file.exists() && file.getName().endsWith(".exe")) {
-			logger.log(Level.INFO, String.format("User indicated Chrome for testing path: %s", chromePathCandidate));
-			return file.getAbsolutePath();
-		} else {
-			if(!chromePathCandidate.isEmpty()) logger.log(Level.WARN, String.format("Invalid Chrome for testing path: %s", chromePathCandidate));
-			logger.log(Level.INFO, "Downloading Chrome for testing...");
-			return ChromeDownloader.downloadChromeForTesting();
-		}
-	}
+    @Override
+    public String resolveBinary(String chromePathCandidate) {
+        File file = new File(chromePathCandidate);
+        if (file.exists() && file.getName().endsWith(".exe")) {
+            logger.log(Level.INFO, String.format("User indicated Chrome for testing path: %s", chromePathCandidate));
+            return file.getAbsolutePath();
+        } else {
+            if (!chromePathCandidate.isEmpty()) {
+                logger.log(Level.WARN, String.format("Invalid Chrome for testing path: %s", chromePathCandidate));
+            }
+            logger.log(Level.INFO, "Downloading Chrome for testing...");
+            return ChromeDownloader.downloadChromeForTesting();
+        }
+    }
 
-	@Override
-	public RemoteWebDriver createWebDriver(String chromeForTestingPath, String extensionPath) {
-		String chromeVersion = getChromeMajorVersion(chromeForTestingPath);
-		if(!chromeVersion.isEmpty()) {
-			logger.log(Level.INFO, String.format("Detected Chrome Version: %s", chromeVersion));
-			WebDriverManager.chromedriver().driverVersion(chromeVersion).setup();
-		}
-		else {
-			logger.log(Level.WARN, "Chrome version not detected, the default WebDriverManager driver version will be used");
-			WebDriverManager.chromedriver().setup();
-		}
+    @Override
+    public RemoteWebDriver createWebDriver(String chromeForTestingPath, String extensionPath) {
+        String chromeVersion = getChromeMajorVersion(chromeForTestingPath);
+        if (!chromeVersion.isEmpty()) {
+            logger.log(Level.INFO, String.format("Detected Chrome Version: %s", chromeVersion));
+            WebDriverManager.chromedriver().driverVersion(chromeVersion).setup();
+        } else {
+            logger.log(Level.WARN, "Chrome version not detected, the default WebDriverManager driver version will be used");
+            WebDriverManager.chromedriver().setup();
+        }
 
-		ChromeOptions options = new ChromeOptions();
-		options.setBinary(chromeForTestingPath);
+        ChromeOptions options = new ChromeOptions();
+        options.setBinary(chromeForTestingPath);
 
-		options.addArguments("--load-extension=" + extensionPath);
+        options.addArguments("--load-extension=" + extensionPath);
 
-		options.addArguments("disable-infobars");
+        options.addArguments("disable-infobars");
 
-		// Workaround to fix https://github.com/SeleniumHQ/selenium/issues/11750
-		options.addArguments("--remote-allow-origins=*");
+        // Workaround to fix https://github.com/SeleniumHQ/selenium/issues/11750
+        options.addArguments("--remote-allow-origins=*");
 
-		// Disable search engine selector
-		options.addArguments("--disable-search-engine-choice-screen");  
+        // Disable search engine selector
+        options.addArguments("--disable-search-engine-choice-screen");
 
-		if(WdDriver.fullScreen) {
-			options.addArguments("--start-maximized");
-			logger.log(Level.INFO, "Browser window starting maximized");
-		}
-		if(WdDriver.disableSecurity) {
-			options.addArguments("ignore-certificate-errors");
-			options.addArguments("--disable-web-security");
-			options.addArguments("--allow-running-insecure-content");
-		}
-		if(WdDriver.remoteDebugging) {
-			options.addArguments("--remote-debugging-port=9222");
-		}
-		if(WdDriver.disableGPU) {
-			options.addArguments("--disable-gpu");
-		}
+        if (WdDriver.fullScreen) {
+            options.addArguments("--start-maximized");
+            logger.log(Level.INFO, "Browser window starting maximized");
+        }
+        if (WdDriver.disableSecurity) {
+            options.addArguments("ignore-certificate-errors");
+            options.addArguments("--disable-web-security");
+            options.addArguments("--allow-running-insecure-content");
+        }
+        if (WdDriver.remoteDebugging) {
+            options.addArguments("--remote-debugging-port=9222");
+        }
+        if (WdDriver.disableGPU) {
+            options.addArguments("--disable-gpu");
+        }
 
-		Map<String, Object> prefs = new HashMap<>();
-		prefs.put("profile.default_content_setting_values.notifications", 1);
-		prefs.put("profile.password_manager_leak_detection", false);
-		options.setExperimentalOption("prefs", prefs);
+        Map<String, Object> prefs = new HashMap<>();
+        prefs.put("profile.default_content_setting_values.notifications", 1);
+        prefs.put("profile.password_manager_leak_detection", false);
+        options.setExperimentalOption("prefs", prefs);
 
-		return new ChromeDriver(options);
-	}
+        return new ChromeDriver(options);
+    }
 
-	private String getChromeMajorVersion(String chromePath) {
-		File chromeDir = new File(chromePath).getParentFile();
-		File[] files = chromeDir.listFiles();
+    private String getChromeMajorVersion(String chromePath) {
+        File chromeDir = new File(chromePath).getParentFile();
+        File[] files = chromeDir.listFiles();
 
-		if (files != null) {
-			for (File file : files) {
-				String name = file.getName();
-				if (name.matches("\\d+\\.\\d+\\.\\d+\\.\\d+\\.manifest")) {
-					// Example: "137.0.7151.40.manifest" to "137"
-					return name.split("\\.")[0];
-				}
-			}
-		}
+        if (files != null) {
+            for (File file : files) {
+                String name = file.getName();
+                if (name.matches("\\d+\\.\\d+\\.\\d+\\.\\d+\\.manifest")) {
+                    // Example: "137.0.7151.40.manifest" to "137"
+                    return name.split("\\.")[0];
+                }
+            }
+        }
 
-		// If no .manifest file found, fall back to using --version
-		try {
-			Process process = new ProcessBuilder(chromePath, "--version").start();
-			try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-				// Example: "Google Chrome 137.0.7151.40.manifest" to "137"
-				String line = reader.readLine();
-				if (line != null && line.matches(".*\\d+\\.\\d+\\.\\d+\\.\\d+.*")) {
-					String version = line.replaceAll("[^\\d.]", "");
-					return version.split("\\.")[0];
-				}
-			}
-		} catch (IOException e) {
-			logger.log(Level.WARN, "Failed to get Chrome version from binary", e);
-		}
+        // If no .manifest file found, fall back to using --version
+        try {
+            Process process = new ProcessBuilder(chromePath, "--version").start();
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+                // Example: "Google Chrome 137.0.7151.40.manifest" to "137"
+                String line = reader.readLine();
+                if (line != null && line.matches(".*\\d+\\.\\d+\\.\\d+\\.\\d+.*")) {
+                    String version = line.replaceAll("[^\\d.]", "");
+                    return version.split("\\.")[0];
+                }
+            }
+        } catch (IOException e) {
+            logger.log(Level.WARN, "Failed to get Chrome version from binary", e);
+        }
 
-		return "";
-	}
+        return "";
+    }
 
 }

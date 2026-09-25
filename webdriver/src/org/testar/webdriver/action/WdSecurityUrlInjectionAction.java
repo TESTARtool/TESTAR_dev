@@ -6,10 +6,12 @@
 
 package org.testar.webdriver.action;
 
-import org.testar.core.action.*;
-import org.testar.core.alayer.*;
-import org.testar.core.state.*;
-import org.testar.core.tag.*;
+import org.testar.core.action.Action;
+import org.testar.core.alayer.Role;
+import org.testar.core.state.SUT;
+import org.testar.core.state.State;
+import org.testar.core.tag.TaggableBase;
+import org.testar.core.tag.Tags;
 import org.testar.core.exceptions.ActionFailedException;
 import org.testar.webdriver.state.WdDriver;
 
@@ -19,8 +21,7 @@ public class WdSecurityUrlInjectionAction extends TaggableBase implements Action
 
     private String text;
 
-    public WdSecurityUrlInjectionAction(String text)
-    {
+    public WdSecurityUrlInjectionAction(String text) {
         super();
         this.set(Tags.Role, WdActionRoles.ExecuteScript);
         this.set(Tags.Desc, "Execute Webdriver script to redirect to different url");
@@ -28,15 +29,14 @@ public class WdSecurityUrlInjectionAction extends TaggableBase implements Action
     }
 
     public String getText() {
-    	return text;
+        return text;
     }
 
     @Override
-    public void run(SUT system, State state, double duration) throws ActionFailedException
-    {
+    public void run(SUT system, State state, double duration) throws ActionFailedException {
         System.out.println("Executing UrlInjectionAction to new location:");
         System.out.println(this.text);
-        WdDriver.executeScript("window.location = \'"+this.text+"\'");
+        WdDriver.executeScript("window.location = \'" + this.text + "\'");
     }
 
     @Override

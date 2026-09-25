@@ -13,8 +13,11 @@ import org.testar.webdriver.alayer.WdHitTester;
 import org.testar.webdriver.tag.WdMapping;
 import org.testar.webdriver.alayer.WdRoles;
 import org.testar.webdriver.tag.WdTags;
-import org.testar.core.state.*;
-import org.testar.core.tag.*;
+import org.testar.core.state.State;
+import org.testar.core.state.Widget;
+import org.testar.core.state.WidgetIterator;
+import org.testar.core.tag.Tag;
+import org.testar.core.tag.Tags;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -22,513 +25,400 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 
 public final class WdState extends WdWidget implements State {
-	private static final long serialVersionUID = 661696260972010052L;
+    private static final long serialVersionUID = 661696260972010052L;
 
-	public WdState(WdElement root) {
-		super(null, null, root);
-		this.root = this;
-	}
+    public WdState(WdElement root) {
+        super(null, null, root);
+        this.root = this;
+    }
 
-	public Iterator<Widget> iterator() {
-		Iterator<Widget> iterator = new WidgetIterator(this);
+    public Iterator<Widget> iterator() {
+        Iterator<Widget> iterator = new WidgetIterator(this);
 
-		// If root element is null, disable iterating
-		if (this.element == null) {
-			iterator.next();
-		}
+        // If root element is null, disable iterating
+        if (this.element == null) {
+            iterator.next();
+        }
 
-		return iterator;
-	}
+        return iterator;
+    }
 
-	public void remove(WdWidget w) {
-		Assert.isTrue(this != w, "You cannot remove the root!");
-		assert (w.parent != null);
-		w.parent.children.remove(w);
-		invalidate(w);
-	}
+    public void remove(WdWidget w) {
+        Assert.isTrue(this != w, "You cannot remove the root!");
+        assert (w.parent != null);
+        w.parent.children.remove(w);
+        invalidate(w);
+    }
 
-	public void invalidate(WdWidget w) {
-		if (w.element != null) {
-			w.element.backRef = null;
-		}
-		w.root = null;
-		for (WdWidget c : w.children) {
-			invalidate(c);
-		}
-	}
+    public void invalidate(WdWidget w) {
+        if (w.element != null) {
+            w.element.backRef = null;
+        }
+        w.root = null;
+        for (WdWidget c : w.children) {
+            invalidate(c);
+        }
+    }
 
-	public void setParent(WdWidget w, Widget parent, int idx) {
-		Assert.notNull(parent);
-		Assert.isTrue(parent instanceof WdWidget);
-		Assert.isTrue(w != this, "You cannot set the root's parent!");
-		assert (w.parent != null);
+    public void setParent(WdWidget w, Widget parent, int idx) {
+        Assert.notNull(parent);
+        Assert.isTrue(parent instanceof WdWidget);
+        Assert.isTrue(w != this, "You cannot set the root's parent!");
+        assert (w.parent != null);
 
-		WdWidget webParent = (WdWidget) parent;
-		Assert.isTrue(webParent.root == this);
-		Assert.isTrue(!Util.isAncestorOf(w, parent), "The parent is a descendent of this widget!");
+        WdWidget webParent = (WdWidget) parent;
+        Assert.isTrue(webParent.root == this);
+        Assert.isTrue(!Util.isAncestorOf(w, parent), "The parent is a descendent of this widget!");
 
-		w.parent.children.remove(w);
-		webParent.children.add(idx, w);
-		w.parent = webParent;
-	}
+        w.parent.children.remove(w);
+        webParent.children.add(idx, w);
+        w.parent = webParent;
+    }
 
-	WdWidget addChild(WdWidget parent, WdElement element) {
-		WdWidget ret = new WdWidget(this, parent, element);
-		return ret;
-	}
+    WdWidget addChild(WdWidget parent, WdElement element) {
+        WdWidget ret = new WdWidget(this, parent, element);
+        return ret;
+    }
 
-	void connect(WdWidget parent, WdWidget child) {
-		parent.children.add(child);
-	}
+    void connect(WdWidget parent, WdWidget child) {
+        parent.children.add(child);
+    }
 
-	public <T> T get(WdWidget w, Tag<T> t) {
-		T ret = get(w, t, null);
-		if (ret == null) {
-			throw new NoSuchTagException(t);
-		}
-		return ret;
-	}
+    public <T> T get(WdWidget w, Tag<T> t) {
+        T ret = get(w, t, null);
+        if (ret == null) {
+            throw new NoSuchTagException(t);
+        }
+        return ret;
+    }
 
-	@SuppressWarnings("unchecked")
-	public <T> T get(WdWidget w, Tag<T> t, T defaultValue) {
-		
-		Tag<T> stateManagementTag = WdMapping.getMappedStateTag(t);
-		if (stateManagementTag != null) {
-			t = stateManagementTag;
-		}
+    @SuppressWarnings("unchecked")
+    public <T> T get(WdWidget w, Tag<T> t, T defaultValue) {
 
-		Object ret = w.tags.get(t);
-		
-		if (ret != null) {
-			return (T)ret;
-		}
+        Tag<T> stateManagementTag = WdMapping.getMappedStateTag(t);
+        if (stateManagementTag != null) {
+            t = stateManagementTag;
+        }
 
-		else if (w.element == null || w.tags.containsKey(t)) {
-			return defaultValue;
-		}
+        Object ret = w.tags.get(t);
 
-		if (t.equals(Tags.Desc)) {
-			ret = w.element.getElementDescription();
-		}
-		else if (t.equals(Tags.Role)) {
-			ret = WdRoles.fromTypeId(w.element.tagName);
-		}
-		else if (t.equals(Tags.HitTester)) {
-			ret = new WdHitTester(w.element);
-		}
-		else if (t.equals(Tags.Shape)) {
-			ret = w.element.rect;
-		}
-		else if (t.equals(Tags.Blocked)) {
-			ret = w.element.blocked;
-		}
-		else if (t.equals(Tags.Enabled)) {
-			ret = w.element.enabled;
-		}
-		else if (t.equals(Tags.Title)) {
-			ret = w.element.genericTitle;
-		}
-		else if (t.equals(WdTags.WebGenericTitle)) {
-			ret = w.element.genericTitle;
-		}
-		else if (t.equals(Tags.ValuePattern)) {
-			ret = w.element.href;
-		}
-		/*else if (t.equals(Tags.ToolTipText)) {
-			ret = w.element.helpText;
-		}*/
-		else if (t.equals(Tags.PID)) {
-			ret = w == this ? ((WdRootElement) element).pid : null;
-		}
-		else if (t.equals(Tags.IsRunning)) {
-			ret = w == this ? ((WdRootElement) element).isRunning : null;
-		}
-		else if (t.equals(Tags.TimeStamp)) {
-			ret = w == this ? ((WdRootElement) element).timeStamp : null;
-		}
-		else if (t.equals(Tags.Foreground)) {
-			ret = w == this ? ((WdRootElement) element).isForeground : null;
-		}
-		else if (t.equals(Tags.HasStandardKeyboard)) {
-			ret = w == this ? ((WdRootElement) element).hasStandardKeyboard : null;
-		}
-		else if (t.equals(Tags.HasStandardMouse)) {
-			ret = w == this ? ((WdRootElement) element).hasStandardMouse : null;
-		}
-		else if (t.equals(WdTags.WebName)) {
-			ret = w.element.name;
-		}
-		/*else if (t.equals(WdTags.WebOrientation)) {
-			ret = (long)0;
-		}*/
-		else if (t.equals(WdTags.WebCssClasses)) {
-			ret = w.element.cssClasses.toString();
-		}
-		else if (t.equals(Tags.ZIndex)) {
-			ret = w.element.zindex;
-		}
-		else if (t.equals(WdTags.WebIsWindowModal)) {
-			ret = w.element.isModal;
-		}
-		/*else if (t.equals(WdTags.WebIsTopmostWindow)) {
-			ret = true;
-		}*/
-		else if (t.equals(WdTags.WebIsContentElement)) {
-			ret = w.element.isContentElement;
-		}
-		else if (t.equals(WdTags.WebIsControlElement)) {
-			ret = w.element.isControlElement;
-		}
-		else if (t.equals(WdTags.WebScrollPattern)) {
-			ret = w.element.scrollPattern;
-		}
-		else if (t.equals(WdTags.WebHorizontallyScrollable)) {
-			ret = w.element.hScroll;
-		}
-		else if (t.equals(WdTags.WebVerticallyScrollable)) {
-			ret = w.element.vScroll;
-		}
-		else if (t.equals(WdTags.WebScrollHorizontalViewSize)) {
-			ret = w.element.hScrollViewSize;
-		}
-		else if (t.equals(WdTags.WebScrollVerticalViewSize)) {
-			ret = w.element.vScrollViewSize;
-		}
-		else if (t.equals(WdTags.WebScrollHorizontalPercent)) {
-			ret = w.element.hScrollPercent;
-		}
-		else if (t.equals(WdTags.WebScrollVerticalPercent)) {
-			ret = w.element.vScrollPercent;
-		}
-		/*else if (t.equals(WdTags.WebHelpText)) {
-			ret = w.element.helpText;
-		}*/
-		else if (t.equals(WdTags.WebTagName)) {
-			ret = w.element.tagName;
-		}
-		/*else if (t.equals(WdTags.WebControlType)) {
-			ret = null;
-		}*/
-		/*else if (t.equals(WdTags.WebCulture)) {
-			ret = w.element.culture;
-		}*/
-		/*else if (t.equals(WdTags.WebFrameworkId)) {
-			ret = null;
-		}*/
-		else if (t.equals(WdTags.WebHasKeyboardFocus)) {
-			ret = w.element.hasKeyboardFocus;
-		}
-		else if (t.equals(WdTags.WebIsFullOnScreen)) {
-			ret = w.element.isFullVisibleOnScreen;
-		}
-		else if (t.equals(WdTags.WebIsOffScreen)) {
-			ret = !w.element.isFullVisibleOnScreen;
-		}
-		else if (t.equals(WdTags.WebIsActuallyVisible)) {
-			ret = w.element.isActuallyVisible;
-		}
-		else if (t.equals(WdTags.WebIsKeyboardFocusable)) {
-			ret = w.element.isKeyboardFocusable;
-		}
-		else if (t.equals(WdTags.WebAcceleratorKey)) {
-			ret = w.element.acceleratorKey;
-		}
-		else if (t.equals(WdTags.WebAccessKey)) {
-			ret = w.element.accessKey;
-		}
-		else if (t.equals(WdTags.WebId)) {
-			ret = w.element.id;
-		}
-		else if (t.equals(WdTags.WebTextContent)) {
-			ret = w.element.textContent;
-		}
-		else if (t.equals(WdTags.WebInnerText)) {
-			ret = w.element.innerText;
-		}
-		else if (t.equals(WdTags.WebTitle)) {
-			ret = w.element.title;
-		}
-		else if (t.equals(WdTags.WebHref)) {
-			ret = w.element.href;
-		}
-		else if (t.equals(WdTags.WebValue)) {
-			ret = w.element.value;
-		}
-		else if (t.equals(WdTags.WebStyle)) {
-			ret = w.element.style;
-		}
-		else if (t.equals(WdTags.WebStyleOpacity)) {
-			ret = w.element.styleOpacity;
-		}
-		else if (t.equals(WdTags.WebStyleOverflow)) {
-			ret = w.element.styleOverflow;
-		}
-		else if (t.equals(WdTags.WebStyleOverflowX)) {
-			ret = w.element.styleOverflowX;
-		}
-		else if (t.equals(WdTags.WebStyleOverflowY)) {
-			ret = w.element.styleOverflowY;
-		}
-		else if (t.equals(WdTags.WebStylePosition)) {
-			ret = w.element.stylePosition;
-		}
-		else if (t.equals(WdTags.WebTarget)) {
-			ret = w.element.target;
-		}
-		else if (t.equals(WdTags.WebAlt)) {
-			ret = w.element.alt;
-		}
-		else if (t.equals(WdTags.WebDisplay)) {
-			ret = w.element.display;
-		}
-		else if (t.equals(WdTags.WebIsHidden)) {
-			ret = w.element.isHidden();
-		}
-		else if (t.equals(WdTags.WebXPath)) {
-			ret = w.element.xpath;
-		}
-		else if (t.equals(WdTags.WebIsDisplayed)) {
-			ret = w.element.isDisplayed();
-		}
-		else if (t.equals(WdTags.WebComputedFontSize)) {
-			ret = w.element.computedFontSize;
-		}
-		else if (t.equals(WdTags.WebComputedColor)) {
-			ret = w.element.computedColor;
-		}
-		else if (t.equals(WdTags.WebComputedBackgroundColor)) {
-			ret = w.element.computedBackgroundColor;
-		}
-		else if (t.equals(WdTags.WebComputedColorName)) {
-		    ret = w.element.computedColorName;
-		}
-		else if (t.equals(WdTags.WebComputedBackgroundColorName)) {
-		    ret = w.element.computedBackgroundColorName;
-		}
-		else if (t.equals(WdTags.WebType)) {
-			ret = w.element.type;
-		}
-		else if (t.equals(WdTags.WebSrc)) {
-			ret = w.element.src;
-		}
-		else if (t.equals(WdTags.WebNaturalWidth)) {
-			ret = w.element.naturalWidth;
-		}
-		else if (t.equals(WdTags.WebNaturalHeight)) {
-			ret = w.element.naturalHeight;
-		}
-		else if (t.equals(WdTags.WebDisplayedWidth)) {
-			ret = w.element.displayedWidth;
-		}
-		else if (t.equals(WdTags.WebDisplayedHeight)) {
-			ret = w.element.displayedHeight;
-		}
-		else if (t.equals(WdTags.WebZIndex)) {
-			ret = w.element.zindex;
-		}
-		else if (t.equals(WdTags.WebIsEnabled)) {
-			ret = w.element.enabled;
-		}
-		else if (t.equals(WdTags.WebIsDisabled)) {
-			ret = w.element.disabled;
-		}
-		else if (t.equals(WdTags.WebIsBlocked)) {
-			ret = w.element.blocked;
-		}
-		else if (t.equals(WdTags.WebIsClickable)) {
-			ret = w.element.isClickable;
-		}
-		else if (t.equals(WdTags.WebIsShadow)) {
-			ret = w.element.isShadow;
-		}
-		else if (t.equals(WdTags.WebBoundingRectangle)) {
-			ret = w.element.rect;
-		}
-		else if (t.equals(WdTags.WebMaxLength)) {
-			ret = w.element.maxLength;
-		}
-		else if (t.equals(WdTags.WebLength)) {
-			ret = w.element.length;
-		}
-		else if (t.equals(WdTags.WebInnerHTML)) {
-			ret = w.element.innerHTML;
-		}
-		else if (t.equals(WdTags.WebOuterHTML)) {
-			ret = w.element.outerHTML;
-		}
-		else if (t.equals(WdTags.WebPlaceholder)) {
-			ret = w.element.placeholder;
-		}
-		else if (t.equals(WdTags.WebIsSelected)) {
-			ret = w.element.selected;
-		}
-		else if (t.equals(WdTags.WebIsChecked)) {
-			ret = w.element.checked;
-		}
-		else if (t.equals(WdTags.WebIsMultiple)) {
-			ret = w.element.multiple;
-		}
-		else if (t.equals(WdTags.WebAriaLabel)) {
-			ret = w.element.ariaLabel;
-		}
-		else if (t.equals(WdTags.WebAriaLabelledBy)) {
-			ret = w.element.ariaLabelledBy;
-		}
-		else if (t.equals(WdTags.WebAriaDescribedBy)) {
-			ret = w.element.ariaDescribedBy;
-		}
-		else if (t.equals(WdTags.WebAriaRole)) {
-			ret = w.element.ariaRole;
-		}
-		else if (t.equals(WdTags.WebAriaDisabled)) {
-			ret = w.element.ariaDisabled;
-		}
-		else if (t.equals(WdTags.WebAriaHidden)) {
-			ret = w.element.ariaHidden;
-		}
-		else if (t.equals(WdTags.WebAriaExpanded)) {
-			ret = w.element.ariaExpanded;
-		}
-		else if (t.equals(WdTags.WebAriaPressed)) {
-			ret = w.element.ariaPressed;
-		}
-		else if (t.equals(WdTags.WebAriaSelected)) {
-			ret = w.element.ariaSelected;
-		}
-		else if (t.equals(WdTags.WebAriaChecked)) {
-			ret = w.element.ariaChecked;
-		}
-		else if (t.equals(WdTags.WebAriaRequired)) {
-			ret = w.element.ariaRequired;
-		}
-		else if (t.equals(WdTags.WebAriaInvalid)) {
-			ret = w.element.ariaInvalid;
-		}
-		else if (t.equals(WdTags.WebAriaReadOnly)) {
-			ret = w.element.ariaReadOnly;
-		}
-		else if (t.equals(WdTags.WebAriaCurrent)) {
-			ret = w.element.ariaCurrent;
-		}
-		else if (t.equals(WdTags.WebAriaHasPopup)) {
-			ret = w.element.ariaHasPopup;
-		}
-		else if (t.equals(WdTags.WebAriaControls)) {
-			ret = w.element.ariaControls;
-		}
-		else if (t.equals(WdTags.WebAriaLive)) {
-			ret = w.element.ariaLive;
-		}
-		else if (t.equals(WdTags.WebAriaBusy)) {
-			ret = w.element.ariaBusy;
-		}
-		else if (t.equals(WdTags.WebAriaModal)) {
-			ret = w.element.ariaModal;
-		}
-		else if (t.equals(WdTags.WebAriaValueNow)) {
-			ret = w.element.ariaValueNow;
-		}
-		else if (t.equals(WdTags.WebAriaValueMin)) {
-			ret = w.element.ariaValueMin;
-		}
-		else if (t.equals(WdTags.WebAriaValueMax)) {
-			ret = w.element.ariaValueMax;
-		}
-		else if (t.equals(WdTags.WebAriaValueText)) {
-			ret = w.element.ariaValueText;
-		}
-		else if (t.equals(WdTags.WebElementSelenium)) {
-			ret = w.element.remoteWebElement;
-		}
-		else if (t.equals(WdTags.WebAttributeMap)) {
-			ret = w.element.attributeMap;
-		}
+        if (ret != null) {
+            return (T)ret;
+        } else if (w.element == null || w.tags.containsKey(t)) {
+            return defaultValue;
+        }
 
-		cacheTag(w, t, ret);
+        if (t.equals(Tags.Desc)) {
+            ret = w.element.getElementDescription();
+        } else if (t.equals(Tags.Role)) {
+            ret = WdRoles.fromTypeId(w.element.tagName);
+        } else if (t.equals(Tags.HitTester)) {
+            ret = new WdHitTester(w.element);
+        } else if (t.equals(Tags.Shape)) {
+            ret = w.element.rect;
+        } else if (t.equals(Tags.Blocked)) {
+            ret = w.element.blocked;
+        } else if (t.equals(Tags.Enabled)) {
+            ret = w.element.enabled;
+        } else if (t.equals(Tags.Title)) {
+            ret = w.element.genericTitle;
+        } else if (t.equals(WdTags.WebGenericTitle)) {
+            ret = w.element.genericTitle;
+        } else if (t.equals(Tags.ValuePattern)) {
+            ret = w.element.href;
+        //} else if (t.equals(Tags.ToolTipText)) {
+        //    ret = w.element.helpText;
+        } else if (t.equals(Tags.PID)) {
+            ret = w == this ? ((WdRootElement) element).pid : null;
+        } else if (t.equals(Tags.IsRunning)) {
+            ret = w == this ? ((WdRootElement) element).isRunning : null;
+        } else if (t.equals(Tags.TimeStamp)) {
+            ret = w == this ? ((WdRootElement) element).timeStamp : null;
+        } else if (t.equals(Tags.Foreground)) {
+            ret = w == this ? ((WdRootElement) element).isForeground : null;
+        } else if (t.equals(Tags.HasStandardKeyboard)) {
+            ret = w == this ? ((WdRootElement) element).hasStandardKeyboard : null;
+        } else if (t.equals(Tags.HasStandardMouse)) {
+            ret = w == this ? ((WdRootElement) element).hasStandardMouse : null;
+        } else if (t.equals(WdTags.WebName)) {
+            ret = w.element.name;
+        //} else if (t.equals(WdTags.WebOrientation)) {
+        //    ret = (long)0;
+        } else if (t.equals(WdTags.WebCssClasses)) {
+            ret = w.element.cssClasses.toString();
+        } else if (t.equals(Tags.ZIndex)) {
+            ret = w.element.zindex;
+        } else if (t.equals(WdTags.WebIsWindowModal)) {
+            ret = w.element.isModal;
+        //} else if (t.equals(WdTags.WebIsTopmostWindow)) {
+        //    ret = true;
+        } else if (t.equals(WdTags.WebIsContentElement)) {
+            ret = w.element.isContentElement;
+        } else if (t.equals(WdTags.WebIsControlElement)) {
+            ret = w.element.isControlElement;
+        } else if (t.equals(WdTags.WebScrollPattern)) {
+            ret = w.element.scrollPattern;
+        } else if (t.equals(WdTags.WebHorizontallyScrollable)) {
+            ret = w.element.hScroll;
+        } else if (t.equals(WdTags.WebVerticallyScrollable)) {
+            ret = w.element.vScroll;
+        } else if (t.equals(WdTags.WebScrollHorizontalViewSize)) {
+            ret = w.element.hScrollViewSize;
+        } else if (t.equals(WdTags.WebScrollVerticalViewSize)) {
+            ret = w.element.vScrollViewSize;
+        } else if (t.equals(WdTags.WebScrollHorizontalPercent)) {
+            ret = w.element.hScrollPercent;
+        } else if (t.equals(WdTags.WebScrollVerticalPercent)) {
+            ret = w.element.vScrollPercent;
+        //} else if (t.equals(WdTags.WebHelpText)) {
+        //    ret = w.element.helpText;
+        } else if (t.equals(WdTags.WebTagName)) {
+            ret = w.element.tagName;
+        //} else if (t.equals(WdTags.WebControlType)) {
+        //    ret = null;
+        //} else if (t.equals(WdTags.WebCulture)) {
+        //    ret = w.element.culture;
+        //} else if (t.equals(WdTags.WebFrameworkId)) {
+        //    ret = null;
+        } else if (t.equals(WdTags.WebHasKeyboardFocus)) {
+            ret = w.element.hasKeyboardFocus;
+        } else if (t.equals(WdTags.WebIsFullOnScreen)) {
+            ret = w.element.isFullVisibleOnScreen;
+        } else if (t.equals(WdTags.WebIsOffScreen)) {
+            ret = !w.element.isFullVisibleOnScreen;
+        } else if (t.equals(WdTags.WebIsActuallyVisible)) {
+            ret = w.element.isActuallyVisible;
+        } else if (t.equals(WdTags.WebIsKeyboardFocusable)) {
+            ret = w.element.isKeyboardFocusable;
+        } else if (t.equals(WdTags.WebAcceleratorKey)) {
+            ret = w.element.acceleratorKey;
+        } else if (t.equals(WdTags.WebAccessKey)) {
+            ret = w.element.accessKey;
+        } else if (t.equals(WdTags.WebId)) {
+            ret = w.element.id;
+        } else if (t.equals(WdTags.WebTextContent)) {
+            ret = w.element.textContent;
+        } else if (t.equals(WdTags.WebInnerText)) {
+            ret = w.element.innerText;
+        } else if (t.equals(WdTags.WebTitle)) {
+            ret = w.element.title;
+        } else if (t.equals(WdTags.WebHref)) {
+            ret = w.element.href;
+        } else if (t.equals(WdTags.WebValue)) {
+            ret = w.element.value;
+        } else if (t.equals(WdTags.WebStyle)) {
+            ret = w.element.style;
+        } else if (t.equals(WdTags.WebStyleOpacity)) {
+            ret = w.element.styleOpacity;
+        } else if (t.equals(WdTags.WebStyleOverflow)) {
+            ret = w.element.styleOverflow;
+        } else if (t.equals(WdTags.WebStyleOverflowX)) {
+            ret = w.element.styleOverflowX;
+        } else if (t.equals(WdTags.WebStyleOverflowY)) {
+            ret = w.element.styleOverflowY;
+        } else if (t.equals(WdTags.WebStylePosition)) {
+            ret = w.element.stylePosition;
+        } else if (t.equals(WdTags.WebTarget)) {
+            ret = w.element.target;
+        } else if (t.equals(WdTags.WebAlt)) {
+            ret = w.element.alt;
+        } else if (t.equals(WdTags.WebDisplay)) {
+            ret = w.element.display;
+        } else if (t.equals(WdTags.WebIsHidden)) {
+            ret = w.element.isHidden();
+        } else if (t.equals(WdTags.WebXPath)) {
+            ret = w.element.xpath;
+        } else if (t.equals(WdTags.WebIsDisplayed)) {
+            ret = w.element.isDisplayed();
+        } else if (t.equals(WdTags.WebComputedFontSize)) {
+            ret = w.element.computedFontSize;
+        } else if (t.equals(WdTags.WebComputedColor)) {
+            ret = w.element.computedColor;
+        } else if (t.equals(WdTags.WebComputedBackgroundColor)) {
+            ret = w.element.computedBackgroundColor;
+        } else if (t.equals(WdTags.WebComputedColorName)) {
+            ret = w.element.computedColorName;
+        } else if (t.equals(WdTags.WebComputedBackgroundColorName)) {
+            ret = w.element.computedBackgroundColorName;
+        } else if (t.equals(WdTags.WebType)) {
+            ret = w.element.type;
+        } else if (t.equals(WdTags.WebSrc)) {
+            ret = w.element.src;
+        } else if (t.equals(WdTags.WebNaturalWidth)) {
+            ret = w.element.naturalWidth;
+        } else if (t.equals(WdTags.WebNaturalHeight)) {
+            ret = w.element.naturalHeight;
+        } else if (t.equals(WdTags.WebDisplayedWidth)) {
+            ret = w.element.displayedWidth;
+        } else if (t.equals(WdTags.WebDisplayedHeight)) {
+            ret = w.element.displayedHeight;
+        } else if (t.equals(WdTags.WebZIndex)) {
+            ret = w.element.zindex;
+        } else if (t.equals(WdTags.WebIsEnabled)) {
+            ret = w.element.enabled;
+        } else if (t.equals(WdTags.WebIsDisabled)) {
+            ret = w.element.disabled;
+        } else if (t.equals(WdTags.WebIsBlocked)) {
+            ret = w.element.blocked;
+        } else if (t.equals(WdTags.WebIsClickable)) {
+            ret = w.element.isClickable;
+        } else if (t.equals(WdTags.WebIsShadow)) {
+            ret = w.element.isShadow;
+        } else if (t.equals(WdTags.WebBoundingRectangle)) {
+            ret = w.element.rect;
+        } else if (t.equals(WdTags.WebMaxLength)) {
+            ret = w.element.maxLength;
+        } else if (t.equals(WdTags.WebLength)) {
+            ret = w.element.length;
+        } else if (t.equals(WdTags.WebInnerHTML)) {
+            ret = w.element.innerHTML;
+        } else if (t.equals(WdTags.WebOuterHTML)) {
+            ret = w.element.outerHTML;
+        } else if (t.equals(WdTags.WebPlaceholder)) {
+            ret = w.element.placeholder;
+        } else if (t.equals(WdTags.WebIsSelected)) {
+            ret = w.element.selected;
+        } else if (t.equals(WdTags.WebIsChecked)) {
+            ret = w.element.checked;
+        } else if (t.equals(WdTags.WebIsMultiple)) {
+            ret = w.element.multiple;
+        } else if (t.equals(WdTags.WebAriaLabel)) {
+            ret = w.element.ariaLabel;
+        } else if (t.equals(WdTags.WebAriaLabelledBy)) {
+            ret = w.element.ariaLabelledBy;
+        } else if (t.equals(WdTags.WebAriaDescribedBy)) {
+            ret = w.element.ariaDescribedBy;
+        } else if (t.equals(WdTags.WebAriaRole)) {
+            ret = w.element.ariaRole;
+        } else if (t.equals(WdTags.WebAriaDisabled)) {
+            ret = w.element.ariaDisabled;
+        } else if (t.equals(WdTags.WebAriaHidden)) {
+            ret = w.element.ariaHidden;
+        } else if (t.equals(WdTags.WebAriaExpanded)) {
+            ret = w.element.ariaExpanded;
+        } else if (t.equals(WdTags.WebAriaPressed)) {
+            ret = w.element.ariaPressed;
+        } else if (t.equals(WdTags.WebAriaSelected)) {
+            ret = w.element.ariaSelected;
+        } else if (t.equals(WdTags.WebAriaChecked)) {
+            ret = w.element.ariaChecked;
+        } else if (t.equals(WdTags.WebAriaRequired)) {
+            ret = w.element.ariaRequired;
+        } else if (t.equals(WdTags.WebAriaInvalid)) {
+            ret = w.element.ariaInvalid;
+        } else if (t.equals(WdTags.WebAriaReadOnly)) {
+            ret = w.element.ariaReadOnly;
+        } else if (t.equals(WdTags.WebAriaCurrent)) {
+            ret = w.element.ariaCurrent;
+        } else if (t.equals(WdTags.WebAriaHasPopup)) {
+            ret = w.element.ariaHasPopup;
+        } else if (t.equals(WdTags.WebAriaControls)) {
+            ret = w.element.ariaControls;
+        } else if (t.equals(WdTags.WebAriaLive)) {
+            ret = w.element.ariaLive;
+        } else if (t.equals(WdTags.WebAriaBusy)) {
+            ret = w.element.ariaBusy;
+        } else if (t.equals(WdTags.WebAriaModal)) {
+            ret = w.element.ariaModal;
+        } else if (t.equals(WdTags.WebAriaValueNow)) {
+            ret = w.element.ariaValueNow;
+        } else if (t.equals(WdTags.WebAriaValueMin)) {
+            ret = w.element.ariaValueMin;
+        } else if (t.equals(WdTags.WebAriaValueMax)) {
+            ret = w.element.ariaValueMax;
+        } else if (t.equals(WdTags.WebAriaValueText)) {
+            ret = w.element.ariaValueText;
+        } else if (t.equals(WdTags.WebElementSelenium)) {
+            ret = w.element.remoteWebElement;
+        } else if (t.equals(WdTags.WebAttributeMap)) {
+            ret = w.element.attributeMap;
+        }
 
-		return (ret == null) ? defaultValue : (T) ret;
-	}
+        cacheTag(w, t, ret);
 
-	@SuppressWarnings("unchecked")
-	public <T> T cacheTag(WdWidget w, Tag<T> t, Object value) {
-		w.tags.put(t, value);
-		return (T) value;
-	}
+        return (ret == null) ? defaultValue : (T) ret;
+    }
 
-	public <T> void setTag(WdWidget w, Tag<T> t, T value) {
-		Assert.notNull(value);
-		w.tags.put(t, value);
-	}
+    @SuppressWarnings("unchecked")
+    public <T> T cacheTag(WdWidget w, Tag<T> t, Object value) {
+        w.tags.put(t, value);
+        return (T) value;
+    }
 
-	public <T> void remove(WdWidget w, Tag<T> t) {
-		Assert.notNull(w, t);
-		w.tags.put(t, null);
-	}
+    public <T> void setTag(WdWidget w, Tag<T> t, T value) {
+        Assert.notNull(value);
+        w.tags.put(t, value);
+    }
 
-	public WdWidget getChild(WdWidget w, int idx) {
-		return w.children.get(idx);
-	}
+    public <T> void remove(WdWidget w, Tag<T> t) {
+        Assert.notNull(w, t);
+        w.tags.put(t, null);
+    }
 
-	public int childCount(WdWidget w) {
-		return w.children.size();
-	}
+    public WdWidget getChild(WdWidget w, int idx) {
+        return w.children.get(idx);
+    }
 
-	public WdWidget getParent(WdWidget w) {
-		return w.parent;
-	}
+    public int childCount(WdWidget w) {
+        return w.children.size();
+    }
 
-	Iterable<Tag<?>> tags(final WdWidget w) {
-		Assert.notNull(w);
+    public WdWidget getParent(WdWidget w) {
+        return w.parent;
+    }
 
-		// compile a query set
-		final Set<Tag<?>> queryTags = new HashSet<Tag<?>>();
-		queryTags.addAll(tags.keySet());
-		queryTags.addAll(Tags.tagSet());
-		queryTags.addAll(WdTags.tagSet());
+    Iterable<Tag<?>> tags(final WdWidget w) {
+        Assert.notNull(w);
 
-		Iterable<Tag<?>> ret = new Iterable<Tag<?>>() {
-			public Iterator<Tag<?>> iterator() {
-				return new Iterator<Tag<?>>() {
-					Iterator<Tag<?>> i = queryTags.iterator();
-					WdWidget target = w;
-					Tag<?> next;
+        // compile a query set
+        final Set<Tag<?>> queryTags = new HashSet<Tag<?>>();
+        queryTags.addAll(tags.keySet());
+        queryTags.addAll(Tags.tagSet());
+        queryTags.addAll(WdTags.tagSet());
 
-					private Tag<?> fetchNext() {
-						if (next == null) {
-							while (i.hasNext()) {
-								next = i.next();
-								if (target.get(next, null) != null) {
-									return next;
-								}
-							}
-							next = null;
-						}
-						return next;
-					}
+        Iterable<Tag<?>> ret = new Iterable<Tag<?>>() {
+            public Iterator<Tag<?>> iterator() {
+                return new Iterator<Tag<?>>() {
+                    Iterator<Tag<?>> i = queryTags.iterator();
+                    WdWidget target = w;
+                    Tag<?> next;
 
-					public boolean hasNext() {
-						return fetchNext() != null;
-					}
+                    private Tag<?> fetchNext() {
+                        if (next == null) {
+                            while (i.hasNext()) {
+                                next = i.next();
+                                if (target.get(next, null) != null) {
+                                    return next;
+                                }
+                            }
+                            next = null;
+                        }
+                        return next;
+                    }
 
-					public Tag<?> next() {
-						Tag<?> ret = fetchNext();
-						if (ret == null) {
-							throw new NoSuchElementException();
-						}
-						next = null;
-						return ret;
-					}
+                    public boolean hasNext() {
+                        return fetchNext() != null;
+                    }
 
-					public void remove() {
-						throw new UnsupportedOperationException();
-					}
-				};
-			}
-		};
-		return ret;
-	}
+                    public Tag<?> next() {
+                        Tag<?> ret = fetchNext();
+                        if (ret == null) {
+                            throw new NoSuchElementException();
+                        }
+                        next = null;
+                        return ret;
+                    }
 
-	public String toString() {
-		return Util.treeDesc(this, 2, Tags.Role, Tags.Title);
-	}
+                    public void remove() {
+                        throw new UnsupportedOperationException();
+                    }
+                };
+            }
+        };
+        return ret;
+    }
+
+    public String toString() {
+        return Util.treeDesc(this, 2, Tags.Role, Tags.Title);
+    }
 }

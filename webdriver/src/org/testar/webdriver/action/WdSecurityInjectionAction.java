@@ -9,10 +9,13 @@ package org.testar.webdriver.action;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
-import org.testar.core.action.*;
-import org.testar.core.alayer.*;
-import org.testar.core.state.*;
-import org.testar.core.tag.*;
+import org.testar.core.action.Action;
+import org.testar.core.alayer.Role;
+import org.testar.core.state.SUT;
+import org.testar.core.state.State;
+import org.testar.core.state.Widget;
+import org.testar.core.tag.TaggableBase;
+import org.testar.core.tag.Tags;
 import org.testar.core.exceptions.ActionFailedException;
 import org.testar.webdriver.tag.WdTags;
 
@@ -23,9 +26,8 @@ public class WdSecurityInjectionAction extends TaggableBase implements Action {
     private WebElement element;
     private String text;
 
-    public WdSecurityInjectionAction(RemoteWebDriver webDriver, Widget widget, String text)
-    {
-    	//TODO: This only works if the web element contains the id property
+    public WdSecurityInjectionAction(RemoteWebDriver webDriver, Widget widget, String text) {
+        //TODO: This only works if the web element contains the id property
         element = webDriver.findElement(new By.ById(widget.get(WdTags.WebId, "")));
         this.set(Tags.Role, WdActionRoles.FormFillingAction);
         this.set(Tags.Desc, "Inject text that contains special characters");
@@ -34,7 +36,7 @@ public class WdSecurityInjectionAction extends TaggableBase implements Action {
     }
 
     public String getText() {
-    	return text;
+        return text;
     }
 
     @Override

@@ -19,96 +19,99 @@ import java.util.List;
  */
 public class WdCanvasDimensions extends Thread {
 
-  private static int canvasX = 0;
-  private static int canvasY = 0;
-  private static int canvasWidth = 0;
-  private static int canvasHeight = 0;
-  private static int innerWidth = 0;
-  private static int innerHeight = 0;
-  private static int scrollY = 0;
-  private static int scrollX = 0;
+    private static int canvasX = 0;
+    private static int canvasY = 0;
+    private static int canvasWidth = 0;
+    private static int canvasHeight = 0;
+    private static int innerWidth = 0;
+    private static int innerHeight = 0;
+    private static int scrollY = 0;
+    private static int scrollX = 0;
 
-  private static boolean running = false;
+    private static boolean running = false;
 
-  private WdCanvasDimensions() {
-  }
-
-  public static void startThread() {
-    if (running) {
-      return;
+    private WdCanvasDimensions() {
     }
 
-    running = true;
-    new Thread(new WdCanvasDimensions()).start();
-  }
+    public static void startThread() {
+        if (running) {
+            return;
+        }
 
-  public static void stopThread() {
-    running = false;
-  }
-
-  public static int getCanvasX() {
-    return canvasX;
-  }
-
-  public static int getCanvasY() {
-    return canvasY;
-  }
-
-  public static int getCanvasWidth() {
-    return canvasWidth;
-  }
-
-  public static int getCanvasHeight() {
-    return canvasHeight;
-  }
-
-  public static int getInnerWidth() {
-    return innerWidth;
-  }
-
-  public static int getInnerHeight() {
-    return innerHeight;
-  }
-
-  public static int getScrollY() {
-    return scrollY;
-  }
-
-  public static int getScrollX() {
-    return scrollX;
-  }
-
-  @Override
-  public void run() {
-    while (running) {
-      updateDimensions();
-      Util.pause(0.5);
+        running = true;
+        new Thread(new WdCanvasDimensions()).start();
     }
-  }
 
-  @SuppressWarnings("unchecked")
-  private void updateDimensions() {
-    // This assumes no status bars on the left or on the bottom
-    try {
-      RemoteWebDriver remoteWebDriver = WdDriver.getRemoteWebDriver();
-
-      if(remoteWebDriver == null) return;
-
-      List<Long> screen = (List<Long>)remoteWebDriver.executeScript("return canvasDimensionsTestar()");
-
-      if (screen == null) return;
-
-      canvasX = Math.toIntExact(screen.get(0));
-      canvasY = Math.toIntExact(screen.get(1));
-      canvasWidth = Math.toIntExact(screen.get(2));
-      canvasHeight = Math.toIntExact(screen.get(3));
-      innerWidth = Math.toIntExact(screen.get(4));
-      innerHeight = Math.toIntExact(screen.get(5));
-      scrollY = Math.toIntExact(screen.get(6));
-      scrollX = Math.toIntExact(screen.get(7));
+    public static void stopThread() {
+        running = false;
     }
-    catch (WebDriverException ignored) {
 
+    public static int getCanvasX() {
+        return canvasX;
     }
-  }
+
+    public static int getCanvasY() {
+        return canvasY;
+    }
+
+    public static int getCanvasWidth() {
+        return canvasWidth;
+    }
+
+    public static int getCanvasHeight() {
+        return canvasHeight;
+    }
+
+    public static int getInnerWidth() {
+        return innerWidth;
+    }
+
+    public static int getInnerHeight() {
+        return innerHeight;
+    }
+
+    public static int getScrollY() {
+        return scrollY;
+    }
+
+    public static int getScrollX() {
+        return scrollX;
+    }
+
+    @Override
+    public void run() {
+        while (running) {
+            updateDimensions();
+            Util.pause(0.5);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private void updateDimensions() {
+        // This assumes no status bars on the left or on the bottom
+        try {
+            RemoteWebDriver remoteWebDriver = WdDriver.getRemoteWebDriver();
+
+            if (remoteWebDriver == null) {
+                return;
+            }
+
+            List<Long> screen = (List<Long>)remoteWebDriver.executeScript("return canvasDimensionsTestar()");
+
+            if (screen == null) {
+                return;
+            }
+
+            canvasX = Math.toIntExact(screen.get(0));
+            canvasY = Math.toIntExact(screen.get(1));
+            canvasWidth = Math.toIntExact(screen.get(2));
+            canvasHeight = Math.toIntExact(screen.get(3));
+            innerWidth = Math.toIntExact(screen.get(4));
+            innerHeight = Math.toIntExact(screen.get(5));
+            scrollY = Math.toIntExact(screen.get(6));
+            scrollX = Math.toIntExact(screen.get(7));
+        } catch (WebDriverException ignored) {
+
+        }
+    }
 }
