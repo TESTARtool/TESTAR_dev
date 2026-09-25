@@ -4,7 +4,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.openqa.selenium.devtools.DevTools;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -16,43 +17,43 @@ import org.testar.oracle.security.ActiveSecurityOracle;
 
 public class SecurityOracleOrchestratorTest {
 
-	private static DevTools mockDevTools;
+    private static DevTools mockDevTools;
 
-	@BeforeClass
-	public static void setup() {
-		// Mock DevTools
-		mockDevTools = Mockito.mock(DevTools.class);
-	}
+    @BeforeClass
+    public static void setup() {
+        // Mock DevTools
+        mockDevTools = Mockito.mock(DevTools.class);
+    }
 
-	@Test
-	public void orchestrator_passive_oracle() {
-		SecurityConfiguration securityConfiguration = new SecurityConfiguration();
-		SecurityResultWriter securityResultWriter = new JsonSecurityResultWriter();
-		RemoteWebDriver webDriver = WdDriver.getRemoteWebDriver();
+    @Test
+    public void orchestrator_passive_oracle() {
+        SecurityConfiguration securityConfiguration = new SecurityConfiguration();
+        SecurityResultWriter securityResultWriter = new JsonSecurityResultWriter();
+        RemoteWebDriver webDriver = WdDriver.getRemoteWebDriver();
 
-		SecurityOracleOrchestrator oracleOrchestrator = 
-				new SecurityOracleOrchestrator(securityResultWriter, 
-						securityConfiguration.getOracles(), 
-						webDriver, 
-						mockDevTools);
+        SecurityOracleOrchestrator oracleOrchestrator =
+                new SecurityOracleOrchestrator(securityResultWriter,
+                        securityConfiguration.getOracles(),
+                        webDriver,
+                        mockDevTools);
 
-		assertFalse(oracleOrchestrator.hasActiveOracle());
-	}
+        assertFalse(oracleOrchestrator.hasActiveOracle());
+    }
 
-	@Test
-	public void orchestrator_active_oracle() {
-		SecurityConfiguration securityConfiguration = 
-				new SecurityConfiguration(ActiveSecurityOracle.ActiveOracle.SQL_INJECTION);
-		SecurityResultWriter securityResultWriter = new JsonSecurityResultWriter();
-		RemoteWebDriver webDriver = WdDriver.getRemoteWebDriver();
+    @Test
+    public void orchestrator_active_oracle() {
+        SecurityConfiguration securityConfiguration =
+                new SecurityConfiguration(ActiveSecurityOracle.ActiveOracle.SQL_INJECTION);
+        SecurityResultWriter securityResultWriter = new JsonSecurityResultWriter();
+        RemoteWebDriver webDriver = WdDriver.getRemoteWebDriver();
 
-		SecurityOracleOrchestrator oracleOrchestrator = 
-				new SecurityOracleOrchestrator(securityResultWriter, 
-						securityConfiguration.getOracles(), 
-						webDriver, 
-						mockDevTools);
+        SecurityOracleOrchestrator oracleOrchestrator =
+                new SecurityOracleOrchestrator(securityResultWriter,
+                        securityConfiguration.getOracles(),
+                        webDriver,
+                        mockDevTools);
 
-		assertTrue(oracleOrchestrator.hasActiveOracle());
-	}
+        assertTrue(oracleOrchestrator.hasActiveOracle());
+    }
 
 }

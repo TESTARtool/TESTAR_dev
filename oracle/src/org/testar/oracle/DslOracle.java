@@ -33,8 +33,8 @@ public abstract class DslOracle implements Oracle, OracleWidgetsMapping {
     }
 
     /**
-     * Get the constraint widget to descend and apply the DSL test oracle. 
-     * If no constraintWidget matches, get and empty state. 
+     * Get the constraint widget to descend and apply the DSL test oracle.
+     * If no constraintWidget matches, get and empty state.
      */
     protected Widget getConstraintWidgetOrState(State state) {
         // If no constraints, return by default the whole state
@@ -50,16 +50,16 @@ public abstract class DslOracle implements Oracle, OracleWidgetsMapping {
         //  - if not, search deeper for the first match
         sectionConstraintHeuristic(state, new ArrayList<>(sectionConstraints), 0);
 
-        // Return the constraintWidget obtained with the heuristic. 
-        // If no constraintWidget matches, return an empty state. 
+        // Return the constraintWidget obtained with the heuristic.
+        // If no constraintWidget matches, return an empty state.
         return constraintWidget != null ? constraintWidget : new StateStub();
     }
 
     /**
-     * Tries to match constraints[index..] along a downward path starting somewhere in the subtree rooted at 'widget'. 
+     * Tries to match constraints[index..] along a downward path starting somewhere in the subtree rooted at 'widget'.
      *
-     * If constraints[index] matches at 'widget', we then try to match the next constraint in its subtree. 
-     * If that fails, we backtrack and try to match constraints[index] deeper in the subtree. 
+     * If constraints[index] matches at 'widget', we then try to match the next constraint in its subtree.
+     * If that fails, we backtrack and try to match constraints[index] deeper in the subtree.
      */
     private boolean sectionConstraintHeuristic(Widget widget, List<String> constraints, int index) {
         if (widget == null) {

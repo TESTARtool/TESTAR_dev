@@ -25,17 +25,17 @@ public class XssSecurityOracle extends ActiveSecurityOracle {
     private static String xssInjectionText = "<script> console.log('XSS detected!'); </script>";
     private static String xssInjectionURL = "<script>console.log(%27XSS%20detected!%27);</script>";
 
-    public XssSecurityOracle(SecurityResultWriter securityResultWriter, RemoteWebDriver webDriver)
-    {
+    public XssSecurityOracle(SecurityResultWriter securityResultWriter, RemoteWebDriver webDriver) {
+
         super(securityResultWriter, webDriver);
     }
 
     @Override
-    public Set<Action> getActions(State state)
-    {
+    public Set<Action> getActions(State state) {
+
         Set<Action> actions = new HashSet<>();
-        for (Widget widget : state)
-        {
+        for (Widget widget : state) {
+
             if (isAtBrowserCanvas(widget) && isTypeable(widget)) {
                 actions.add(new WdSecurityInjectionAction(webDriver, widget, xssInjectionText));
             }
@@ -43,55 +43,59 @@ public class XssSecurityOracle extends ActiveSecurityOracle {
         preferredActions.addAll(actions);
 
         Action urlInjection = getUrlInjectionOrDefault();
-        if (urlInjection != null)
+        if (urlInjection != null) {
             actions.add(urlInjection);
-
-        return actions;
-    }
-
-    @Override
-    public Set<Action> preSelect(Set<Action> actions)
-    {
-        Set<Action> intersectingSet = new HashSet<>();
-        for (Action action : preferredActions) {
-            if (actions.contains(action))
-                intersectingSet.add(action);
         }
 
-        if (!intersectingSet.isEmpty())
-            return intersectingSet;
         return actions;
     }
 
-    // An XSS injection with a character that is not processed properly 
-    // may provoke a 500 server error or Uncaught SyntaxError. 
+    @Override
+    public Set<Action> preSelect(Set<Action> actions) {
+
+        Set<Action> intersectingSet = new HashSet<>();
+        for (Action action : preferredActions) {
+            if (actions.contains(action)) {
+                intersectingSet.add(action);
+            }
+        }
+
+        if (!intersectingSet.isEmpty()) {
+            return intersectingSet;
+        }
+        return actions;
+    }
+
+    // An XSS injection with a character that is not processed properly
+    // may provoke a 500 server error or Uncaught SyntaxError.
     // TODO: Enrich this verdict or allow customization
     @Override
-    public Verdict getVerdict()
-    {
+    public Verdict getVerdict() {
+
         LogEntries logs = WdDriver.getBrowserLogs();
         for (LogEntry entry : logs) {
-            if (entry.getMessage().contains("XSS"))
+            if (entry.getMessage().contains("XSS")) {
                 securityResultWriter.WriteResult(WdDriver.getCurrentUrl(), "79", "XSS detected");
+            }
         }
 
         return Verdict.OK;
     }
 
     public static void setXssInjectionText(String xssInjectionText) {
-    	XssSecurityOracle.xssInjectionText = xssInjectionText;
+        XssSecurityOracle.xssInjectionText = xssInjectionText;
     }
 
     public static void setXssInjectionURL(String xssInjectionURL) {
-    	XssSecurityOracle.xssInjectionURL = xssInjectionURL;
+        XssSecurityOracle.xssInjectionURL = xssInjectionURL;
     }
 
-    private Action getUrlInjectionOrDefault()
-    {
+    private Action getUrlInjectionOrDefault() {
+
         String url = webDriver.getCurrentUrl();
 
-        if (url.contains("?"))
-        {
+        if (url.contains("?")) {
+
             // Replace the parameter with the XSS injection
             // regex (?<=X)(.*?)(?=Y) with X,Y delimiters
             String newUrl = url.replaceAll("(?<==)(.*?)(?=&)", xssInjectionURL);

@@ -7,8 +7,8 @@
 package org.testar.oracle.security;
 
 public class SecurityResultDto {
-    public SecurityResultDto(String path, String cwe, String result)
-    {
+    public SecurityResultDto(String path, String cwe, String result) {
+
         this.path = path;
         this.cwe = cwe;
         this.result = result;

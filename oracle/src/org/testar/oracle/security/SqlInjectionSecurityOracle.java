@@ -30,14 +30,14 @@ public class SqlInjectionSecurityOracle extends ActiveSecurityOracle {
     // Use always the 500 Internal Server Error by default
     private static Set<Integer> serverErrorCodes = new HashSet<>(Arrays.asList(500));
 
-    public SqlInjectionSecurityOracle(SecurityResultWriter securityResultWriter, RemoteWebDriver webDriver)
-    {
+    public SqlInjectionSecurityOracle(SecurityResultWriter securityResultWriter, RemoteWebDriver webDriver) {
+
         super(securityResultWriter, webDriver);
     }
 
     @Override
-    public void addListener(DevTools devTools)
-    {
+    public void addListener(DevTools devTools) {
+
         devTools.addListener(Network.responseReceivedExtraInfo(),
                 responseReceived -> {
                     if (serverErrorCodes.contains(responseReceived.getStatusCode())) {
@@ -47,11 +47,11 @@ public class SqlInjectionSecurityOracle extends ActiveSecurityOracle {
     }
 
     @Override
-    public Set<Action> getActions(State state)
-    {
+    public Set<Action> getActions(State state) {
+
         Set<Action> actions = new HashSet<>();
-        for (Widget widget : state)
-        {
+        for (Widget widget : state) {
+
             if (isAtBrowserCanvas(widget) && isTypeable(widget)) {
                 actions.add(new WdSecurityInjectionAction(webDriver, widget, sqlInjectionText));
             }
@@ -60,17 +60,19 @@ public class SqlInjectionSecurityOracle extends ActiveSecurityOracle {
         proposedActions = actions;
 
         Action urlInjection = getUrlInjectionOrDefault();
-        if (urlInjection != null)
-        	actions.add(urlInjection);
+        if (urlInjection != null) {
+            actions.add(urlInjection);
+        }
 
         return actions;
     }
 
     @Override
-    public Verdict getVerdict()
-    {
-        if (errorReceived)
+    public Verdict getVerdict() {
+
+        if (errorReceived) {
             securityResultWriter.WriteResult(WdDriver.getCurrentUrl(), "89", "SQL injection detected");
+        }
 
         return Verdict.OK;
     }
@@ -80,29 +82,29 @@ public class SqlInjectionSecurityOracle extends ActiveSecurityOracle {
     }
 
     public static void setSqlInjectionText(String sqlInjectionText) {
-    	SqlInjectionSecurityOracle.sqlInjectionText = sqlInjectionText;
+        SqlInjectionSecurityOracle.sqlInjectionText = sqlInjectionText;
     }
 
     public static void setSqlInjectionURL(String sqlInjectionURL) {
-    	SqlInjectionSecurityOracle.sqlInjectionURL = sqlInjectionURL;
+        SqlInjectionSecurityOracle.sqlInjectionURL = sqlInjectionURL;
     }
 
-    private Action getUrlInjectionOrDefault()
-    {
-    	String url = webDriver.getCurrentUrl();
+    private Action getUrlInjectionOrDefault() {
 
-    	if (url.contains("?"))
-    	{
-    		// TODO: Maybe add the injection character instead of replace
-    		// Replace the parameter with the SQL injection character
-    		// regex (?<=X)(.*?)(?=Y) with X,Y delimiters
-    		String newUrl = url.replaceAll("(?<==)(.*?)(?=&)", sqlInjectionURL);
-    		// regex = to end of line
-    		newUrl = newUrl.replaceFirst("[^=]*$", sqlInjectionURL);
-    		if (!newUrl.equals(url)) {
-    			return new WdSecurityUrlInjectionAction(newUrl);
-    		}
-    	}
-    	return null;
+        String url = webDriver.getCurrentUrl();
+
+        if (url.contains("?")) {
+
+            // TODO: Maybe add the injection character instead of replace
+            // Replace the parameter with the SQL injection character
+            // regex (?<=X)(.*?)(?=Y) with X,Y delimiters
+            String newUrl = url.replaceAll("(?<==)(.*?)(?=&)", sqlInjectionURL);
+            // regex = to end of line
+            newUrl = newUrl.replaceFirst("[^=]*$", sqlInjectionURL);
+            if (!newUrl.equals(url)) {
+                return new WdSecurityUrlInjectionAction(newUrl);
+            }
+        }
+        return null;
     }
 }

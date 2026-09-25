@@ -16,21 +16,21 @@ public class NetworkCollector {
     private List<NetworkDataDto> networkData = new ArrayList<>();
     private int currentSequence = 0;
 
-    public void addData(NetworkDataDto data)
-    {
+    public void addData(NetworkDataDto data) {
+
         data.sequence = currentSequence++;
         networkData.add(data);
     }
 
     private Map<String, Map<String, String>> requests = new HashMap<>();
 
-    public List<NetworkDataDto> getData()
-    {
+    public List<NetworkDataDto> getData() {
+
         return networkData;
     }
 
-    public List<NetworkDataDto> getDataBySequence(int sequence)
-    {
+    public List<NetworkDataDto> getDataBySequence(int sequence) {
+
         return networkData.stream().filter(d -> d.sequence > sequence).collect(Collectors.toList());
     }
 }

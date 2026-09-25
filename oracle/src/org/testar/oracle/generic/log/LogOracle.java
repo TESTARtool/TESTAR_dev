@@ -43,8 +43,8 @@ public class LogOracle implements Oracle {
         errorsList.addAll(checker.readAndCheck());
         if ( errorsList.size() == 0  ) {
             return Collections.singletonList(Verdict.OK);
-        }
-        else {
+        } else {
+
             return Collections.singletonList(new Verdict(Verdict.Severity.SUSPICIOUS_LOG, String.join(";", errorsList)));
         }
     }

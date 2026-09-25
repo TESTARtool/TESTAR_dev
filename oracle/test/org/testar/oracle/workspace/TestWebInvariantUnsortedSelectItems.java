@@ -35,7 +35,7 @@ public class TestWebInvariantUnsortedSelectItems extends WorkspaceOracleTestSupp
             // Mock the static method executeScript(query)
             List<String> mockOptions = Arrays.asList("January", "March", "February");
             mockedStatic.when(() -> WdDriver.executeScript(Mockito.anyString()))
-            .thenReturn(new ArrayList<>(mockOptions));
+                    .thenReturn(new ArrayList<>(mockOptions));
 
             // Assert the oracle verdict is WARNING_WEB_INVARIANT_FAULT
             List<Verdict> verdicts = oracle.getVerdicts(state);
@@ -62,7 +62,7 @@ public class TestWebInvariantUnsortedSelectItems extends WorkspaceOracleTestSupp
             // Mock the static method executeScript(query)
             List<String> mockOptions = Arrays.asList("Banana", "Apple", "Orange");
             mockedStatic.when(() -> WdDriver.executeScript(Mockito.anyString()))
-            .thenReturn(new ArrayList<>(mockOptions));
+                    .thenReturn(new ArrayList<>(mockOptions));
 
             // Assert the oracle verdict is WARNING_WEB_INVARIANT_FAULT
             List<Verdict> verdicts = oracle.getVerdicts(state);
@@ -89,7 +89,7 @@ public class TestWebInvariantUnsortedSelectItems extends WorkspaceOracleTestSupp
             // Mock the static method executeScript(query)
             List<String> mockOptions = Arrays.asList("12345", "12367", "123");
             mockedStatic.when(() -> WdDriver.executeScript(Mockito.anyString()))
-            .thenReturn(new ArrayList<>(mockOptions));
+                    .thenReturn(new ArrayList<>(mockOptions));
 
             // Assert the oracle verdict is WARNING_WEB_INVARIANT_FAULT
             List<Verdict> verdicts = oracle.getVerdicts(state);
@@ -116,7 +116,7 @@ public class TestWebInvariantUnsortedSelectItems extends WorkspaceOracleTestSupp
             // Mock the static method executeScript(query)
             List<String> mockOptions = Arrays.asList("January", "February", "March");
             mockedStatic.when(() -> WdDriver.executeScript(Mockito.anyString()))
-            .thenReturn(new ArrayList<>(mockOptions));
+                    .thenReturn(new ArrayList<>(mockOptions));
 
             // Assert the oracle verdict is OK
             List<Verdict> verdicts = oracle.getVerdicts(state);
@@ -143,7 +143,7 @@ public class TestWebInvariantUnsortedSelectItems extends WorkspaceOracleTestSupp
             // Mock the static method executeScript(query)
             List<String> mockOptions = Arrays.asList("Apple", "Banana", "Orange");
             mockedStatic.when(() -> WdDriver.executeScript(Mockito.anyString()))
-            .thenReturn(new ArrayList<>(mockOptions));
+                    .thenReturn(new ArrayList<>(mockOptions));
 
             // Assert the oracle verdict is OK
             List<Verdict> verdicts = oracle.getVerdicts(state);
@@ -170,7 +170,7 @@ public class TestWebInvariantUnsortedSelectItems extends WorkspaceOracleTestSupp
             // Mock the static method executeScript(query)
             List<String> mockOptions = Arrays.asList("123", "12345", "12367");
             mockedStatic.when(() -> WdDriver.executeScript(Mockito.anyString()))
-            .thenReturn(new ArrayList<>(mockOptions));
+                    .thenReturn(new ArrayList<>(mockOptions));
 
             // Assert the oracle verdict is OK
             List<Verdict> verdicts = oracle.getVerdicts(state);

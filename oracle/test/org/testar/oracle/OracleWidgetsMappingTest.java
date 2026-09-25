@@ -9,7 +9,11 @@ import org.testar.stub.WidgetStub;
 import org.testar.webdriver.alayer.WdRoles;
 import org.testar.webdriver.tag.WdTags;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.awt.Color;
 import java.util.List;
@@ -21,7 +25,7 @@ public class OracleWidgetsMappingTest {
 
     @Before
     public void setup() {
-        mapping = new OracleWidgetsMapping() {};
+        mapping = new OracleWidgetsMapping() { };
         state = new StateStub();
     }
 

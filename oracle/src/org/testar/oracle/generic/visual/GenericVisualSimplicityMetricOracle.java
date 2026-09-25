@@ -24,48 +24,48 @@ import org.testar.oracle.Oracle;
  * and gives a warning if the threshold is breached.
  * Based on the work of "Towards an evaluation of graphical user interfaces aesthetics based on metrics" by
  * Zen, Mathieu ; Vanderdonckt, Jean.
- * 
+ *
  * The default threshold value is 50.0.
  */
 public class GenericVisualSimplicityMetricOracle implements Oracle {
 
-	private final double thresholdValue;
+    private final double thresholdValue;
 
-	public GenericVisualSimplicityMetricOracle() {
-		this(50.0);
-	}
+    public GenericVisualSimplicityMetricOracle() {
+        this(50.0);
+    }
 
-	public GenericVisualSimplicityMetricOracle(double thresholdValue) {
-		this.thresholdValue = thresholdValue;
-	}
+    public GenericVisualSimplicityMetricOracle(double thresholdValue) {
+        this.thresholdValue = thresholdValue;
+    }
 
-	@Override
-	public List<Verdict> getVerdicts(State state) {
-		if (state.childCount() == 0) {
-			return Collections.singletonList(Verdict.OK); // State has no children, no need for balance metric evaluation
-		}
+    @Override
+    public List<Verdict> getVerdicts(State state) {
+        if (state.childCount() == 0) {
+            return Collections.singletonList(Verdict.OK); // State has no children, no need for balance metric evaluation
+        }
 
-		Shape sutShape = state.child(0).get(Tags.Shape, null);
-		if (sutShape == null) {
-			return Collections.singletonList(Verdict.OK); // SUT has no shape, no need for balance metric evaluation
-		}
+        Shape sutShape = state.child(0).get(Tags.Shape, null);
+        if (sutShape == null) {
+            return Collections.singletonList(Verdict.OK); // SUT has no shape, no need for balance metric evaluation
+        }
 
-		Rect sutRect = (Rect) sutShape;
-		if (sutRect.width() <= 0 || sutRect.height() <= 0) {
-			return Collections.singletonList(Verdict.OK); // Invalid shape dimensions, skip evaluation
-		}
+        Rect sutRect = (Rect) sutShape;
+        if (sutRect.width() <= 0 || sutRect.height() <= 0) {
+            return Collections.singletonList(Verdict.OK); // Invalid shape dimensions, skip evaluation
+        }
 
-		ArrayList<Shape> regions = MetricsHelper.getRegions(state);
+        ArrayList<Shape> regions = MetricsHelper.getRegions(state);
 
-		double simplicityMetric = MetricsHelper.calculateSimplicity(regions, sutRect.width(), sutRect.height());
+        double simplicityMetric = MetricsHelper.calculateSimplicity(regions, sutRect.width(), sutRect.height());
 
-		if (simplicityMetric < thresholdValue) {
-			String verdictMsg = String.format("Simplicity metric with value %f is below threshold value %f!", simplicityMetric, thresholdValue);
-			Visualizer visualizer = new RegionsVisualizer(getRedPen(), regions, "Simplicity Warning", 0.5, 0.5);
-			return Collections.singletonList(new Verdict(Verdict.Severity.WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, visualizer));
-		}
+        if (simplicityMetric < thresholdValue) {
+            String verdictMsg = String.format("Simplicity metric with value %f is below threshold value %f!", simplicityMetric, thresholdValue);
+            Visualizer visualizer = new RegionsVisualizer(getRedPen(), regions, "Simplicity Warning", 0.5, 0.5);
+            return Collections.singletonList(new Verdict(Verdict.Severity.WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, visualizer));
+        }
 
-		return Collections.singletonList(Verdict.OK);
-	}
+        return Collections.singletonList(Verdict.OK);
+    }
 
 }

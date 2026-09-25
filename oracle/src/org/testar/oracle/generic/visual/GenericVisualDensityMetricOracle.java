@@ -24,64 +24,64 @@ import org.testar.oracle.Oracle;
  * and gives a warning if the threshold is breached.
  * Based on the work of "Towards an evaluation of graphical user interfaces aesthetics based on metrics" by
  * Zen, Mathieu ; Vanderdonckt, Jean.
- * 
+ *
  * The default threshold values are 25.0 (minimum) and 75.0 (maximum).
  */
 public class GenericVisualDensityMetricOracle implements Oracle {
 
-	private final double thresholdMinValue;
-	private final double thresholdMaxValue;
+    private final double thresholdMinValue;
+    private final double thresholdMaxValue;
 
-	public GenericVisualDensityMetricOracle() {
-		this(25.0, 75.0);
-	}
+    public GenericVisualDensityMetricOracle() {
+        this(25.0, 75.0);
+    }
 
-	public GenericVisualDensityMetricOracle(double thresholdMinValue, double thresholdMaxValue) {
-		this.thresholdMinValue = thresholdMinValue;
-		this.thresholdMaxValue = thresholdMaxValue;
-	}
+    public GenericVisualDensityMetricOracle(double thresholdMinValue, double thresholdMaxValue) {
+        this.thresholdMinValue = thresholdMinValue;
+        this.thresholdMaxValue = thresholdMaxValue;
+    }
 
-	@Override
-	public List<Verdict> getVerdicts(State state) {
-		if (state.childCount() == 0) {
-			return Collections.singletonList(Verdict.OK); // State has no children, no need for balance metric evaluation
-		}
+    @Override
+    public List<Verdict> getVerdicts(State state) {
+        if (state.childCount() == 0) {
+            return Collections.singletonList(Verdict.OK); // State has no children, no need for balance metric evaluation
+        }
 
-		Shape sutShape = state.child(0).get(Tags.Shape, null);
-		if (sutShape == null) {
-			return Collections.singletonList(Verdict.OK); // SUT has no shape, no need for balance metric evaluation
-		}
+        Shape sutShape = state.child(0).get(Tags.Shape, null);
+        if (sutShape == null) {
+            return Collections.singletonList(Verdict.OK); // SUT has no shape, no need for balance metric evaluation
+        }
 
-		Rect sutRect = (Rect) sutShape;
-		if (sutRect.width() <= 0 || sutRect.height() <= 0) {
-			return Collections.singletonList(Verdict.OK); // Invalid shape dimensions, skip evaluation
-		}
+        Rect sutRect = (Rect) sutShape;
+        if (sutRect.width() <= 0 || sutRect.height() <= 0) {
+            return Collections.singletonList(Verdict.OK); // Invalid shape dimensions, skip evaluation
+        }
 
-		ArrayList<Shape> regions = MetricsHelper.getRegions(state);
+        ArrayList<Shape> regions = MetricsHelper.getRegions(state);
 
-		double densityMetric = MetricsHelper.calculateDensity(regions, sutRect.width(), sutRect.height());
+        double densityMetric = MetricsHelper.calculateDensity(regions, sutRect.width(), sutRect.height());
 
-		List<Verdict> verdicts = new ArrayList<>();
+        List<Verdict> verdicts = new ArrayList<>();
 
-		if (densityMetric < thresholdMinValue) {
-			String verdictMsg = String.format("Density metric with value %f is below threshold minimum value %f! Design too simple.", densityMetric, thresholdMinValue);
+        if (densityMetric < thresholdMinValue) {
+            String verdictMsg = String.format("Density metric with value %f is below threshold minimum value %f! Design too simple.", densityMetric, thresholdMinValue);
 
-			Visualizer visualizer = new RegionsVisualizer(getRedPen(), regions, "Density Warning - Too Simple", 0.5, 0.5);
-			Verdict verdict = new Verdict(Verdict.Severity.WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, visualizer);
-			verdicts.add(verdict);
-		}
+            Visualizer visualizer = new RegionsVisualizer(getRedPen(), regions, "Density Warning - Too Simple", 0.5, 0.5);
+            Verdict verdict = new Verdict(Verdict.Severity.WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, visualizer);
+            verdicts.add(verdict);
+        }
 
-		if (densityMetric > thresholdMaxValue) {
-			String verdictMsg = String.format("Density metric with value %f is higher than threshold maximum value %f! Design too complex.", densityMetric, thresholdMaxValue);
-			Visualizer visualizer = new RegionsVisualizer(getRedPen(), regions, "Density Warning - Too Complex", 0.5, 0.5);
-			Verdict verdict = new Verdict(Verdict.Severity.WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, visualizer);
-			verdicts.add(verdict);
-		}
+        if (densityMetric > thresholdMaxValue) {
+            String verdictMsg = String.format("Density metric with value %f is higher than threshold maximum value %f! Design too complex.", densityMetric, thresholdMaxValue);
+            Visualizer visualizer = new RegionsVisualizer(getRedPen(), regions, "Density Warning - Too Complex", 0.5, 0.5);
+            Verdict verdict = new Verdict(Verdict.Severity.WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, visualizer);
+            verdicts.add(verdict);
+        }
 
-		if (verdicts.isEmpty()) {
-			return Collections.singletonList(Verdict.OK);
-		}
-		return verdicts;
-	}
+        if (verdicts.isEmpty()) {
+            return Collections.singletonList(Verdict.OK);
+        }
+        return verdicts;
+    }
 
 }

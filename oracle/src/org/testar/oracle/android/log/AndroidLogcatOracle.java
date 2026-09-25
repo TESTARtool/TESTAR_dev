@@ -32,9 +32,9 @@ import java.util.regex.Pattern;
 
 /**
  * Android logcat-backed oracle.
- * Clears logcat at the start of each sequence, 
- * dumps logcat each getVerdict, 
- * and returns SUSPICIOUS_LOG if any new log line matches LogOracleRegex. 
+ * Clears logcat at the start of each sequence,
+ * dumps logcat each getVerdict,
+ * and returns SUSPICIOUS_LOG if any new log line matches LogOracleRegex.
  */
 public class AndroidLogcatOracle implements Oracle {
 
@@ -71,9 +71,9 @@ public class AndroidLogcatOracle implements Oracle {
             sequenceLogPath = Paths.get(logcatFileName);
 
             Files.writeString(sequenceLogPath,
-                    "# TESTAR Android logcat (threadtime)\n\n", 
-                    StandardCharsets.UTF_8, 
-                    StandardOpenOption.CREATE, 
+                    "# TESTAR Android logcat (threadtime)\n\n",
+                    StandardCharsets.UTF_8,
+                    StandardOpenOption.CREATE,
                     StandardOpenOption.TRUNCATE_EXISTING);
         } catch (Exception ignored) {
             sequenceLogPath = null;
@@ -128,8 +128,8 @@ public class AndroidLogcatOracle implements Oracle {
         }
         try {
             Files.write(sequenceLogPath,
-                    (String.join("\n", lines) + "\n").getBytes(StandardCharsets.UTF_8), 
-                    StandardOpenOption.CREATE, 
+                    (String.join("\n", lines) + "\n").getBytes(StandardCharsets.UTF_8),
+                    StandardOpenOption.CREATE,
                     StandardOpenOption.APPEND);
         } catch (Exception ignored) {
         }
@@ -167,7 +167,9 @@ public class AndroidLogcatOracle implements Oracle {
     );
 
     private String normalizeThreadtimeLine(String line) {
-        if (line == null) return "";
+        if (line == null) {
+            return "";
+        }
         line = line.trim();
         Matcher m = THREADTIME_PATTERN.matcher(line);
         if (!m.matches()) {

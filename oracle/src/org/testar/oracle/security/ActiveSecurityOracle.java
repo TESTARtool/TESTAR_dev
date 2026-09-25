@@ -24,45 +24,45 @@ import java.util.Set;
 
 public abstract class ActiveSecurityOracle extends BaseSecurityOracle {
 
-	public enum ActiveOracle {
-		SQL_INJECTION("SqlInjectionSecurityOracle"), 
-		XSS_INJECTION("XssSecurityOracle"), 
-		TOKEN_INVALIDATION("TokenInvalidationSecurityOracle"); 
+    public enum ActiveOracle {
+        SQL_INJECTION("SqlInjectionSecurityOracle"),
+        XSS_INJECTION("XssSecurityOracle"),
+        TOKEN_INVALIDATION("TokenInvalidationSecurityOracle");
 
-		private final String oracle;
+        private final String oracle;
 
-		ActiveOracle(String oracle) {
-			this.oracle = oracle;
-		}
+        ActiveOracle(String oracle) {
+            this.oracle = oracle;
+        }
 
-		public String getOracle() {
-			return oracle;
-		}
-	}
+        public String getOracle() {
+            return oracle;
+        }
+    }
 
     protected RemoteWebDriver webDriver;
 
-    public ActiveSecurityOracle(SecurityResultWriter securityResultWriter, RemoteWebDriver webDriver){
+    public ActiveSecurityOracle(SecurityResultWriter securityResultWriter, RemoteWebDriver webDriver) {
         super(securityResultWriter);
         this.webDriver = webDriver;
     }
 
     /** Enables oracle to add actions to action pool **/
-    public Set<Action> getActions(State state)
-    {
+    public Set<Action> getActions(State state) {
+
         /** Add actions **/
         return new HashSet<>();
     }
 
     /** Enables oracle to select action **/
-    public Set<Action> preSelect(Set<Action> actions)
-    {
+    public Set<Action> preSelect(Set<Action> actions) {
+
         return actions;
     }
 
     /** Lets the oracle know what action is executed for potential followup actions **/
-    public void actionSelected(Action action)
-    {
+    public void actionSelected(Action action) {
+
     }
 
     //region helpers

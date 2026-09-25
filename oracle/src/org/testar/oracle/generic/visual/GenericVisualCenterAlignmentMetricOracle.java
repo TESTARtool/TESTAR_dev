@@ -22,7 +22,7 @@ import org.testar.oracle.Oracle;
  * and gives a warning if the threshold is breached.
  * Based on the work of "Towards an evaluation of graphical user interfaces aesthetics based on metrics" by
  * Zen, Mathieu ; Vanderdonckt, Jean.
- * 
+ *
  * The default threshold value is 50.0.
  */
 public class GenericVisualCenterAlignmentMetricOracle implements Oracle {

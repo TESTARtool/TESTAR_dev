@@ -26,8 +26,8 @@ public class JsonSecurityResultWriter implements SecurityResultWriter {
     private String vulnerabilityPath = OutputStructure.outerLoopOutputDir + File.separator + "SecurityResult.json";
     private String visitPath = OutputStructure.outerLoopOutputDir + File.separator + "VisitResult.json";
 
-    public JsonSecurityResultWriter()
-    {
+    public JsonSecurityResultWriter() {
+
         System.out.println("Start securityResultWriter");
         Gson gson = new Gson();
 
@@ -38,8 +38,8 @@ public class JsonSecurityResultWriter implements SecurityResultWriter {
 
             currentResults = gson.fromJson(reader1, HashMap.class);
             System.out.println("Start securityResultWriter fromJson");
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
+
             System.out.println("Creating new currentResults list");
             currentResults = new HashMap<>();
         }
@@ -50,32 +50,33 @@ public class JsonSecurityResultWriter implements SecurityResultWriter {
 
             visitList = gson.fromJson(reader2, List.class);
             System.out.println("Start securityResultWriter fromJson");
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
+
             System.out.println("Creating new currentResults list");
             visitList = new ArrayList<>();
         }
     }
 
-    public void WriteVisit(String url)
-    {
+    public void WriteVisit(String url) {
+
         visitList.add(url);
         WriteVisitFile();
     }
 
-    public void WriteResult(String url, String cwe, String description)
-    {
+    public void WriteResult(String url, String cwe, String description) {
+
         String key = url + "-" + cwe;
-        if (currentResults.get(key) != null)
+        if (currentResults.get(key) != null) {
             return;
+        }
 
         SecurityResultDto result = new SecurityResultDto(url, cwe, description);
         currentResults.put(key, result);
         WriteResultFile();
     }
 
-    private void WriteResultFile()
-    {
+    private void WriteResultFile() {
+
         String json = "";
         try {
             Gson gson = new Gson();
@@ -91,8 +92,8 @@ public class JsonSecurityResultWriter implements SecurityResultWriter {
         }
     }
 
-    private void WriteVisitFile()
-    {
+    private void WriteVisitFile() {
+
         String json = "";
         try {
             Gson gson = new Gson();

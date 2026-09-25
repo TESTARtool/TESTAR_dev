@@ -28,21 +28,21 @@ public class SecurityConfiguration {
     public long tokenInvalidationWaitTime = 60000; /** One minute **/
 
     /**
-     * Create the security configuration only with the passive HeaderAnalysisSecurityOracle. 
+     * Create the security configuration only with the passive HeaderAnalysisSecurityOracle.
      */
-    public SecurityConfiguration() {}
+    public SecurityConfiguration() { }
 
     /**
-     * Create the security configuration with the passive HeaderAnalysisSecurityOracle 
-     * and the chosen active security oracle. 
-     * 
+     * Create the security configuration with the passive HeaderAnalysisSecurityOracle
+     * and the chosen active security oracle.
+     *
      * @param activeOracle
      */
     public SecurityConfiguration(ActiveSecurityOracle.ActiveOracle activeOracle) {
-    	oracles = Arrays.asList("HeaderAnalysisSecurityOracle", activeOracle.getOracle());
+        oracles = Arrays.asList("HeaderAnalysisSecurityOracle", activeOracle.getOracle());
     }
 
     public List<String> getOracles() {
-    	return oracles;
+        return oracles;
     }
 }

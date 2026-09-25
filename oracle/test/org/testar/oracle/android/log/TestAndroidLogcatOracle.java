@@ -219,6 +219,8 @@ public class TestAndroidLogcatOracle {
         List<Pair<?, ?>> tags = new ArrayList<>();
         tags.add(Pair.from(ConfigTags.Mode, mode));
         tags.add(Pair.from(ConfigTags.LogOracleRegex, regex));
+        tags.add(Pair.from(ConfigTags.SUTConnector, Settings.SUT_CONNECTOR_CMDLINE));
+        tags.add(Pair.from(ConfigTags.SUTConnectorValue, "test-command"));
         return new Settings(tags, new Properties());
     }
 

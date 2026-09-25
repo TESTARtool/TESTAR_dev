@@ -1,6 +1,10 @@
 package org.testar.oracle.windows.log;
 
-import static org.testar.config.ConfigTags.*;
+import static org.testar.config.ConfigTags.Mode;
+import static org.testar.config.ConfigTags.ProcessLogs;
+import static org.testar.config.ConfigTags.SUTConnector;
+import static org.testar.config.ConfigTags.SUTConnectorValue;
+import static org.testar.config.ConfigTags.SuspiciousProcessOutput;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -26,213 +30,220 @@ import org.testar.config.settings.Settings;
 
 public class TestProcessListenerOracle {
 
-	private static File tempLogDir;
+    private static File tempLogDir;
 
-	@BeforeClass
-	public static void prepareProcessOutputEnv() {
-		try {
-			// Create a temporary directory
-			tempLogDir = Files.createTempDirectory("process_listener_logs").toFile();
-			tempLogDir.deleteOnExit();
+    @BeforeClass
+    public static void prepareProcessOutputEnv() {
+        try {
+            // Create a temporary directory
+            tempLogDir = Files.createTempDirectory("process_listener_logs").toFile();
+            tempLogDir.deleteOnExit();
 
-			// Set the OutputStructure path to this temp directory
-			OutputStructure.processListenerDir = tempLogDir.getAbsolutePath();
+            // Set the OutputStructure path to this temp directory
+            OutputStructure.processListenerDir = tempLogDir.getAbsolutePath();
 
-			// Optional: set fake values for naming
-			OutputStructure.startInnerLoopDateString = "2020-01-01";
-			OutputStructure.executedSUTname = "junit_app";
-			OutputStructure.sequenceInnerLoopCount = 1;
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+            // Optional: set fake values for naming
+            OutputStructure.startInnerLoopDateString = "2020-01-01";
+            OutputStructure.executedSUTname = "junit_app";
+            OutputStructure.sequenceInnerLoopCount = 1;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
-	@Before
-	public void cleanLogOracleFile() {
-		if (tempLogDir != null && tempLogDir.isDirectory()) {
-			for (File file : tempLogDir.listFiles()) {
-				if (!file.delete()) {
-					System.err.println("Warning: Failed to delete temp file: " + file.getName());
-				}
-			}
-		}
-	}
+    @Before
+    public void cleanLogOracleFile() {
+        if (tempLogDir != null && tempLogDir.isDirectory()) {
+            for (File file : tempLogDir.listFiles()) {
+                if (!file.delete()) {
+                    System.err.println("Warning: Failed to delete temp file: " + file.getName());
+                }
+            }
+        }
+    }
 
-	@Test
-	public void spy_mode_is_always_ok_because_is_disabled() {
-		SUT system = Mockito.mock(SUT.class);
-		Mockito.when(system.get(Tags.StdErr)).thenReturn(new ByteArrayInputStream("exception error".getBytes()));
-		Mockito.when(system.get(Tags.StdOut)).thenReturn(new ByteArrayInputStream("exception output".getBytes()));
+    @Test
+    public void spy_mode_is_always_ok_because_is_disabled() {
+        SUT system = Mockito.mock(SUT.class);
+        Mockito.when(system.get(Tags.StdErr)).thenReturn(new ByteArrayInputStream("exception error".getBytes()));
+        Mockito.when(system.get(Tags.StdOut)).thenReturn(new ByteArrayInputStream("exception output".getBytes()));
 
-		List<Pair<?, ?>> tags = new ArrayList<Pair<?, ?>>();
-		tags.add(Pair.from(Mode, TestarMode.Spy));
-		tags.add(Pair.from(SUTConnector, Settings.SUT_CONNECTOR_CMDLINE));
-		tags.add(Pair.from(SuspiciousProcessOutput, ".*exception.*"));
-		tags.add(Pair.from(ProcessLogs, ".*.*"));
-		Settings settings = new Settings(tags, new Properties());
+        List<Pair<?, ?>> tags = new ArrayList<Pair<?, ?>>();
+        tags.add(Pair.from(Mode, TestarMode.Spy));
+        tags.add(Pair.from(SUTConnector, Settings.SUT_CONNECTOR_CMDLINE));
+        tags.add(Pair.from(SUTConnectorValue, "test-command"));
+        tags.add(Pair.from(SuspiciousProcessOutput, ".*exception.*"));
+        tags.add(Pair.from(ProcessLogs, ".*.*"));
+        Settings settings = new Settings(tags, new Properties());
 
-		ProcessListenerOracle processOracle = new ProcessListenerOracle(system, settings);
-		processOracle.initialize();
+        ProcessListenerOracle processOracle = new ProcessListenerOracle(system, settings);
+        processOracle.initialize();
 
-		State state = Mockito.mock(State.class);
-		List<Verdict> verdicts = processOracle.getVerdicts(state);
-		Assert.assertEquals(1, verdicts.size());
-		Verdict processVerdict = verdicts.get(0);
+        State state = Mockito.mock(State.class);
+        List<Verdict> verdicts = processOracle.getVerdicts(state);
+        Assert.assertEquals(1, verdicts.size());
+        Verdict processVerdict = verdicts.get(0);
 
-		// Verify that the processVerdict is OK because we are in spy mode
-		Assert.assertTrue(processVerdict.severity() == Verdict.Severity.OK.getValue());
-	}
+        // Verify that the processVerdict is OK because we are in spy mode
+        Assert.assertTrue(processVerdict.severity() == Verdict.Severity.OK.getValue());
+    }
 
-	@Test
-	public void connect_windows_title_is_always_ok_because_is_disabled() {
-		SUT system = Mockito.mock(SUT.class);
-		Mockito.when(system.get(Tags.StdErr)).thenReturn(new ByteArrayInputStream("exception error".getBytes()));
-		Mockito.when(system.get(Tags.StdOut)).thenReturn(new ByteArrayInputStream("exception output".getBytes()));
+    @Test
+    public void connect_windows_title_is_always_ok_because_is_disabled() {
+        SUT system = Mockito.mock(SUT.class);
+        Mockito.when(system.get(Tags.StdErr)).thenReturn(new ByteArrayInputStream("exception error".getBytes()));
+        Mockito.when(system.get(Tags.StdOut)).thenReturn(new ByteArrayInputStream("exception output".getBytes()));
 
-		List<Pair<?, ?>> tags = new ArrayList<Pair<?, ?>>();
-		tags.add(Pair.from(Mode, TestarMode.Generate));
-		tags.add(Pair.from(SUTConnector, Settings.SUT_CONNECTOR_WINDOW_TITLE));
-		tags.add(Pair.from(SuspiciousProcessOutput, ".*exception.*"));
-		tags.add(Pair.from(ProcessLogs, ".*.*"));
-		Settings settings = new Settings(tags, new Properties());
+        List<Pair<?, ?>> tags = new ArrayList<Pair<?, ?>>();
+        tags.add(Pair.from(Mode, TestarMode.Generate));
+        tags.add(Pair.from(SUTConnector, Settings.SUT_CONNECTOR_WINDOW_TITLE));
+        tags.add(Pair.from(SUTConnectorValue, "test-window"));
+        tags.add(Pair.from(SuspiciousProcessOutput, ".*exception.*"));
+        tags.add(Pair.from(ProcessLogs, ".*.*"));
+        Settings settings = new Settings(tags, new Properties());
 
-		ProcessListenerOracle processOracle = new ProcessListenerOracle(system, settings);
-		processOracle.initialize();
+        ProcessListenerOracle processOracle = new ProcessListenerOracle(system, settings);
+        processOracle.initialize();
 
-		State state = Mockito.mock(State.class);
-		List<Verdict> verdicts = processOracle.getVerdicts(state);
-		Assert.assertEquals(1, verdicts.size());
-		Verdict processVerdict = verdicts.get(0);
+        State state = Mockito.mock(State.class);
+        List<Verdict> verdicts = processOracle.getVerdicts(state);
+        Assert.assertEquals(1, verdicts.size());
+        Verdict processVerdict = verdicts.get(0);
 
-		// Verify that the processVerdict is OK because we connect with title
-		Assert.assertTrue(processVerdict.severity() == Verdict.Severity.OK.getValue());
-	}
+        // Verify that the processVerdict is OK because we connect with title
+        Assert.assertTrue(processVerdict.severity() == Verdict.Severity.OK.getValue());
+    }
 
-	@Test
-	public void connect_process_name_is_always_ok_because_is_disabled() {
-		SUT system = Mockito.mock(SUT.class);
-		Mockito.when(system.get(Tags.StdErr)).thenReturn(new ByteArrayInputStream("exception error".getBytes()));
-		Mockito.when(system.get(Tags.StdOut)).thenReturn(new ByteArrayInputStream("exception output".getBytes()));
+    @Test
+    public void connect_process_name_is_always_ok_because_is_disabled() {
+        SUT system = Mockito.mock(SUT.class);
+        Mockito.when(system.get(Tags.StdErr)).thenReturn(new ByteArrayInputStream("exception error".getBytes()));
+        Mockito.when(system.get(Tags.StdOut)).thenReturn(new ByteArrayInputStream("exception output".getBytes()));
 
-		List<Pair<?, ?>> tags = new ArrayList<Pair<?, ?>>();
-		tags.add(Pair.from(Mode, TestarMode.Generate));
-		tags.add(Pair.from(SUTConnector, Settings.SUT_CONNECTOR_PROCESS_NAME));
-		tags.add(Pair.from(SuspiciousProcessOutput, ".*exception.*"));
-		tags.add(Pair.from(ProcessLogs, ".*.*"));
-		Settings settings = new Settings(tags, new Properties());
+        List<Pair<?, ?>> tags = new ArrayList<Pair<?, ?>>();
+        tags.add(Pair.from(Mode, TestarMode.Generate));
+        tags.add(Pair.from(SUTConnector, Settings.SUT_CONNECTOR_PROCESS_NAME));
+        tags.add(Pair.from(SUTConnectorValue, "test-process"));
+        tags.add(Pair.from(SuspiciousProcessOutput, ".*exception.*"));
+        tags.add(Pair.from(ProcessLogs, ".*.*"));
+        Settings settings = new Settings(tags, new Properties());
 
-		ProcessListenerOracle processOracle = new ProcessListenerOracle(system, settings);
-		processOracle.initialize();
+        ProcessListenerOracle processOracle = new ProcessListenerOracle(system, settings);
+        processOracle.initialize();
 
-		State state = Mockito.mock(State.class);
-		List<Verdict> verdicts = processOracle.getVerdicts(state);
-		Assert.assertEquals(1, verdicts.size());
-		Verdict processVerdict = verdicts.get(0);
+        State state = Mockito.mock(State.class);
+        List<Verdict> verdicts = processOracle.getVerdicts(state);
+        Assert.assertEquals(1, verdicts.size());
+        Verdict processVerdict = verdicts.get(0);
 
-		// Verify that the processVerdict is OK because we connect with process name
-		Assert.assertTrue(processVerdict.severity() == Verdict.Severity.OK.getValue());
-	}
+        // Verify that the processVerdict is OK because we connect with process name
+        Assert.assertTrue(processVerdict.severity() == Verdict.Severity.OK.getValue());
+    }
 
-	@Test
-	public void webdriver_is_always_ok_because_is_disabled() {
-		SUT system = Mockito.mock(SUT.class);
-		Mockito.when(system.get(Tags.StdErr)).thenReturn(new ByteArrayInputStream("exception error".getBytes()));
-		Mockito.when(system.get(Tags.StdOut)).thenReturn(new ByteArrayInputStream("exception output".getBytes()));
+    @Test
+    public void webdriver_is_always_ok_because_is_disabled() {
+        SUT system = Mockito.mock(SUT.class);
+        Mockito.when(system.get(Tags.StdErr)).thenReturn(new ByteArrayInputStream("exception error".getBytes()));
+        Mockito.when(system.get(Tags.StdOut)).thenReturn(new ByteArrayInputStream("exception output".getBytes()));
 
-		List<Pair<?, ?>> tags = new ArrayList<Pair<?, ?>>();
-		tags.add(Pair.from(Mode, TestarMode.Generate));
-		tags.add(Pair.from(SUTConnector, Settings.SUT_CONNECTOR_WEBDRIVER));
-		tags.add(Pair.from(SuspiciousProcessOutput, ".*exception.*"));
-		tags.add(Pair.from(ProcessLogs, ".*.*"));
-		Settings settings = new Settings(tags, new Properties());
+        List<Pair<?, ?>> tags = new ArrayList<Pair<?, ?>>();
+        tags.add(Pair.from(Mode, TestarMode.Generate));
+        tags.add(Pair.from(SUTConnector, Settings.SUT_CONNECTOR_WEBDRIVER));
+        tags.add(Pair.from(SUTConnectorValue, "https://example.org"));
+        tags.add(Pair.from(SuspiciousProcessOutput, ".*exception.*"));
+        tags.add(Pair.from(ProcessLogs, ".*.*"));
+        Settings settings = new Settings(tags, new Properties());
 
-		ProcessListenerOracle processOracle = new ProcessListenerOracle(system, settings);
-		processOracle.initialize();
+        ProcessListenerOracle processOracle = new ProcessListenerOracle(system, settings);
+        processOracle.initialize();
 
-		State state = Mockito.mock(State.class);
-		List<Verdict> verdicts = processOracle.getVerdicts(state);
-		Assert.assertEquals(1, verdicts.size());
-		Verdict processVerdict = verdicts.get(0);
+        State state = Mockito.mock(State.class);
+        List<Verdict> verdicts = processOracle.getVerdicts(state);
+        Assert.assertEquals(1, verdicts.size());
+        Verdict processVerdict = verdicts.get(0);
 
-		// Verify that the processVerdict is OK because we connect with web apps
-		Assert.assertTrue(processVerdict.severity() == Verdict.Severity.OK.getValue());
-	}
+        // Verify that the processVerdict is OK because we connect with web apps
+        Assert.assertTrue(processVerdict.severity() == Verdict.Severity.OK.getValue());
+    }
 
-	@Test
-	public void process_detection_for_error_buffer() {
-		SUT system = Mockito.mock(SUT.class);
-		Mockito.when(system.get(Tags.StdErr)).thenReturn(new ByteArrayInputStream("exception error".getBytes()));
-		Mockito.when(system.get(Tags.StdOut)).thenReturn(new ByteArrayInputStream("".getBytes()));
+    @Test
+    public void process_detection_for_error_buffer() {
+        SUT system = Mockito.mock(SUT.class);
+        Mockito.when(system.get(Tags.StdErr)).thenReturn(new ByteArrayInputStream("exception error".getBytes()));
+        Mockito.when(system.get(Tags.StdOut)).thenReturn(new ByteArrayInputStream("".getBytes()));
 
-		List<Pair<?, ?>> tags = new ArrayList<Pair<?, ?>>();
-		tags.add(Pair.from(Mode, TestarMode.Generate));
-		tags.add(Pair.from(SUTConnector, Settings.SUT_CONNECTOR_CMDLINE));
-		tags.add(Pair.from(SuspiciousProcessOutput, ".*exception.*"));
-		tags.add(Pair.from(ProcessLogs, ""));
-		Settings settings = new Settings(tags, new Properties());
+        List<Pair<?, ?>> tags = new ArrayList<Pair<?, ?>>();
+        tags.add(Pair.from(Mode, TestarMode.Generate));
+        tags.add(Pair.from(SUTConnector, Settings.SUT_CONNECTOR_CMDLINE));
+        tags.add(Pair.from(SUTConnectorValue, "test-command"));
+        tags.add(Pair.from(SuspiciousProcessOutput, ".*exception.*"));
+        tags.add(Pair.from(ProcessLogs, ""));
+        Settings settings = new Settings(tags, new Properties());
 
-		ProcessListenerOracle processOracle = new ProcessListenerOracle(system, settings);
-		processOracle.initialize();
+        ProcessListenerOracle processOracle = new ProcessListenerOracle(system, settings);
+        processOracle.initialize();
 
-		State state = Mockito.mock(State.class);
-		List<Verdict> verdicts = processOracle.getVerdicts(state);
-		Assert.assertEquals(1, verdicts.size());
-		Verdict processVerdict = verdicts.get(0);
+        State state = Mockito.mock(State.class);
+        List<Verdict> verdicts = processOracle.getVerdicts(state);
+        Assert.assertEquals(1, verdicts.size());
+        Verdict processVerdict = verdicts.get(0);
 
-		// Verify that the processVerdict detects an error in the error buffer
-		Assert.assertTrue(processVerdict.severity() == Verdict.Severity.SUSPICIOUS_PROCESS.getValue());
-		Assert.assertTrue(processVerdict.info().contains("Process Listener suspicious process: 'exception error'"));
-	}
+        // Verify that the processVerdict detects an error in the error buffer
+        Assert.assertTrue(processVerdict.severity() == Verdict.Severity.SUSPICIOUS_PROCESS.getValue());
+        Assert.assertTrue(processVerdict.info().contains("Process Listener suspicious process: 'exception error'"));
+    }
 
-	@Test
-	public void process_detection_for_output_buffer() {
-		SUT system = Mockito.mock(SUT.class);
-		Mockito.when(system.get(Tags.StdErr)).thenReturn(new ByteArrayInputStream("".getBytes()));
-		Mockito.when(system.get(Tags.StdOut)).thenReturn(new ByteArrayInputStream("exception output".getBytes()));
+    @Test
+    public void process_detection_for_output_buffer() {
+        SUT system = Mockito.mock(SUT.class);
+        Mockito.when(system.get(Tags.StdErr)).thenReturn(new ByteArrayInputStream("".getBytes()));
+        Mockito.when(system.get(Tags.StdOut)).thenReturn(new ByteArrayInputStream("exception output".getBytes()));
 
-		List<Pair<?, ?>> tags = new ArrayList<Pair<?, ?>>();
-		tags.add(Pair.from(Mode, TestarMode.Generate));
-		tags.add(Pair.from(SUTConnector, Settings.SUT_CONNECTOR_CMDLINE));
-		tags.add(Pair.from(SuspiciousProcessOutput, ".*exception.*"));
-		tags.add(Pair.from(ProcessLogs, ""));
-		Settings settings = new Settings(tags, new Properties());
+        List<Pair<?, ?>> tags = new ArrayList<Pair<?, ?>>();
+        tags.add(Pair.from(Mode, TestarMode.Generate));
+        tags.add(Pair.from(SUTConnector, Settings.SUT_CONNECTOR_CMDLINE));
+        tags.add(Pair.from(SUTConnectorValue, "test-command"));
+        tags.add(Pair.from(SuspiciousProcessOutput, ".*exception.*"));
+        tags.add(Pair.from(ProcessLogs, ""));
+        Settings settings = new Settings(tags, new Properties());
 
-		ProcessListenerOracle processOracle = new ProcessListenerOracle(system, settings);
-		processOracle.initialize();
+        ProcessListenerOracle processOracle = new ProcessListenerOracle(system, settings);
+        processOracle.initialize();
 
-		State state = Mockito.mock(State.class);
-		List<Verdict> verdicts = processOracle.getVerdicts(state);
-		Assert.assertEquals(1, verdicts.size());
-		Verdict processVerdict = verdicts.get(0);
+        State state = Mockito.mock(State.class);
+        List<Verdict> verdicts = processOracle.getVerdicts(state);
+        Assert.assertEquals(1, verdicts.size());
+        Verdict processVerdict = verdicts.get(0);
 
-		// Verify that the processVerdict detects an error in the output buffer
-		Assert.assertTrue(processVerdict.severity() == Verdict.Severity.SUSPICIOUS_PROCESS.getValue());
-		Assert.assertTrue(processVerdict.info().contains("Process Listener suspicious process: 'exception output'"));
-	}
+        // Verify that the processVerdict detects an error in the output buffer
+        Assert.assertTrue(processVerdict.severity() == Verdict.Severity.SUSPICIOUS_PROCESS.getValue());
+        Assert.assertTrue(processVerdict.info().contains("Process Listener suspicious process: 'exception output'"));
+    }
 
-	@Test
-	public void process_detection_for_both_buffers() {
-		SUT system = Mockito.mock(SUT.class);
-		Mockito.when(system.get(Tags.StdErr)).thenReturn(new ByteArrayInputStream("exception error".getBytes()));
-		Mockito.when(system.get(Tags.StdOut)).thenReturn(new ByteArrayInputStream("exception output".getBytes()));
+    @Test
+    public void process_detection_for_both_buffers() {
+        SUT system = Mockito.mock(SUT.class);
+        Mockito.when(system.get(Tags.StdErr)).thenReturn(new ByteArrayInputStream("exception error".getBytes()));
+        Mockito.when(system.get(Tags.StdOut)).thenReturn(new ByteArrayInputStream("exception output".getBytes()));
 
-		List<Pair<?, ?>> tags = new ArrayList<Pair<?, ?>>();
-		tags.add(Pair.from(Mode, TestarMode.Generate));
-		tags.add(Pair.from(SUTConnector, Settings.SUT_CONNECTOR_CMDLINE));
-		tags.add(Pair.from(SuspiciousProcessOutput, ".*exception.*"));
-		tags.add(Pair.from(ProcessLogs, ""));
-		Settings settings = new Settings(tags, new Properties());
+        List<Pair<?, ?>> tags = new ArrayList<Pair<?, ?>>();
+        tags.add(Pair.from(Mode, TestarMode.Generate));
+        tags.add(Pair.from(SUTConnector, Settings.SUT_CONNECTOR_CMDLINE));
+        tags.add(Pair.from(SUTConnectorValue, "test-command"));
+        tags.add(Pair.from(SuspiciousProcessOutput, ".*exception.*"));
+        tags.add(Pair.from(ProcessLogs, ""));
+        Settings settings = new Settings(tags, new Properties());
 
-		ProcessListenerOracle processOracle = new ProcessListenerOracle(system, settings);
-		processOracle.initialize();
+        ProcessListenerOracle processOracle = new ProcessListenerOracle(system, settings);
+        processOracle.initialize();
 
-		State state = Mockito.mock(State.class);
-		List<Verdict> verdicts = processOracle.getVerdicts(state);
-		Assert.assertEquals(1, verdicts.size());
-		Verdict processVerdict = verdicts.get(0);
+        State state = Mockito.mock(State.class);
+        List<Verdict> verdicts = processOracle.getVerdicts(state);
+        Assert.assertEquals(1, verdicts.size());
+        Verdict processVerdict = verdicts.get(0);
 
-		// Verify that the processVerdict detects an error
-		Assert.assertTrue(processVerdict.severity() == Verdict.Severity.SUSPICIOUS_PROCESS.getValue());
-		Assert.assertTrue(processVerdict.info().contains("Process Listener suspicious process: 'exception error'"));
-	}
+        // Verify that the processVerdict detects an error
+        Assert.assertTrue(processVerdict.severity() == Verdict.Severity.SUSPICIOUS_PROCESS.getValue());
+        Assert.assertTrue(processVerdict.info().contains("Process Listener suspicious process: 'exception error'"));
+    }
 }

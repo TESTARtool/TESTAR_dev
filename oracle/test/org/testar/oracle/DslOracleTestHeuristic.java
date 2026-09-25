@@ -58,13 +58,13 @@ public class DslOracleTestHeuristic {
     }
 
     @Test
-    public void appliesWhenConstraintsNull_rootIsWholePage() {        
+    public void appliesWhenConstraintsNull_rootIsWholePage() {
         DslOracle dslOracle = new TestDslOracle(null);
         assertTrue(dslOracle.getConstraintWidgetOrState(pageState).equals(pageState));
     }
 
     @Test
-    public void appliesWhenConstraintsEmpty_rootIsWholePage() {        
+    public void appliesWhenConstraintsEmpty_rootIsWholePage() {
         DslOracle dslOracle = new TestDslOracle(Collections.emptyList());
         assertTrue(dslOracle.getConstraintWidgetOrState(pageState).equals(pageState));
     }

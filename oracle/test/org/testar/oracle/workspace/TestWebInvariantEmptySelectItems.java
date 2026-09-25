@@ -32,7 +32,7 @@ public class TestWebInvariantEmptySelectItems extends WorkspaceOracleTestSupport
         try (MockedStatic<WdDriver> mockedStatic = Mockito.mockStatic(WdDriver.class)) {
             // Mock the static method executeScript(query)
             mockedStatic.when(() -> WdDriver.executeScript(Mockito.anyString()))
-            .thenReturn(1L);
+                    .thenReturn(1L);
 
             // Assert the oracle verdict is WARNING_WEB_INVARIANT_FAULT
             List<Verdict> verdicts = oracle.getVerdicts(state);
@@ -58,7 +58,7 @@ public class TestWebInvariantEmptySelectItems extends WorkspaceOracleTestSupport
         try (MockedStatic<WdDriver> mockedStatic = Mockito.mockStatic(WdDriver.class)) {
             // Mock the static method executeScript(query)
             mockedStatic.when(() -> WdDriver.executeScript(Mockito.anyString()))
-            .thenReturn(2L);
+                    .thenReturn(2L);
 
             // Assert the oracle verdict is OK
             List<Verdict> verdicts = oracle.getVerdicts(state);

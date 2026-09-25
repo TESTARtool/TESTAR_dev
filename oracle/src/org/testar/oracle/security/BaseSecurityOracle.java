@@ -12,18 +12,18 @@ import org.testar.core.verdict.Verdict;
 public class BaseSecurityOracle {
     protected SecurityResultWriter securityResultWriter;
 
-    public BaseSecurityOracle(SecurityResultWriter securityResultWriter)
-    {
+    public BaseSecurityOracle(SecurityResultWriter securityResultWriter) {
+
         this.securityResultWriter = securityResultWriter;
     }
 
-    public void addListener(DevTools devTools)
-    {
+    public void addListener(DevTools devTools) {
+
         /** Add listeners **/
     }
 
-    public Verdict getVerdict()
-    {
+    public Verdict getVerdict() {
+
         /** ORACLE **/
         return Verdict.OK;
     }

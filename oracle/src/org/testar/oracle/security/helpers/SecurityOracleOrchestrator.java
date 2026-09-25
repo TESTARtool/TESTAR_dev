@@ -32,76 +32,86 @@ public class SecurityOracleOrchestrator {
     private ActiveSecurityOracle activeSecurityOracle;
     private SecurityResultWriter securityResultWriter;
 
-    public SecurityOracleOrchestrator(SecurityResultWriter securityResultWriter, List<String> securityOracleNames, RemoteWebDriver webDriver, DevTools devTools)
-    {
+    public SecurityOracleOrchestrator(SecurityResultWriter securityResultWriter, List<String> securityOracleNames, RemoteWebDriver webDriver, DevTools devTools) {
+
         this.securityResultWriter = securityResultWriter;
         setSecurityOracles(securityOracleNames, webDriver);
         addListeners(devTools);
     }
 
-    public boolean hasActiveOracle()
-    {
+    public boolean hasActiveOracle() {
+
         return (activeSecurityOracle != null);
     }
 
-    public Set<Action> getActions(State state)
-    {
-        if (activeSecurityOracle != null)
+    public Set<Action> getActions(State state) {
+
+        if (activeSecurityOracle != null) {
             return activeSecurityOracle.getActions(state);
+        }
 
         return new HashSet<>();
     }
 
-    public Set<Action> preSelect(Set<Action> actions)
-    {
-        if (activeSecurityOracle != null)
+    public Set<Action> preSelect(Set<Action> actions) {
+
+        if (activeSecurityOracle != null) {
             return activeSecurityOracle.preSelect(actions);
+        }
 
         return actions;
     }
 
-    public void actionSelected(Action action)
-    {
-        if (activeSecurityOracle != null)
-            activeSecurityOracle.actionSelected(action);
-    }
+    public void actionSelected(Action action) {
 
-    //region configuration
-    private void setSecurityOracles(List<String> securityOracleNames, RemoteWebDriver webDriver)
-    {
-        for (String name : securityOracleNames)
-        {
-            if (name.compareToIgnoreCase("HeaderAnalysisSecurityOracle") == 0)
-                securityOracles.add(new HeaderAnalysisSecurityOracle(securityResultWriter));
-            if (name.compareToIgnoreCase("SqlInjectionSecurityOracle") == 0)
-                setActiveOracle(new SqlInjectionSecurityOracle(securityResultWriter, webDriver));
-            if (name.compareToIgnoreCase("XssSecurityOracle") == 0)
-                setActiveOracle(new XssSecurityOracle(securityResultWriter, webDriver));
-            if (name.compareToIgnoreCase("TokenInvalidationSecurityOracle") == 0)
-                setActiveOracle(new TokenInvalidationSecurityOracle(securityResultWriter, webDriver));
+        if (activeSecurityOracle != null) {
+            activeSecurityOracle.actionSelected(action);
         }
     }
 
-    private void setActiveOracle(ActiveSecurityOracle securityOracle)
-    {
-        if (activeSecurityOracle == null)
+    //region configuration
+    private void setSecurityOracles(List<String> securityOracleNames, RemoteWebDriver webDriver) {
+
+        for (String name : securityOracleNames) {
+
+            if (name.compareToIgnoreCase("HeaderAnalysisSecurityOracle") == 0) {
+                securityOracles.add(new HeaderAnalysisSecurityOracle(securityResultWriter));
+            }
+            if (name.compareToIgnoreCase("SqlInjectionSecurityOracle") == 0) {
+                setActiveOracle(new SqlInjectionSecurityOracle(securityResultWriter, webDriver));
+            }
+            if (name.compareToIgnoreCase("XssSecurityOracle") == 0) {
+                setActiveOracle(new XssSecurityOracle(securityResultWriter, webDriver));
+            }
+            if (name.compareToIgnoreCase("TokenInvalidationSecurityOracle") == 0) {
+                setActiveOracle(new TokenInvalidationSecurityOracle(securityResultWriter, webDriver));
+            }
+        }
+    }
+
+    private void setActiveOracle(ActiveSecurityOracle securityOracle) {
+
+        if (activeSecurityOracle == null) {
             activeSecurityOracle = securityOracle;
-        else
+        } else {
             throw new UnsupportedOperationException("Only one active security oracle at a time please!");
+        }
     }
     //endregion
 
-    private void addListeners(DevTools devTools)
-    {
-        if (activeSecurityOracle != null)
-            activeSecurityOracle.addListener(devTools);
+    private void addListeners(DevTools devTools) {
 
-        for (BaseSecurityOracle securityOracle : securityOracles)
+        if (activeSecurityOracle != null) {
+            activeSecurityOracle.addListener(devTools);
+        }
+
+        for (BaseSecurityOracle securityOracle : securityOracles) {
             securityOracle.addListener(devTools);
+        }
     }
 
-    public List<Verdict> getVerdicts()
-    {
+    public List<Verdict> getVerdicts() {
+
         List<Verdict> verdicts = new ArrayList<>();
         for (BaseSecurityOracle securityOracle : securityOracles) {
             Verdict newVerdict = securityOracle.getVerdict();

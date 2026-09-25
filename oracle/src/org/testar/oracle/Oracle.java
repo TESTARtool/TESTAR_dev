@@ -26,8 +26,8 @@ public interface Oracle extends OracleWidgetReporter, OracleApplicationStatus {
     }
 
     /**
-     * The message that will be shown to the user when reporting a Verdict. 
-     * 
+     * The message that will be shown to the user when reporting a Verdict.
+     *
      * @return
      */
     default String getMessage() {

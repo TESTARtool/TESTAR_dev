@@ -35,7 +35,7 @@ public class TestWebInvariantDuplicateSelectItems extends WorkspaceOracleTestSup
             // Mock the static method executeScript(query)
             List<String> mockOptions = Arrays.asList("Renault", "Volvo", "Renault");
             mockedStatic.when(() -> WdDriver.executeScript(Mockito.anyString()))
-            .thenReturn(new ArrayList<>(mockOptions));
+                    .thenReturn(new ArrayList<>(mockOptions));
 
             // Assert the oracle verdict is WARNING_WEB_INVARIANT_FAULT
             List<Verdict> verdicts = oracle.getVerdicts(state);
@@ -62,7 +62,7 @@ public class TestWebInvariantDuplicateSelectItems extends WorkspaceOracleTestSup
             // Mock the static method executeScript(query)
             List<String> mockOptions = Arrays.asList("Renault", "Volvo", "Opel");
             mockedStatic.when(() -> WdDriver.executeScript(Mockito.anyString()))
-            .thenReturn(new ArrayList<>(mockOptions));
+                    .thenReturn(new ArrayList<>(mockOptions));
 
             // Assert the oracle verdict is OK
             List<Verdict> verdicts = oracle.getVerdicts(state);

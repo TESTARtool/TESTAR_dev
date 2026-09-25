@@ -48,12 +48,12 @@ public class TestWebInvariantUnsortedListboxItems extends WorkspaceOracleTestSup
         Oracle oracle = loadWorkspaceOracle("WebInvariantUnsortedListboxItems");
         StateStub state = new StateStub();
         createDownshiftList(
-            state,
-            "downshift-1-menu",
-            "Brazil",
-            "Serbia",
-            "Poland",
-            "Oman"
+                state,
+                "downshift-1-menu",
+                "Brazil",
+                "Serbia",
+                "Poland",
+                "Oman"
         );
 
         List<Verdict> verdicts = oracle.getVerdicts(state);

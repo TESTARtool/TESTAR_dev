@@ -65,8 +65,8 @@ class PlainLinebasedLogChecker extends LogChecker {
         for ( String command : commands) {
             try {
                 readNewLines(getCommandBufferedReader(command), this.logCommandPtr, command);
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
+
                 logger.warn("LogChecker could not run command " + command + ":" + e.toString());
             }
         }
@@ -74,8 +74,8 @@ class PlainLinebasedLogChecker extends LogChecker {
         for ( String file : files) {
             try {
                 readNewLines(getFileBufferedReader(file), this.logFilePtr, file);
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
+
                 logger.warn("LogChecker could not read file " + file + ":" + e.toString());
             }
         }
@@ -99,14 +99,14 @@ class PlainLinebasedLogChecker extends LogChecker {
                 for ( String error : errors ) {
                     if ( this.numberEntries > 1 ) {
                         result.add("[Command " + command + "] :" + error);
-                    }
-                    else {
+                    } else {
+
                         result.add(error);
                     }
                 }
 
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
+
                 logger.trace("LogChecker could not run command " + command + ":" + e.toString());
             }
         }
@@ -124,14 +124,14 @@ class PlainLinebasedLogChecker extends LogChecker {
                 for ( String error : errors ) {
                     if ( this.numberEntries > 1 ) {
                         result.add("[File " + file + "] :" + error);
-                    }
-                    else {
+                    } else {
+
                         result.add(error);
                     }
                 }
 
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
+
                 logger.trace("LogChecker could not read file " + file + ":" + e.toString());
             }
         }
