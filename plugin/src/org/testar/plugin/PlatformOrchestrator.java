@@ -335,11 +335,11 @@ public final class PlatformOrchestrator {
         bootstrapStateModelStorage(settings);
 
         String modelName = settings.get(ConfigTags.ApplicationName, "");
-        if(modelName.isEmpty()) {
+        if (modelName.isEmpty()) {
             modelName = sessionSpec.getTarget().replaceAll("[^A-Za-z0-9]", "_");
         }
         String modelVersion = settings.get(ConfigTags.ApplicationVersion, "");
-        if(modelVersion.isEmpty()) {
+        if (modelVersion.isEmpty()) {
             modelVersion = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm_ss"));
         }
 

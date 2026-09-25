@@ -32,8 +32,10 @@ public class ScreenshotProviderFactoryTest {
         AWTCanvas expected_stateshot = mock(AWTCanvas.class);
         String expected_actionshot = "webdriver-action-path";
 
-        try (MockedStatic<NativeLinker> nativeLinker = Mockito.mockStatic(NativeLinker.class);
-             MockedStatic<WdScreenshotUtil> wd = Mockito.mockStatic(WdScreenshotUtil.class)) {
+        try (
+                MockedStatic<NativeLinker> nativeLinker = Mockito.mockStatic(NativeLinker.class);
+                MockedStatic<WdScreenshotUtil> wd = Mockito.mockStatic(WdScreenshotUtil.class)
+        ) {
 
             nativeLinker.when(NativeLinker::getPLATFORM_OS).thenReturn(EnumSet.of(OperatingSystems.WEBDRIVER));
             wd.when(() -> WdScreenshotUtil.getStateshotBinary(state)).thenReturn(expected_stateshot);
@@ -52,8 +54,10 @@ public class ScreenshotProviderFactoryTest {
         AWTCanvas expected_stateshot = mock(AWTCanvas.class);
         String expected_actionshot = "android-action-path";
 
-        try (MockedStatic<NativeLinker> nativeLinker = Mockito.mockStatic(NativeLinker.class);
-             MockedStatic<AndroidScreenshotUtil> android = Mockito.mockStatic(AndroidScreenshotUtil.class)) {
+        try (
+                MockedStatic<NativeLinker> nativeLinker = Mockito.mockStatic(NativeLinker.class);
+                MockedStatic<AndroidScreenshotUtil> android = Mockito.mockStatic(AndroidScreenshotUtil.class)
+        ) {
 
             nativeLinker.when(NativeLinker::getPLATFORM_OS).thenReturn(EnumSet.of(OperatingSystems.ANDROID));
             android.when(() -> AndroidScreenshotUtil.getStateshotBinary(state)).thenReturn(expected_stateshot);
@@ -72,8 +76,10 @@ public class ScreenshotProviderFactoryTest {
         AWTCanvas expected_stateshot = mock(AWTCanvas.class);
         String expected_actionshot = "default-action-path";
 
-        try (MockedStatic<NativeLinker> nativeLinker = Mockito.mockStatic(NativeLinker.class);
-             MockedStatic<ScreenshotUtil> defaultUtil = Mockito.mockStatic(ScreenshotUtil.class)) {
+        try (
+                MockedStatic<NativeLinker> nativeLinker = Mockito.mockStatic(NativeLinker.class);
+                MockedStatic<ScreenshotUtil> defaultUtil = Mockito.mockStatic(ScreenshotUtil.class)
+        ) {
 
             nativeLinker.when(NativeLinker::getPLATFORM_OS).thenReturn(EnumSet.of(OperatingSystems.WINDOWS));
             defaultUtil.when(() -> ScreenshotUtil.getStateshotBinary(state)).thenReturn(expected_stateshot);
@@ -90,8 +96,10 @@ public class ScreenshotProviderFactoryTest {
         State state = mock(State.class);
         AWTCanvas expected = mock(AWTCanvas.class);
 
-        try (MockedStatic<NativeLinker> nativeLinker = Mockito.mockStatic(NativeLinker.class);
-             MockedStatic<WdScreenshotUtil> wd = Mockito.mockStatic(WdScreenshotUtil.class)) {
+        try (
+                MockedStatic<NativeLinker> nativeLinker = Mockito.mockStatic(NativeLinker.class);
+                MockedStatic<WdScreenshotUtil> wd = Mockito.mockStatic(WdScreenshotUtil.class)
+        ) {
 
             nativeLinker.when(NativeLinker::getPLATFORM_OS).thenReturn(EnumSet.of(OperatingSystems.WEBDRIVER, OperatingSystems.ANDROID));
             wd.when(() -> WdScreenshotUtil.getStateshotBinary(state)).thenReturn(expected);
@@ -108,8 +116,10 @@ public class ScreenshotProviderFactoryTest {
         AWTCanvas expected_stateshot = mock(AWTCanvas.class);
         String expected_actionshot = "default-action-path";
 
-        try (MockedStatic<NativeLinker> nativeLinker = Mockito.mockStatic(NativeLinker.class);
-             MockedStatic<ScreenshotUtil> defaultUtil = Mockito.mockStatic(ScreenshotUtil.class)) {
+        try (
+                MockedStatic<NativeLinker> nativeLinker = Mockito.mockStatic(NativeLinker.class);
+                MockedStatic<ScreenshotUtil> defaultUtil = Mockito.mockStatic(ScreenshotUtil.class)
+        ) {
 
             nativeLinker.when(NativeLinker::getPLATFORM_OS).thenReturn(null);
             defaultUtil.when(() -> ScreenshotUtil.getStateshotBinary(state)).thenReturn(expected_stateshot);

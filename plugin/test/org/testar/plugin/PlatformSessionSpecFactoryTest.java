@@ -78,6 +78,8 @@ public class PlatformSessionSpecFactoryTest {
     }
 
     private static Settings defaultSettings() {
-        return new Settings(SettingsDefaults.getSettingsDefaults(), new Properties());
+        Properties properties = new Properties();
+        properties.setProperty(ConfigTags.SUTConnectorValue.name(), "android");
+        return new Settings(SettingsDefaults.getSettingsDefaults(), properties);
     }
 }

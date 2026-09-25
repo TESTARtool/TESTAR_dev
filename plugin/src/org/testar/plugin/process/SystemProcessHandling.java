@@ -6,17 +6,17 @@
 
 package org.testar.plugin.process;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.testar.core.exceptions.SystemStopException;
-import org.testar.core.process.ProcessInfo;
 import org.testar.core.process.ProcessHandle;
+import org.testar.core.process.ProcessInfo;
 import org.testar.core.state.SUT;
 import org.testar.core.tag.Tags;
 import org.testar.core.util.Util;
 import org.testar.plugin.NativeLinker;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 public class SystemProcessHandling {
 
@@ -25,39 +25,41 @@ public class SystemProcessHandling {
      * @param debugTag Tag used in debug output
      * @return a list of running processes
      */
-    public static List<ProcessInfo> getRunningProcesses(String debugTag){
-        List<ProcessInfo> runningProcesses = new ArrayList<ProcessInfo>();
-        long pid, handle; String desc;
+    public static List<ProcessInfo> getRunningProcesses(String debugTag) {
+        List<ProcessInfo> runningProcesses = new ArrayList<>();
+        long pid;
+        long handle;
+        String description;
         List<SUT> runningP = NativeLinker.getNativeProcesses();
         System.out.println("[" + debugTag + "] " + "Running processes (" + runningP.size() + "):");
 
-        for (SUT sut : runningP){
-            //System.out.println("\t[" + (i++) +  "] " + sut.getStatus());
+        for (SUT sut : runningP) {
             pid = sut.get(Tags.PID, Long.MIN_VALUE);
-            if (pid != Long.MIN_VALUE){
+            if (pid != Long.MIN_VALUE) {
                 handle = sut.get(Tags.HANDLE, Long.MIN_VALUE);
-                desc = sut.get(Tags.Desc, null);
-                ProcessInfo pi = new ProcessInfo(sut,pid,handle,desc);
-                runningProcesses.add(pi);
+                description = sut.get(Tags.Desc, null);
+                ProcessInfo processInfo = new ProcessInfo(sut, pid, handle, description);
+                runningProcesses.add(processInfo);
             }
         }
         return runningProcesses;
     }
 
-    final static long MAX_KILL_WINDOW = 10000; // 10 seconds
+    static final long MAX_KILL_WINDOW = 10000; // 10 seconds
 
-    public static void killTestLaunchedProcesses(List<ProcessInfo> contextRunningProcesses){
+    public static void killTestLaunchedProcesses(List<ProcessInfo> contextRunningProcesses) {
         boolean kill;
-        for (ProcessInfo pi1 : getRunningProcesses("END")){
+        for (ProcessInfo processInfo : getRunningProcesses("END")) {
             kill = true;
-            for (ProcessInfo pi2 : contextRunningProcesses){
-                if (pi1.pid == pi2.pid){
+            for (ProcessInfo contextProcessInfo : contextRunningProcesses) {
+                if (processInfo.pid == contextProcessInfo.pid) {
                     kill = false;
                     break;
                 }
             }
-            if (kill)
-                killProcess(pi1,MAX_KILL_WINDOW);
+            if (kill) {
+                killProcess(processInfo, MAX_KILL_WINDOW);
+            }
         }
     }
 
@@ -67,15 +69,17 @@ public class SystemProcessHandling {
      * @param KILL_WINDOW
      * @return
      */
-    public static boolean killRunningProcesses(SUT sut, long KILL_WINDOW){
+    public static boolean killRunningProcesses(SUT sut, long killWindow) {
         boolean allKilled = true;
-        for(ProcessHandle ph : Util.makeIterable(sut.get(Tags.ProcessHandles, Collections.<ProcessHandle>emptyList().iterator()))){
-            if (ph.name() != null && sut.get(Tags.Desc, "").contains(ph.name())){
-                try{
-                    System.out.println("\tWill kill <" + ph.name() +"> with PID <" + ph.pid() + ">");
-                    ph.kill();
-                } catch (SystemStopException e){
-                    System.out.println("Exception killing SUT running processes: " + e.getMessage());
+        for (ProcessHandle processHandle : Util.makeIterable(
+                sut.get(Tags.ProcessHandles, Collections.<ProcessHandle>emptyList().iterator())
+        )) {
+            if (processHandle.name() != null && sut.get(Tags.Desc, "").contains(processHandle.name())) {
+                try {
+                    System.out.println("\tWill kill <" + processHandle.name() + "> with PID <" + processHandle.pid() + ">");
+                    processHandle.kill();
+                } catch (SystemStopException exception) {
+                    System.out.println("Exception killing SUT running processes: " + exception.getMessage());
                     allKilled = false;
                 }
             }
@@ -89,23 +93,23 @@ public class SystemProcessHandling {
      * @param KILL_WINDOW indicates a time frame
      * @return
      */
-    private static boolean killProcess(ProcessInfo pi, long KILL_WINDOW){
-        if (pi.sut.isRunning()){
-            System.out.println("Will kill process: " + pi.toString());
-            long now = System.currentTimeMillis(),
-                    elapsed;
-            do{
-                elapsed = System.currentTimeMillis() - now;
+    private static boolean killProcess(ProcessInfo processInfo, long killWindow) {
+        if (processInfo.sut.isRunning()) {
+            System.out.println("Will kill process: " + processInfo);
+            long startTime = System.currentTimeMillis();
+            long elapsed;
+            do {
+                elapsed = System.currentTimeMillis() - startTime;
                 try {
-                    NativeLinker.getNativeProcessHandle(pi.pid).kill();
-                } catch (SystemStopException e) {
-                    System.out.println("\tException trying to kill process: <" + e.getMessage() + "> after <" + elapsed + "> ms");
+                    NativeLinker.getNativeProcessHandle(processInfo.pid).kill();
+                } catch (SystemStopException exception) {
+                    System.out.println("\tException trying to kill process: <" + exception.getMessage() + "> after <" + elapsed + "> ms");
                     Util.pauseMs(500);
                 }
-            } while (pi.sut.isRunning() && elapsed < KILL_WINDOW);
-            return pi.sut.isRunning();
-        } else{
-            System.out.println("Did not kill process as it is not running: " + pi.toString());
+            } while (processInfo.sut.isRunning() && elapsed < killWindow);
+            return processInfo.sut.isRunning();
+        } else {
+            System.out.println("Did not kill process as it is not running: " + processInfo);
             return true;
         }
     }
