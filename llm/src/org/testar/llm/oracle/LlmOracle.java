@@ -39,195 +39,197 @@ import org.testar.plugin.screenshot.ScreenshotProviderFactory;
 
 public class LlmOracle implements Oracle {
 
-	protected static final Logger logger = LogManager.getLogger();
+    protected static final Logger logger = LogManager.getLogger();
 
-	private IPromptOracleGenerator promptGenerator;
+    private IPromptOracleGenerator promptGenerator;
 
-	private final String platform;
-	private final String model;
-	private final String reasoning;
-	private final String hostUrl;
-	private final String authorizationHeader;
-	private final String fewshotOracleFile;
-	private final String appName;
-	private final float temperature;
-	private final boolean stateless;
+    private final String platform;
+    private final String model;
+    private final String reasoning;
+    private final String hostUrl;
+    private final String authorizationHeader;
+    private final String fewshotOracleFile;
+    private final String appName;
+    private final float temperature;
+    private final boolean stateless;
 
-	private LlmConversation conversation;
-	private int tokens_used;
+    private LlmConversation conversation;
+    private int tokens_used;
 
-	private String previousTestGoal = "";
-	private LlmTestGoal currentTestGoal;
+    private String previousTestGoal = "";
+    private LlmTestGoal currentTestGoal;
 
-	public LlmOracle(Settings settings, IPromptOracleGenerator oracleGenerator) {
-		this.promptGenerator = oracleGenerator;
+    public LlmOracle(Settings settings, IPromptOracleGenerator oracleGenerator) {
+        this.promptGenerator = oracleGenerator;
 
-		this.platform = settings.get(ConfigTags.LlmPlatform);
-		this.model = settings.get(ConfigTags.LlmModel);
-		this.reasoning = settings.get(ConfigTags.LlmReasoning);
-		this.hostUrl = settings.get(ConfigTags.LlmHostUrl);
-		this.authorizationHeader = settings.get(ConfigTags.LlmAuthorizationHeader);
-		this.fewshotOracleFile = settings.get(ConfigTags.LlmOracleFewshotFile);
-		this.appName = settings.get(ConfigTags.ApplicationName);
-		this.temperature = settings.get(ConfigTags.LlmTemperature);
-		this.stateless = settings.get(ConfigTags.LlmStateless);
+        this.platform = settings.get(ConfigTags.LlmPlatform);
+        this.model = settings.get(ConfigTags.LlmModel);
+        this.reasoning = settings.get(ConfigTags.LlmReasoning);
+        this.hostUrl = settings.get(ConfigTags.LlmHostUrl);
+        this.authorizationHeader = settings.get(ConfigTags.LlmAuthorizationHeader);
+        this.fewshotOracleFile = settings.get(ConfigTags.LlmOracleFewshotFile);
+        this.appName = settings.get(ConfigTags.ApplicationName);
+        this.temperature = settings.get(ConfigTags.LlmTemperature);
+        this.stateless = settings.get(ConfigTags.LlmStateless);
 
-		initialize();
-	}
+        initialize();
+    }
 
-	public void reset(LlmTestGoal newTestGoal, boolean appendPreviousTestGoal) {
-		// Reset variables
-		tokens_used = 0;
+    public void reset(LlmTestGoal newTestGoal, boolean appendPreviousTestGoal) {
+        // Reset variables
+        tokens_used = 0;
 
-		if(appendPreviousTestGoal) {
-			previousTestGoal = currentTestGoal.getTestGoal();
-		} else {
-			previousTestGoal = "";
-		}
+        if (appendPreviousTestGoal) {
+            previousTestGoal = currentTestGoal.getTestGoal();
+        } else {
+            previousTestGoal = "";
+        }
 
-		currentTestGoal = newTestGoal;
+        currentTestGoal = newTestGoal;
 
-		// When a new goal is attached, always re-initialize a new conversation
-		initialize();
-	}
+        // When a new goal is attached, always re-initialize a new conversation
+        initialize();
+    }
 
-	@Override
-	public void initialize() {
-		conversation = LlmFactory.createLlmConversation(this.platform, this.model, this.reasoning, this.temperature);
-		conversation.initConversation(this.fewshotOracleFile);
-	}
+    @Override
+    public void initialize() {
+        conversation = LlmFactory.createLlmConversation(this.platform, this.model, this.reasoning, this.temperature);
+        conversation.initConversation(this.fewshotOracleFile);
+    }
 
-	@Override
-	public List<Verdict> getVerdicts(State state) {
-		// If the stateless option is enabled, initialize a new prompt to reduce tokens usage
-		if(this.stateless) initialize();
+    @Override
+    public List<Verdict> getVerdicts(State state) {
+        // If the stateless option is enabled, initialize a new prompt to reduce tokens usage
+        if (this.stateless) {
+            initialize();
+        }
 
-		return Collections.singletonList(getVerdictWithLlm(state));
-	}
+        return Collections.singletonList(getVerdictWithLlm(state));
+    }
 
-	private Verdict getVerdictWithLlm(State state) {
-		String prompt = promptGenerator.generateOraclePrompt(state, appName, currentTestGoal.getTestGoal(), previousTestGoal);
-		logger.log(Level.DEBUG, "Generated oracle prompt: " + prompt);
+    private Verdict getVerdictWithLlm(State state) {
+        String prompt = promptGenerator.generateOraclePrompt(state, appName, currentTestGoal.getTestGoal(), previousTestGoal);
+        logger.log(Level.DEBUG, "Generated oracle prompt: " + prompt);
 
-		if (promptGenerator.attachImage()) {
+        if (promptGenerator.attachImage()) {
 
-			ByteArrayOutputStream screenshotBytes = new ByteArrayOutputStream();
-			AWTCanvas screenshot = ScreenshotProviderFactory.current().getStateshotBinary(state);
+            ByteArrayOutputStream screenshotBytes = new ByteArrayOutputStream();
+            AWTCanvas screenshot = ScreenshotProviderFactory.current().getStateshotBinary(state);
 
-			try {
-				screenshot.saveAsPng(screenshotBytes);
-				byte[] imageBytes = screenshotBytes.toByteArray();
-				String base64Image = Base64.getEncoder().encodeToString(imageBytes);
-				conversation.addMessage("user", prompt, base64Image);
-			} catch (IOException e) {
-				logger.log(Level.WARN, "OracleImagePromptGenerator: Issue generating base64 image");
-				conversation.addMessage("user", prompt);
-			}
+            try {
+                screenshot.saveAsPng(screenshotBytes);
+                byte[] imageBytes = screenshotBytes.toByteArray();
+                String base64Image = Base64.getEncoder().encodeToString(imageBytes);
+                conversation.addMessage("user", prompt, base64Image);
+            } catch (IOException e) {
+                logger.log(Level.WARN, "OracleImagePromptGenerator: Issue generating base64 image");
+                conversation.addMessage("user", prompt);
+            }
 
-		} else {
-			conversation.addMessage("user", prompt);
-		}
+        } else {
+            conversation.addMessage("user", prompt);
+        }
 
-		String conversationJson = conversation.buildRequestBody();
+        String conversationJson = conversation.buildRequestBody();
 
-		try {
+        try {
 
-			String llmResponse = getResponseFromLlm(conversationJson);
+            String llmResponse = getResponseFromLlm(conversationJson);
 
-			LlmVerdict llmVerdict = LlmVerdictParser.parse(llmResponse);
-			String info = llmVerdict.getInfo() == null ? "" : llmVerdict.getInfo();
+            LlmVerdict llmVerdict = LlmVerdictParser.parse(llmResponse);
+            String info = llmVerdict.getInfo() == null ? "" : llmVerdict.getInfo();
 
-			switch (llmVerdict.getDecision()) {
-			case COMPLETED:
-				return new Verdict(Verdict.Severity.LLM_COMPLETE, info);
-			case INVALID:
-				return new Verdict(Verdict.Severity.LLM_INVALID, info);
-			case CONTINUE:
-				return Verdict.OK;
-			case UNKNOWN:
-			default:
-				logger.log(Level.WARN, "LLM oracle response did not include a recognized verdict status/match.");
-				return Verdict.OK;
-			}
+            switch (llmVerdict.getDecision()) {
+                case COMPLETED:
+                    return new Verdict(Verdict.Severity.LLM_COMPLETE, info);
+                case INVALID:
+                    return new Verdict(Verdict.Severity.LLM_INVALID, info);
+                case CONTINUE:
+                    return Verdict.OK;
+                case UNKNOWN:
+                default:
+                    logger.log(Level.WARN, "LLM oracle response did not include a recognized verdict status/match.");
+                    return Verdict.OK;
+            }
 
-		} catch(Exception e) {
-			logger.log(Level.ERROR, "Error obtaining the verdict with the LLM");
-		}
+        } catch (Exception e) {
+            logger.log(Level.ERROR, "Error obtaining the verdict with the LLM");
+        }
 
-		return Verdict.OK;
-	}
+        return Verdict.OK;
+    }
 
-	private String getResponseFromLlm(String requestBody) {
-		String testarVer = TestarInfo.VERSION.substring(0, TestarInfo.VERSION.indexOf(" "));
-		URI uri = URI.create(LlmUtils.replaceApiKeyPlaceholder(this.hostUrl));
+    private String getResponseFromLlm(String requestBody) {
+        String testarVer = TestarInfo.VERSION.substring(0, TestarInfo.VERSION.indexOf(" "));
+        URI uri = URI.create(LlmUtils.replaceApiKeyPlaceholder(this.hostUrl));
 
-		try {
-			URL url = uri.toURL();
-			HttpURLConnection con = (HttpURLConnection)url.openConnection();
+        try {
+            URL url = uri.toURL();
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
 
-			con.setRequestMethod("POST");
-			con.setRequestProperty("Content-Type", "application/json");
-			con.setRequestProperty("Accept", "application/json");
-			con.setRequestProperty("User-Agent", "testar/" + testarVer);
+            con.setRequestMethod("POST");
+            con.setRequestProperty("Content-Type", "application/json");
+            con.setRequestProperty("Accept", "application/json");
+            con.setRequestProperty("User-Agent", "testar/" + testarVer);
 
-			// Check optional Authorization Header parameter
-			if (this.authorizationHeader != null && !this.authorizationHeader.isEmpty()) {
-				con.setRequestProperty("Authorization", LlmUtils.replaceApiKeyPlaceholder(this.authorizationHeader));
-			}
+            // Check optional Authorization Header parameter
+            if (this.authorizationHeader != null && !this.authorizationHeader.isEmpty()) {
+                con.setRequestProperty("Authorization", LlmUtils.replaceApiKeyPlaceholder(this.authorizationHeader));
+            }
 
-			con.setDoInput(true);
-			con.setDoOutput(true);
-			con.setConnectTimeout(10000);
+            con.setDoInput(true);
+            con.setDoOutput(true);
+            con.setConnectTimeout(10000);
 
-			try(OutputStream os = con.getOutputStream()) {
-				byte[] input = requestBody.getBytes(StandardCharsets.UTF_8);
-				os.write(input, 0, input.length);
-			}
+            try (OutputStream os = con.getOutputStream()) {
+                byte[] input = requestBody.getBytes(StandardCharsets.UTF_8);
+                os.write(input, 0, input.length);
+            }
 
-			if(con.getResponseCode() == 200) {
-				try(BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8))) {
-					StringBuilder response = new StringBuilder();
-					String responseLine = null;
-					while ((responseLine = br.readLine()) != null) {
-						response.append(responseLine.trim());
-					}
+            if (con.getResponseCode() == 200) {
+                try (BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8))) {
+                    StringBuilder response = new StringBuilder();
+                    String responseLine = null;
+                    while ((responseLine = br.readLine()) != null) {
+                        response.append(responseLine.trim());
+                    }
 
-					LlmResponse llmResponse = LlmFactory.createResponse(this.platform, response);
-					this.tokens_used = llmResponse.getUsageTokens();
-					logger.log(Level.INFO, String.format("LLM tokens_used for oracle: [%s]", this.tokens_used));
+                    LlmResponse llmResponse = LlmFactory.createResponse(this.platform, response);
+                    this.tokens_used = llmResponse.getUsageTokens();
+                    logger.log(Level.INFO, String.format("LLM tokens_used for oracle: [%s]", this.tokens_used));
 
-					String responseContent = llmResponse.getResponse();
-					// From testing, response often includes newlines and spaces at the end.
-					// We strip this here to so we can parse the result easier.
-					responseContent = responseContent.replace("\n", "").replace("\r", "");
-					responseContent = responseContent.replaceFirst("\\s++$", "");
+                    String responseContent = llmResponse.getResponse();
+                    // From testing, response often includes newlines and spaces at the end.
+                    // We strip this here to so we can parse the result easier.
+                    responseContent = responseContent.replace("\n", "").replace("\r", "");
+                    responseContent = responseContent.replaceFirst("\\s++$", "");
 
-					logger.log(Level.INFO, String.format("LLM Response: [%s]", responseContent));
+                    logger.log(Level.INFO, String.format("LLM Response: [%s]", responseContent));
 
-					return responseContent;
-				}
-			} else {
-				// If response is not 200 OK, debug the error message
-				try(BufferedReader br = new BufferedReader(new InputStreamReader(con.getErrorStream(), StandardCharsets.UTF_8))) {
-					StringBuilder errorResponse = new StringBuilder();
-					String responseLine = null;
-					while ((responseLine = br.readLine()) != null) {
-						errorResponse.append(responseLine.trim());
-					}
+                    return responseContent;
+                }
+            } else {
+                // If response is not 200 OK, debug the error message
+                try (BufferedReader br = new BufferedReader(new InputStreamReader(con.getErrorStream(), StandardCharsets.UTF_8))) {
+                    StringBuilder errorResponse = new StringBuilder();
+                    String responseLine = null;
+                    while ((responseLine = br.readLine()) != null) {
+                        errorResponse.append(responseLine.trim());
+                    }
 
-					logger.log(Level.ERROR, String.format("LLM error code %d response: %s", con.getResponseCode(), errorResponse));
+                    logger.log(Level.ERROR, String.format("LLM error code %d response: %s", con.getResponseCode(), errorResponse));
 
-					throw new Exception("Server returned " + con.getResponseCode() + " status code.");
-				}
-			}
-		} catch(Exception e) {
-			logger.log(Level.ERROR, "Unable to communicate with the LLM due to the cause:");
-			if(e.getMessage() != null && !e.getMessage().isEmpty()) {
-				logger.log(Level.ERROR, e.getMessage());
-			} else {
-				e.printStackTrace();
-			}
-			return null;
-		}
-	}
+                    throw new Exception("Server returned " + con.getResponseCode() + " status code.");
+                }
+            }
+        } catch (Exception e) {
+            logger.log(Level.ERROR, "Unable to communicate with the LLM due to the cause:");
+            if (e.getMessage() != null && !e.getMessage().isEmpty()) {
+                logger.log(Level.ERROR, e.getMessage());
+            } else {
+                e.printStackTrace();
+            }
+            return null;
+        }
+    }
 }

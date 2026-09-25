@@ -112,14 +112,14 @@ public class LlmConversationOpenAI implements LlmConversation {
             String initPromptJson = getTextResource(fewshotFile);
 
             Gson gson = new GsonBuilder()
-                    .registerTypeAdapter(new TypeToken<List<ContentPart>>() {}.getType(), new ContentDeserializerOpenAI())
+                    .registerTypeAdapter(new TypeToken<List<ContentPart>>() { }.getType(), new ContentDeserializerOpenAI())
                     .create();
 
             LlmConversationOpenAI.Message[] initMessages = gson.fromJson(initPromptJson, LlmConversationOpenAI.Message[].class);
-            for(LlmConversationOpenAI.Message message : initMessages) {
+            for (LlmConversationOpenAI.Message message : initMessages) {
                 addMessage(message);
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             logger.log(Level.ERROR, "Failed to initialize conversation, LLM quality may be degraded.");
         }
     }
@@ -180,7 +180,7 @@ public class LlmConversationOpenAI implements LlmConversation {
         private String text;
         private ImageUrl image_url;
 
-        public ContentPart() {}
+        public ContentPart() { }
 
         public ContentPart(String type, String text) {
             this.type = type;
@@ -219,8 +219,13 @@ public class LlmConversationOpenAI implements LlmConversation {
 
     public static class ResponseFormat {
         private String type;
-        public ResponseFormat(String type) { this.type = type; }
-        public String getType() { return type; }
+        public ResponseFormat(String type) {
+            this.type = type;
+        }
+
+        public String getType() {
+            return type;
+        }
     }
 
     public JsonObject toRequestJson() {
@@ -257,7 +262,9 @@ public class LlmConversationOpenAI implements LlmConversation {
             jm.addProperty("role", m.getRole());
             JsonArray content = new JsonArray();
             for (ContentPart p : m.getContent()) {
-                if (p == null || p.getType() == null) continue;
+                if (p == null || p.getType() == null) {
+                    continue;
+                }
                 JsonObject part = new JsonObject();
                 part.addProperty("type", p.getType());
                 if ("text".equals(p.getType())) {
@@ -278,13 +285,17 @@ public class LlmConversationOpenAI implements LlmConversation {
     }
 
     private static boolean supportsReasoningEffort(String model) {
-        if (model == null) return false;
+        if (model == null) {
+            return false;
+        }
         String m = model.toLowerCase();
         return m.startsWith("gpt-5") || m.startsWith("o-") || m.contains("reasoning");
     }
 
     private static boolean hasFixedTemperature(String model) {
-        if (model == null) return false;
+        if (model == null) {
+            return false;
+        }
         String m = model.toLowerCase();
         return m.startsWith("gpt-5") || m.startsWith("o-") || m.contains("reasoning");
     }

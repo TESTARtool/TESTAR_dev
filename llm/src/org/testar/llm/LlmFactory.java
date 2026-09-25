@@ -28,12 +28,12 @@ public class LlmFactory {
      */
     public static LlmConversation createLlmConversation(String platform, String model, String reasoning, float temperature) {
         switch (platform) {
-        case "OpenAI":
-            return new LlmConversationOpenAI(model, reasoning, temperature);
-        case "Gemini":
-            return new LlmConversationGemini();
-        default:
-            throw new IllegalArgumentException("Unknown conversation platform: " + platform);
+            case "OpenAI":
+                return new LlmConversationOpenAI(model, reasoning, temperature);
+            case "Gemini":
+                return new LlmConversationGemini();
+            default:
+                throw new IllegalArgumentException("Unknown conversation platform: " + platform);
         }
     }
 
@@ -45,12 +45,12 @@ public class LlmFactory {
      */
     public static LlmResponse createResponse(String platform, StringBuilder response) {
         switch (platform) {
-        case "OpenAI":
-            return GSON.fromJson(response.toString(), LlmResponseOpenAI.class);
-        case "Gemini":
-            return GSON.fromJson(response.toString(), LlmResponseGemini.class);
-        default:
-            throw new IllegalArgumentException("Unknown response platform: " + platform);
+            case "OpenAI":
+                return GSON.fromJson(response.toString(), LlmResponseOpenAI.class);
+            case "Gemini":
+                return GSON.fromJson(response.toString(), LlmResponseGemini.class);
+            default:
+                throw new IllegalArgumentException("Unknown response platform: " + platform);
         }
     }
 }

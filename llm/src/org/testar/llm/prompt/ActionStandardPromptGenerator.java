@@ -94,14 +94,14 @@ public class ActionStandardPromptGenerator implements IPromptActionGenerator {
         StringBuilder builder = new StringBuilder();
         builder.append(String.format("We are testing the \"%s\" GUI application. ", appName));
 
-        if(StringUtils.isEmpty(previousTestGoal)) {
+        if (StringUtils.isEmpty(previousTestGoal)) {
             builder.append(String.format("The objective of the test is: %s. ", currentTestGoal));
         } else {
             builder.append(String.format("The following objective was previously achieved: %s. ", previousTestGoal));
             builder.append(String.format("The current objective of the test is: %s. ", currentTestGoal));
         }
 
-        if(attachImage) {
+        if (attachImage) {
             builder.append("An image of the current state is attached so you can observe what actionable widgets are present and which actions were executed. ");
         }
 
@@ -115,23 +115,23 @@ public class ActionStandardPromptGenerator implements IPromptActionGenerator {
                 String description = widget.get(descriptionTag, "");
 
                 switch (type) {
-                case "ClickTypeInto":
-                case "PasteTextInto":
-                    builder.append(String.format("%s: Type in Field '%s' ", actionId, description));
-                    break;
-                case "LeftClickAt":
-                    builder.append(String.format("%s: Click on '%s' ", actionId, description));
-                    break;
-                case "HitESC":
-                    // TODO: Decide if it makes sense to rely on the LLM to make this control decision
-                    builder.append(String.format("%s: Hit the ESC key", actionId));
-                    break;
-                default:
-                    logger.log(Level.WARN, "Unsupported action type for LLM action selection: " + type);
-                    break;
+                    case "ClickTypeInto":
+                    case "PasteTextInto":
+                        builder.append(String.format("%s: Type in Field '%s' ", actionId, description));
+                        break;
+                    case "LeftClickAt":
+                        builder.append(String.format("%s: Click on '%s' ", actionId, description));
+                        break;
+                    case "HitESC":
+                        // TODO: Decide if it makes sense to rely on the LLM to make this control decision
+                        builder.append(String.format("%s: Hit the ESC key", actionId));
+                        break;
+                    default:
+                        logger.log(Level.WARN, "Unsupported action type for LLM action selection: " + type);
+                        break;
                 }
 
-            } catch(NoSuchTagException e) {
+            } catch (NoSuchTagException e) {
                 // This usually happens when OriginWidget is unknown, so we skip these.
                 logger.log(Level.WARN, "Action is missing critical tags, skipping.");
             }
@@ -141,7 +141,7 @@ public class ActionStandardPromptGenerator implements IPromptActionGenerator {
 
         builder.append(". ");
 
-        if(!history.getActions().isEmpty()) {
+        if (!history.getActions().isEmpty()) {
             builder.append(history.toString());
         }
 

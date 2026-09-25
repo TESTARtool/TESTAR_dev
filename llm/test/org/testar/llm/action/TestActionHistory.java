@@ -32,13 +32,13 @@ public class TestActionHistory {
     @Test
     public void test_history_web_click_action() {
         Action web_click_action = createClickAction(
-            createState(), 
-            "clickable_widget_desc", 
-            "clickable_widget_web_id", 
-            "CID_clickable_widget", 
-            "AID_clickable_widget", 
-            "CID_click", 
-            "AID_click"
+                createState(),
+                "clickable_widget_desc",
+                "clickable_widget_web_id",
+                "CID_clickable_widget",
+                "AID_clickable_widget",
+                "CID_click",
+                "AID_click"
         );
 
         ActionHistory actionHistory = new ActionHistory(1);
@@ -233,8 +233,8 @@ public class TestActionHistory {
                 inputText, false);
         action.set(Tags.ConcreteID, actionConcreteId);
         action.set(Tags.AbstractID, actionAbstractId);
-        for(Action innerAction : ((CompoundAction) action).getActions()) {
-            if(innerAction instanceof Type) {
+        for (Action innerAction : ((CompoundAction) action).getActions()) {
+            if (innerAction instanceof Type) {
                 ((Type) innerAction).set(Tags.InputText, llmText);
             }
         }

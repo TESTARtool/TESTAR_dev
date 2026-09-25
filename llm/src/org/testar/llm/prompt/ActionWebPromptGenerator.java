@@ -98,7 +98,7 @@ public class ActionWebPromptGenerator implements IPromptActionGenerator {
         StringBuilder builder = new StringBuilder();
         builder.append(String.format("We are testing the \"%s\" web application. ", appName));
 
-        if(StringUtils.isEmpty(previousTestGoal)) {
+        if (StringUtils.isEmpty(previousTestGoal)) {
             builder.append(String.format("The objective of the test is: %s. ", currentTestGoal));
         } else {
             builder.append(String.format("The following objective was previously achieved: %s. ", previousTestGoal));
@@ -107,7 +107,7 @@ public class ActionWebPromptGenerator implements IPromptActionGenerator {
 
         String pageTitle = state.get(WdTags.WebTitle, "");
         builder.append(String.format("We are currently on the following page: %s. ", pageTitle));
-        if(attachImage) {
+        if (attachImage) {
             builder.append("An image of the current state is attached so you can observe what actionable widgets are present and which actions were executed. ");
         }
 
@@ -121,12 +121,12 @@ public class ActionWebPromptGenerator implements IPromptActionGenerator {
                 String description = widget.get(descriptionTag, "");
 
                 // Depending on the action, format into something the LLM is more likely to understand.
-                if(Objects.equals(widget.get(WdTags.WebTagName, ""), "select")) {
+                if (Objects.equals(widget.get(WdTags.WebTagName, ""), "select")) {
                     // Workaround for comboboxes
                     List<String> choices = getComboBoxChoices(widget, state);
                     builder.append(String.format("%s: Set ComboBox '%s' to one of the following values: ",
                             actionId, description));
-                    for(String choice : choices) {
+                    for (String choice : choices) {
                         builder.append(String.format("%s,", choice));
                     }
                     builder.append(" ");
@@ -163,7 +163,7 @@ public class ActionWebPromptGenerator implements IPromptActionGenerator {
                     }
                 }
 
-            } catch(NoSuchTagException e) {
+            } catch (NoSuchTagException e) {
                 // This usually happens when OriginWidget is unknown, so we skip these.
                 logger.log(Level.WARN, "Action is missing critical tags, skipping.");
             }
@@ -173,7 +173,7 @@ public class ActionWebPromptGenerator implements IPromptActionGenerator {
 
         builder.append(". ");
 
-        if(!history.getActions().isEmpty()) {
+        if (!history.getActions().isEmpty()) {
             builder.append(history.toString());
         }
 

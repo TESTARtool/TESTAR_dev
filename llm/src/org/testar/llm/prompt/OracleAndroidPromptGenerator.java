@@ -35,25 +35,25 @@ public class OracleAndroidPromptGenerator implements IPromptOracleGenerator {
     }
 
     /**
-     * Creates a new oracle prompt generator for Android applications with a set of oracleTags. 
-     * @param attachImage Indicate if an image should be attached together with the text prompt. 
+     * Creates a new oracle prompt generator for Android applications with a set of oracleTags.
+     * @param attachImage Indicate if an image should be attached together with the text prompt.
      */
     public OracleAndroidPromptGenerator(boolean attachImage) {
         this(new HashSet<>(Arrays.asList(AndroidTags.AndroidText)), attachImage); // AndroidTags.AndroidText is the default widget context
     }
 
     /**
-     * Creates a new oracle prompt generator for Android applications with a set of oracleTags. 
-     * @param oracleTags Are the tags to be used for applying the oracle. 
+     * Creates a new oracle prompt generator for Android applications with a set of oracleTags.
+     * @param oracleTags Are the tags to be used for applying the oracle.
      */
     public OracleAndroidPromptGenerator(Set<Tag<String>> oracleTags) {
         this(oracleTags, false); // Do not attach an image by default
     }
 
     /**
-     * Creates a new oracle prompt generator for Android applications with a set of oracleTags. 
-     * @param oracleTags Are the tags to be used for applying the oracle. 
-     * @param attachImage Indicate if an image should be attached together with the text prompt. 
+     * Creates a new oracle prompt generator for Android applications with a set of oracleTags.
+     * @param oracleTags Are the tags to be used for applying the oracle.
+     * @param attachImage Indicate if an image should be attached together with the text prompt.
      */
     public OracleAndroidPromptGenerator(Set<Tag<String>> oracleTags, boolean attachImage) {
         this.oracleTags = oracleTags;
@@ -71,7 +71,7 @@ public class OracleAndroidPromptGenerator implements IPromptOracleGenerator {
         StringBuilder builder = new StringBuilder();
         builder.append(String.format("We are testing the \"%s\" Android application. ", appName));
 
-        if(StringUtils.isEmpty(previousTestGoal)) {
+        if (StringUtils.isEmpty(previousTestGoal)) {
             builder.append(String.format("The objective of the test is: %s. ", currentTestGoal));
         } else {
             builder.append(String.format("The following objective was previously achieved: %s. ", previousTestGoal));
@@ -86,23 +86,23 @@ public class OracleAndroidPromptGenerator implements IPromptOracleGenerator {
                 // Iterate trough the indicated widget Tags to create the widget content
                 String widgetContent = "";
 
-                for(Tag<String> tag : oracleTags) {
+                for (Tag<String> tag : oracleTags) {
                     widgetContent = widgetContent.concat(widget.get(tag, "") + " ");
                 }
 
                 // If the widget content is not empty, add it to the Oracle conversation
-                if(!widgetContent.trim().isEmpty()) {
+                if (!widgetContent.trim().isEmpty()) {
                     builder.append(String.format("Widget: %s, ", widgetContent));
                 }
 
-            } catch(NoSuchTagException e) {
+            } catch (NoSuchTagException e) {
                 logger.log(Level.WARN, "Widget Tag is missing, skipping.");
             }
         }
 
         builder.append(". ");
 
-        if(attachImage) {
+        if (attachImage) {
             builder.append("An image of the current state is attached. ");
         }
 

@@ -51,8 +51,8 @@ public class LlmMetricsCollector implements IMetricsCollector {
 
         // Use the TestCondition evaluator of  to determine if the LlmTestGoals have been achieved
         boolean allGoalsAccomplished = testGoals.stream()
-        		.flatMap(goal -> goal.getCompletionConditions().stream())
-        		.allMatch(condition -> condition.evaluate(modelIdentifier, stateModelManager));
+                .flatMap(goal -> goal.getCompletionConditions().stream())
+                .allMatch(condition -> condition.evaluate(modelIdentifier, stateModelManager));
 
         newMetrics.setTestGoalAccomplished(allGoalsAccomplished);
 

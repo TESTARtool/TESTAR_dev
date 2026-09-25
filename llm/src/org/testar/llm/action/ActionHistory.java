@@ -59,7 +59,7 @@ public class ActionHistory {
      * @param action Action to add.
      */
     public void addToHistory(Action action) {
-        if(actions.size() == maxEntries) {
+        if (actions.size() == maxEntries) {
             actions.remove(0);
         }
 
@@ -77,7 +77,7 @@ public class ActionHistory {
     public String toString() {
         StringBuilder builder = new StringBuilder();
 
-        if(actions.size() == 1) {
+        if (actions.size() == 1) {
             builder.append("This is the last action we executed: ");
         } else {
             builder.append(String.format("These are the last %d actions we executed: ", actions.size()));
@@ -88,14 +88,14 @@ public class ActionHistory {
             String type = action.get(Tags.Role).name();
             String description = widget.get(descriptionTag, "Unknown Widget");
 
-            if(action instanceof WdSelectListAction) {
+            if (action instanceof WdSelectListAction) {
                 // Special case for combobox/select list actions
                 WdSelectListAction selectListAction = (WdSelectListAction) action;
                 String selectWidget = selectListAction.getTarget();
                 String value = selectListAction.getValue();
                 builder.append(String.format("Set value of ComboBox '%s' to '%s'", selectWidget, value));
             } else {
-                switch(type) {
+                switch (type) {
                     case "ClickTypeInto":
                     case "PasteTextInto":
                     case "RemoteType":
@@ -143,20 +143,20 @@ public class ActionHistory {
      */
     private String getCompoundActionInputText(Action action) {
         //TODO: Create single actions in protocol so this is not necessary?
-        if(action instanceof CompoundAction) {
-            for(Action innerAction : ((CompoundAction)action).getActions()) {
+        if (action instanceof CompoundAction) {
+            for (Action innerAction : ((CompoundAction) action).getActions()) {
 
-                if(innerAction instanceof Type) {
-                    return ((Type)innerAction).get(Tags.InputText, "Unknown Type Input");
+                if (innerAction instanceof Type) {
+                    return ((Type) innerAction).get(Tags.InputText, "Unknown Type Input");
                 }
 
-                if(innerAction instanceof PasteText) {
-                    return ((PasteText)innerAction).get(Tags.InputText, "Unknown Paste Input");
+                if (innerAction instanceof PasteText) {
+                    return ((PasteText) innerAction).get(Tags.InputText, "Unknown Paste Input");
                 }
             }
         }
 
-        if(action instanceof WdRemoteTypeAction) {
+        if (action instanceof WdRemoteTypeAction) {
             CharSequence input = ((WdRemoteTypeAction) action).getKeys();
             return input == null ? "Unknown Action Input" : input.toString();
         }

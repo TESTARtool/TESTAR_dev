@@ -23,16 +23,21 @@ import org.testar.config.ConfigTags;
 import org.testar.config.TestarInfo;
 import org.testar.core.action.Action;
 import org.testar.core.action.NOP;
-import org.testar.core.alayer.*;
+import org.testar.core.alayer.AWTCanvas;
 import org.testar.core.service.ActionSelectorService;
 import org.testar.config.settings.Settings;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.Base64;
+import java.util.Set;
 
 /**
  * Protocol for selecting actions using a large language model (LLM).
@@ -68,7 +73,7 @@ public class LlmActionSelector implements ActionSelectorService {
      * 2. LlmHostPort for the port of the API.
      * 3. LlmTestGoals for the objective of the test. Ex: Log in with username john and password demo.
      * 4. LlmActionFewshotFile for the fewshot file that contains the prompt instructions.
-     * 5. ApplicationName for the name of the SUT. 
+     * 5. ApplicationName for the name of the SUT.
      */
     public LlmActionSelector(Settings settings, IPromptActionGenerator generator) {
         this.promptGenerator = generator;
@@ -113,7 +118,7 @@ public class LlmActionSelector implements ActionSelectorService {
         invalidActions = 0;
         actionHistory.clear();
 
-        if(appendPreviousTestGoal) {
+        if (appendPreviousTestGoal) {
             previousTestGoal = currentTestGoal.getTestGoal();
         } else {
             previousTestGoal = "";
@@ -128,7 +133,9 @@ public class LlmActionSelector implements ActionSelectorService {
     @Override
     public Action selectAction(State state, Set<Action> actions) {
         // If the stateless option is enabled, initialize a new prompt to reduce tokens usage
-        if(this.stateless) initializeConversation();
+        if (this.stateless) {
+            initializeConversation();
+        }
 
         return selectActionWithLlm(state, actions);
     }
@@ -138,7 +145,7 @@ public class LlmActionSelector implements ActionSelectorService {
      * 1. The prompt is generated.
      * 2. The prompt is sent to the LLM.
      * 3. The response from the LLM is parsed.
-     * 
+     *
      * @param state The current state of the SUT.
      * @param actions Set of actions in the current state.
      * @return The action to execute or null if failed.
@@ -148,7 +155,7 @@ public class LlmActionSelector implements ActionSelectorService {
                 actions, state, actionHistory, appName, currentTestGoal.getTestGoal(), previousTestGoal);
 
         logger.log(Level.DEBUG, "Generated prompt: " + prompt);
-        
+
         if (promptGenerator.attachImage()) {
             ByteArrayOutputStream screenshotBytes = new ByteArrayOutputStream();
             AWTCanvas screenshot = ScreenshotProviderFactory.current().getStateshotBinary(state);
@@ -171,7 +178,7 @@ public class LlmActionSelector implements ActionSelectorService {
         LlmParseActionResponse llmParseResponse = new LlmParseActionResponse(new Gson());
         LlmParseActionResult llmParseResult = llmParseResponse.parseLlmResponse(actions, llmResponse);
 
-        switch(llmParseResult.getParseResult()) {
+        switch (llmParseResult.getParseResult()) {
             case SUCCESS: {
                 Action actionToTake = llmParseResult.getActionToExecute();
 
@@ -253,7 +260,7 @@ public class LlmActionSelector implements ActionSelectorService {
 
         try {
             URL url = uri.toURL();
-            HttpURLConnection con = (HttpURLConnection)url.openConnection();
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
 
             con.setRequestMethod("POST");
             con.setRequestProperty("Content-Type", "application/json");
@@ -269,13 +276,13 @@ public class LlmActionSelector implements ActionSelectorService {
             con.setDoOutput(true);
             con.setConnectTimeout(10000);
 
-            try(OutputStream os = con.getOutputStream()) {
+            try (OutputStream os = con.getOutputStream()) {
                 byte[] input = requestBody.getBytes(StandardCharsets.UTF_8);
                 os.write(input, 0, input.length);
             }
 
-            if(con.getResponseCode() == 200) {
-                try(BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8))) {
+            if (con.getResponseCode() == 200) {
+                try (BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8))) {
                     StringBuilder response = new StringBuilder();
                     String responseLine = null;
                     while ((responseLine = br.readLine()) != null) {
@@ -298,7 +305,7 @@ public class LlmActionSelector implements ActionSelectorService {
                 }
             } else {
                 // If response is not 200 OK, debug the error message
-                try(BufferedReader br = new BufferedReader(new InputStreamReader(con.getErrorStream(), StandardCharsets.UTF_8))) {
+                try (BufferedReader br = new BufferedReader(new InputStreamReader(con.getErrorStream(), StandardCharsets.UTF_8))) {
                     StringBuilder errorResponse = new StringBuilder();
                     String responseLine = null;
                     while ((responseLine = br.readLine()) != null) {
@@ -310,9 +317,9 @@ public class LlmActionSelector implements ActionSelectorService {
                     throw new Exception("Server returned " + con.getResponseCode() + " status code.");
                 }
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             logger.log(Level.ERROR, "Unable to communicate with the LLM due to the cause:");
-            if(e.getMessage() != null && !e.getMessage().isEmpty()) {
+            if (e.getMessage() != null && !e.getMessage().isEmpty()) {
                 logger.log(Level.ERROR, e.getMessage());
             } else {
                 e.printStackTrace();

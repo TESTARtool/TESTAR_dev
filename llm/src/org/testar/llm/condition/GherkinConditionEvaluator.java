@@ -42,8 +42,8 @@ public class GherkinConditionEvaluator extends BasicConditionEvaluator {
             }
         }
 
-        if(getConditions().isEmpty()) {
-        	logger.log(Level.WARN, String.format("GherkinConditionEvaluator, no valid 'Then' statements found in content: %s", gherkinContent));
+        if (getConditions().isEmpty()) {
+            logger.log(Level.WARN, String.format("GherkinConditionEvaluator, no valid 'Then' statements found in content: %s", gherkinContent));
         }
     }
 

@@ -4,7 +4,9 @@ import org.junit.Test;
 import org.testar.core.tag.Tags;
 import org.testar.stub.StateStub;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class TransitionConditionEvaluatorTest {
 
@@ -14,10 +16,10 @@ public class TransitionConditionEvaluatorTest {
         TransitionConditionEvaluator evaluator = new TransitionConditionEvaluator(
                 Tags.Title, Tags.Title, Tags.Title, testGoal);
 
-        assertEquals("The number of identified transition conditions should be zero", 
+        assertEquals("The number of identified transition conditions should be zero",
                 0, evaluator.getConditions().size());
 
-        assertTrue("The state evaluator must be true for empty transition conditions", 
+        assertTrue("The state evaluator must be true for empty transition conditions",
                 evaluator.evaluateConditions(new StateStub()));
     }
 
@@ -27,10 +29,10 @@ public class TransitionConditionEvaluatorTest {
         TransitionConditionEvaluator evaluator = new TransitionConditionEvaluator(
                 Tags.Title, Tags.Title, Tags.Title, testGoal);
 
-        assertEquals("The number of transition conditions should be zero if one field is missing.", 
+        assertEquals("The number of transition conditions should be zero if one field is missing.",
                 0, evaluator.getConditions().size());
 
-        assertTrue("The state evaluator must be true for empty transition conditions", 
+        assertTrue("The state evaluator must be true for empty transition conditions",
                 evaluator.evaluateConditions(new StateStub()));
     }
 
@@ -40,7 +42,7 @@ public class TransitionConditionEvaluatorTest {
         TransitionConditionEvaluator evaluator = new TransitionConditionEvaluator(
                 Tags.Title, Tags.Title, Tags.Title, testGoal);
 
-        assertEquals("Exactly one transition condition should be loaded from the goal string.", 
+        assertEquals("Exactly one transition condition should be loaded from the goal string.",
                 1, evaluator.getConditions().size());
 
         assertTrue(evaluator.getConditions().get(0) instanceof StateTransitionCondition);
@@ -51,7 +53,7 @@ public class TransitionConditionEvaluatorTest {
         assertEquals("ClickButton", stateTransitionCondition.getActionMessage());
         assertEquals("StateB", stateTransitionCondition.getDestStateMessage());
 
-        assertFalse("The state evaluator must be false due pending transition conditions", 
+        assertFalse("The state evaluator must be false due pending transition conditions",
                 evaluator.evaluateConditions(new StateStub()));
     }
 
@@ -62,7 +64,7 @@ public class TransitionConditionEvaluatorTest {
         TransitionConditionEvaluator evaluator = new TransitionConditionEvaluator(
                 Tags.Title, Tags.Title, Tags.Title, testGoal);
 
-        assertEquals("Only the first complete Origin/Action/Dest block should be used.", 
+        assertEquals("Only the first complete Origin/Action/Dest block should be used.",
                 1, evaluator.getConditions().size());
 
         assertTrue(evaluator.getConditions().get(0) instanceof StateTransitionCondition);
@@ -73,7 +75,7 @@ public class TransitionConditionEvaluatorTest {
         assertEquals("ClickButton", stateTransitionCondition.getActionMessage());
         assertEquals("StateY", stateTransitionCondition.getDestStateMessage());
 
-        assertFalse("The state evaluator must be false due pending transition conditions", 
+        assertFalse("The state evaluator must be false due pending transition conditions",
                 evaluator.evaluateConditions(new StateStub()));
     }
 
@@ -83,10 +85,10 @@ public class TransitionConditionEvaluatorTest {
         TransitionConditionEvaluator evaluator = new TransitionConditionEvaluator(
                 Tags.Title, Tags.Title, Tags.Title, testGoal);
 
-        assertEquals("The number of identified transition conditions should be zero", 
+        assertEquals("The number of identified transition conditions should be zero",
                 0, evaluator.getConditions().size());
 
-        assertTrue("The state evaluator must be true for empty transition conditions", 
+        assertTrue("The state evaluator must be true for empty transition conditions",
                 evaluator.evaluateConditions(new StateStub()));
     }
 
@@ -96,10 +98,10 @@ public class TransitionConditionEvaluatorTest {
         TransitionConditionEvaluator evaluator = new TransitionConditionEvaluator(
                 Tags.Title, Tags.Title, Tags.Title, testGoal);
 
-        assertEquals("The number of identified transition conditions should be zero", 
+        assertEquals("The number of identified transition conditions should be zero",
                 0, evaluator.getConditions().size());
 
-        assertTrue("The state evaluator must be true for empty transition conditions", 
+        assertTrue("The state evaluator must be true for empty transition conditions",
                 evaluator.evaluateConditions(new StateStub()));
     }
 
@@ -109,10 +111,10 @@ public class TransitionConditionEvaluatorTest {
         TransitionConditionEvaluator evaluator = new TransitionConditionEvaluator(
                 null, Tags.Title, Tags.Title, testGoal);
 
-        assertEquals("The number of identified transition conditions should be zero", 
+        assertEquals("The number of identified transition conditions should be zero",
                 0, evaluator.getConditions().size());
 
-        assertTrue("The state evaluator must be true for empty transition conditions", 
+        assertTrue("The state evaluator must be true for empty transition conditions",
                 evaluator.evaluateConditions(new StateStub()));
     }
 
@@ -122,10 +124,10 @@ public class TransitionConditionEvaluatorTest {
         TransitionConditionEvaluator evaluator = new TransitionConditionEvaluator(
                 Tags.Title, null, Tags.Title, testGoal);
 
-        assertEquals("The number of identified transition conditions should be zero", 
+        assertEquals("The number of identified transition conditions should be zero",
                 0, evaluator.getConditions().size());
 
-        assertTrue("The state evaluator must be true for empty transition conditions", 
+        assertTrue("The state evaluator must be true for empty transition conditions",
                 evaluator.evaluateConditions(new StateStub()));
     }
 
@@ -135,10 +137,10 @@ public class TransitionConditionEvaluatorTest {
         TransitionConditionEvaluator evaluator = new TransitionConditionEvaluator(
                 Tags.Title, Tags.Title, null, testGoal);
 
-        assertEquals("The number of identified transition conditions should be zero", 
+        assertEquals("The number of identified transition conditions should be zero",
                 0, evaluator.getConditions().size());
 
-        assertTrue("The state evaluator must be true for empty transition conditions", 
+        assertTrue("The state evaluator must be true for empty transition conditions",
                 evaluator.evaluateConditions(new StateStub()));
     }
 }

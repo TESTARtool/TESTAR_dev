@@ -22,7 +22,7 @@ import com.google.gson.GsonBuilder;
 /**
  * Conversation with the Gemini LLM.
  * This gets converted to JSON and sent to the LLM.
- * 
+ *
  * { "contents": [{ "role": "user", "parts": [{ "text": "TEXT" }] }] }
  */
 public class LlmConversationGemini implements LlmConversation {
@@ -55,12 +55,12 @@ public class LlmConversationGemini implements LlmConversation {
 
             LlmConversationGemini.Content[] initContents = new Gson().fromJson(initPromptJson, LlmConversationGemini.Content[].class);
 
-            for(LlmConversationGemini.Content content : initContents) {
-                for(LlmConversationGemini.Part part : content.getParts()) {
+            for (LlmConversationGemini.Content content : initContents) {
+                for (LlmConversationGemini.Part part : content.getParts()) {
                     addMessage(content.getRole(), part.getText());
                 }
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             logger.log(Level.ERROR, "Failed to initialize conversation, LLM quality may be degraded.", e);
         }
     }

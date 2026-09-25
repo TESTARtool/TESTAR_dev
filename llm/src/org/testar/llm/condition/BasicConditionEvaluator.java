@@ -21,10 +21,10 @@ public class BasicConditionEvaluator extends ConditionEvaluator {
      * @return True if all conditions evaluate to true.
      */
     public boolean evaluateConditions(String modelIdentifier, StateModelManager stateModelManager) {
-        for(TestCondition condition : getConditions()) {
+        for (TestCondition condition : getConditions()) {
             boolean evaluation = condition.evaluate(modelIdentifier, stateModelManager);
 
-            if(!evaluation) {
+            if (!evaluation) {
                 return false;
             }
         }
@@ -39,10 +39,10 @@ public class BasicConditionEvaluator extends ConditionEvaluator {
      * @return True if all conditions evaluate to true.
      */
     public boolean evaluateConditions(State state) {
-        for(TestCondition condition : getConditions()) {
+        for (TestCondition condition : getConditions()) {
             boolean evaluation = condition.evaluate(state);
 
-            if(!evaluation) {
+            if (!evaluation) {
                 return false;
             }
         }

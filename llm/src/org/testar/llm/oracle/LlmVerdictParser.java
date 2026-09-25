@@ -12,43 +12,43 @@ import com.google.gson.JsonParser;
 
 public final class LlmVerdictParser {
 
-	private LlmVerdictParser() {}
+    private LlmVerdictParser() { }
 
-	public static LlmVerdict parse(String llmResponse) {
-		JsonObject object = JsonParser.parseString(llmResponse).getAsJsonObject();
+    public static LlmVerdict parse(String llmResponse) {
+        JsonObject object = JsonParser.parseString(llmResponse).getAsJsonObject();
 
-		String info = getStringValue(object, "info");
-		String status = getStringValue(object, "status");
-		Boolean match = getBooleanValue(object, "match");
+        String info = getStringValue(object, "info");
+        String status = getStringValue(object, "status");
+        Boolean match = getBooleanValue(object, "match");
 
-		return new LlmVerdict(match, status, info);
-	}
+        return new LlmVerdict(match, status, info);
+    }
 
-	private static String getStringValue(JsonObject object, String property) {
-		if (!object.has(property) || object.get(property).isJsonNull()) {
-			return "";
-		}
-		JsonElement value = object.get(property);
-		if (value.isJsonPrimitive()) {
-			return value.getAsString();
-		}
-		return value.toString();
-	}
+    private static String getStringValue(JsonObject object, String property) {
+        if (!object.has(property) || object.get(property).isJsonNull()) {
+            return "";
+        }
+        JsonElement value = object.get(property);
+        if (value.isJsonPrimitive()) {
+            return value.getAsString();
+        }
+        return value.toString();
+    }
 
-	private static Boolean getBooleanValue(JsonObject object, String property) {
-		if (!object.has(property) || object.get(property).isJsonNull()) {
-			return null;
-		}
+    private static Boolean getBooleanValue(JsonObject object, String property) {
+        if (!object.has(property) || object.get(property).isJsonNull()) {
+            return null;
+        }
 
-		JsonElement value = object.get(property);
-		try {
-			return value.getAsBoolean();
-		} catch (Exception ignored) {
-			try {
-				return Boolean.parseBoolean(value.getAsString());
-			} catch (Exception ignoredAgain) {
-				return null;
-			}
-		}
-	}
+        JsonElement value = object.get(property);
+        try {
+            return value.getAsBoolean();
+        } catch (Exception ignored) {
+            try {
+                return Boolean.parseBoolean(value.getAsString());
+            } catch (Exception ignoredAgain) {
+                return null;
+            }
+        }
+    }
 }

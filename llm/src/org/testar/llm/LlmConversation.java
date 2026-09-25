@@ -37,11 +37,11 @@ public interface LlmConversation {
     default String getTextResource(String resourceLocation) throws Exception {
         ClassLoader classLoader = LlmConversation.class.getClassLoader();
         // Try to find the file from the resource stream of system file path
-        InputStream inputStream = classLoader.getResourceAsStream(resourceLocation) != null 
-        		? classLoader.getResourceAsStream(resourceLocation) 
-        				: Files.exists(Paths.get(resourceLocation)) 
-        				? Files.newInputStream(Paths.get(resourceLocation)) 
-        						: null;
+        InputStream inputStream = classLoader.getResourceAsStream(resourceLocation) != null
+                ? classLoader.getResourceAsStream(resourceLocation)
+                        : Files.exists(Paths.get(resourceLocation))
+                        ? Files.newInputStream(Paths.get(resourceLocation))
+                                : null;
 
         if (inputStream != null) {
             StringBuilder stringBuilder = new StringBuilder();

@@ -37,7 +37,7 @@ public class WordsStateCondition extends StateCondition {
                     "WHERE uid LIKE ? " +
                     "AND " + getField() + ".toLowerCase() containstext ?";
 
-            String result = stateModelManager.queryStateModel(query, 
+            String result = stateModelManager.queryStateModel(query,
                     modelIdentifier + "%",
                     "'" + word.toLowerCase() + "'");
 
@@ -51,7 +51,7 @@ public class WordsStateCondition extends StateCondition {
         // Compute the threshold based on the number of search words
         int threshold = (int) Math.ceil((double) (getThreshold() * searchWords.length) / 2);
 
-        switch(getComparator()) {
+        switch (getComparator()) {
             case EQUAL:
                 return totalThenMatches == threshold;
             case LESS_THAN:

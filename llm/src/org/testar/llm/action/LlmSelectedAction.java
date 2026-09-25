@@ -25,7 +25,7 @@ public class LlmSelectedAction {
     }
 
     public String getInput() {
-        if(input == null) {
+        if (input == null) {
             return "";
         }
         return input;

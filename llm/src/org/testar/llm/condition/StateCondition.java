@@ -75,7 +75,7 @@ public class StateCondition extends TestCondition {
         int matches = QueryHelper.parseCountQueryResponse(result, "found");
         int threshold = getThreshold();
 
-        switch(getComparator()) {
+        switch (getComparator()) {
             case EQUAL:
                 return matches == threshold;
             case LESS_THAN:
@@ -93,26 +93,26 @@ public class StateCondition extends TestCondition {
 
     @Override
     public boolean evaluate(State state) {
-    	for(Widget widget : state) {
-    		// For web apps check the widget is visible
-        	// The default value is true to avoid blocking SUT systems other than web apps
-    		if(widget.get(WdTags.WebIsFullOnScreen, true) && widget.get(WdTags.WebIsDisplayed, true)) {
-    	    	for(Tag<?> tag : widget.tags()){
-    	    		if(tag.name().equals(getField()) && widget.get(tag, null) != null){
-    	    			try {
-    	    				String tagValue = widget.get(tag).toString();
-    	    				if(tagValue.contains(searchMessage)) {
-    	    					logger.info("State Condition Match for Tag Value: " + tagValue);
-    	    					return true;
-    	    				}
-    	    			} catch (Exception e) {
-    	    				// Continue with next tag
-    	    			}
-    	    		}
-    	    	}
-    		}
-    	}
+        for (Widget widget : state) {
+            // For web apps check the widget is visible
+            // The default value is true to avoid blocking SUT systems other than web apps
+            if (widget.get(WdTags.WebIsFullOnScreen, true) && widget.get(WdTags.WebIsDisplayed, true)) {
+                for (Tag<?> tag : widget.tags()) {
+                    if (tag.name().equals(getField()) && widget.get(tag, null) != null) {
+                        try {
+                            String tagValue = widget.get(tag).toString();
+                            if (tagValue.contains(searchMessage)) {
+                                logger.info("State Condition Match for Tag Value: " + tagValue);
+                                return true;
+                            }
+                        } catch (Exception e) {
+                            // Continue with next tag
+                        }
+                    }
+                }
+            }
+        }
 
-    	return false;
+        return false;
     }
 }

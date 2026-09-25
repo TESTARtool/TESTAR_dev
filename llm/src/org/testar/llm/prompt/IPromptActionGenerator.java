@@ -17,9 +17,9 @@ import java.util.Set;
  */
 public interface IPromptActionGenerator {
 
-	Tag<String> getDescriptionTag();
+    Tag<String> getDescriptionTag();
 
-	boolean attachImage();
+    boolean attachImage();
 
     /**
      * Generates a prompt for action selection with large language models.

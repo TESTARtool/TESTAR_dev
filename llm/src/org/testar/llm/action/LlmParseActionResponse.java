@@ -57,7 +57,7 @@ public class LlmParseActionResponse {
 
             // If the selectedAction is a NOP action at this stage, parsing has likely failed.
             // Observed to happen when the LLM selects an actionId that does not exist.
-            if(selectedAction instanceof NOP) {
+            if (selectedAction instanceof NOP) {
                 logger.log(Level.ERROR, "Action AbstractID not found, parsing LLM response has likely failed!: " + responseContent);
                 return new LlmParseActionResult(null, LlmParseActionResult.ParseResult.INVALID_ACTION);
             }
@@ -67,8 +67,8 @@ public class LlmParseActionResponse {
 
             // For interacting with select combobox web widgets
             // A WdSelectListAction is created to change the active value of the combobox
-            if(Objects.equals(widget.get(WdTags.WebTagName, ""), "select")) {
-                if(Objects.equals(input, "")) {
+            if (Objects.equals(widget.get(WdTags.WebTagName, ""), "select")) {
+                if (Objects.equals(input, "")) {
                     return new LlmParseActionResult(null, LlmParseActionResult.ParseResult.SL_MISSING_INPUT);
                 }
                 Action selectAction = WebdriverSelectListSupport.createActionForInput(widget, input);
@@ -83,13 +83,13 @@ public class LlmParseActionResponse {
             setCompoundActionInputText(selectedAction, input);
             return new LlmParseActionResult(selectedAction, LlmParseActionResult.ParseResult.SUCCESS);
 
-        } catch(JsonParseException e) {
+        } catch (JsonParseException e) {
             logger.log(Level.ERROR, "Unable to parse response from LLM to JSON: " + responseContent);
             return new LlmParseActionResult(null, LlmParseActionResult.ParseResult.PARSE_FAILED);
-        } catch(NullPointerException e) {
+        } catch (NullPointerException e) {
             logger.log(Level.ERROR, "Null response due to LLM parse response error");
             return new LlmParseActionResult(null, LlmParseActionResult.ParseResult.COMMUNICATION_FAILURE);
-        } catch(Exception e) {
+        } catch (Exception e) {
             logger.log(Level.ERROR, "Exception parsing LLM response");
             return new LlmParseActionResult(null, LlmParseActionResult.ParseResult.COMMUNICATION_FAILURE);
         }
@@ -101,7 +101,9 @@ public class LlmParseActionResponse {
      * @return The sanitized LLM response
      */
     private String sanitizeJsonResponse(String responseContent) {
-        if (responseContent == null) return null;
+        if (responseContent == null) {
+            return null;
+        }
 
         if (responseContent.startsWith("```")) {
             logger.log(Level.INFO, String.format("Sanitizing Response: [%s]", responseContent));
@@ -121,8 +123,8 @@ public class LlmParseActionResponse {
      * @return Requested action if found, NOP Action if not found.
      */
     private Action getActionByIdentifier(Set<Action> actions, String actionId) {
-        for(Action action : actions) {
-            if(action.get(Tags.AbstractID, "").equalsIgnoreCase(actionId)) {
+        for (Action action : actions) {
+            if (action.get(Tags.AbstractID, "").equalsIgnoreCase(actionId)) {
                 return action;
             }
         }
@@ -137,8 +139,8 @@ public class LlmParseActionResponse {
      */
     private boolean setCompoundActionInputText(Action action, String inputText) {
         //TODO: Create single actions in protocol so this is not necessary?
-        if(action instanceof CompoundAction) {
-            for(Action innerAction : ((CompoundAction)action).getActions()) {
+        if (action instanceof CompoundAction) {
+            for (Action innerAction : ((CompoundAction) action).getActions()) {
                 if (innerAction instanceof Type || innerAction instanceof PasteText) {
                     return updateTextAction(action, innerAction, inputText);
                 }
@@ -149,7 +151,7 @@ public class LlmParseActionResponse {
     }
 
     private boolean updateTextAction(Action action, Action innerAction, String inputText) {
-        if(action instanceof WdRemoteTypeAction) {
+        if (action instanceof WdRemoteTypeAction) {
             ((WdRemoteTypeAction) action).setKeys(inputText);
             return true;
         }
@@ -159,7 +161,7 @@ public class LlmParseActionResponse {
         String widgetDesc = action.get(Tags.OriginWidget).get(Tags.Desc, "<no description>");
         action.set(Tags.Desc, innerAction.getClass().getSimpleName() + " '" + inputText + "' into '" + widgetDesc + "'");
 
-        if(action.get(Tags.Visualizer) instanceof TextVisualizer) {
+        if (action.get(Tags.Visualizer) instanceof TextVisualizer) {
             TextVisualizer textVisualizer = (TextVisualizer) action.get(Tags.Visualizer);
             Pen newPen = Pen.newPen().setColor(Color.Red).setFillPattern(FillPattern.Solid).setStrokeWidth(50).build();
             action.set(Tags.Visualizer, textVisualizer.withText(inputText, newPen));
