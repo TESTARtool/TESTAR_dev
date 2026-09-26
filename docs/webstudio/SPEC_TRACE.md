@@ -869,6 +869,8 @@ Keep the main functional and UX specs readable. Use this file when a reader need
 **Frontend implementation**
 
 - [TopNavigation.svelte](../../webstudio/frontend/src/app/TopNavigation.svelte)
+- [AboutDialog.svelte](../../webstudio/frontend/src/app/AboutDialog.svelte)
+- [aboutProject.js](../../webstudio/frontend/src/app/aboutProject.js)
 - [webStudioRoles.js](../../webstudio/frontend/src/app/webStudioRoles.js)
 - [webStudioNavigation.js](../../webstudio/frontend/src/app/webStudioNavigation.js)
 - [App.svelte](../../webstudio/frontend/src/App.svelte)
@@ -877,6 +879,7 @@ Keep the main functional and UX specs readable. Use this file when a reader need
 
 - [webStudioRoles.test.js](../../webstudio/frontend/test/app/webStudioRoles.test.js)
 - [webStudioNavigation.test.js](../../webstudio/frontend/test/app/webStudioNavigation.test.js)
+- [aboutProject.test.js](../../webstudio/frontend/test/app/aboutProject.test.js)
 
 **Integration tests**
 

@@ -1,5 +1,6 @@
 ﻿@import "./styles/base.css";
 @import "./styles/layout.css";
+@import "./styles/about.css";
 @import "./styles/run-testar.css";
 @import "./styles/test-results.css";
 @import "./styles/spy-mode.css";

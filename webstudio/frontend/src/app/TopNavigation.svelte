@@ -1,4 +1,5 @@
 <script>
+    import AboutDialog from "./AboutDialog.svelte";
     import { committedSelectChangeState } from "./committedSelectModel.js";
     import { menuHasActivePage, resultMenuItems, runModeMenuItems, testConfigurationMenuItems } from "./webStudioNavigation.js";
     import { WEB_STUDIO_ROLES, roleSelectorChangeState } from "./webStudioRoles.js";
@@ -17,6 +18,8 @@
     export let onNavigateToTestOracles = () => {};
     export let onNavigateToTestGoals = () => {};
     export let onNavigateToSpy = () => {};
+
+    let aboutOpen = false;
 
     function changeRole(event) {
         const nextState = roleSelectorChangeState(currentRole, event.currentTarget.value);
@@ -120,4 +123,9 @@
             </div>
         {/if}
     </div>
+    <button type="button" class="secondary page-nav-help" aria-label="About TESTAR" title="About TESTAR" on:click={() => aboutOpen = true}>
+        ?
+    </button>
 </nav>
+
+<AboutDialog open={aboutOpen} onClose={() => aboutOpen = false} />

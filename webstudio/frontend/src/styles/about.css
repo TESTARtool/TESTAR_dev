@@ -1,0 +1,127 @@
+.page-nav-help {
+    width: 40px;
+    height: 40px;
+    margin-left: auto;
+    padding: 0;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 1.1rem;
+    font-weight: 800;
+}
+
+.composition-modal-backdrop.about-backdrop {
+    z-index: 2200;
+}
+
+.composition-modal.about-dialog {
+    width: min(880px, 100%);
+    padding: 26px;
+}
+
+.about-dialog-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+}
+
+.about-dialog-heading h2 {
+    margin: 3px 0 8px;
+    color: #10344a;
+    font-size: clamp(1.7rem, 4vw, 2.3rem);
+}
+
+.about-dialog-heading p {
+    max-width: 58ch;
+    margin: 0;
+    color: var(--muted);
+    line-height: 1.5;
+}
+
+.about-dialog-eyebrow {
+    color: #0f5b78;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.about-dialog-body {
+    display: grid;
+    gap: 22px;
+    margin-top: 22px;
+}
+
+.about-brand {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    padding: 20px 24px;
+    border-radius: 16px;
+    background: linear-gradient(115deg, #e8f4f5, #f5f8f2);
+}
+
+.about-brand img {
+    width: min(185px, 40%);
+    max-height: 76px;
+    object-fit: contain;
+}
+
+.about-brand p {
+    margin: 0;
+    line-height: 1.5;
+}
+
+.about-support h3 {
+    margin: 0 0 12px;
+    font-size: 0.95rem;
+}
+
+.about-logo-grid {
+    display: grid;
+    gap: 10px;
+}
+
+.about-partner-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.about-project-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.about-logo-card {
+    display: grid;
+    place-items: center;
+    min-height: 92px;
+    padding: 14px;
+    border: 1px solid var(--panel-border);
+    border-radius: 14px;
+    background: #fff;
+}
+
+.about-logo-card img {
+    display: block;
+    max-width: 100%;
+    max-height: 68px;
+    object-fit: contain;
+}
+
+@media (max-width: 720px) {
+    .composition-modal.about-dialog {
+        padding: 18px;
+    }
+
+    .about-project-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .about-brand {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .about-brand img {
+        width: 185px;
+    }
+}

@@ -71,6 +71,8 @@ The role selector belongs in the top navigation near the workspace selector. Rol
 
 Basic and Advanced roles use the same top-level navigation positions and shared labels and icons. Basic role may hide or simplify advanced dropdown entries, but it does not create a different workspace format.
 
+The top navigation includes an `About TESTAR` help button for both roles. It opens an informational dialog describing TESTAR and showing the research partner and project logos. The dialog closes without changing the current page or workspace.
+
 ### WS-UX-SOURCE-EDITOR-001 - Source Editor State and Document Selection
 
 Traceability: [`WS-UX-SOURCE-EDITOR-001`](../SPEC_TRACE.md#ws-ux-source-editor-001---source-editor-state-and-document-selection)

@@ -7,6 +7,7 @@ def configuredWebStudioPort = (findProperty('webstudioPort') ?: '8888').toString
 def configuredWebStudioWorkspacesRoot = project(':testar').file('target/install/testar/bin/workspaces').absolutePath
 def frontendDirectory = file("${projectDir}/frontend")
 def frontendSourceDirectory = file("${frontendDirectory}/src")
+def frontendPublicDirectory = file("${frontendDirectory}/public")
 def frontendGeneratedResourcesRoot = file("${buildDir}/generated/webstudio-frontend")
 def frontendOutputDirectory = file("${frontendGeneratedResourcesRoot}/web")
 def frontendPackageJson = file("${frontendDirectory}/package.json")
@@ -108,6 +109,7 @@ tasks.register('buildWebStudioFrontend', Exec) {
     inputs.file(frontendViteConfig)
     inputs.file(frontendSvelteConfig)
     inputs.files(fileTree(dir: frontendSourceDirectory))
+    inputs.files(fileTree(dir: frontendPublicDirectory))
     if (frontendPackageLock.exists()) {
         inputs.file(frontendPackageLock)
     }
