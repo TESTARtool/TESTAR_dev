@@ -18,7 +18,7 @@ import java.util.Set;
 
 public class StateManagementTags {
 
-    public enum Group { General, ControlPattern, WebDriver }
+    public enum Group { General, ControlPattern, WebDriver, Android }
 
     // a widget's control type
     public static final Tag<String> WidgetControlType = Tag.from("Widget control type", String.class);
@@ -301,6 +301,27 @@ public class StateManagementTags {
     public static final Tag<String> WebWidgetAriaLabel = Tag.from("Web Widget Aria Label", String.class);
     public static final Tag<String> WebWidgetAriaLabelledBy = Tag.from("Web Widget Aria Labelled By", String.class);
 
+    // Android widgets
+    public static final Tag<Boolean> AndroidWidgetEnabled = Tag.from("Android widget enabled", Boolean.class);
+    public static final Tag<String> AndroidWidgetText = Tag.from("Android widget text", String.class);
+    public static final Tag<String> AndroidWidgetHint = Tag.from("Android widget hint", String.class);
+    public static final Tag<String> AndroidWidgetResourceId = Tag.from("Android widget resource ID", String.class);
+    public static final Tag<String> AndroidWidgetClassName = Tag.from("Android widget class name", String.class);
+    public static final Tag<String> AndroidWidgetPackageName = Tag.from("Android widget package name", String.class);
+    public static final Tag<Boolean> AndroidWidgetCheckable = Tag.from("Android widget checkable", Boolean.class);
+    public static final Tag<Boolean> AndroidWidgetChecked = Tag.from("Android widget checked", Boolean.class);
+    public static final Tag<Boolean> AndroidWidgetClickable = Tag.from("Android widget clickable", Boolean.class);
+    public static final Tag<Boolean> AndroidWidgetFocusable = Tag.from("Android widget focusable", Boolean.class);
+    public static final Tag<Boolean> AndroidWidgetFocused = Tag.from("Android widget focused", Boolean.class);
+    public static final Tag<Boolean> AndroidWidgetScrollable = Tag.from("Android widget scrollable", Boolean.class);
+    public static final Tag<Boolean> AndroidWidgetLongClickable = Tag.from("Android widget long-clickable", Boolean.class);
+    public static final Tag<Boolean> AndroidWidgetPassword = Tag.from("Android widget password", Boolean.class);
+    public static final Tag<Boolean> AndroidWidgetSelected = Tag.from("Android widget selected", Boolean.class);
+    public static final Tag<String> AndroidWidgetAccessibilityId = Tag.from("Android widget accessibility ID", String.class);
+    public static final Tag<Boolean> AndroidWidgetDisplayed = Tag.from("Android widget displayed", Boolean.class);
+    public static final Tag<String> AndroidWidgetXpath = Tag.from("Android widget XPath", String.class);
+    public static final Tag<String> AndroidWidgetActivity = Tag.from("Android activity", String.class);
+
 
     // a set containing the tags that are available for state management
     private static Set<Tag<?>> stateManagementTags = new HashSet<Tag<?>>() {
@@ -394,6 +415,27 @@ public class StateManagementTags {
             add(WebWidgetIsDisabled);
             add(WebWidgetAriaLabel);
             add(WebWidgetAriaLabelledBy);
+
+            // Android
+            add(AndroidWidgetEnabled);
+            add(AndroidWidgetText);
+            add(AndroidWidgetHint);
+            add(AndroidWidgetResourceId);
+            add(AndroidWidgetClassName);
+            add(AndroidWidgetPackageName);
+            add(AndroidWidgetCheckable);
+            add(AndroidWidgetChecked);
+            add(AndroidWidgetClickable);
+            add(AndroidWidgetFocusable);
+            add(AndroidWidgetFocused);
+            add(AndroidWidgetScrollable);
+            add(AndroidWidgetLongClickable);
+            add(AndroidWidgetPassword);
+            add(AndroidWidgetSelected);
+            add(AndroidWidgetAccessibilityId);
+            add(AndroidWidgetDisplayed);
+            add(AndroidWidgetXpath);
+            add(AndroidWidgetActivity);
         }
     };
 
@@ -494,6 +536,27 @@ public class StateManagementTags {
         settingsMap.put(WebWidgetIsDisabled, "WebWidgetIsDisabled");
         settingsMap.put(WebWidgetAriaLabel, "WebWidgetAriaLabel");
         settingsMap.put(WebWidgetAriaLabelledBy, "WebWidgetAriaLabelledBy");
+
+        // Android
+        settingsMap.put(AndroidWidgetEnabled, "AndroidWidgetEnabled");
+        settingsMap.put(AndroidWidgetText, "AndroidWidgetText");
+        settingsMap.put(AndroidWidgetHint, "AndroidWidgetHint");
+        settingsMap.put(AndroidWidgetResourceId, "AndroidWidgetResourceId");
+        settingsMap.put(AndroidWidgetClassName, "AndroidWidgetClassName");
+        settingsMap.put(AndroidWidgetPackageName, "AndroidWidgetPackageName");
+        settingsMap.put(AndroidWidgetCheckable, "AndroidWidgetCheckable");
+        settingsMap.put(AndroidWidgetChecked, "AndroidWidgetChecked");
+        settingsMap.put(AndroidWidgetClickable, "AndroidWidgetClickable");
+        settingsMap.put(AndroidWidgetFocusable, "AndroidWidgetFocusable");
+        settingsMap.put(AndroidWidgetFocused, "AndroidWidgetFocused");
+        settingsMap.put(AndroidWidgetScrollable, "AndroidWidgetScrollable");
+        settingsMap.put(AndroidWidgetLongClickable, "AndroidWidgetLongClickable");
+        settingsMap.put(AndroidWidgetPassword, "AndroidWidgetPassword");
+        settingsMap.put(AndroidWidgetSelected, "AndroidWidgetSelected");
+        settingsMap.put(AndroidWidgetAccessibilityId, "AndroidWidgetAccessibilityId");
+        settingsMap.put(AndroidWidgetDisplayed, "AndroidWidgetDisplayed");
+        settingsMap.put(AndroidWidgetXpath, "AndroidWidgetXpath");
+        settingsMap.put(AndroidWidgetActivity, "AndroidWidgetActivity");
     }
 
     // a mapping of a tag to its group
@@ -584,6 +647,27 @@ public class StateManagementTags {
             put(WebWidgetIsDisabled, Group.WebDriver);
             put(WebWidgetAriaLabel, Group.WebDriver);
             put(WebWidgetAriaLabelledBy, Group.WebDriver);
+
+            // Android
+            put(AndroidWidgetEnabled, Group.Android);
+            put(AndroidWidgetText, Group.Android);
+            put(AndroidWidgetHint, Group.Android);
+            put(AndroidWidgetResourceId, Group.Android);
+            put(AndroidWidgetClassName, Group.Android);
+            put(AndroidWidgetPackageName, Group.Android);
+            put(AndroidWidgetCheckable, Group.Android);
+            put(AndroidWidgetChecked, Group.Android);
+            put(AndroidWidgetClickable, Group.Android);
+            put(AndroidWidgetFocusable, Group.Android);
+            put(AndroidWidgetFocused, Group.Android);
+            put(AndroidWidgetScrollable, Group.Android);
+            put(AndroidWidgetLongClickable, Group.Android);
+            put(AndroidWidgetPassword, Group.Android);
+            put(AndroidWidgetSelected, Group.Android);
+            put(AndroidWidgetAccessibilityId, Group.Android);
+            put(AndroidWidgetDisplayed, Group.Android);
+            put(AndroidWidgetXpath, Group.Android);
+            put(AndroidWidgetActivity, Group.Android);
         }
     };
 

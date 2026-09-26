@@ -1104,3 +1104,95 @@
     font-size: 0.88rem;
 }
 
+.abstract-identification-editor {
+    display: grid;
+    gap: 14px;
+}
+
+.abstract-identification-editor fieldset {
+    min-width: 0;
+}
+
+.abstract-identification-editor legend {
+    font-weight: 700;
+}
+
+.abstract-identification-groups {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.abstract-identification-common {
+    grid-column: 1 / -1;
+}
+
+.abstract-identification-common .abstract-identification-options {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    max-height: none;
+}
+
+.abstract-identification-options {
+    display: grid;
+    gap: 6px;
+    max-height: 308px;
+    overflow-y: auto;
+}
+
+.abstract-identification-options .settings-checkbox-row {
+    overflow-wrap: anywhere;
+}
+
+@media (max-width: 1120px) {
+    .abstract-identification-groups {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .abstract-identification-common .abstract-identification-options {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 760px) {
+    .abstract-identification-groups,
+    .abstract-identification-common .abstract-identification-options {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+.settings-reporting-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 16px;
+}
+
+.ignored-verdicts-dialog {
+    display: flex;
+    flex-direction: column;
+    min-height: min(580px, calc(100vh - 56px));
+}
+
+.ignored-verdicts-dialog > .composition-modal-body {
+    flex: 1;
+    min-height: 0;
+}
+
+.ignored-verdicts-panel {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+}
+
+.ignored-verdicts-list {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: grid;
+    gap: 0.4rem;
+}
+
+.ignored-verdicts-list .settings-checkbox-row {
+    overflow-wrap: anywhere;
+}

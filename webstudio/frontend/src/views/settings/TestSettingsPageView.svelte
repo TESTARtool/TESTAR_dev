@@ -4,6 +4,7 @@
 
     export let currentEditorDocument = null;
     export let loading = false;
+    export let loadJson;
     export let openTestSettings;
     export let openVisualSettings;
     export let openVisualSettingsGroup;
@@ -25,6 +26,7 @@
             excludedSettingKeys={TEST_SETTINGS_EXCLUDED_SETTING_KEYS}
             currentEditorDocument={currentEditorDocument}
             loading={loading}
+            {loadJson}
             openTestSettings={openTestSettings}
             openVisualSettings={openVisualSettings}
             openVisualSettingsGroup={openVisualSettingsGroup}
@@ -48,6 +50,7 @@
             excludedSettingKeys={TEST_SETTINGS_EXCLUDED_SETTING_KEYS}
             currentEditorDocument={currentEditorDocument}
             loading={loading}
+            {loadJson}
             openTestSettings={openTestSettings}
             openVisualSettings={openVisualSettings}
             openVisualSettingsGroup={openVisualSettingsGroup}

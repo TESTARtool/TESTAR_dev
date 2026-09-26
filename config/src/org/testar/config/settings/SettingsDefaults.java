@@ -95,7 +95,6 @@ import static org.testar.config.ConfigTags.ReportInHTML;
 import static org.testar.config.ConfigTags.ReportInPlainText;
 import static org.testar.config.ConfigTags.SequenceLength;
 import static org.testar.config.ConfigTags.Sequences;
-import static org.testar.config.ConfigTags.ShowVisualSettingsDialogOnStartup;
 import static org.testar.config.ConfigTags.SpyTagAttributes;
 import static org.testar.config.ConfigTags.StartupTime;
 import static org.testar.config.ConfigTags.AgentCLIApiKeyEnvVar;
@@ -142,7 +141,6 @@ public class SettingsDefaults {
         List<Pair<?, ?>> defaults = new ArrayList<Pair<?, ?>>();
 
         defaults.add(Pair.from(ProcessesToKillDuringTest, "(?!x)x"));
-        defaults.add(Pair.from(ShowVisualSettingsDialogOnStartup, true));
         defaults.add(Pair.from(LogLevel, 1));
         defaults.add(Pair.from(Mode, TestarMode.Spy));
         defaults.add(Pair.from(OutputDir, TestarDirectories.getOutputDir()));

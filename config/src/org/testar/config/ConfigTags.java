@@ -360,9 +360,6 @@ public final class ConfigTags {
     public static final Tag<String> SUTProcesses = Tag.from("SUTProcesses", String.class,
             "Regular expressions that indicates which processes conform the SUT");
 
-    public static final Tag<Boolean> ShowVisualSettingsDialogOnStartup = Tag.from("ShowVisualSettingsDialogOnStartup", Boolean.class,
-            "Sets whether to display TESTAR dialog. If false is used, then TESTAR will run in the mode of the Mode property");
-
     public static final Tag<Boolean> ForceForeground = Tag.from("ForceForeground", Boolean.class,
             "Sets whether to keep the SUTs GUI active in the screen (e.g. when its minimised or when a process is started and its UI is in front, etc.)");
 

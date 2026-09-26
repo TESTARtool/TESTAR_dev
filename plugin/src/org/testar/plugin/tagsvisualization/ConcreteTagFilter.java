@@ -4,7 +4,7 @@
  * Copyright (c) 2018-2026 Universitat Politecnica de Valencia - www.upv.es
  */
 
-package org.testar.dialog.tagsvisualization;
+package org.testar.plugin.tagsvisualization;
 
 import org.testar.core.tag.Tag;
 
@@ -17,9 +17,8 @@ public class ConcreteTagFilter implements ITagFilter {
         filter = newFilter;
     }
 
-    public boolean visualizeTag(Tag<?> t)
-    {
-        if(filter==null){
+    public boolean visualizeTag(Tag<?> t) {
+        if (filter == null) {
             return false;
         }
         return filter.contains(t);

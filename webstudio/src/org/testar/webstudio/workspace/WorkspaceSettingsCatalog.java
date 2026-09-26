@@ -70,8 +70,6 @@ public final class WorkspaceSettingsCatalog {
                 ConfigTags.MaxTime,
                 ConfigTags.StopGenerationOnFault,
                 ConfigTags.KeyBoardListener
-                //,
-                //ConfigTags.ShowVisualSettingsDialogOnStartup
             ),
             /*group(
                 "scriptless",

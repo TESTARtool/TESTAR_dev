@@ -131,6 +131,17 @@ public final class WebStudioServer {
             String workspace = context.pathParam("workspace");
             return workspaceController.readWorkspaceDocument(workspace);
         }));
+        routes.get("/api/settings/abstract-state-tags", context -> handle(context,
+            workspaceController::abstractStateTags));
+        routes.get("/api/workspaces/{workspace}/ignored-verdicts", context -> handle(context, () ->
+            workspaceController.ignoredVerdicts(context.pathParam("workspace"))));
+        routes.post("/api/workspaces/{workspace}/ignored-verdicts/remove", context -> handle(context, () -> {
+            String[] selected = gson.fromJson(context.body(), String[].class);
+            return workspaceController.removeIgnoredVerdicts(context.pathParam("workspace"),
+                selected == null ? null : List.of(selected));
+        }));
+        routes.delete("/api/workspaces/{workspace}/ignored-verdicts", context -> handle(context, () ->
+            workspaceController.clearIgnoredVerdicts(context.pathParam("workspace"))));
         routes.put("/api/workspaces/{workspace}/test-settings", context -> handle(context, () -> {
             String workspace = context.pathParam("workspace");
             WorkspaceFileUpdateDto update = gson.fromJson(context.body(), WorkspaceFileUpdateDto.class);

@@ -162,7 +162,7 @@ public class AndroidState extends AndroidWidget implements State {
         } else if (t.equals(AndroidTags.AndroidLongClickable)) {
             ret = w.element.longclicklable;
         } else if (t.equals(AndroidTags.AndroidPassword)) {
-            ret = w.element.clickable;
+            ret = w.element.password;
         } else if (t.equals(AndroidTags.AndroidSelected)) {
             ret = w.element.selected;
         } else if (t.equals(AndroidTags.AndroidAccessibilityId)) {

@@ -4,7 +4,7 @@
  * Copyright (c) 2018-2026 Universitat Politecnica de Valencia - www.upv.es
  */
 
-package org.testar.dialog.tagsvisualization;
+package org.testar.plugin.tagsvisualization;
 
 import org.testar.core.tag.Tag;
 import org.testar.core.tag.Tags;
@@ -19,7 +19,7 @@ import java.util.Set;
 public class DefaultTagFilter {
 
     private static final List<Tag<?>> allAvailableTags;
-    static{
+    static {
         // Fill the list with all the available tags.
         List<Tag<?>> tmpList = new ArrayList<>(UIATags.getAllTags());
         tmpList.addAll(Tags.getAllTags());

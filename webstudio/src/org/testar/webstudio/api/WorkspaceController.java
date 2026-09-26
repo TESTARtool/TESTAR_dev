@@ -21,13 +21,17 @@ import org.testar.webstudio.api.dto.WorkspaceJavaCompileResultDto;
 import org.testar.webstudio.api.dto.WorkspaceRenameRequestDto;
 import org.testar.webstudio.api.dto.WorkspaceSummaryDto;
 import org.testar.webstudio.workspace.WorkspaceService;
+import org.testar.webstudio.workspace.WorkspaceIgnoredVerdictsService;
+import org.testar.webstudio.workspace.AbstractStateTagCatalog;
 
 public final class WorkspaceController {
 
     private final WorkspaceService workspaceService;
+    private final WorkspaceIgnoredVerdictsService ignoredVerdictsService;
 
     public WorkspaceController(WorkspaceService workspaceService) {
         this.workspaceService = workspaceService;
+        this.ignoredVerdictsService = new WorkspaceIgnoredVerdictsService(workspaceService);
     }
 
     public List<WorkspaceSummaryDto> listWorkspaces() {
@@ -57,6 +61,22 @@ public final class WorkspaceController {
 
     public Path workspacesRoot() {
         return workspaceService.workspacesRoot();
+    }
+
+    public List<AbstractStateTagCatalog.TagOption> abstractStateTags() {
+        return AbstractStateTagCatalog.options();
+    }
+
+    public List<String> ignoredVerdicts(String workspaceName) {
+        return ignoredVerdictsService.list(workspaceName);
+    }
+
+    public List<String> removeIgnoredVerdicts(String workspaceName, List<String> selected) {
+        return ignoredVerdictsService.remove(workspaceName, selected);
+    }
+
+    public List<String> clearIgnoredVerdicts(String workspaceName) {
+        return ignoredVerdictsService.clear(workspaceName);
     }
 
     public WorkspaceDocumentDto readWorkspaceDocument(String workspaceName) {

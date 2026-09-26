@@ -2,6 +2,8 @@
     // Implements WS-UX-TEST-SETTINGS-001: shared visual/raw test.settings editor surface.
     import { contentChanged } from "../../models/editorDirtyState.js";
     import { shouldShowBlankSelectOption } from "./settingsSelectOptions.js";
+    import AbstractIdentificationEditor from "./AbstractIdentificationEditor.svelte";
+    import IgnoredVerdictsPanel from "./IgnoredVerdictsPanel.svelte";
 
     export let currentEditorDocument = null;
     export let allowedSettingsGroupIds = null;
@@ -9,6 +11,7 @@
     export let excludedSettingKeys = null;
     export let allowSettingsFileToggle = true;
     export let loading = false;
+    export let loadJson;
     export let openTestSettings;
     export let openVisualSettings;
     export let openVisualSettingsGroup;
@@ -56,6 +59,8 @@
     }
 
     let settingsSearch = "";
+    let showIgnoredVerdicts = false;
+    let ignoredVerdictsWorkspace = "";
     let expandedSettingsGroups = {};
     let settingsExpansionWorkspaceKey = "";
 
@@ -120,6 +125,13 @@
         ? filteredSettingsGroups
         : filteredSettingsGroups.filter((settingsGroup) => settingsGroup.id === selectedSettingsGroupId);
     $: rawSettingsDirty = contentChanged(workspaceDocument?.testSettings?.content, savedTestSettingsContent);
+    $: if (workspaceDocument?.workspaceName !== ignoredVerdictsWorkspace) {
+        ignoredVerdictsWorkspace = workspaceDocument?.workspaceName || "";
+        showIgnoredVerdicts = false;
+    }
+    $: if (selectedEditor !== "settings-form") {
+        showIgnoredVerdicts = false;
+    }
 
     $: {
         const nextWorkspaceKey = workspaceDocument?.workspaceName || "";
@@ -241,6 +253,13 @@
                             </button>
 
                             {#if normalizedSettingsSearch ? true : Boolean(expandedSettingsGroups[settingsGroup.id])}
+                                {#if settingsGroup.id === "state-identification"}
+                                    <AbstractIdentificationEditor
+                                        {loadJson}
+                                        setting={settingsGroup.settings[0]}
+                                        {setSettingValue}
+                                    />
+                                {:else}
                                 <div class="settings-fields">
                                     {#each settingsGroup.settings as setting}
                                         <div
@@ -362,6 +381,14 @@
                                         </div>
                                     {/each}
                                 </div>
+                                {#if settingsGroup.id === "reporting"}
+                                    <div class="settings-reporting-actions">
+                                        <button type="button" class="secondary" on:click={() => showIgnoredVerdicts = true}>
+                                            Manage Ignored Verdicts
+                                        </button>
+                                    </div>
+                                {/if}
+                                {/if}
                             {/if}
                         </article>
                     {/each}
@@ -406,4 +433,18 @@
             <textarea bind:value={workspaceDocument.testSettings.content}></textarea>
         </section>
     {/if}
+{/if}
+
+{#if renderContent && showIgnoredVerdicts && workspaceDocument?.workspaceName}
+    <div class="composition-modal-backdrop" role="presentation">
+        <div class="composition-modal state-model-dialog ignored-verdicts-dialog" role="dialog" aria-modal="true" aria-labelledby="ignored-verdicts-title">
+            <div class="composition-modal-header">
+                <h2 id="ignored-verdicts-title">Ignored Verdicts</h2>
+                <button type="button" class="secondary" on:click={() => showIgnoredVerdicts = false}>Close</button>
+            </div>
+            <div class="composition-modal-body">
+                <IgnoredVerdictsPanel {loadJson} workspaceName={workspaceDocument.workspaceName} />
+            </div>
+        </div>
+    </div>
 {/if}

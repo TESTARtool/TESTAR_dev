@@ -4,6 +4,94 @@ This document maps stable specification IDs to implementation files and tests.
 
 Keep the main functional and UX specs readable. Use this file when a reader needs to jump from a spec ID to the code and tests that implement it.
 
+<a id="ws-func-test-settings-002---abstract-state-identification-attributes"></a>
+
+## WS-FUNC-TEST-SETTINGS-002 - Abstract State Identification Attributes
+
+**Specification**
+
+- [Test Settings specification](./specs/settings.md#ws-func-test-settings-002---abstract-state-identification-attributes)
+
+**Backend implementation**
+
+- [AbstractStateTagCatalog.java](../../webstudio/src/org/testar/webstudio/workspace/AbstractStateTagCatalog.java)
+- [StateManagementTags.java](../../core/src/org/testar/core/StateManagementTags.java)
+- [AndroidMapping.java](../../android/src/org/testar/android/tag/AndroidMapping.java)
+- [AndroidState.java](../../android/src/org/testar/android/state/AndroidState.java)
+
+**Frontend implementation**
+
+- [AbstractIdentificationEditor.svelte](../../webstudio/frontend/src/views/settings/AbstractIdentificationEditor.svelte)
+- [abstractIdentificationModel.js](../../webstudio/frontend/src/views/settings/abstractIdentificationModel.js)
+
+**Unit tests**
+
+- [AbstractStateTagCatalogTest.java](../../webstudio/test/org/testar/webstudio/workspace/AbstractStateTagCatalogTest.java)
+- [AndroidAbstractStateAttributesTest.java](../../config/test/org/testar/config/settings/AndroidAbstractStateAttributesTest.java)
+- [TestAndroidStateManagementTag.java](../../android/test/org/testar/android/tag/TestAndroidStateManagementTag.java)
+- [AndroidPasswordStateTagTest.java](../../android/test/org/testar/android/state/AndroidPasswordStateTagTest.java)
+- [TestWebdriverStateManagementTag.java](../../webdriver/test/org/testar/webdriver/tag/TestWebdriverStateManagementTag.java)
+- [TestWindowsStateManagementTag.java](../../windows/test/org/testar/windows/tag/TestWindowsStateManagementTag.java)
+- [abstractIdentificationModel.test.js](../../webstudio/frontend/test/views/settings/abstractIdentificationModel.test.js)
+
+<a id="ws-func-test-settings-003---workspace-ignored-verdicts"></a>
+
+## WS-FUNC-TEST-SETTINGS-003 - Workspace Ignored Verdicts
+
+**Specification**
+
+- [Test Settings specification](./specs/settings.md#ws-func-test-settings-003---workspace-ignored-verdicts)
+
+**Backend implementation**
+
+- [WorkspaceIgnoredVerdictsService.java](../../webstudio/src/org/testar/webstudio/workspace/WorkspaceIgnoredVerdictsService.java)
+- [WorkspaceController.java](../../webstudio/src/org/testar/webstudio/api/WorkspaceController.java)
+
+**Frontend implementation**
+
+- [IgnoredVerdictsPanel.svelte](../../webstudio/frontend/src/views/settings/IgnoredVerdictsPanel.svelte)
+- [ignoredVerdictsApi.js](../../webstudio/frontend/src/views/settings/ignoredVerdictsApi.js)
+
+**Unit tests**
+
+- [WorkspaceIgnoredVerdictsServiceTest.java](../../webstudio/test/org/testar/webstudio/workspace/WorkspaceIgnoredVerdictsServiceTest.java)
+- [ignoredVerdictsApi.test.js](../../webstudio/frontend/test/views/settings/ignoredVerdictsApi.test.js)
+
+<a id="ws-ux-test-settings-002---abstract-identification-selector"></a>
+
+## WS-UX-TEST-SETTINGS-002 - Abstract Identification Selector
+
+**Specification**
+
+- [Test Settings specification](./specs/settings.md#ws-ux-test-settings-002---abstract-identification-selector)
+
+**Frontend implementation**
+
+- [TestSettingsView.svelte](../../webstudio/frontend/src/views/settings/TestSettingsView.svelte)
+- [AbstractIdentificationEditor.svelte](../../webstudio/frontend/src/views/settings/AbstractIdentificationEditor.svelte)
+
+**Unit tests**
+
+- [abstractIdentificationModel.test.js](../../webstudio/frontend/test/views/settings/abstractIdentificationModel.test.js)
+
+<a id="ws-ux-test-settings-003---ignored-verdicts-management"></a>
+
+## WS-UX-TEST-SETTINGS-003 - Ignored Verdicts Management
+
+**Specification**
+
+- [Test Settings specification](./specs/settings.md#ws-ux-test-settings-003---ignored-verdicts-management)
+
+**Frontend implementation**
+
+- [TestSettingsView.svelte](../../webstudio/frontend/src/views/settings/TestSettingsView.svelte)
+- [IgnoredVerdictsPanel.svelte](../../webstudio/frontend/src/views/settings/IgnoredVerdictsPanel.svelte)
+
+**Unit tests**
+
+- [WorkspaceIgnoredVerdictsServiceTest.java](../../webstudio/test/org/testar/webstudio/workspace/WorkspaceIgnoredVerdictsServiceTest.java)
+- [ignoredVerdictsApi.test.js](../../webstudio/frontend/test/views/settings/ignoredVerdictsApi.test.js)
+
 <a id="ws-func-test-goals-001---workspace-scoped-test-goals"></a>
 
 ## WS-FUNC-TEST-GOALS-001 - Workspace-Scoped Test Goals

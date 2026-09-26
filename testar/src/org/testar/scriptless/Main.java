@@ -15,11 +15,10 @@ import org.testar.core.StateManagementTags;
 import org.testar.core.environment.Environment;
 import org.testar.core.environment.UnknownEnvironment;
 import org.testar.core.serialisation.LogSerialiser;
-import org.testar.dialog.SettingsDialog;
-import org.testar.dialog.tagsvisualization.ConcreteTagFilter;
-import org.testar.dialog.tagsvisualization.TagFilter;
 import org.testar.plugin.NativeLinker;
 import org.testar.plugin.OperatingSystems;
+import org.testar.plugin.tagsvisualization.ConcreteTagFilter;
+import org.testar.plugin.tagsvisualization.TagFilter;
 import org.testar.windows.Windows10;
 
 import javax.swing.JFrame;
@@ -55,24 +54,10 @@ public class Main {
 
         Settings settings = Settings.loadSettings(args, testSettingsFile);
 
-        if (!settings.get(ConfigTags.ShowVisualSettingsDialogOnStartup)) {
-            setTestarDirectory(settings);
-            initCodingManager(settings);
-            initOperatingSystem();
-            startTestar(settings);
-        } else {
-            while (startTestarDialog(settings, testSettingsFile)) {
-                testSettingsFile = getTestSettingsFile();
-                settings = Settings.loadSettings(args, testSettingsFile);
-
-                setTestarDirectory(settings);
-                initCodingManager(settings);
-                initOperatingSystem();
-                startTestar(settings);
-            }
-
-            System.exit(0);
-        }
+        setTestarDirectory(settings);
+        initCodingManager(settings);
+        initOperatingSystem();
+        startTestar(settings);
     }
 
     public static String[] getSseFiles() {
@@ -224,16 +209,6 @@ public class Main {
 
         activatedSse = null;
         TestarDirectories.setSelectedWorkspaceName(null);
-    }
-
-    public static boolean startTestarDialog(Settings settings, String testSettingsFile) {
-        try {
-            Settings updatedSettings = new SettingsDialog().run(settings, testSettingsFile);
-            return updatedSettings != null;
-        } catch (IOException exception) {
-            exception.printStackTrace();
-            return false;
-        }
     }
 
     private static void startTestar(Settings settings) {

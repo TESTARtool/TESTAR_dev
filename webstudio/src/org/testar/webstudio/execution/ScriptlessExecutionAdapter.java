@@ -339,9 +339,6 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
             if (line.trim().startsWith("Mode")) {
                 updatedLines.add("Mode = " + mode);
                 modeUpdated = true;
-            } else if (line.trim().startsWith("ShowVisualSettingsDialogOnStartup")) {
-                updatedLines.add("ShowVisualSettingsDialogOnStartup = false");
-                dialogUpdated = true;
             } else if (line.trim().startsWith("OutputDir")) {
                 updatedLines.add("OutputDir = " + ResultWorkspacePaths.workspaceOutputSettingValue(workspaceName));
                 outputDirUpdated = true;
@@ -352,10 +349,6 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
 
         if (!modeUpdated) {
             updatedLines.add("Mode = " + mode);
-        }
-
-        if (!dialogUpdated) {
-            updatedLines.add("ShowVisualSettingsDialogOnStartup = false");
         }
 
         if (!outputDirUpdated) {

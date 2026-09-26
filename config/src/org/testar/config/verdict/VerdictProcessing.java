@@ -24,7 +24,7 @@ import java.util.List;
 
 public class VerdictProcessing {
 
-    private static final String LIST_VERDICTS_FAILURES_FILENAME = "list_of_verdicts_with_failures.txt";
+    public static final String LIST_VERDICTS_FAILURES_FILENAME = "list_of_verdicts_with_failures.txt";
 
     private final boolean ignoreDuplicatedVerdicts;
     private final List<String> verdictIgnoreList = new ArrayList<>();

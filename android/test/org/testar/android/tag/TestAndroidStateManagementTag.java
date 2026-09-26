@@ -22,30 +22,66 @@ public class TestAndroidStateManagementTag {
     }
 
     @Test
-    public void testAndroidCodingIDs() {
-        Tag<?>[] abstractTags = new Tag<?>[]{StateManagementTags.WidgetTitle, StateManagementTags.WidgetAutomationId};
-        CodingManager.setCustomTagsForAbstractId(abstractTags);
+    public void testAndroidSpecificAbstractStateAttributes() {
+        Assert.assertEquals(StateManagementTags.AndroidWidgetResourceId,
+                StateManagementTags.getTagFromSettingsString("AndroidWidgetResourceId"));
+        Assert.assertEquals(StateManagementTags.AndroidWidgetClickable,
+                StateManagementTags.getTagFromSettingsString("AndroidWidgetClickable"));
+        Assert.assertEquals(StateManagementTags.Group.Android,
+                StateManagementTags.getTagGroup(StateManagementTags.AndroidWidgetResourceId));
 
         AndroidState androidState = new AndroidState(null);
         AndroidWidget androidWidget = new AndroidWidget(androidState, androidState, null);
-        androidWidget.set(AndroidTags.AndroidText, "mobileText");
-        androidWidget.set(AndroidTags.AndroidAccessibilityId, "mobileAccessibilityId");
+        androidWidget.set(AndroidTags.AndroidResourceId, "login-button");
+        androidWidget.set(AndroidTags.AndroidClickable, true);
 
-        // Build the first AbstractID and check the StateManagementTags uses the Android values
-        CodingManager.buildIDs(androidWidget);
-        Assert.assertEquals(androidWidget.get(Tags.AbstractID), "WA1nhk37a1f1534562034");
+        Assert.assertEquals("login-button", androidWidget.get(StateManagementTags.AndroidWidgetResourceId));
+        Assert.assertEquals(Boolean.TRUE, androidWidget.get(StateManagementTags.AndroidWidgetClickable));
 
-        // Change AndroidText value to verify the AbstractID changes
-        androidWidget.set(AndroidTags.AndroidText, "mobileTextNEW");
-        androidWidget.set(AndroidTags.AndroidAccessibilityId, "mobileAccessibilityId");
-        CodingManager.buildIDs(androidWidget);
-        Assert.assertEquals(androidWidget.get(Tags.AbstractID), "WA1co2l5622543551600");
+        Tag<?>[] previousTags = CodingManager.getCustomTagsForAbstractId();
+        try {
+            CodingManager.setCustomTagsForAbstractId(new Tag<?>[] { StateManagementTags.AndroidWidgetResourceId });
+            CodingManager.buildIDs(androidWidget);
+            String firstId = androidWidget.get(Tags.AbstractID);
 
-        // Change AndroidAccessibilityId value to verify the AbstractID changes
-        androidWidget.set(AndroidTags.AndroidText, "mobileTextNEW");
-        androidWidget.set(AndroidTags.AndroidAccessibilityId, "mobileAccessibility");
-        CodingManager.buildIDs(androidWidget);
-        Assert.assertEquals(androidWidget.get(Tags.AbstractID), "WA1tvgaud203868755727");
+            androidWidget.set(AndroidTags.AndroidResourceId, "logout-button");
+            CodingManager.buildIDs(androidWidget);
+            Assert.assertNotEquals(firstId, androidWidget.get(Tags.AbstractID));
+        } finally {
+            CodingManager.setCustomTagsForAbstractId(previousTags);
+        }
+    }
+
+    @Test
+    public void testAndroidCodingIDs() {
+        Tag<?>[] previousTags = CodingManager.getCustomTagsForAbstractId();
+        try {
+            Tag<?>[] abstractTags = new Tag<?>[]{StateManagementTags.WidgetTitle, StateManagementTags.WidgetAutomationId};
+            CodingManager.setCustomTagsForAbstractId(abstractTags);
+
+            AndroidState androidState = new AndroidState(null);
+            AndroidWidget androidWidget = new AndroidWidget(androidState, androidState, null);
+            androidWidget.set(AndroidTags.AndroidText, "mobileText");
+            androidWidget.set(AndroidTags.AndroidAccessibilityId, "mobileAccessibilityId");
+
+            // Build the first AbstractID and check the StateManagementTags uses the Android values
+            CodingManager.buildIDs(androidWidget);
+            Assert.assertEquals(androidWidget.get(Tags.AbstractID), "WA1nhk37a1f1534562034");
+
+            // Change AndroidText value to verify the AbstractID changes
+            androidWidget.set(AndroidTags.AndroidText, "mobileTextNEW");
+            androidWidget.set(AndroidTags.AndroidAccessibilityId, "mobileAccessibilityId");
+            CodingManager.buildIDs(androidWidget);
+            Assert.assertEquals(androidWidget.get(Tags.AbstractID), "WA1co2l5622543551600");
+
+            // Change AndroidAccessibilityId value to verify the AbstractID changes
+            androidWidget.set(AndroidTags.AndroidText, "mobileTextNEW");
+            androidWidget.set(AndroidTags.AndroidAccessibilityId, "mobileAccessibility");
+            CodingManager.buildIDs(androidWidget);
+            Assert.assertEquals(androidWidget.get(Tags.AbstractID), "WA1tvgaud203868755727");
+        } finally {
+            CodingManager.setCustomTagsForAbstractId(previousTags);
+        }
     }
 
 }

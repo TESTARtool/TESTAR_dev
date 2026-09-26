@@ -2664,6 +2664,7 @@
 
     {#if currentPage === "settings"}
         <TestSettingsPageView
+            {loadJson}
             currentEditorDocument={currentEditorDocument}
             loading={loading}
             openTestSettings={openTestSettings}

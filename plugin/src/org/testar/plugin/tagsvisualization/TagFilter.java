@@ -4,7 +4,7 @@
  * Copyright (c) 2018-2026 Universitat Politecnica de Valencia - www.upv.es
  */
 
-package org.testar.dialog.tagsvisualization;
+package org.testar.plugin.tagsvisualization;
 
 public class TagFilter {
     private static ITagFilter instance;

@@ -20,8 +20,8 @@ import org.testar.core.devices.MouseButtons;
 import org.testar.core.state.State;
 import org.testar.core.tag.Tag;
 import org.testar.core.util.VisualizationUtil;
-import org.testar.dialog.tagsvisualization.TagFilter;
 import org.testar.engine.manager.FilteringManager;
+import org.testar.plugin.tagsvisualization.TagFilter;
 import org.testar.scriptless.RuntimeContext;
 
 /**

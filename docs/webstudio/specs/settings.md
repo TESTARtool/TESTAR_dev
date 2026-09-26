@@ -19,6 +19,18 @@ The visual form is the default representation. A toggle in the view header switc
 
 The selected workspace settings include `CliStateProjectionMode`, rendered as a dropdown using the available enum values.
 
+### WS-FUNC-TEST-SETTINGS-002 - Abstract State Identification Attributes
+
+Traceability: [`WS-FUNC-TEST-SETTINGS-002`](../SPEC_TRACE.md#ws-func-test-settings-002---abstract-state-identification-attributes)
+
+`Abstract Identification` presents supported state-management attributes as Common attributes and Windows, WebDriver, and Android platform groups. Checked attributes reflect the selected workspace's `AbstractStateAttributes` value. Changing a checkbox updates the visual settings draft; `Save Settings` persists it through the normal settings editor flow. `Restore defaults` replaces the entire draft selection with the core abstract-state defaults, including removal of non-default attributes outside the visual catalog.
+
+### WS-FUNC-TEST-SETTINGS-003 - Workspace Ignored Verdicts
+
+Traceability: [`WS-FUNC-TEST-SETTINGS-003`](../SPEC_TRACE.md#ws-func-test-settings-003---workspace-ignored-verdicts)
+
+The Reporting settings group provides `Manage Ignored Verdicts` for the selected workspace. It lists nonempty messages from that workspace's `list_of_verdicts_with_failures.txt`, and allows removing selected messages or clearing the list. The file is created only when the list is changed. Updates affect future executions; an already-running TESTAR process may retain the list it loaded at startup. Both removal actions require confirmation.
+
 ### Settings Persistence
 
 When the user saves either representation, WebStudio persists the selected workspace `test.settings` content. A successful save updates the persisted baseline used by both representations and disables `Save Settings` until a new change is made.
@@ -54,7 +66,79 @@ The left sidebar shows one `Edit Settings` entry. The visual form is shown by de
 - `Save Settings` is enabled when either representation changes settings
 - toggling representations while dirty uses the save/discard/cancel guard pattern
 
+### WS-UX-TEST-SETTINGS-002 - Abstract Identification Selector
+
+Traceability: [`WS-UX-TEST-SETTINGS-002`](../SPEC_TRACE.md#ws-ux-test-settings-002---abstract-identification-selector)
+
+The Abstract Identification group shows a Common row above three horizontally aligned Windows, WebDriver, and Android columns, with labeled checkboxes and a `Restore defaults` action. The columns stack on narrow screens. Loading or catalog errors are displayed in place of the selector. Its changes share the standard `Save Settings` button and unsaved-change guard.
+
+### WS-UX-TEST-SETTINGS-003 - Ignored Verdicts Management
+
+Traceability: [`WS-UX-TEST-SETTINGS-003`](../SPEC_TRACE.md#ws-ux-test-settings-003---ignored-verdicts-management)
+
+The Reporting settings group offers `Manage Ignored Verdicts`. Its modal shows a scrollable list, multi-selection, `Remove selected`, and `Clear all`. Empty and loading states are distinct. Confirmation names the operation; closing or canceling leaves the list unchanged.
+
 ## Acceptance Scenarios
+
+### WS-SCENARIO-SETTINGS-IGNORED-001 - Remove Selected Verdicts
+
+Verification: `WorkspaceIgnoredVerdictsServiceTest.java`, `ignoredVerdictsApi.test.js`
+
+Given the selected workspace has two ignored verdict messages
+When the user opens `Manage Ignored Verdicts` in Reporting and confirms removal of one message
+Then that message is removed from the workspace's ignored-verdicts file
+And the other message remains
+And another workspace's file remains unchanged
+
+### WS-SCENARIO-SETTINGS-IGNORED-002 - Clear Or Cancel
+
+Verification: `WorkspaceIgnoredVerdictsServiceTest.java`
+
+Given the selected workspace has ignored verdict messages
+When the user cancels `Clear all` in the Reporting settings modal
+Then the file remains unchanged
+When the user confirms `Clear all`
+Then the list becomes empty
+
+### WS-SCENARIO-SETTINGS-ABSTRACT-001 - Edit Abstract Identification
+
+Verification: `AbstractStateTagCatalogTest.java`, `abstractIdentificationModel.test.js`
+
+Given `WidgetControlType` is selected in `AbstractStateAttributes`
+When the user checks `WebWidgetId` in Abstract Identification
+Then both attributes are checked
+And `Save Settings` is enabled
+When the user saves settings
+Then the selected workspace's `test.settings` contains both attributes
+
+### WS-SCENARIO-SETTINGS-ABSTRACT-002 - Restore Defaults
+
+Verification: `AbstractStateTagCatalogTest.java`, `abstractIdentificationModel.test.js`
+
+Given `AbstractStateAttributes` contains `WidgetValuePattern` and another non-default attribute
+When the user clicks `Restore defaults`
+Then the checkboxes match the core default abstract-state attributes
+And the restored selection remains a draft until `Save Settings` is clicked
+When the user saves settings
+Then `AbstractStateAttributes` contains only the core default abstract-state attributes
+And `WidgetValuePattern` is removed from the selected workspace's `test.settings`
+
+### WS-SCENARIO-SETTINGS-ABSTRACT-003 - Platform-Specific Identification
+
+Verification: `AndroidAbstractStateAttributesTest.java`, `TestAndroidStateManagementTag.java`, `TestWebdriverStateManagementTag.java`, `TestWindowsStateManagementTag.java`, `AbstractStateTagCatalogTest.java`
+
+Given the selected workspace uses a supported platform
+When the user selects an attribute from that platform's Abstract Identification group and saves settings
+Then `AbstractStateAttributes` contains the selected attribute
+And the platform's widget value contributes to abstract state identification
+
+### WS-SCENARIO-SETTINGS-ABSTRACT-004 - Retain Hidden Attributes During Checkbox Edits
+
+Verification: `AbstractStateTagCatalogTest.java`, `abstractIdentificationModel.test.js`
+
+Given `AbstractStateAttributes` contains `WidgetValuePattern`
+When the user changes a visible checkbox in Abstract Identification
+Then the saved control-pattern key remains in the settings draft
 
 ### WS-SCENARIO-SETTINGS-001 - Visual Settings Save
 

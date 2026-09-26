@@ -401,7 +401,6 @@ public class SettingsFileStructure {
         // Second, create a list of secondary configuration tags settings
         // To add their descriptions to the file
         List<Tag<?>> secondarySettingsList = new ArrayList<>();
-        secondarySettingsList.add(ConfigTags.ShowVisualSettingsDialogOnStartup);
         secondarySettingsList.add(ConfigTags.ForceForeground);
         secondarySettingsList.add(ConfigTags.SpyTagAttributes);
         secondarySettingsList.add(ConfigTags.VisualizeActions);

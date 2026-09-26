@@ -70,7 +70,6 @@ dependencies {
     implementation project(':engine')
     implementation project(':rascal')
     implementation project(':oracle')
-    implementation project(':dialog')
     implementation project(':coverage')
     implementation project(':llm')
     implementation project(':statemodel')
