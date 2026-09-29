@@ -99,39 +99,39 @@ The modal must not resize the page layout. Validation feedback appears inside th
 
 Verification: `committedSelectModel.test.js`, `configurationGuard.test.js`
 
-Given the user selected workspace is `webdriver_generic`
-And the user has unsaved settings changes
-When the user selects workspace `android_generic`
-Then the unsaved changes guard is shown
+Given the user selected workspace is `webdriver_generic`\
+And the user has unsaved settings changes\
+When the user selects workspace `android_generic`\
+Then the unsaved changes guard is shown\
 And the workspace selector still shows `webdriver_generic` while the workspace change is pending
 
-When the user clicks `Cancel`
-Then the application remains in workspace `webdriver_generic`
+When the user clicks `Cancel`\
+Then the application remains in workspace `webdriver_generic`\
 And the workspace selector shows `webdriver_generic`
 
-When the user accepts the guarded workspace change
-Then the application changes to workspace `android_generic`
+When the user accepts the guarded workspace change\
+Then the application changes to workspace `android_generic`\
 And the workspace selector shows `android_generic`
 
 ### WS-SCENARIO-WORKSPACE-CREATE-001 - Clone Uses Its Own Composition and Policies Resources
 
 Verification: `WorkspaceServiceManagementTest.java`
 
-Given workspace `webdriver_generic` contains `composition.properties` and `policies.properties`
-And its `test.settings` contains `CustomCompositionResource = ./workspaces/webdriver_generic/composition.properties`
-And its `test.settings` contains `CustomPoliciesResource = ./workspaces/webdriver_generic/policies.properties`
-When the user creates workspace `webdriver_cloned` using `webdriver_generic` as its base
-Then `webdriver_cloned/test.settings` contains `CustomCompositionResource = ./workspaces/webdriver_cloned/composition.properties`
-And `webdriver_cloned/test.settings` contains `CustomPoliciesResource = ./workspaces/webdriver_cloned/policies.properties`
+Given workspace `webdriver_generic` contains `composition.properties` and `policies.properties`\
+And its `test.settings` contains `CustomCompositionResource = ./workspaces/webdriver_generic/composition.properties`\
+And its `test.settings` contains `CustomPoliciesResource = ./workspaces/webdriver_generic/policies.properties`\
+When the user creates workspace `webdriver_cloned` using `webdriver_generic` as its base\
+Then `webdriver_cloned/test.settings` contains `CustomCompositionResource = ./workspaces/webdriver_cloned/composition.properties`\
+And `webdriver_cloned/test.settings` contains `CustomPoliciesResource = ./workspaces/webdriver_cloned/policies.properties`\
 And the cloned composition and policies files are available at those configured locations
 
 ### WS-SCENARIO-WORKSPACE-RENAME-001 - Rename Updates Composition and Policies Resources
 
 Verification: `WorkspaceServiceManagementTest.java`
 
-Given workspace `webdriver_generic` contains `composition.properties` and `policies.properties`
-And its `test.settings` references those resources under `./workspaces/webdriver_generic`
-When the user renames the workspace to `webdriver_renamed`
-Then `webdriver_renamed/test.settings` contains `CustomCompositionResource = ./workspaces/webdriver_renamed/composition.properties`
-And `webdriver_renamed/test.settings` contains `CustomPoliciesResource = ./workspaces/webdriver_renamed/policies.properties`
+Given workspace `webdriver_generic` contains `composition.properties` and `policies.properties`\
+And its `test.settings` references those resources under `./workspaces/webdriver_generic`\
+When the user renames the workspace to `webdriver_renamed`\
+Then `webdriver_renamed/test.settings` contains `CustomCompositionResource = ./workspaces/webdriver_renamed/composition.properties`\
+And `webdriver_renamed/test.settings` contains `CustomPoliciesResource = ./workspaces/webdriver_renamed/policies.properties`\
 And the composition and policies files are available at those configured locations

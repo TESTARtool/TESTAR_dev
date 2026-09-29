@@ -63,12 +63,12 @@ Oracle composition customization belongs to Composition Flow and changes verdict
 
 Verification: `TestOracleServiceTest.java`, `testOraclesModel.test.js`
 
-Given a workspace Java oracle class is compiled, enabled in `ExtendedOracles`, and visible in `Active Oracles`
-When the user confirms deletion of the Java oracle file
-Then the Java oracle file is deleted
-And the deleted class is removed from the `ExtendedOracles` setting
-And the deleted class is absent from `Enable Extended Oracles`
-And the deleted class is absent from `Active Oracles`
+Given a workspace Java oracle class is compiled, enabled in `ExtendedOracles`, and visible in `Active Oracles`\
+When the user confirms deletion of the Java oracle file\
+Then the Java oracle file is deleted\
+And the deleted class is removed from the `ExtendedOracles` setting\
+And the deleted class is absent from `Enable Extended Oracles`\
+And the deleted class is absent from `Active Oracles`\
 And reloading the workspace keeps the deleted class absent from all three locations
 
 ## UX Requirements

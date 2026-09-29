@@ -31,6 +31,8 @@ Do not create scenarios for every static label or simple rendering detail.
 
 Use concise Given/When/Then statements. Every `WS-SCENARIO-*` block must contain explicit `Given`, `When`, and `Then` lines. Keep verification references close to the scenario without repeating full trace information.
 
+End a scenario step with `\` when another `Given`, `When`, `Then`, or `And` step follows immediately. This keeps each step on its own line when GitHub renders the Markdown.
+
 ## Traceability
 
 Every `WS-FUNC-*` and `WS-UX-*` requirement must have a trace entry.

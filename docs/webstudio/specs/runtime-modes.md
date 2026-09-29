@@ -99,28 +99,28 @@ Generate Mode renders one detailed outcome row for every verdict report produced
 
 Verification: `ScriptlessSequenceVerdictTest.java`, `runtimeModel.test.js`
 
-Given Generate Mode has produced multiple verdict reports for sequence 1
-And Generate Mode has produced multiple verdict reports for sequence 2 in the same run
-And the sequence 1 reports are named `sequence_1_V001_WARNING_ACCESSIBILITY_FAULT.html`, `sequence_1_V002_WARNING_ACCESSIBILITY_FAULT.html`, `sequence_1_V003_WARNING_ACCESSIBILITY_FAULT.html`, `sequence_1_V004_WARNING_WEB_INVARIANT_FAULT.html`, and `sequence_1_V005_SUSPICIOUS_LOG.html`
-And the sequence 2 reports are named `sequence_2_V001_SUSPICIOUS_TAG.html`, `sequence_2_V002_SUSPICIOUS_TAG.html`, `sequence_2_V003_SUSPICIOUS_TAG.html`, and `sequence_2_V004_WARNING_WEB_INVARIANT_FAULT.html`
-And every listed report has a failed verdict
-When the Generate status is displayed
-Then the sequence graph shows exactly two sequence blocks numbered 1 and 2
-And both sequence blocks show the aggregate status `FAILED`
-And the Test Results Outcomes panel shows exactly nine detailed verdict entries
-And the five sequence 1 entries appear together before the four sequence 2 entries
-And every entry preserves its complete report label and individual status
-And the detailed list does not show standalone `sequence_1` or `sequence_2` entries
+Given Generate Mode has produced multiple verdict reports for sequence 1\
+And Generate Mode has produced multiple verdict reports for sequence 2 in the same run\
+And the sequence 1 reports are named `sequence_1_V001_WARNING_ACCESSIBILITY_FAULT.html`, `sequence_1_V002_WARNING_ACCESSIBILITY_FAULT.html`, `sequence_1_V003_WARNING_ACCESSIBILITY_FAULT.html`, `sequence_1_V004_WARNING_WEB_INVARIANT_FAULT.html`, and `sequence_1_V005_SUSPICIOUS_LOG.html`\
+And the sequence 2 reports are named `sequence_2_V001_SUSPICIOUS_TAG.html`, `sequence_2_V002_SUSPICIOUS_TAG.html`, `sequence_2_V003_SUSPICIOUS_TAG.html`, and `sequence_2_V004_WARNING_WEB_INVARIANT_FAULT.html`\
+And every listed report has a failed verdict\
+When the Generate status is displayed\
+Then the sequence graph shows exactly two sequence blocks numbered 1 and 2\
+And both sequence blocks show the aggregate status `FAILED`\
+And the Test Results Outcomes panel shows exactly nine detailed verdict entries\
+And the five sequence 1 entries appear together before the four sequence 2 entries\
+And every entry preserves its complete report label and individual status\
+And the detailed list does not show standalone `sequence_1` or `sequence_2` entries\
 And no verdict from sequence 1 is displayed under sequence 2
 
 ### WS-SCENARIO-RUNTIME-SPY-001 - Local Spy Stops When the SUT Closes
 
 Verification: `ScriptlessExecutionAdapterTest.java`
 
-Given Local Spy is running for the selected workspace
-And the SUT is running
-When the user closes the SUT or presses `Shift+Down` to end the Spy loop
-Then TESTAR completes its Spy session cleanup
-And WebStudio receives the Spy completion signal
-And the scriptless execution status becomes `idle`
+Given Local Spy is running for the selected workspace\
+And the SUT is running\
+When the user closes the SUT or presses `Shift+Down` to end the Spy loop\
+Then TESTAR completes its Spy session cleanup\
+And WebStudio receives the Spy completion signal\
+And the scriptless execution status becomes `idle`\
 And the Spy view no longer requires the user to click `Stop Local`

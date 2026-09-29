@@ -84,150 +84,150 @@ The Reporting settings group offers `Manage Ignored Verdicts`. Its modal shows a
 
 Verification: `WorkspaceIgnoredVerdictsServiceTest.java`, `ignoredVerdictsApi.test.js`
 
-Given the selected workspace has two ignored verdict messages
-When the user opens `Manage Ignored Verdicts` in Reporting and confirms removal of one message
-Then that message is removed from the workspace's ignored-verdicts file
-And the other message remains
+Given the selected workspace has two ignored verdict messages\
+When the user opens `Manage Ignored Verdicts` in Reporting and confirms removal of one message\
+Then that message is removed from the workspace's ignored-verdicts file\
+And the other message remains\
 And another workspace's file remains unchanged
 
 ### WS-SCENARIO-SETTINGS-IGNORED-002 - Clear Or Cancel
 
 Verification: `WorkspaceIgnoredVerdictsServiceTest.java`
 
-Given the selected workspace has ignored verdict messages
-When the user cancels `Clear all` in the Reporting settings modal
-Then the file remains unchanged
-When the user confirms `Clear all`
+Given the selected workspace has ignored verdict messages\
+When the user cancels `Clear all` in the Reporting settings modal\
+Then the file remains unchanged\
+When the user confirms `Clear all`\
 Then the list becomes empty
 
 ### WS-SCENARIO-SETTINGS-ABSTRACT-001 - Edit Abstract Identification
 
 Verification: `AbstractStateTagCatalogTest.java`, `abstractIdentificationModel.test.js`
 
-Given `WidgetControlType` is selected in `AbstractStateAttributes`
-When the user checks `WebWidgetId` in Abstract Identification
-Then both attributes are checked
-And `Save Settings` is enabled
-When the user saves settings
+Given `WidgetControlType` is selected in `AbstractStateAttributes`\
+When the user checks `WebWidgetId` in Abstract Identification\
+Then both attributes are checked\
+And `Save Settings` is enabled\
+When the user saves settings\
 Then the selected workspace's `test.settings` contains both attributes
 
 ### WS-SCENARIO-SETTINGS-ABSTRACT-002 - Restore Defaults
 
 Verification: `AbstractStateTagCatalogTest.java`, `abstractIdentificationModel.test.js`
 
-Given `AbstractStateAttributes` contains `WidgetValuePattern` and another non-default attribute
-When the user clicks `Restore defaults`
-Then the checkboxes match the core default abstract-state attributes
-And the restored selection remains a draft until `Save Settings` is clicked
-When the user saves settings
-Then `AbstractStateAttributes` contains only the core default abstract-state attributes
+Given `AbstractStateAttributes` contains `WidgetValuePattern` and another non-default attribute\
+When the user clicks `Restore defaults`\
+Then the checkboxes match the core default abstract-state attributes\
+And the restored selection remains a draft until `Save Settings` is clicked\
+When the user saves settings\
+Then `AbstractStateAttributes` contains only the core default abstract-state attributes\
 And `WidgetValuePattern` is removed from the selected workspace's `test.settings`
 
 ### WS-SCENARIO-SETTINGS-ABSTRACT-003 - Platform-Specific Identification
 
 Verification: `AndroidAbstractStateAttributesTest.java`, `TestAndroidStateManagementTag.java`, `TestWebdriverStateManagementTag.java`, `TestWindowsStateManagementTag.java`, `AbstractStateTagCatalogTest.java`
 
-Given the selected workspace uses a supported platform
-When the user selects an attribute from that platform's Abstract Identification group and saves settings
-Then `AbstractStateAttributes` contains the selected attribute
+Given the selected workspace uses a supported platform\
+When the user selects an attribute from that platform's Abstract Identification group and saves settings\
+Then `AbstractStateAttributes` contains the selected attribute\
 And the platform's widget value contributes to abstract state identification
 
 ### WS-SCENARIO-SETTINGS-ABSTRACT-004 - Retain Hidden Attributes During Checkbox Edits
 
 Verification: `AbstractStateTagCatalogTest.java`, `abstractIdentificationModel.test.js`
 
-Given `AbstractStateAttributes` contains `WidgetValuePattern`
-When the user changes a visible checkbox in Abstract Identification
+Given `AbstractStateAttributes` contains `WidgetValuePattern`\
+When the user changes a visible checkbox in Abstract Identification\
 Then the saved control-pattern key remains in the settings draft
 
 ### WS-SCENARIO-SETTINGS-001 - Visual Settings Save
 
 Verification: `settingsApi.test.js`, `settingsEditorModel.test.js`, `editorDirtyState.test.js`, `editorSelectionModel.test.js`
 
-Given the user is editing the visual settings form
-When the user changes a setting value
-Then the `Save Settings` button is enabled
-When the user clicks `Save Settings`
-Then the generated `test.settings` content is persisted
-And the `Save Settings` button is disabled
+Given the user is editing the visual settings form\
+When the user changes a setting value\
+Then the `Save Settings` button is enabled\
+When the user clicks `Save Settings`\
+Then the generated `test.settings` content is persisted\
+And the `Save Settings` button is disabled\
 And the visual settings form keeps the saved value
 
 ### WS-SCENARIO-SETTINGS-002 - Raw Settings Save
 
 Verification: `settingsApi.test.js`, `editorDirtyState.test.js`, `editorSelectionModel.test.js`
 
-Given the user is editing raw `test.settings`
-When the user changes a setting value
-Then the `Save Settings` button is enabled
-When the user clicks `Save Settings`
-Then the raw `test.settings` content is persisted
+Given the user is editing raw `test.settings`\
+When the user changes a setting value\
+Then the `Save Settings` button is enabled\
+When the user clicks `Save Settings`\
+Then the raw `test.settings` content is persisted\
 And the `Save Settings` button is disabled
 
 ### WS-SCENARIO-SETTINGS-003 - Raw To Visual Settings Guard
 
 Verification: `configurationGuard.test.js`, `workspaceSettingsModel.test.js`, `editorDirtyState.test.js`
 
-Given the user is editing raw `test.settings`
-And the user changes a setting value
-When the user clicks `Show settings form`
+Given the user is editing raw `test.settings`\
+And the user changes a setting value\
+When the user clicks `Show settings form`\
 Then the unsaved changes guard is shown
 
-When the user clicks `Cancel`
+When the user clicks `Cancel`\
 Then the user remains in the raw `test.settings` editor
 
-When the user clicks `Save`
-Then the raw `test.settings` content is persisted
-And the visual settings form is shown
-And the visual settings form shows the saved value
+When the user clicks `Save`\
+Then the raw `test.settings` content is persisted\
+And the visual settings form is shown\
+And the visual settings form shows the saved value\
 And the `Save Settings` button is disabled
 
-When the user clicks `Discard`
-Then the raw `test.settings` content is not persisted
-And the visual settings form is shown
-And the visual settings form shows the previous saved value
+When the user clicks `Discard`\
+Then the raw `test.settings` content is not persisted\
+And the visual settings form is shown\
+And the visual settings form shows the previous saved value\
 And the `Save Settings` button is disabled
 
 ### WS-SCENARIO-SETTINGS-004 - Visual To Raw Settings Guard
 
 Verification: `configurationGuard.test.js`, `settingsEditorModel.test.js`, `editorDirtyState.test.js`
 
-Given the user is editing the visual settings form
-And the user changes a setting value
-When the user clicks `Show settings file`
+Given the user is editing the visual settings form\
+And the user changes a setting value\
+When the user clicks `Show settings file`\
 Then the unsaved changes guard is shown
 
-When the user clicks `Cancel`
+When the user clicks `Cancel`\
 Then the user remains in the visual settings form
 
-When the user clicks `Save`
-Then the generated `test.settings` content is persisted
-And the raw `test.settings` editor is shown
-And the raw `test.settings` content contains the saved value
+When the user clicks `Save`\
+Then the generated `test.settings` content is persisted\
+And the raw `test.settings` editor is shown\
+And the raw `test.settings` content contains the saved value\
 And the `Save Settings` button is disabled
 
-When the user clicks `Discard`
-Then the generated `test.settings` content is not persisted
-And the raw `test.settings` editor is shown
-And the raw `test.settings` content contains the previous saved value
+When the user clicks `Discard`\
+Then the generated `test.settings` content is not persisted\
+And the raw `test.settings` editor is shown\
+And the raw `test.settings` content contains the previous saved value\
 And the `Save Settings` button is disabled
 
 ### WS-SCENARIO-SETTINGS-005 - Visual Settings Group Switch
 
 Verification: `configurationGuard.test.js`, `editorSelectionModel.test.js`
 
-Given the user is editing the visual settings form
-And the user changes a setting value
-Then the `Save Settings` button is enabled
-When the user opens another settings group
-Then the user can continue editing the visual settings form
+Given the user is editing the visual settings form\
+And the user changes a setting value\
+Then the `Save Settings` button is enabled\
+When the user opens another settings group\
+Then the user can continue editing the visual settings form\
 And the `Save Settings` button is still enabled
 
 ### WS-SCENARIO-SETTINGS-006 - Settings To Non-Settings View Guard
 
 Verification: `configurationGuard.test.js`, `editorDirtyState.test.js`
 
-Given the user is editing either the visual settings form or raw `test.settings`
-When the user changes a setting value
-Then the `Save Settings` button is enabled
-When the user navigates to another non-settings view
+Given the user is editing either the visual settings form or raw `test.settings`\
+When the user changes a setting value\
+Then the `Save Settings` button is enabled\
+When the user navigates to another non-settings view\
 Then the unsaved changes guard is shown

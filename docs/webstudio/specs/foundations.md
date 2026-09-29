@@ -135,16 +135,16 @@ Status colors are meaningful and consistent, but color is not the only signal. L
 
 Verification: `webStudioRoles.test.js`, `committedSelectModel.test.js`, `configurationGuard.test.js`
 
-Given the user is in the `Advanced` role
-And the user has unsaved settings changes
-When the user selects the `Basic` role
-Then the unsaved changes guard is shown
+Given the user is in the `Advanced` role\
+And the user has unsaved settings changes\
+When the user selects the `Basic` role\
+Then the unsaved changes guard is shown\
 And the role selector still shows `Advanced` while the role change is pending
 
-When the user clicks `Cancel`
-Then the application remains in the `Advanced` role
+When the user clicks `Cancel`\
+Then the application remains in the `Advanced` role\
 And the role selector shows `Advanced`
 
-When the user accepts the guarded role change
-Then the application changes to the `Basic` role
+When the user accepts the guarded role change\
+Then the application changes to the `Basic` role\
 And the role selector shows `Basic`
