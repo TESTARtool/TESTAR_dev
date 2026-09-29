@@ -27,6 +27,9 @@
     function handleKeydown(event) {
         if (open && event.key === "Escape") {
             close();
+        } else if (open && event.key === "Tab") {
+            event.preventDefault();
+            closeButton?.focus();
         }
     }
 </script>
