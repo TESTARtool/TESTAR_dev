@@ -17,8 +17,6 @@ import org.testar.core.environment.UnknownEnvironment;
 import org.testar.core.serialisation.LogSerialiser;
 import org.testar.plugin.NativeLinker;
 import org.testar.plugin.OperatingSystems;
-import org.testar.plugin.tagsvisualization.ConcreteTagFilter;
-import org.testar.plugin.tagsvisualization.TagFilter;
 import org.testar.windows.Windows10;
 
 import javax.swing.JFrame;
@@ -45,7 +43,6 @@ public class Main {
     public static void main(String[] args) throws IOException {
         verifyJavaEnvironment();
         verifyTestarInitialDirectory();
-        initTagVisualization();
         initTestarSse(args);
 
         String testSettingsFile = getTestSettingsFile();
@@ -285,9 +282,5 @@ public class Main {
             );
             Environment.setInstance(new UnknownEnvironment());
         }
-    }
-
-    private static void initTagVisualization() {
-        TagFilter.setInstance(new ConcreteTagFilter());
     }
 }

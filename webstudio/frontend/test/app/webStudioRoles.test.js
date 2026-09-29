@@ -64,10 +64,10 @@ test("exposes visual test settings without oracle settings", () => {
             "filters",
             "state-model",
             "state-identification",
+            "spy",
             "agent-cli",
             "webdriver",
             "appium",
-            "llm",
             "coverage"
         ]
     );

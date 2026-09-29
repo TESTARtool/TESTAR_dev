@@ -1,5 +1,6 @@
 <script>
     import { canStartRuntimeMode } from "../../models/runtimeModeControls.js";
+    import { visibleSpyProperties } from "./spyInspectorModel.js";
 
     export let scriptlessStatus = null;
     export let saving = false;
@@ -192,30 +193,6 @@
             `width:${Math.max(1, widget.width * scaleX)}px`,
             `height:${Math.max(1, widget.height * scaleY)}px`
         ].join(";");
-    }
-
-    function visibleProperties(widget) {
-        if (!widget) {
-            return [];
-        }
-
-        const metadata = [
-            ["WidgetId", widget.id || ""],
-            ["AbstractID", widget.properties?.AbstractID || ""],
-            ["ConcreteID", widget.properties?.ConcreteID || ""],
-            ["ParentId", widget.parentId || ""],
-            ["Role", widget.role || ""],
-            ["Enabled", String(widget.enabled)],
-            ["X", String(Math.round(widget.x || 0))],
-            ["Y", String(Math.round(widget.y || 0))],
-            ["Width", String(Math.round(widget.width || 0))],
-            ["Height", String(Math.round(widget.height || 0))]
-        ];
-        const propertyEntries = Object.entries(widget.properties || {})
-            .filter(([key]) => key !== "AbstractID" && key !== "ConcreteID");
-
-        return [...metadata, ...propertyEntries]
-            .filter(([, value]) => value !== null && value !== undefined && String(value).trim() !== "");
     }
 
     function handleExecuteDefaultAction() {
@@ -412,7 +389,7 @@
 
                 <div class="spy-hover-properties spy-inspector-properties">
                     {#if displayedWidget}
-                        {#each visibleProperties(displayedWidget) as [key, value]}
+                        {#each visibleSpyProperties(displayedWidget) as [key, value]}
                             <div class="spy-hover-property-row">
                                 <strong>{key}</strong>
                                 <span>{value}</span>

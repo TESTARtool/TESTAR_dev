@@ -15,6 +15,7 @@ import org.testar.core.tag.Tag;
 public class TestRegularExpressionSettings {
 
     private List<Tag<String>> regularExpressionTags = Arrays.asList(
+            ConfigTags.SUTProcesses,
             ConfigTags.ProcessesToKillDuringTest,
             ConfigTags.ClickFilter,
             ConfigTags.SuspiciousTags,

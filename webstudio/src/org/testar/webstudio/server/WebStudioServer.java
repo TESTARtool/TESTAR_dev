@@ -133,6 +133,8 @@ public final class WebStudioServer {
         }));
         routes.get("/api/settings/abstract-state-tags", context -> handle(context,
             workspaceController::abstractStateTags));
+        routes.get("/api/settings/spy-tags", context -> handle(context,
+            workspaceController::spyTags));
         routes.get("/api/workspaces/{workspace}/ignored-verdicts", context -> handle(context, () ->
             workspaceController.ignoredVerdicts(context.pathParam("workspace"))));
         routes.post("/api/workspaces/{workspace}/ignored-verdicts/remove", context -> handle(context, () -> {

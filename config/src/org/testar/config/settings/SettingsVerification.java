@@ -200,6 +200,7 @@ public class SettingsVerification {
         StringBuilder invalidExpressions = new StringBuilder();
 
         List<Tag<String>> regularExpressionTags = Arrays.asList(
+                ConfigTags.SUTProcesses,
                 ConfigTags.ProcessesToKillDuringTest,
                 ConfigTags.ClickFilter,
                 ConfigTags.SuspiciousTags,

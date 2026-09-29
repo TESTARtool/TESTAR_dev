@@ -22,6 +22,10 @@ import {
     workspaceSettingDefaultValue,
     workspaceSettingValue
 } from "../../src/models/workspaceSettingsModel.js";
+import {
+    availableSpyTags,
+    selectedSpyTags
+} from "../../src/views/settings/spyTagsModel.js";
 
 function workspaceDocument(settings = [], testSettingsContent = "") {
     return {
@@ -149,6 +153,24 @@ test("syncs visual settings values while preserving setting metadata", () => {
         type: "string",
         description: "Connector"
     });
+});
+
+test("shows saved raw Spy attributes in the visual included and excluded lists", () => {
+    const document = workspaceDocument(
+        [{ key: "SpyTagAttributes", value: "Title" }],
+        "SpyTagAttributes = Role\n"
+    );
+    const syncedDocument = workspaceDocumentWithSettingsContentValues(document);
+    const value = workspaceSettingValue(syncedDocument, "SpyTagAttributes");
+    const selected = selectedSpyTags(value);
+    const options = availableSpyTags([
+        { key: "Title", group: "Common", defaultSelected: true },
+        { key: "Role", group: "Common", defaultSelected: false }
+    ], value);
+
+    assert.deepEqual(options.filter((option) => selected.has(option.key)).map((option) => option.key), ["Role"]);
+    assert.deepEqual(options.filter((option) => !selected.has(option.key)).map((option) => option.key), ["Title"]);
+    assert.equal(workspaceSettingValue(document, "SpyTagAttributes"), "Title");
 });
 
 test("finds workspace summaries by name", () => {

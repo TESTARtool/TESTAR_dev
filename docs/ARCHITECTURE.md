@@ -407,41 +407,9 @@ The loading path is documented in:
 - `docs/scriptless/architecture_scriptless_loader_flow.mmd`
 - `docs/SCRIPTLESS_CONFIGURATION_GUIDE.md`
 
-## Dialog extension model
+## WebStudio extension model
 
-The dialog flow exposes the customization model directly.
-
-The relevant tabs are:
-
-- `General`
-  - connector
-  - `CompositionProfile`
-- `Modules`
-  - `CustomCompositionResource`
-  - on-demand creation and editing of service and capability wrappers
-- `Policies`
-  - `CustomPoliciesResource`
-  - on-demand creation and editing of policy classes
-
-This replaces the old protocol-editing model as the active extension workflow.
-
-The design intent is:
-
-- users should not edit one monolithic protocol class
-- users should create only the wrappers they actually need
-- TESTAR should provide editors and templates for these wrappers inside the dialog
-- the functional model remains the same across dialog implementations
-
-The supporting dialog infrastructure includes:
-
-- `ModulesPanel`
-- `PoliciesPanel`
-- `CustomCompositionEditor`
-- `CustomPoliciesEditor`
-- `ModuleSourceEditor`
-- helper classes under `org.testar.dialog.helper`
-
-That means the customization architecture is now a first-class product feature, not just a hidden settings convention.
+WebStudio exposes workspace customization through Test Settings, Composition Flow, and Policies. Test Settings edits the connector and workspace settings. Composition Flow edits `CompositionProfile`, `CustomCompositionResource`, and service or capability classes. Policies edits `CustomPoliciesResource` and policy classes. The editors and templates create workspace-local wrappers that the scriptless loaders use at runtime.
 
 ## Core contracts
 

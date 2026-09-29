@@ -23,6 +23,7 @@ import org.testar.webstudio.api.dto.WorkspaceSummaryDto;
 import org.testar.webstudio.workspace.WorkspaceService;
 import org.testar.webstudio.workspace.WorkspaceIgnoredVerdictsService;
 import org.testar.webstudio.workspace.AbstractStateTagCatalog;
+import org.testar.webstudio.workspace.SpyTagCatalog;
 
 public final class WorkspaceController {
 
@@ -65,6 +66,10 @@ public final class WorkspaceController {
 
     public List<AbstractStateTagCatalog.TagOption> abstractStateTags() {
         return AbstractStateTagCatalog.options();
+    }
+
+    public List<SpyTagCatalog.TagOption> spyTags() {
+        return SpyTagCatalog.options();
     }
 
     public List<String> ignoredVerdicts(String workspaceName) {

@@ -458,6 +458,7 @@ Keep the main functional and UX specs readable. Use this file when a reader need
 
 - [RunTestarView.svelte](../../webstudio/frontend/src/views/runtime/RunTestarView.svelte)
 - [SpyModeView.svelte](../../webstudio/frontend/src/views/spy/SpyModeView.svelte)
+- [spyInspectorModel.js](../../webstudio/frontend/src/views/spy/spyInspectorModel.js)
 - [CliModeView.svelte](../../webstudio/frontend/src/views/runtime/CliModeView.svelte)
 - [runtimeModel.js](../../webstudio/frontend/src/views/runtime/runtimeModel.js)
 
@@ -488,6 +489,7 @@ Keep the main functional and UX specs readable. Use this file when a reader need
 - [WorkspaceController.java](../../webstudio/src/org/testar/webstudio/api/WorkspaceController.java)
 - [WorkspaceService.java](../../webstudio/src/org/testar/webstudio/workspace/WorkspaceService.java)
 - [WorkspaceSettingsCatalog.java](../../webstudio/src/org/testar/webstudio/workspace/WorkspaceSettingsCatalog.java)
+- [SettingsVerification.java](../../config/src/org/testar/config/settings/SettingsVerification.java)
 
 **Frontend implementation**
 
@@ -500,6 +502,10 @@ Keep the main functional and UX specs readable. Use this file when a reader need
 **Unit tests**
 
 - [WorkspaceSettingsCatalogCliAgentTest.java](../../webstudio/test/org/testar/webstudio/workspace/WorkspaceSettingsCatalogCliAgentTest.java)
+- [WorkspaceSettingsCatalogExecutionTest.java](../../webstudio/test/org/testar/webstudio/workspace/WorkspaceSettingsCatalogExecutionTest.java)
+- [WorkspaceSettingsCatalogSutConnectionTest.java](../../webstudio/test/org/testar/webstudio/workspace/WorkspaceSettingsCatalogSutConnectionTest.java)
+- [WorkspaceControllerRegexValidationTest.java](../../webstudio/test/org/testar/webstudio/api/WorkspaceControllerRegexValidationTest.java)
+- [TestRegularExpressionSettings.java](../../config/test/org/testar/config/settings/TestRegularExpressionSettings.java)
 - [settingsApi.test.js](../../webstudio/frontend/test/views/settings/settingsApi.test.js)
 - [settingsEditorModel.test.js](../../webstudio/frontend/test/views/settings/settingsEditorModel.test.js)
 - [settingsSelectOptions.test.js](../../webstudio/frontend/test/views/settings/settingsSelectOptions.test.js)
@@ -536,11 +542,13 @@ Keep the main functional and UX specs readable. Use this file when a reader need
 - [BasicSettingsView.svelte](../../webstudio/frontend/src/views/settings/BasicSettingsView.svelte)
 - [TestSettingsView.svelte](../../webstudio/frontend/src/views/settings/TestSettingsView.svelte)
 - [settingsEditorModel.js](../../webstudio/frontend/src/views/settings/settingsEditorModel.js)
+- [settingsInputType.js](../../webstudio/frontend/src/views/settings/settingsInputType.js)
 - [settingsSelectOptions.js](../../webstudio/frontend/src/views/settings/settingsSelectOptions.js)
 
 **Unit tests**
 
 - [settingsEditorModel.test.js](../../webstudio/frontend/test/views/settings/settingsEditorModel.test.js)
+- [settingsInputType.test.js](../../webstudio/frontend/test/views/settings/settingsInputType.test.js)
 - [settingsSelectOptions.test.js](../../webstudio/frontend/test/views/settings/settingsSelectOptions.test.js)
 
 **Integration tests**
@@ -550,6 +558,72 @@ Keep the main functional and UX specs readable. Use this file when a reader need
 **Related requirements**
 
 - [WS-FUNC-TEST-SETTINGS-001](#ws-func-test-settings-001---workspace-test-settings-editor)
+- [WS-UX-CONFIG-GUARD-001](#ws-ux-config-guard-001---configuration-guard-dialogs-and-save-buttons)
+
+<a id="ws-func-test-settings-004---spy-visualization-attributes"></a>
+
+## WS-FUNC-TEST-SETTINGS-004 - Spy Visualization Attributes
+
+**Specification**
+
+- [Test Settings specification](./specs/settings.md#ws-func-test-settings-004---spy-visualization-attributes)
+
+**Backend implementation**
+
+- [SpyTagCatalog.java](../../webstudio/src/org/testar/webstudio/workspace/SpyTagCatalog.java)
+- [WorkspaceSettingsCatalog.java](../../webstudio/src/org/testar/webstudio/workspace/WorkspaceSettingsCatalog.java)
+- [WorkspaceController.java](../../webstudio/src/org/testar/webstudio/api/WorkspaceController.java)
+- [WebStudioServer.java](../../webstudio/src/org/testar/webstudio/server/WebStudioServer.java)
+- [SpyTagSelection.java](../../plugin/src/org/testar/plugin/tagsvisualization/SpyTagSelection.java)
+- [VisualizationListener.java](../../testar/src/org/testar/scriptless/listener/VisualizationListener.java)
+- [RemoteSpyService.java](../../webstudio/src/org/testar/webstudio/spy/RemoteSpyService.java)
+
+**Frontend implementation**
+
+- [spyTagsModel.js](../../webstudio/frontend/src/views/settings/spyTagsModel.js)
+- [SpyTagEditor.svelte](../../webstudio/frontend/src/views/settings/SpyTagEditor.svelte)
+- [TestSettingsView.svelte](../../webstudio/frontend/src/views/settings/TestSettingsView.svelte)
+- [SpyModeView.svelte](../../webstudio/frontend/src/views/spy/SpyModeView.svelte)
+- [spyInspectorModel.js](../../webstudio/frontend/src/views/spy/spyInspectorModel.js)
+
+**Unit tests**
+
+- [SpyTagCatalogTest.java](../../webstudio/test/org/testar/webstudio/workspace/SpyTagCatalogTest.java)
+- [SpyTagSelectionTest.java](../../plugin/test/org/testar/plugin/tagsvisualization/SpyTagSelectionTest.java)
+- [spyTagsModel.test.js](../../webstudio/frontend/test/views/settings/spyTagsModel.test.js)
+- [spyInspectorModel.test.js](../../webstudio/frontend/test/views/spy/spyInspectorModel.test.js)
+
+**Acceptance scenarios**
+
+- [Spy Visualization scenarios](./specs/settings.md#ws-scenario-settings-spy-001---save-spy-attributes)
+
+**Related requirements**
+
+- [WS-UX-TEST-SETTINGS-004](#ws-ux-test-settings-004---spy-attribute-selector)
+
+<a id="ws-ux-test-settings-004---spy-attribute-selector"></a>
+
+## WS-UX-TEST-SETTINGS-004 - Spy Attribute Selector
+
+**Specification**
+
+- [Test Settings specification](./specs/settings.md#ws-ux-test-settings-004---spy-attribute-selector)
+
+**Frontend implementation**
+
+- [SpyTagEditor.svelte](../../webstudio/frontend/src/views/settings/SpyTagEditor.svelte)
+- [spyTagsModel.js](../../webstudio/frontend/src/views/settings/spyTagsModel.js)
+- [TestSettingsView.svelte](../../webstudio/frontend/src/views/settings/TestSettingsView.svelte)
+- [test-configuration.css](../../webstudio/frontend/src/styles/test-configuration.css)
+
+**Unit tests**
+
+- [spyTagsModel.test.js](../../webstudio/frontend/test/views/settings/spyTagsModel.test.js)
+- [webStudioRoles.test.js](../../webstudio/frontend/test/app/webStudioRoles.test.js)
+
+**Related requirements**
+
+- [WS-FUNC-TEST-SETTINGS-004](#ws-func-test-settings-004---spy-visualization-attributes)
 - [WS-UX-CONFIG-GUARD-001](#ws-ux-config-guard-001---configuration-guard-dialogs-and-save-buttons)
 
 <a id="ws-func-composition-flow-001---composition-file-and-java-flow"></a>

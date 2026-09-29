@@ -376,7 +376,7 @@ public final class ConfigTags {
             "Sets the time window, in seconds, for which to wait for a not responding SUT. After that, the test will finish with a fail");
 
     public static final Tag<Boolean> VisualizeActions = Tag.from("VisualizeActions", Boolean.class,
-            "Sets whether to display overlay information, inside the SPY mode, for all the UI actions derived from the test set up");
+            "Display derived and selected actions during Generate mode execution");
 
     public static final Tag<Boolean> KeyBoardListener = Tag.from("KeyBoardListener", Boolean.class,
             "Sets whether to listen to keyboard shortcuts during the exceution");
@@ -416,5 +416,5 @@ public final class ConfigTags {
      */
 
     public static final Tag<List<String>> SpyTagAttributes = Tag.from("SpyTagAttributes", (Class<List<String>>) (Class<?>) List.class,
-            "Specify the widget attributes that you wish to visualize during Spy Mode. Use a semicolon separated list.");
+            "Widget attributes shown in extended local Spy details and the remote Spy inspector; use a semicolon-separated list");
 }

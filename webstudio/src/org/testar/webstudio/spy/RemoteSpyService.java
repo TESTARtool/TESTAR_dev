@@ -35,6 +35,7 @@ import org.testar.core.tag.Tags;
 import org.testar.plugin.PlatformOrchestrator;
 import org.testar.plugin.PlatformSession;
 import org.testar.plugin.PlatformSessionSpecFactory;
+import org.testar.plugin.tagsvisualization.SpyTagSelection;
 import org.testar.plugin.configuration.PlatformSessionSpecification;
 import org.testar.plugin.screenshot.ScreenshotProviderFactory;
 import org.testar.scriptless.util.TriggerActionUtil;
@@ -59,6 +60,7 @@ public final class RemoteSpyService {
     private Map<String, Widget> currentWidgetsById = Map.of();
     private Map<String, String> currentWidgetIdsByPath = Map.of();
     private Map<String, Action> currentDerivedActionsById = Map.of();
+    private SpyTagSelection spyTagSelection;
 
     public RemoteSpyService(WorkspaceService workspaceService) {
         this.workspaceService = workspaceService;
@@ -81,6 +83,7 @@ public final class RemoteSpyService {
             Settings.setSettingsPath(workspaceDirectory.toString());
             debugLog.log("RemoteSpyService.startRemoteSpy settingsPath=" + workspaceDirectory);
             Settings settings = Settings.loadSettings(new String[0], testSettingsPath.toString());
+            spyTagSelection = new SpyTagSelection(settings.get(ConfigTags.SpyTagAttributes));
             normalizeSettingsPaths(settings);
             debugLog.log(
                 "RemoteSpyService.startRemoteSpy normalized resources composition="
@@ -232,6 +235,7 @@ public final class RemoteSpyService {
         currentWidgetsById = Map.of();
         currentWidgetIdsByPath = Map.of();
         currentDerivedActionsById = Map.of();
+        spyTagSelection = null;
         currentState = new SpyStateDto(
             "idle",
             "",
@@ -370,20 +374,6 @@ public final class RemoteSpyService {
     private SpyWidgetDto toSpyWidget(Widget widget, String widgetId, String parentId, double offsetX, double offsetY) {
         Shape shape = widget.get(Tags.Shape, null);
         Role role = widget.get(Tags.Role, null);
-        Map<String, String> properties = new LinkedHashMap<>();
-        putProperty(properties, "Desc", widget.get(Tags.Desc, ""));
-        putProperty(properties, "Role", String.valueOf(widget.get(Tags.Role, null)));
-        putProperty(properties, "Title", widget.get(Tags.Title, ""));
-        putProperty(properties, "Text", widget.get(Tags.Text, ""));
-        putProperty(properties, "Path", widget.get(Tags.Path, ""));
-        putProperty(properties, "AbstractID", widget.get(Tags.AbstractID, ""));
-        putProperty(properties, "ConcreteID", widget.get(Tags.ConcreteID, ""));
-        putProperty(properties, "Enabled", String.valueOf(widget.get(Tags.Enabled, false)));
-        putProperty(properties, "Blocked", String.valueOf(widget.get(Tags.Blocked, false)));
-        putProperty(properties, "Foreground", String.valueOf(widget.get(Tags.Foreground, false)));
-        putProperty(properties, "ValuePattern", widget.get(Tags.ValuePattern, ""));
-        putProperty(properties, "LinkReference", widget.get(Tags.LinkReference, ""));
-
         return new SpyWidgetDto(
             widgetId,
             parentId,
@@ -394,7 +384,7 @@ public final class RemoteSpyService {
             shape == null ? 0.0d : shape.width(),
             shape == null ? 0.0d : shape.height(),
             widget.get(Tags.Enabled, false),
-            properties
+            spyTagSelection.selectWidgetProperties(widget)
         );
     }
 
@@ -563,12 +553,6 @@ public final class RemoteSpyService {
         }
 
         return String.valueOf(widget.get(Tags.Role, null));
-    }
-
-    private void putProperty(Map<String, String> properties, String key, String value) {
-        if (value != null && !value.isBlank() && !"null".equals(value)) {
-            properties.put(key, value);
-        }
     }
 
     private long elapsedMillis(long startedAt) {

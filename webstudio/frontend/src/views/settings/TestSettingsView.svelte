@@ -2,8 +2,10 @@
     // Implements WS-UX-TEST-SETTINGS-001: shared visual/raw test.settings editor surface.
     import { contentChanged } from "../../models/editorDirtyState.js";
     import { shouldShowBlankSelectOption } from "./settingsSelectOptions.js";
+    import { textInputTypeForSetting } from "./settingsInputType.js";
     import AbstractIdentificationEditor from "./AbstractIdentificationEditor.svelte";
     import IgnoredVerdictsPanel from "./IgnoredVerdictsPanel.svelte";
+    import SpyTagEditor from "./SpyTagEditor.svelte";
 
     export let currentEditorDocument = null;
     export let allowedSettingsGroupIds = null;
@@ -305,7 +307,9 @@
                                                 </div>
                                             </div>
 
-                                            {#if setting.type === "boolean"}
+                                            {#if setting.key === "SpyTagAttributes"}
+                                                <SpyTagEditor {loadJson} {setting} {setSettingValue} />
+                                            {:else if setting.type === "boolean"}
                                                 <span class="settings-checkbox-row">
                                                     <input
                                                         type="checkbox"
@@ -359,7 +363,7 @@
                                                 />
                                             {:else}
                                                 <input
-                                                    type="text"
+                                                    type={textInputTypeForSetting(setting)}
                                                     value={setting.value}
                                                     on:input={(event) => {
                                                         setSettingValue(setting, event.currentTarget.value);

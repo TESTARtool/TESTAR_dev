@@ -21,7 +21,7 @@ import org.testar.core.state.State;
 import org.testar.core.tag.Tag;
 import org.testar.core.util.VisualizationUtil;
 import org.testar.engine.manager.FilteringManager;
-import org.testar.plugin.tagsvisualization.TagFilter;
+import org.testar.plugin.tagsvisualization.SpyTagSelection;
 import org.testar.scriptless.RuntimeContext;
 
 /**
@@ -46,9 +46,11 @@ public final class VisualizationListener implements IEventListener {
 
     private final FilteringManager filteringManager;
     private final RuntimeContext runtimeContext;
+    private final SpyTagSelection spyTagSelection;
 
     public VisualizationListener(RuntimeContext runtimeContext) {
         this.runtimeContext = runtimeContext;
+        this.spyTagSelection = new SpyTagSelection(runtimeContext.settings().get(ConfigTags.SpyTagAttributes));
 		filteringManager = new FilteringManager();
 		filteringManager.loadFilters();
 
@@ -89,7 +91,7 @@ public final class VisualizationListener implements IEventListener {
     }
 
     private boolean shouldVisualizeTag(Tag<?> tag) {
-        return TagFilter.getInstance() == null || TagFilter.getInstance().visualizeTag(tag);
+        return spyTagSelection.includes(tag);
     }
 
     @Override

@@ -24,10 +24,10 @@ export const TEST_SETTINGS_GROUP_IDS = [
     "filters",
     "state-model",
     "state-identification",
+    "spy",
     "agent-cli",
     "webdriver",
     "appium",
-    "llm",
     "coverage"
 ];
 

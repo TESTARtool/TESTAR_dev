@@ -16,7 +16,6 @@ test("does not show a blank option for enum settings", () => {
 test("does not show a blank option for string configured dropdown settings", () => {
     const configuredDropdownSettings = [
         "SUTConnector",
-        "LlmReasoning",
         "DataStoreType",
         "DataStoreMode",
         "ActionSelectionAlgorithm"

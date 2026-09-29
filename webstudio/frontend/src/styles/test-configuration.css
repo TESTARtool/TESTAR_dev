@@ -1,4 +1,4 @@
-﻿.sidebar {
+.sidebar {
     position: sticky;
     top: 20px;
 }
@@ -1107,6 +1107,66 @@
 .abstract-identification-editor {
     display: grid;
     gap: 14px;
+}
+
+.spy-tags-editor {
+    display: grid;
+    gap: 14px;
+    min-width: 0;
+}
+
+.spy-tags-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.spy-tags-toolbar input {
+    flex: 1;
+    min-width: 0;
+}
+
+.spy-tags-actions {
+    flex-wrap: wrap;
+}
+
+.spy-tags-lists {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.spy-tags-list {
+    min-width: 0;
+}
+
+.spy-tags-list legend {
+    font-weight: 700;
+}
+
+.spy-tags-list-content {
+    display: grid;
+    align-content: start;
+    gap: 5px;
+    max-height: 360px;
+    overflow-y: auto;
+}
+
+.spy-tags-list-content .settings-checkbox-row {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 8px;
+    overflow-wrap: anywhere;
+}
+
+.spy-tags-list-content small {
+    color: var(--muted);
+}
+
+@media (max-width: 760px) {
+    .spy-tags-lists {
+        grid-template-columns: minmax(0, 1fr);
+    }
 }
 
 .abstract-identification-editor fieldset {

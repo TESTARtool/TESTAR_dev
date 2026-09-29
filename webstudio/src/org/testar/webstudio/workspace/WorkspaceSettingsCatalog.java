@@ -27,6 +27,7 @@ public final class WorkspaceSettingsCatalog {
 
     private static final Map<String, String> DEFAULT_VALUES = buildDefaultValues();
     private static final Set<String> REGEX_SETTING_KEYS = Set.of(
+        ConfigTags.SUTProcesses.name(),
         ConfigTags.ProcessesToKillDuringTest.name(),
         ConfigTags.ClickFilter.name(),
         ConfigTags.SuspiciousTags.name(),
@@ -51,11 +52,9 @@ public final class WorkspaceSettingsCatalog {
                 ConfigTags.SUTConnector,
                 ConfigTags.SUTConnectorValue,
                 ConfigTags.ApplicationName,
-                ConfigTags.ApplicationVersion
-                //,
-                //ConfigTags.SUTProcesses,
-                //ConfigTags.JavaAccessBridge,
-                //ConfigTags.ForceForeground
+                ConfigTags.ApplicationVersion,
+                ConfigTags.SUTProcesses,
+                ConfigTags.JavaAccessBridge
             ),
             group(
                 "execution",
@@ -69,6 +68,7 @@ public final class WorkspaceSettingsCatalog {
                 ConfigTags.StartupTime,
                 ConfigTags.MaxTime,
                 ConfigTags.StopGenerationOnFault,
+                ConfigTags.VisualizeActions,
                 ConfigTags.KeyBoardListener
             ),
             /*group(
@@ -163,15 +163,14 @@ public final class WorkspaceSettingsCatalog {
                 ConfigTags.AgentCLIPromptTitle,
                 ConfigTags.AgentCLIPromptText
             ),
-            /*group(
+            group(
                 "spy",
-                "Spy mode configuration",
-                "Spy mode visualization settings.",
+                "Spy Visualization",
+                "Extended local Spy attributes, remote inspector properties, and the Spy refresh interval.",
                 settingsProperties,
                 ConfigTags.SpyTagAttributes,
-                ConfigTags.VisualizeActions,
                 ConfigTags.RefreshSpyCanvas
-            ),*/
+            ),
             group(
                 "webdriver",
                 "WebDriver",
@@ -221,23 +220,6 @@ public final class WorkspaceSettingsCatalog {
                 ConfigTags.UseSystemActions
             ),
             group(
-                "llm",
-                "LLM Agent",
-                "Prompting, model, endpoint, and history settings for LLM-based testing.",
-                settingsProperties,
-                ConfigTags.LlmPlatform,
-                ConfigTags.LlmModel,
-                ConfigTags.LlmReasoning,
-                ConfigTags.LlmHostUrl,
-                ConfigTags.LlmAuthorizationHeader,
-                ConfigTags.LlmActionFewshotFile,
-                ConfigTags.LlmOracleFewshotFile,
-                ConfigTags.LlmTemperature,
-                ConfigTags.LlmHistorySize,
-                ConfigTags.LlmStateless,
-                ConfigTags.LlmTestGoals
-            ),
-            group(
                 "coverage",
                 "Coverage",
                 "Jacoco-based code coverage collection settings.",
@@ -282,6 +264,9 @@ public final class WorkspaceSettingsCatalog {
 
     private static WorkspaceSettingDto setting(Tag<?> tag, Properties settingsProperties) {
         String value = settingsProperties.getProperty(tag.name(), "").trim();
+        if (tag.equals(ConfigTags.SpyTagAttributes) && !settingsProperties.containsKey(tag.name())) {
+            value = DEFAULT_VALUES.getOrDefault(tag.name(), "");
+        }
         return new WorkspaceSettingDto(
             tag.name(),
             value,
@@ -331,7 +316,6 @@ public final class WorkspaceSettingsCatalog {
     private static List<String> optionsFor(Tag<?> tag) {
         Map<String, List<String>> configuredOptions = new LinkedHashMap<>();
         configuredOptions.put(ConfigTags.SUTConnector.name(), List.of("COMMAND_LINE", "SUT_WINDOW_TITLE", "SUT_PROCESS_NAME", "WEB_DRIVER", "ANDROID_APPIUM"));
-        configuredOptions.put(ConfigTags.LlmReasoning.name(), List.of("low", "medium", "high"));
         configuredOptions.put(ConfigTags.AgentCLIReasoningEffort.name(), List.of("low", "medium", "high"));
         configuredOptions.put(ConfigTags.AgentCLISandboxMode.name(), List.of("read-only", "workspace-write", "danger-full-access"));
         configuredOptions.put(ConfigTags.AgentCLIApprovalPolicy.name(), List.of("never", "on-request", "on-failure", "untrusted"));

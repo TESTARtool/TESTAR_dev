@@ -31,6 +31,12 @@ Traceability: [`WS-FUNC-TEST-SETTINGS-003`](../SPEC_TRACE.md#ws-func-test-settin
 
 The Reporting settings group provides `Manage Ignored Verdicts` for the selected workspace. It lists nonempty messages from that workspace's `list_of_verdicts_with_failures.txt`, and allows removing selected messages or clearing the list. The file is created only when the list is changed. Updates affect future executions; an already-running TESTAR process may retain the list it loaded at startup. Both removal actions require confirmation.
 
+### WS-FUNC-TEST-SETTINGS-004 - Spy Visualization Attributes
+
+Traceability: [`WS-FUNC-TEST-SETTINGS-004`](../SPEC_TRACE.md#ws-func-test-settings-004---spy-visualization-attributes)
+
+The Advanced Test Settings view edits the selected workspace's `SpyTagAttributes` as included and excluded widget attributes. The available names and default selection come from the TESTAR tag catalog and settings defaults. Changes remain in the settings draft until `Save Settings` persists the semicolon-separated list. Extended local Spy widget details and the configurable widget properties in the remote Spy inspector use the saved selection when a Spy session starts. The remote inspector keeps structural widget information for navigation. The same settings group also edits `RefreshSpyCanvas`.
+
 ### Settings Persistence
 
 When the user saves either representation, WebStudio persists the selected workspace `test.settings` content. A successful save updates the persisted baseline used by both representations and disables `Save Settings` until a new change is made.
@@ -78,7 +84,54 @@ Traceability: [`WS-UX-TEST-SETTINGS-003`](../SPEC_TRACE.md#ws-ux-test-settings-0
 
 The Reporting settings group offers `Manage Ignored Verdicts`. Its modal shows a scrollable list, multi-selection, `Remove selected`, and `Clear all`. Empty and loading states are distinct. Confirmation names the operation; closing or canceling leaves the list unchanged.
 
+### WS-UX-TEST-SETTINGS-004 - Spy Attribute Selector
+
+Traceability: [`WS-UX-TEST-SETTINGS-004`](../SPEC_TRACE.md#ws-ux-test-settings-004---spy-attribute-selector)
+
+`Spy Visualization` shows searchable, scrollable Included and Excluded attribute lists. Checking an excluded attribute includes it; unchecking an included attribute excludes it. Bulk actions include all, exclude all, include Windows tags, include WebDriver tags, and restore defaults. Existing names outside the catalog remain visible for removal. Editing shares the standard `Save Settings` button and unsaved-change guard.
+
 ## Acceptance Scenarios
+
+### WS-SCENARIO-SETTINGS-SPY-001 - Save Spy Attributes
+
+Verification: `SpyTagCatalogTest.java`, `spyTagsModel.test.js`, `SpyTagSelectionTest.java`
+
+Given the selected workspace has `Title` included and `Role` excluded in Spy Visualization\
+When the user includes `Role` and clicks `Save Settings`\
+Then its `SpyTagAttributes` contains both `Title` and `Role`\
+And a new local Spy session shows those widget attributes in its extended details according to the saved selection
+
+### WS-SCENARIO-SETTINGS-SPY-002 - Bulk Actions And Defaults
+
+Verification: `SpyTagCatalogTest.java`, `spyTagsModel.test.js`
+
+Given Spy Visualization includes a workspace-specific attribute name\
+When the user includes a platform's attributes\
+Then the existing selection is retained\
+When the user restores defaults\
+Then the draft matches TESTAR's default Spy attributes\
+And `Save Settings` remains enabled until the draft is saved or discarded
+
+### WS-SCENARIO-SETTINGS-SPY-003 - Remote Spy Inspector Attributes
+
+Verification: `SpyTagSelectionTest.java`, `spyInspectorModel.test.js`
+
+Given a saved Spy selection includes `Title` and `WebTagName` but excludes `Path`\
+When a remote Spy session starts for that workspace\
+Then the inspector provides `Title` among configurable widget properties\
+And provides `WebTagName` when the widget has that attribute\
+And omits `Path` from those properties\
+And keeps structural widget information for navigation
+
+### WS-SCENARIO-SETTINGS-SPY-004 - Raw Spy Attributes In Visual Settings
+
+Verification: `workspaceSettingsModel.test.js`, `spyTagsModel.test.js`
+
+Given the selected workspace has `Title` included and `Role` excluded in Spy Visualization\
+When the user changes raw `SpyTagAttributes` to `Role` and clicks `Save Settings`\
+And the user switches to the visual settings form and opens Spy Visualization\
+Then `Role` appears in Included\
+And `Title` appears in Excluded
 
 ### WS-SCENARIO-SETTINGS-IGNORED-001 - Remove Selected Verdicts
 
