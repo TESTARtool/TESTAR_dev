@@ -33,18 +33,18 @@ public final class WidgetMatchingUtil {
     public static Widget getWidgetWithMatchingTag(String tagName, String value, State state) {
         // If the state has no children return null
         // This may happen because the state has no GUI elements, for example a XML page
-        if(state.childCount() == 0) {
+        if (state.childCount() == 0) {
             return null;
         }
 
-        if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)) {
-            if(!tagName.startsWith("Web")) {
-                tagName = "Web"+tagName;
+        if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)) {
+            if (!tagName.startsWith("Web")) {
+                tagName = "Web" + tagName;
             }
         }
 
-        for(Tag<?> tag : state.child(0).tags()) {
-            if(tag.name().equalsIgnoreCase(tagName)) {
+        for (Tag<?> tag : state.child(0).tags()) {
+            if (tag.name().equalsIgnoreCase(tagName)) {
                 return getWidgetWithMatchingTag(tag, value, state);
             }
         }
@@ -62,7 +62,7 @@ public final class WidgetMatchingUtil {
     public static Widget getWidgetWithMatchingTags(Map<String,String> tagValues, State state) {
         // If the state has no children return null
         // This may happen because the state has no GUI elements, for example a XML page
-        if(state.childCount() == 0) {
+        if (state.childCount() == 0) {
             return null;
         }
 
@@ -70,7 +70,7 @@ public final class WidgetMatchingUtil {
         Map<String,Tag<?>> tagLookup = new HashMap<String,Tag<?>>();
         for (String tagName : tagValues.keySet()) {
 
-            if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER) && !tagName.startsWith("Web")) {
+            if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER) && !tagName.startsWith("Web")) {
                 tagName = "Web" + tagName;
             }
 
@@ -99,8 +99,7 @@ public final class WidgetMatchingUtil {
 
             for (String tagName : tagValues.keySet()) {
 
-                if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER) &&
-                        !tagName.startsWith("Web") ) {
+                if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER) && !tagName.startsWith("Web") ) {
                     String value = tagValues.get(tagName);
                     webTagValues.remove(tagName);
                     tagName = "Web" + tagName;
@@ -109,8 +108,7 @@ public final class WidgetMatchingUtil {
 
                 Tag<?> tag = tagLookup.get(tagName);
                 String value = webTagValues.get(tagName);
-                if (widget.get(tag, null) != null &&
-                        widget.get(tag, null).toString().equals(value) )  {
+                if (widget.get(tag, null) != null && widget.get(tag, null).toString().equals(value) )  {
                     tagsFound.add(tagName);
                 }
             }
@@ -133,14 +131,12 @@ public final class WidgetMatchingUtil {
      * @return the matching widget if found, null if not found
      */
     public static Widget getWidgetWithMatchingTag(Tag<?> tag, String value, State state) {
-        for(Widget widget:state) {
-            if(widget.get(tag, null)==null) {
+        for (Widget widget:state) {
+            if (widget.get(tag, null) == null) {
                 // this widget did not have a value for the given tag
-            }
-            else if(widget.get(tag, null).toString().equals(value)) {
+            } else if (widget.get(tag, null).toString().equals(value)) {
                 return widget;
-            }
-            else if(widget.get(tag, null).toString().contains(value)) {
+            } else if (widget.get(tag, null).toString().contains(value)) {
                 return widget;
             }
         }

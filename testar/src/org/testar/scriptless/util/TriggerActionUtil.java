@@ -58,18 +58,18 @@ public final class TriggerActionUtil {
 
         // If the state has no children return false
         // This may happen because the state has no GUI elements, for example a XML page
-        if(state.childCount() == 0) {
+        if (state.childCount() == 0) {
             return false;
         }
 
-        if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)) {
-            if(!tagName.startsWith("Web")) {
+        if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)) {
+            if (!tagName.startsWith("Web")) {
                 tagName = "Web" + tagName;
             }
         }
 
-        for(Tag<?> tag : state.child(0).tags()) {
-            if(tag.name().equalsIgnoreCase(tagName)) {
+        for (Tag<?> tag : state.child(0).tags()) {
+            if (tag.name().equalsIgnoreCase(tagName)) {
                 return clickMatchingWidget(
                         tag,
                         value,
@@ -118,8 +118,7 @@ public final class TriggerActionUtil {
                 runtime.refreshActions(state, Collections.singleton(triggeredAction));
                 runtime.executeTriggerAction(system, state, triggeredAction);
                 return true;
-            }
-            else {
+            } else {
                 Util.pause(waitBetween);
                 state = runtime.refreshState(system);
                 numberOfRetries++;
@@ -155,10 +154,10 @@ public final class TriggerActionUtil {
         TriggerActionRuntime runtime = triggerActionRuntime(runtimeContext);
 
         int numberOfRetries = 0;
-        while(numberOfRetries < maxNumberOfRetries) {
+        while (numberOfRetries < maxNumberOfRetries) {
             //looking for a widget with matching tag value:
             Widget widget = WidgetMatchingUtil.getWidgetWithMatchingTag(tag, value, state);
-            if(widget != null) {
+            if (widget != null) {
                 // When the desired widget to interact with is found,
                 // Create the triggered action, build the identifier, and execute it.
                 Action triggeredAction = triggeredClickAction(state, widget);
@@ -166,8 +165,7 @@ public final class TriggerActionUtil {
                 runtime.executeTriggerAction(system, state, triggeredAction);
                 // is waiting needed after the action has been executed?
                 return true;
-            }
-            else{
+            } else {
                 Util.pause(waitBetween);
                 state = runtime.refreshState(system);
                 numberOfRetries++;
@@ -205,18 +203,18 @@ public final class TriggerActionUtil {
         Assert.notNull(state, system, runtimeContext);
         // If the state has no children return false
         // This may happen because the state has no GUI elements, for example a XML page
-        if(state.childCount() == 0) {
+        if (state.childCount() == 0) {
             return false;
         }
 
-        if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)) {
-            if(!tagName.startsWith("Web")) {
+        if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)) {
+            if (!tagName.startsWith("Web")) {
                 tagName = "Web" + tagName;
             }
         }
 
-        for(Tag<?> tag : state.child(0).tags()) {
-            if(tag.name().equalsIgnoreCase(tagName)) {
+        for (Tag<?> tag : state.child(0).tags()) {
+            if (tag.name().equalsIgnoreCase(tagName)) {
                 return typeMatchingWidget(
                         tag,
                         value,
@@ -260,17 +258,16 @@ public final class TriggerActionUtil {
         TriggerActionRuntime runtime = triggerActionRuntime(runtimeContext);
 
         int numberOfRetries = 0;
-        while(numberOfRetries < maxNumberOfRetries) {
+        while (numberOfRetries < maxNumberOfRetries) {
             Widget widget = WidgetMatchingUtil.getWidgetWithMatchingTags(tagValues, state);
-            if(widget != null) {
+            if (widget != null) {
                 // When the desired widget to interact with is found,
                 // Create the triggered action, build the identifier, and execute it.
                 Action triggeredAction = triggeredTypeAction(state, widget, textToType, true);
                 runtime.refreshActions(state, Collections.singleton(triggeredAction));
                 runtime.executeTriggerAction(system, state, triggeredAction);
                 return true;
-            }
-            else {
+            } else {
                 Util.pause(waitBetween);
                 state = runtime.refreshState(system);
                 numberOfRetries++;
@@ -308,10 +305,10 @@ public final class TriggerActionUtil {
         TriggerActionRuntime runtime = triggerActionRuntime(runtimeContext);
 
         int numberOfRetries = 0;
-        while(numberOfRetries < maxNumberOfRetries) {
+        while (numberOfRetries < maxNumberOfRetries) {
             //looking for a widget with matching tag value:
             Widget widget = WidgetMatchingUtil.getWidgetWithMatchingTag(tag, value, state);
-            if(widget != null) {
+            if (widget != null) {
                 // When the desired widget to interact with is found,
                 // Create the triggered action, build the identifier, and execute it.
                 Action triggeredAction = triggeredTypeAction(state, widget, textToType, true);
@@ -319,8 +316,7 @@ public final class TriggerActionUtil {
                 runtime.executeTriggerAction(system, state, triggeredAction);
                 // is waiting needed after the action has been executed?
                 return true;
-            }
-            else{
+            } else {
                 Util.pause(waitBetween);
                 state = runtime.refreshState(system);
                 numberOfRetries++;
@@ -360,17 +356,18 @@ public final class TriggerActionUtil {
 
         // If the state has no children return false
         // This may happen because the state has no GUI elements, for example a XML page
-        if(state.childCount() == 0) {
+        if (state.childCount() == 0) {
             return false;
         }
 
-        if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)) {
-            if(!tagName.startsWith("Web")) {
+        if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)) {
+            if (!tagName.startsWith("Web")) {
                 tagName = "Web" + tagName;
             }
         }
-        for(Tag<?> tag : state.child(0).tags()) {
-            if(tag.name().equalsIgnoreCase(tagName)) {
+
+        for (Tag<?> tag : state.child(0).tags()) {
+            if (tag.name().equalsIgnoreCase(tagName)) {
                 return pasteMatchingWidget(
                         tag,
                         value,
@@ -414,17 +411,16 @@ public final class TriggerActionUtil {
         TriggerActionRuntime runtime = triggerActionRuntime(runtimeContext);
 
         int numberOfRetries = 0;
-        while(numberOfRetries < maxNumberOfRetries) {
+        while (numberOfRetries < maxNumberOfRetries) {
             Widget widget = WidgetMatchingUtil.getWidgetWithMatchingTags(tagValues, state);
-            if(widget != null) {
+            if (widget != null) {
                 // When the desired widget to interact with is found,
                 // Create the triggered action, build the identifier, and execute it.
                 Action triggeredAction = triggeredPasteAction(state, widget, textToPaste, true);
                 runtime.refreshActions(state, Collections.singleton(triggeredAction));
                 runtime.executeTriggerAction(system, state, triggeredAction);
                 return true;
-            }
-            else {
+            } else {
                 Util.pause(waitBetween);
                 state = runtime.refreshState(system);
                 numberOfRetries++;
@@ -462,10 +458,10 @@ public final class TriggerActionUtil {
         TriggerActionRuntime runtime = triggerActionRuntime(runtimeContext);
 
         int numberOfRetries = 0;
-        while(numberOfRetries < maxNumberOfRetries) {
+        while (numberOfRetries < maxNumberOfRetries) {
             //looking for a widget with matching tag value:
             Widget widget = WidgetMatchingUtil.getWidgetWithMatchingTag(tag, value, state);
-            if(widget != null) {
+            if (widget != null) {
                 // When the desired widget to interact with is found,
                 // Create the triggered action, build the identifier, and execute it.
                 Action triggeredAction = triggeredPasteAction(state, widget, textToPaste, true);
@@ -473,8 +469,7 @@ public final class TriggerActionUtil {
                 runtime.executeTriggerAction(system, state, triggeredAction);
                 // is waiting needed after the action has been executed?
                 return true;
-            }
-            else{
+            } else {
                 Util.pause(waitBetween);
                 state = runtime.refreshState(system);
                 numberOfRetries++;
@@ -493,50 +488,49 @@ public final class TriggerActionUtil {
      * @param state
      */
     private static void printTagValuesOfWidgets(Tag<?> tag, State state) {
-        for(Widget widget : state) {
-            if(widget.get(tag, null) == null) {
+        for (Widget widget : state) {
+            if (widget.get(tag, null) == null) {
                 // this widget did not have a value for the given tag
-            }
-            else{
-                System.out.println(tag.toString() + "=" + widget.get(tag, null).toString()+ "; Description of the widget = " + widget.get(Tags.Desc, ""));
+            } else {
+                System.out.println(tag.toString() + "=" + widget.get(tag, null).toString() + "; Description of the widget = " + widget.get(Tags.Desc, ""));
             }
         }
     }
 
     /**
-     * By default, trigger click widget using LeftClickAt (Windows level). 
+     * By default, trigger click widget using LeftClickAt (Windows level).
      */
     public static Action triggeredClickAction(State state, Widget widget) {
         if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER) && widget instanceof WdWidget wdWidget) {
             return new WdRemoteScrollClickAction(wdWidget);
         }
 
-    	StdActionCompiler ac = new AnnotatingActionCompiler();
-    	return ac.leftClickAt(widget);
+        StdActionCompiler ac = new AnnotatingActionCompiler();
+        return ac.leftClickAt(widget);
     }
 
     /**
-     * By default, trigger click and type text using ClickTypeInto (Windows level). 
+     * By default, trigger click and type text using ClickTypeInto (Windows level).
      */
     public static Action triggeredTypeAction(State state, Widget widget, String textToType, boolean replaceText) {
         if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER) && widget instanceof WdWidget wdWidget) {
             return new WdRemoteScrollTypeAction(wdWidget, textToType);
         }
 
-    	StdActionCompiler ac = new AnnotatingActionCompiler();
-    	return ac.clickTypeInto(widget, textToType, replaceText);
+        StdActionCompiler ac = new AnnotatingActionCompiler();
+        return ac.clickTypeInto(widget, textToType, replaceText);
     }
 
     /**
-     * By default, trigger click and paste text using ClickPasteInto (Windows level). 
+     * By default, trigger click and paste text using ClickPasteInto (Windows level).
      */
     public static Action triggeredPasteAction(State state, Widget widget, String textToPaste, boolean replaceText) {
         if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER) && widget instanceof WdWidget wdWidget) {
             return new WdRemoteScrollTypeAction(wdWidget, textToPaste);
         }
 
-    	StdActionCompiler ac = new AnnotatingActionCompiler();
-    	return ac.pasteTextInto(widget, textToPaste, replaceText);
+        StdActionCompiler ac = new AnnotatingActionCompiler();
+        return ac.pasteTextInto(widget, textToPaste, replaceText);
     }
 
     private static TriggerActionRuntime triggerActionRuntime(RuntimeContext runtimeContext) {

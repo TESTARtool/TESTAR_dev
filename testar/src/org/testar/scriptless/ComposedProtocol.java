@@ -74,7 +74,7 @@ public abstract class ComposedProtocol implements Consumer<Settings> {
     }
 
     protected ScriptlessCapabilities scriptlessCapabilities;
-    public final ScriptlessCapabilities scriptlessCapabilities() { 
+    public final ScriptlessCapabilities scriptlessCapabilities() {
         return Assert.notNull(scriptlessCapabilities);
     }
 
@@ -132,7 +132,7 @@ public abstract class ComposedProtocol implements Consumer<Settings> {
         runtimeContext.setVisualizationEnabled(runtimeContext.settings().get(ConfigTags.VisualizeActions));
         runtimeContext.setVerdictProcessing(new VerdictProcessing(runtimeContext.settings()));
 
-        // Runtime listeners are protocol concerns: 
+        // Runtime listeners are protocol concerns:
         // they translate mode-specific UI events and visualization into the shared runtime context
         modeListener = new ModeListener(runtimeContext, runtimeContext.settings().get(ConfigTags.KeyBoardListener, false));
         visualizationListener = new VisualizationListener(runtimeContext);
@@ -146,7 +146,7 @@ public abstract class ComposedProtocol implements Consumer<Settings> {
         runtimeContext.setSessionReportingManager(testingServices.sessionReportingManager());
         runtimeContext.setStateModelManager(testingServices.stateModelManager());
 
-        // Build the full scriptless capability bundle 
+        // Build the full scriptless capability bundle
         // once the runtime context already contains the managers that later capabilities depend on
         scriptlessCapabilities = ScriptlessFactory.buildScriptlessCapabilities(runtimeContext);
 
@@ -159,9 +159,9 @@ public abstract class ComposedProtocol implements Consumer<Settings> {
             } else if (runtimeContext().mode() == TestarMode.Generate) {
                 new GenerateMode().runGenerateOuterLoop(this);
             }
-        } catch(WinApiException we) {
+        } catch (WinApiException we) {
             we.printStackTrace();
-        } catch(SystemStartException se) {
+        } catch (SystemStartException se) {
             se.printStackTrace();
         } finally {
             closeTestSession();

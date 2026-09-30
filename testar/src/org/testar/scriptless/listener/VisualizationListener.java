@@ -38,9 +38,9 @@ public final class VisualizationListener implements IEventListener {
     private double mouseX = Double.MIN_VALUE;
     private double mouseY = Double.MIN_VALUE;
     private double[] filterArea = new double[] { // <x1,y1,x2,y2>
-        Double.MAX_VALUE, 
-        Double.MAX_VALUE, 
-        Double.MIN_VALUE, 
+        Double.MAX_VALUE,
+        Double.MAX_VALUE,
+        Double.MIN_VALUE,
         Double.MIN_VALUE
     };
 
@@ -51,30 +51,30 @@ public final class VisualizationListener implements IEventListener {
     public VisualizationListener(RuntimeContext runtimeContext) {
         this.runtimeContext = runtimeContext;
         this.spyTagSelection = new SpyTagSelection(runtimeContext.settings().get(ConfigTags.SpyTagAttributes));
-		filteringManager = new FilteringManager();
-		filteringManager.loadFilters();
+        filteringManager = new FilteringManager();
+        filteringManager.loadFilters();
 
-		// If the environment is not headless, initialize the CAPS LOCK display mouse
-		if (!GraphicsEnvironment.isHeadless()) {
-			displayWhiteTabu = Toolkit.getDefaultToolkit().getLockingKeyState(KeyEvent.VK_CAPS_LOCK);
-		}
+        // If the environment is not headless, initialize the CAPS LOCK display mouse
+        if (!GraphicsEnvironment.isHeadless()) {
+            displayWhiteTabu = Toolkit.getDefaultToolkit().getLockingKeyState(KeyEvent.VK_CAPS_LOCK);
+        }
     }
 
     public final void visualizeState(State state) {
         VisualizationUtil.visualizeState(
-            showExtendedWidgetInfo,
-            runtimeContext.mouse(),
-            runtimeContext.canvas(),
-            state,
-            this::shouldVisualizeTag
+                showExtendedWidgetInfo,
+                runtimeContext.mouse(),
+                runtimeContext.canvas(),
+                state,
+                this::shouldVisualizeTag
         );
     }
 
     public final void visualizeActions(State state, Set<Action> actions) {
         VisualizationUtil.visualizeActions(
-            runtimeContext.canvas(), 
-            state, 
-            actions
+                runtimeContext.canvas(),
+                state,
+                actions
         );
         if (displayWhiteTabu && runtimeContext.mode() == TestarMode.Spy) {
             filteringManager.visualizeActions(runtimeContext.canvas(), state);
@@ -83,10 +83,10 @@ public final class VisualizationListener implements IEventListener {
 
     public final void visualizeSelectedAction(State state, Action action) {
         VisualizationUtil.visualizeSelectedAction(
-            runtimeContext.canvas(), 
-            runtimeContext.settings().get(ConfigTags.ActionDuration, 0.0),
-            state, 
-            action
+                runtimeContext.canvas(),
+                runtimeContext.settings().get(ConfigTags.ActionDuration, 0.0),
+                state,
+                action
         );
     }
 
@@ -95,8 +95,8 @@ public final class VisualizationListener implements IEventListener {
     }
 
     @Override
-    public void keyDown(KBKeys key) {   
-        if (runtimeContext.mode() == TestarMode.Spy) { 
+    public void keyDown(KBKeys key) {
+        if (runtimeContext.mode() == TestarMode.Spy) {
             if (key == KBKeys.VK_CAPS_LOCK || key == KBKeys.VK_ALT) {
                 displayWhiteTabu = !displayWhiteTabu;
             } else if (key == KBKeys.VK_TAB) {
@@ -122,11 +122,11 @@ public final class VisualizationListener implements IEventListener {
                 filterArea[3] = mouseY;
                 whiteTabuMode = shiftPressed;
                 filteringManager.manageWhiteTabuLists(
-                    runtimeContext.latestState(),
-                    runtimeContext.mouse(),
-                    filterArea,
-                    whiteTabuMode,
-                    preciseCoding
+                        runtimeContext.latestState(),
+                        runtimeContext.mouse(),
+                        filterArea,
+                        whiteTabuMode,
+                        preciseCoding
                 );
             }
         }
@@ -140,9 +140,9 @@ public final class VisualizationListener implements IEventListener {
     public void mouseUp(MouseButtons btn, double x, double y) {
     }
 
-	@Override
-	public void mouseMoved(double x, double y) {
-		mouseX = x;
-		mouseY = y;
-	}
+    @Override
+    public void mouseMoved(double x, double y) {
+        mouseX = x;
+        mouseY = y;
+    }
 }

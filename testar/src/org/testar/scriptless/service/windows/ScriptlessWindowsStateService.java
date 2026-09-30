@@ -36,10 +36,10 @@ public class ScriptlessWindowsStateService implements StateService {
         State state = delegate.getState(system);
 
         // For Qt applications, block elements outside the modal window
-        if(state.childCount() > 0 && state.child(0).get(UIATags.UIAFrameworkId, "").equals("Qt")) {
+        if (state.childCount() > 0 && state.child(0).get(UIATags.UIAFrameworkId, "").equals("Qt")) {
             // Obtain the modal element. By default the main window
             Widget modalWindow = state.child(0);
-            for(Widget w : state) {
+            for (Widget w : state) {
                 if (w.get(UIATags.UIAIsWindowModal, false)) {
                     modalWindow = w;
                     break; // exit loop once modal is found
@@ -47,8 +47,8 @@ public class ScriptlessWindowsStateService implements StateService {
             }
 
             // If the modal element exists, mark elements outside modal as blocked
-            if(modalWindow != null) {
-                for(Widget w : state) {
+            if (modalWindow != null) {
+                for (Widget w : state) {
                     if (!isQtElementVisibleOnModalScreen(w, modalWindow)) {
                         w.set(Tags.Blocked, true);
                     }
@@ -57,7 +57,7 @@ public class ScriptlessWindowsStateService implements StateService {
         }
 
         // Creating a JSON file with information about widgets and their location on the screenshot:
-        if(runtimeContext.settings().get(ConfigTags.Mode) == TestarMode.Generate && runtimeContext.settings().get(ConfigTags.CreateWidgetInfoJsonFile)) {
+        if (runtimeContext.settings().get(ConfigTags.Mode) == TestarMode.Generate && runtimeContext.settings().get(ConfigTags.CreateWidgetInfoJsonFile)) {
             JsonUtils.createWidgetInfoJsonFile(state);
         }
 
@@ -74,9 +74,9 @@ public class ScriptlessWindowsStateService implements StateService {
         double modalBottom = modalRect.y() + modalRect.height();
 
         // Check if element is completely visible inside the modal
-        return elementRect.x() >= modalRect.x() && 
+        return elementRect.x() >= modalRect.x() &&
                 elementRight <= modalRight &&
-                elementRect.y() >= modalRect.y() && 
+                elementRect.y() >= modalRect.y() &&
                 elementBottom <= modalBottom;
     }
 }

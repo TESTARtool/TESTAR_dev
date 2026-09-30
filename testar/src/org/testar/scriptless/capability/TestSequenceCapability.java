@@ -67,9 +67,9 @@ public class TestSequenceCapability {
         runtimeContext.stateModelManager().notifyTestSequencedStarted();
 
         LogSerialiser.log(
-            "Starting sequence " + runtimeContext.sequenceCount()
-            + " (output as: " + runtimeContext.generatedSequence() + ")\n\n",
-            LogSerialiser.LogLevel.Info
+                "Starting sequence " + runtimeContext.sequenceCount()
+                + " (output as: " + runtimeContext.generatedSequence() + ")\n\n",
+                LogSerialiser.LogLevel.Info
         );
     }
 

@@ -37,8 +37,8 @@ public class WebdriverTestSessionCapability extends TestSessionCapability {
     }
 
     /*
-     * If webDomainsAllowed from SUTConnectorValue is not set, include it in the webDomainsAllowed. 
-     * If the default starting domain of the SUT is not set, included it in the webDomainsAllowed. 
+     * If webDomainsAllowed from SUTConnectorValue is not set, include it in the webDomainsAllowed.
+     * If the default starting domain of the SUT is not set, included it in the webDomainsAllowed.
      */
     private void ensureWebDomainsAllowed(RuntimeContext runtimeContext) {
         try {
@@ -46,7 +46,7 @@ public class WebdriverTestSessionCapability extends TestSessionCapability {
 
             List<String> configuredDomainsAllowed = List.copyOf(runtimeContext.settings().get(ConfigTags.WebDomainsAllowed));
             System.out.println(String.format("WebDomainsAllowed: %s", String.join(",", configuredDomainsAllowed)));
-        } catch(Exception e) {
+        } catch (Exception e) {
             System.out.println("WEBDRIVER ERROR: Trying to add the startup domain to webDomainsAllowed List");
             System.out.println("Please review webDomainsAllowed List inside Webdriver Java Protocol");
         }

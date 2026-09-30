@@ -51,15 +51,15 @@ public class CssCustomizationListener implements IEventListener {
                     Widget w = Util.widgetFromPoint(latestState, mouse.cursor().x(), mouse.cursor().y());
                     // Add the widget web CSS class property as clickable
                     WdElement element = ((WdWidget) w).element;
-                    for(String s : element.cssClasses) {
-                        if(s != null && !s.isEmpty()) {
+                    for (String s : element.cssClasses) {
+                        if (s != null && !s.isEmpty()) {
                             clickableClasses.add(s);
                         }
                     }
                     // And save the new CSS class property in the test.setting file
                     Util.saveToFile(runtimeContext.settings().toFileString(), TestarDirectories.getTestSettingsFile());
-                } catch(Exception e) {
-                    System.out.println("ERROR adding the widget from point: " + "x(" + mouse.cursor().x() + "), y("+ mouse.cursor().y() +")");
+                } catch (Exception e) {
+                    System.out.println("ERROR adding the widget from point: " + "x(" + mouse.cursor().x() + "), y(" + mouse.cursor().y() + ")");
                 }
             }
 
@@ -69,15 +69,15 @@ public class CssCustomizationListener implements IEventListener {
                     Widget w = Util.widgetFromPoint(latestState, mouse.cursor().x(), mouse.cursor().y());
                     // Remove the widget web CSS class property from all clickables
                     WdElement element = ((WdWidget) w).element;
-                    for(String s : element.cssClasses) {
-                        if(s != null && !s.isEmpty()) {
+                    for (String s : element.cssClasses) {
+                        if (s != null && !s.isEmpty()) {
                             clickableClasses.remove(s);
                         }
                     }
                     // And save the new CSS class property in the test.setting file
                     Util.saveToFile(runtimeContext.settings().toFileString(), TestarDirectories.getTestSettingsFile());
-                } catch(Exception e) {
-                    System.out.println("ERROR removing the widget from point: " + "x(" + mouse.cursor().x() + "), y("+ mouse.cursor().y() +")");
+                } catch (Exception e) {
+                    System.out.println("ERROR removing the widget from point: " + "x(" + mouse.cursor().x() + "), y(" + mouse.cursor().y() + ")");
                 }
             }
         }

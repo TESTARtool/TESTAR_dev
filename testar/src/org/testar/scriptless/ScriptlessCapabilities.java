@@ -22,7 +22,7 @@ public final class ScriptlessCapabilities {
     private final StopCriteriaCapability stopCriteriaCapability;
 
     private ScriptlessCapabilities(Builder builder) {
-        this.settingsCapability = Assert.notNull(builder.settingsCapability); 
+        this.settingsCapability = Assert.notNull(builder.settingsCapability);
         this.testSessionCapability = Assert.notNull(builder.testSessionCapability);
         this.testSequenceCapability = Assert.notNull(builder.testSequenceCapability);
         this.scriptlessOracleComposer = Assert.notNull(builder.scriptlessOracleComposer);
