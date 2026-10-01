@@ -12,16 +12,20 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.testar.OutputStructure;
 import org.testar.config.ConfigTags;
 import org.testar.config.settings.Settings;
 import org.testar.core.Pair;
 import org.testar.core.action.Action;
 import org.testar.core.action.Type;
+import org.testar.core.screenshot.ScreenshotProvider;
 import org.testar.core.state.State;
 import org.testar.core.tag.Tags;
 import org.testar.core.verdict.Verdict;
 import org.testar.reporting.Reporting;
+import org.testar.plugin.screenshot.ScreenshotProviderFactory;
 import org.testar.stub.StateStub;
 import org.testar.stub.WidgetStub;
 
@@ -80,6 +84,27 @@ public class SessionReportingManagerTest {
 
         Assert.assertEquals(List.of(verdict), reporting.verdicts);
         Assert.assertEquals(1, reporting.finishCount);
+    }
+
+    @Test
+    public void selectedActionTracksOnlyAvailableScreenshotPath() {
+        SessionReportingManager manager = SessionReportingManager.deferred("https://example.org");
+        StateStub state = new StateStub();
+        state.set(Tags.ConcreteID, "state-1");
+        Type action = new Type("value");
+        action.set(Tags.ConcreteID, "action-1");
+        ScreenshotProvider provider = Mockito.mock(ScreenshotProvider.class);
+
+        try (MockedStatic<ScreenshotProviderFactory> factory = Mockito.mockStatic(ScreenshotProviderFactory.class)) {
+            factory.when(ScreenshotProviderFactory::current).thenReturn(provider);
+            Mockito.when(provider.getActionshot(state, action)).thenReturn("action.png", "");
+
+            manager.addSelectedAction(state, action);
+            Assert.assertEquals("action.png", action.get(Tags.ActionScreenshotPath));
+
+            manager.addSelectedAction(state, action);
+            Assert.assertNull(action.get(Tags.ActionScreenshotPath, null));
+        }
     }
 
     private Settings settings() {

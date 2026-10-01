@@ -124,7 +124,12 @@ public final class SessionReportingManager {
 
     public void addSelectedAction(State state, Action action) {
         // Add the selected action information to the reports
-        ScreenshotProviderFactory.current().getActionshot(state, action);
+        String actionScreenshotPath = ScreenshotProviderFactory.current().getActionshot(state, action);
+        if (actionScreenshotPath != null && !actionScreenshotPath.isBlank()) {
+            action.set(Tags.ActionScreenshotPath, actionScreenshotPath);
+        } else {
+            action.remove(Tags.ActionScreenshotPath);
+        }
         if (reporting != null) {
             reporting.addSelectedAction(state, action);
         }
