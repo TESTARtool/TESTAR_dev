@@ -116,8 +116,7 @@ public final class TriggerActionUtil {
                 // Create the triggered action, build the identifier, and execute it.
                 Action triggeredAction = triggeredClickAction(state, widget);
                 runtime.refreshActions(state, Collections.singleton(triggeredAction));
-                runtime.executeTriggerAction(system, state, triggeredAction);
-                return true;
+                return runtime.executeTriggerAction(system, state, triggeredAction);
             } else {
                 Util.pause(waitBetween);
                 state = runtime.refreshState(system);
@@ -162,9 +161,7 @@ public final class TriggerActionUtil {
                 // Create the triggered action, build the identifier, and execute it.
                 Action triggeredAction = triggeredClickAction(state, widget);
                 runtime.refreshActions(state, Collections.singleton(triggeredAction));
-                runtime.executeTriggerAction(system, state, triggeredAction);
-                // is waiting needed after the action has been executed?
-                return true;
+                return runtime.executeTriggerAction(system, state, triggeredAction);
             } else {
                 Util.pause(waitBetween);
                 state = runtime.refreshState(system);
@@ -265,8 +262,7 @@ public final class TriggerActionUtil {
                 // Create the triggered action, build the identifier, and execute it.
                 Action triggeredAction = triggeredTypeAction(state, widget, textToType, true);
                 runtime.refreshActions(state, Collections.singleton(triggeredAction));
-                runtime.executeTriggerAction(system, state, triggeredAction);
-                return true;
+                return runtime.executeTriggerAction(system, state, triggeredAction);
             } else {
                 Util.pause(waitBetween);
                 state = runtime.refreshState(system);
@@ -313,9 +309,7 @@ public final class TriggerActionUtil {
                 // Create the triggered action, build the identifier, and execute it.
                 Action triggeredAction = triggeredTypeAction(state, widget, textToType, true);
                 runtime.refreshActions(state, Collections.singleton(triggeredAction));
-                runtime.executeTriggerAction(system, state, triggeredAction);
-                // is waiting needed after the action has been executed?
-                return true;
+                return runtime.executeTriggerAction(system, state, triggeredAction);
             } else {
                 Util.pause(waitBetween);
                 state = runtime.refreshState(system);
@@ -418,8 +412,7 @@ public final class TriggerActionUtil {
                 // Create the triggered action, build the identifier, and execute it.
                 Action triggeredAction = triggeredPasteAction(state, widget, textToPaste, true);
                 runtime.refreshActions(state, Collections.singleton(triggeredAction));
-                runtime.executeTriggerAction(system, state, triggeredAction);
-                return true;
+                return runtime.executeTriggerAction(system, state, triggeredAction);
             } else {
                 Util.pause(waitBetween);
                 state = runtime.refreshState(system);
@@ -466,9 +459,7 @@ public final class TriggerActionUtil {
                 // Create the triggered action, build the identifier, and execute it.
                 Action triggeredAction = triggeredPasteAction(state, widget, textToPaste, true);
                 runtime.refreshActions(state, Collections.singleton(triggeredAction));
-                runtime.executeTriggerAction(system, state, triggeredAction);
-                // is waiting needed after the action has been executed?
-                return true;
+                return runtime.executeTriggerAction(system, state, triggeredAction);
             } else {
                 Util.pause(waitBetween);
                 state = runtime.refreshState(system);

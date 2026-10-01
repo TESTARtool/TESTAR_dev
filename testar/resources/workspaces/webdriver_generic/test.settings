@@ -187,6 +187,8 @@ AgentCLIPromptText = As a test agent verify that you can log in with the credent
 # WebPathsAllowed: Regular expressions to indicate which web URL paths are allowed to explore when testing
 # FollowLinks: Indicate if allowing to follow links opened in new tabs
 # BrowserFullScreen: Indicate if perform the web testing with the browser in full screen
+# WebChromeUserDataDir: Chrome user data directory to use for WebDriver sessions (empty uses a temporary profile)
+# WebChromeProfileDirectory: Chrome profile directory within WebChromeUserDataDir (empty uses the default profile)
 # SwitchNewTabs: Indicate if switch to a new web tab if opened
 # WebForcedPopupClickAttributes: Widget attribute selectors in attribute=value form whose click actions are forced when matching widgets appear during WebDriver exploration
 #################################################################
@@ -198,6 +200,8 @@ WebDomainsAllowed = para.testar.org
 WebPathsAllowed = null
 FollowLinks = false
 BrowserFullScreen = true
+WebChromeUserDataDir =
+WebChromeProfileDirectory =
 SwitchNewTabs = true
 WebForcedPopupClickAttributes =
 
