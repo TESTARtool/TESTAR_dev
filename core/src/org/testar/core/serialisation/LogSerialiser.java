@@ -6,6 +6,9 @@
 
 package org.testar.core.serialisation;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.PrintStream;
 import java.util.LinkedList;
 
@@ -15,6 +18,8 @@ import org.testar.core.Assert;
  * Logs serialiser.
  */
 public class LogSerialiser extends Thread {
+
+    private static final Logger logger = LogManager.getLogger();
 
     private static PrintStream log;
     private static int logLevel;
@@ -84,12 +89,17 @@ public class LogSerialiser extends Thread {
                 logthis(logR.logS, logR.logL);
             }
         }
-        log.flush();
-        log.close();
-        synchronized (log) {
-            //System.out.println("<" + singletonLogSerialiser.getName() + "> LogSerialiser finished");
+        PrintStream currentLog = log;
+        if (currentLog == null) {
+            logger.error("LogSerialiser finished without an active PrintStream.");
             singletonLogSerialiser = null;
-            log.notifyAll();
+            return;
+        }
+        currentLog.flush();
+        currentLog.close();
+        synchronized (currentLog) {
+            singletonLogSerialiser = null;
+            currentLog.notifyAll();
         }
     }
 
@@ -118,7 +128,9 @@ public class LogSerialiser extends Thread {
     }
 
     public static void flush() {
-        log.flush();
+        if (log != null) {
+            log.flush();
+        }
     }
 
     public static PrintStream getLogStream() {
@@ -128,11 +140,17 @@ public class LogSerialiser extends Thread {
     public static void exit() {
         if (singletonLogSerialiser != null) {
             LogSerialiser.finish();
+            PrintStream currentLog = log;
+            if (currentLog == null) {
+                logger.error("LogSerialiser.exit() called while log stream is null.");
+                singletonLogSerialiser = null;
+                return;
+            }
             try {
-                synchronized (log) {
+                synchronized (currentLog) {
                     while (singletonLogSerialiser != null) {
                         try {
-                            log.wait(10);
+                            currentLog.wait(10);
                         } catch (InterruptedException e) {
                             System.out.println("LogSerialiser exit interrupted");
                         }

@@ -131,6 +131,9 @@ public final class Tags extends TagsBase {
     /** Usually attached to an object of {@link State}. The value is a screenshot of the state. */
     public static final Tag<String> ScreenshotPath = from("ScreenshotPath", String.class);
 
+    /** Screenshot of an action target area, attached to an Action when capture succeeds. */
+    public static final Tag<String> ActionScreenshotPath = from("ActionScreenshotPath", String.class);
+
     /** Usually attached to a {@link State} object. The value is a list of outcomes of test oracles for that state. */
     @SuppressWarnings("unchecked")
     public static final Tag<List<Verdict>> OracleVerdicts = from("OracleVerdicts", (Class<List<Verdict>>)(Class<?>)List.class);
@@ -193,6 +196,9 @@ public final class Tags extends TagsBase {
      * measuring when the main content becomes visible or ready for interaction.
      */
     public static final Tag<Double> StateRenderTime = from("StateRenderTime", Double.class);
+
+    /** Feedback from state fetching, such as an Appium page-source error. */
+    public static final Tag<String> StateFeedback = from("StateFeedback", String.class);
 
     /**
      * A link reference associated to the widget or state

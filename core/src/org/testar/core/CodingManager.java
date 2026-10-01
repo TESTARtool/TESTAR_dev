@@ -187,6 +187,14 @@ public class CodingManager {
                     CodingManager.codify(state.get(Tags.ConcreteID), a));
         }
 
+        // TODO: Replace the path/counter-based abstract ID with a stable ID derived from
+        // the state and origin widget abstract IDs plus the action role. Distinguish
+        // different actions on the same widget with the same role (such as click and
+        // long-click, or selecting different options) without depending on set order.
+        // Keep input values out of the abstract ID when they represent the same action;
+        // derive the concrete ID from the state and widget concrete IDs, action role,
+        // and stable action parameters rather than Object.toString().
+
         // for the abstract action identifier, we first sort the actions by their path in the widget tree
         // and then set their ids using incremental counters
         Map<Role, Integer> roleCounter = new HashMap<>();
@@ -201,7 +209,9 @@ public class CodingManager {
                         return false;
                     }
                 })
-                .sorted(Comparator.comparing(action -> action.get(Tags.OriginWidget).get(Tags.Path)))
+                .sorted(Comparator.comparing((Action action) -> action.get(Tags.OriginWidget).get(Tags.Path))
+                        .thenComparing(action -> action.get(Tags.Role, Roles.Invalid).toString())
+                        .thenComparing(Action::toParametersString))
                 .forEach(action -> {
                     updateRoleCounter(action, roleCounter);
                     action.set(Tags.AbstractID, ID_PREFIX_ACTION + ID_PREFIX_ABSTRACT +

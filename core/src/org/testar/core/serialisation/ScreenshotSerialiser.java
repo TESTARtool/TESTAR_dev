@@ -6,6 +6,9 @@
 
 package org.testar.core.serialisation;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -21,6 +24,8 @@ import org.testar.core.alayer.AWTCanvas;
  * SUT screenshots serialiser
  */
 public class ScreenshotSerialiser extends Thread {
+
+    private static final Logger logger = LogManager.getLogger();
 
     public static final String SCRSHOTS = "scrshots";
     private static String testSequenceFolder = null;
@@ -91,6 +96,10 @@ public class ScreenshotSerialiser extends Thread {
                 synchronized (scrshotSavingQueue) {
                     r = scrshotSavingQueue.removeFirst();
                 }
+                if (r.scrshot == null) {
+                    logger.error("ScreenshotSerialiser skipped a null screenshot canvas.");
+                    continue;
+                }
                 try {
                     // Write to a temp file, then atomically move/replace it to the final name.
                     Path finalPath = Paths.get(r.scrshotPath);
@@ -113,9 +122,15 @@ public class ScreenshotSerialiser extends Thread {
                 }
             }
         }
-        synchronized (testSequenceFolder) {
+        String currentTestSequenceFolder = testSequenceFolder;
+        if (currentTestSequenceFolder == null) {
+            logger.error("ScreenshotSerialiser finished without a test sequence folder.");
             singletonScreenshotSerialiser = null;
-            testSequenceFolder.notifyAll();
+            return;
+        }
+        synchronized (currentTestSequenceFolder) {
+            singletonScreenshotSerialiser = null;
+            currentTestSequenceFolder.notifyAll();
         }
     }
 
@@ -128,6 +143,10 @@ public class ScreenshotSerialiser extends Thread {
     }
 
     public static String saveActionshot(String stateID, String actionID, final AWTCanvas actionshot) {
+        if (actionshot == null) {
+            logger.error("ScreenshotSerialiser skipped a null action screenshot canvas.");
+            return "";
+        }
         String actionPath = scrshotOutputFolder + File.separator + testSequenceFolder + File.separator + stateID + "_" + actionID + ".png";
         if (!new File(actionPath).exists()) {
             savethis(actionPath, actionshot);
@@ -136,6 +155,10 @@ public class ScreenshotSerialiser extends Thread {
     }
 
     private static void savethis(String scrshotPath, AWTCanvas scrshot) {
+        if (scrshot == null) {
+            logger.error("ScreenshotSerialiser skipped queuing a null screenshot canvas.");
+            return;
+        }
         if (alive) {
             synchronized (scrshotSavingQueue) {
                 scrshotSavingQueue.add(new ScrshotRecord(scrshotPath, scrshot));
@@ -146,11 +169,17 @@ public class ScreenshotSerialiser extends Thread {
     public static void exit() {
         if (singletonScreenshotSerialiser != null) {
             ScreenshotSerialiser.finish();
+            String currentTestSequenceFolder = testSequenceFolder;
+            if (currentTestSequenceFolder == null) {
+                logger.error("ScreenshotSerialiser.exit() called while testSequenceFolder is null.");
+                singletonScreenshotSerialiser = null;
+                return;
+            }
             try {
-                synchronized (testSequenceFolder) {
+                synchronized (currentTestSequenceFolder) {
                     while (singletonScreenshotSerialiser != null) {
                         try {
-                            testSequenceFolder.wait(10);
+                            currentTestSequenceFolder.wait(10);
                         } catch (InterruptedException e) {
                             System.out.println("ScreenshotSerialiser exit interrupted");
                         }
