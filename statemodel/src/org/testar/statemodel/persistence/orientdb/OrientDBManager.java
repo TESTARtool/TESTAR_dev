@@ -552,6 +552,7 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         // get the concrete state and make a vertex out of it
         EntityClass concreteStateClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.ConcreteState);
         VertexEntity stateEntity = new VertexEntity(concreteStateClass);
+        stateEntity.enableUpdate(false);
 
         // hydrate the entity to a format the orient database can store
         try {

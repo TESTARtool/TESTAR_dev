@@ -30,7 +30,6 @@ import org.testar.statemodel.sequence.SequenceVerdict;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -407,7 +406,7 @@ public class AnalysisManager {
         // abstract actions
         stmt = "SELECT FROM AbstractAction WHERE modelIdentifier = :identifier";
         resultSet = db.query(stmt, params);
-        elements.addAll(fetchEdges(resultSet, "AbstractAction"));
+        elements.addAll(fetchEdges(resultSet, "AbstractAction", modelIdentifier));
         resultSet.close();
 
         // Black hole class
@@ -419,7 +418,7 @@ public class AnalysisManager {
         // unvisited abstract actions
         stmt = "SELECT FROM UnvisitedAbstractAction WHERE modelIdentifier = :identifier";
         resultSet = db.query(stmt, params);
-        elements.addAll(fetchEdges(resultSet, "UnvisitedAbstractAction"));
+        elements.addAll(fetchEdges(resultSet, "UnvisitedAbstractAction", modelIdentifier));
         resultSet.close();
 
         return elements;
@@ -451,7 +450,7 @@ public class AnalysisManager {
         // concrete actions
         stmt = "SELECT FROM (TRAVERSE in('isAbstractedBy').outE('ConcreteAction') FROM (SELECT FROM AbstractState WHERE modelIdentifier = :identifier)) WHERE @class = 'ConcreteAction'";
         resultSet = db.query(stmt, params);
-        elements.addAll(fetchEdges(resultSet, "ConcreteAction"));
+        elements.addAll(fetchEdges(resultSet, "ConcreteAction", modelIdentifier));
         resultSet.close();
 
         return elements;
@@ -489,13 +488,13 @@ public class AnalysisManager {
         // sequence steps
         stmt = "SELECT FROM (TRAVERSE in('isAbstractedBy').in('Accessed').outE('SequenceStep') FROM (SELECT FROM AbstractState WHERE modelIdentifier = :identifier)) WHERE @class = 'SequenceStep'";
         resultSet = db.query(stmt, params);
-        elements.addAll(fetchEdges(resultSet, "SequenceStep"));
+        elements.addAll(fetchEdges(resultSet, "SequenceStep", modelIdentifier));
         resultSet.close();
 
         // first node
         stmt = "SELECT FROM (TRAVERSE outE('FirstNode') FROM (SELECT FROM TestSequence WHERE modelIdentifier = :identifier)) WHERE @class = 'FirstNode'";
         resultSet = db.query(stmt, params);
-        elements.addAll(fetchEdges(resultSet, "FirstNode"));
+        elements.addAll(fetchEdges(resultSet, "FirstNode", modelIdentifier));
         resultSet.close();
 
         return elements;
@@ -515,7 +514,7 @@ public class AnalysisManager {
         Map<String, Object> params = new HashMap<>();
         params.put("identifier", modelIdentifier);
         OResultSet resultSet = db.query(stmt, params);
-        elements.addAll(fetchEdges(resultSet, "isAbstractedBy"));
+        elements.addAll(fetchEdges(resultSet, "isAbstractedBy", modelIdentifier));
 
         return elements;
     }
@@ -534,7 +533,7 @@ public class AnalysisManager {
         Map<String, Object> params = new HashMap<>();
         params.put("identifier", modelIdentifier);
         OResultSet resultSet = db.query(stmt, params);
-        elements.addAll(fetchEdges(resultSet, "Accessed"));
+        elements.addAll(fetchEdges(resultSet, "Accessed", modelIdentifier));
         resultSet.close();
 
         return elements;
@@ -564,7 +563,7 @@ public class AnalysisManager {
             // then get the parent/child relationship between the widgets
             stmt = "SELECT FROM isChildOf WHERE in IN(SELECT @RID FROM (TRAVERSE in('isChildOf') FROM (SELECT FROM Widget WHERE @RID = :rid)))";
             resultSet = db.query(stmt, params);
-            elements.addAll(fetchEdges(resultSet, "isChildOf"));
+            elements.addAll(fetchEdges(resultSet, "isChildOf", concreteStateIdentifier));
             resultSet.close();
 
             // create a filename
@@ -607,7 +606,7 @@ public class AnalysisManager {
                         processScreenShot(stateVertex.getProperty("screenshot"), "n" + formatId(stateVertex.getIdentity().toString()), modelIdentifier);
                         continue;
                     }
-                    jsonVertex.addProperty(propertyName, stateVertex.getProperty(propertyName).toString());
+                    jsonVertex.addProperty(exportPropertyName(propertyName), stateVertex.getProperty(propertyName).toString());
                 }
                 // optionally add a parent
                 if (parent != null) {
@@ -631,7 +630,7 @@ public class AnalysisManager {
      * @param className
      * @return
      */
-    private ArrayList<Element> fetchEdges(OResultSet resultSet, String className) {
+    private ArrayList<Element> fetchEdges(OResultSet resultSet, String className, String modelIdentifier) {
         ArrayList<Element> elements = new ArrayList<>();
         while (resultSet.hasNext()) {
             OResult result = resultSet.next();
@@ -650,7 +649,17 @@ public class AnalysisManager {
                         // these are edge indicators. Ignore
                         continue;
                     }
-                    jsonEdge.addProperty(propertyName, actionEdge.getProperty(propertyName).toString());
+                    Object propertyValue = actionEdge.getProperty(propertyName);
+                    if ("ConcreteAction".equals(className) && "screenshot".equals(propertyName)) {
+                        if (propertyValue instanceof ORecordBytes
+                                && processScreenShot((ORecordBytes) propertyValue, jsonEdge.getId(), modelIdentifier)) {
+                            jsonEdge.addProperty("hasScreenshot", "true");
+                        }
+                        continue;
+                    }
+                    if (propertyValue != null) {
+                        jsonEdge.addProperty(exportPropertyName(propertyName), propertyValue.toString());
+                    }
                 }
                 elements.add(new Element(Element.GROUP_EDGES, jsonEdge, className));
             }
@@ -663,34 +672,33 @@ public class AnalysisManager {
      * @param recordBytes
      * @param identifier
      */
-    private void processScreenShot(ORecordBytes recordBytes, String identifier, String modelIdentifier) {
-        if (!outputDir.substring(outputDir.length() - 1).equals(File.separator)) {
-            outputDir += File.separator;
+    private boolean processScreenShot(ORecordBytes recordBytes, String identifier, String modelIdentifier) {
+        if (recordBytes == null || recordBytes.toStream().length == 0) {
+            return false;
         }
+        File screenshotDir = new File(outputDir, modelIdentifier);
 
-        // see if we have a directory for the screenshots yet
-        File screenshotDir = new File(outputDir + modelIdentifier + File.separator);
-
-        if (!screenshotDir.exists()) {
-            screenshotDir.mkdir();
+        if (!screenshotDir.exists() && !screenshotDir.mkdirs()) {
+            return false;
         }
 
         // save the file to disk
         File screenshotFile = new File( screenshotDir, identifier + ".png");
         if (screenshotFile.exists()) {
-            return;
+            return true;
         }
-        try {
-            FileOutputStream outputStream = new FileOutputStream(screenshotFile);
+        try (FileOutputStream outputStream = new FileOutputStream(screenshotFile)) {
             outputStream.write(recordBytes.toStream());
             outputStream.flush();
-            outputStream.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            return true;
         } catch (IOException e) {
             e.printStackTrace();
+            return false;
         }
+    }
 
+    static String exportPropertyName(String propertyName) {
+        return "id".equals(propertyName) ? "attributeId" : propertyName;
     }
 
     // this helper method formats the @RID property into something that can be used in a web frontend

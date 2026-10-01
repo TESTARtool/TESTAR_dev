@@ -6,6 +6,7 @@
 
 package org.testar.statemodel;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 public class ConcreteAction extends ModelWidget {
@@ -19,6 +20,8 @@ public class ConcreteAction extends ModelWidget {
      * The abstract action that abstracts this concrete action.
      */
     private final AbstractAction abstractAction;
+
+    private byte[] screenshot;
 
     /**
      * Constructor.
@@ -39,5 +42,13 @@ public class ConcreteAction extends ModelWidget {
 
     public AbstractAction getAbstractAction() {
         return abstractAction;
+    }
+
+    public byte[] getScreenshot() {
+        return screenshot == null ? null : Arrays.copyOf(screenshot, screenshot.length);
+    }
+
+    public void setScreenshot(byte[] screenshot) {
+        this.screenshot = screenshot == null ? null : Arrays.copyOf(screenshot, screenshot.length);
     }
 }

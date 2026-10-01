@@ -4,6 +4,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertNull;
 
 public class ConcreteActionTest {
 
@@ -20,6 +22,20 @@ public class ConcreteActionTest {
     public void testConcreteActionConstructor() {
         assertEquals("concrete-C1", concreteAction.getActionId());
         assertEquals(abstractAction, concreteAction.getAbstractAction());
+    }
+
+    @Test
+    public void screenshotIsOptionalAndDefensivelyCopied() {
+        assertNull(concreteAction.getScreenshot());
+
+        byte[] screenshot = {1, 2, 3};
+        concreteAction.setScreenshot(screenshot);
+        screenshot[0] = 9;
+        assertArrayEquals(new byte[] {1, 2, 3}, concreteAction.getScreenshot());
+
+        byte[] returned = concreteAction.getScreenshot();
+        returned[1] = 9;
+        assertArrayEquals(new byte[] {1, 2, 3}, concreteAction.getScreenshot());
     }
 
     @Test(expected = NullPointerException.class)

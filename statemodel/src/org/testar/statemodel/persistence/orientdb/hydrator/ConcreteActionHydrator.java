@@ -51,6 +51,11 @@ public class ConcreteActionHydrator implements EntityHydrator<EdgeEntity> {
         // add the action id
         edgeEntity.addPropertyValue("actionId", new PropertyValue(OType.STRING, ((ConcreteAction) source).getActionId()));
 
+        byte[] screenshot = ((ConcreteAction) source).getScreenshot();
+        if (screenshot != null && screenshot.length > 0) {
+            edgeEntity.addPropertyValue("screenshot", new PropertyValue(OType.BINARY, screenshot));
+        }
+
         // loop through the tagged attributes for this state and add them
         TaggableBase attributes = ((ConcreteAction) source).getAttributes();
         for (Tag<?> tag :attributes.tags()) {

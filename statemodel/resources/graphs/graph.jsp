@@ -856,6 +856,17 @@
 
             // add the divs in order
             popupContent.appendChild(sourceDiv);
+            let actionDiv = document.createElement("div");
+            actionDiv.classList.add('screenshot');
+            if (targetEdge.data('hasScreenshot') === 'true') {
+                let actionImg = document.createElement("img");
+                actionImg.src = "${contentFolder}/" + targetEdge.id() + ".png";
+                actionImg.alt = "Selected action";
+                actionDiv.appendChild(actionImg);
+            } else {
+                actionDiv.appendChild(document.createTextNode("Action screenshot unavailable"));
+            }
+            popupContent.appendChild(actionDiv);
             popupContent.appendChild(descDiv);
             popupContent.appendChild(targetDiv);
             contentPanelHeader.appendChild(popupContent);

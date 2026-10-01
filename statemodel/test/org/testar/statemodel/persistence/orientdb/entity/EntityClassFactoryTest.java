@@ -1,5 +1,6 @@
 package org.testar.statemodel.persistence.orientdb.entity;
 
+import com.orientechnologies.orient.core.metadata.schema.OType;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -51,6 +52,12 @@ public class EntityClassFactoryTest {
         assertEquals("ConcreteAction", entityClass.getClassName());
         assertEquals(EntityClass.EntityType.Edge, entityClass.getEntityType());
         assertFalse(entityClass.getProperties().isEmpty());
+        Property screenshot = entityClass.getProperties().stream()
+                .filter(property -> "screenshot".equals(property.getPropertyName()))
+                .findFirst()
+                .orElseThrow();
+        assertEquals(OType.BINARY, screenshot.getPropertyType());
+        assertFalse(screenshot.isMandatory());
     }
 
     @Test

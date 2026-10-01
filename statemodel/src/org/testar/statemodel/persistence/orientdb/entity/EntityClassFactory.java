@@ -224,6 +224,11 @@ public class EntityClassFactory {
         actionId.setNullable(false);
         actionId.setIdentifier(false);
         concreteActionClass.addProperty(actionId);
+        Property screenshot = new Property("screenshot", OType.BINARY);
+        screenshot.setMandatory(false);
+        screenshot.setNullable(true);
+        screenshot.setIdentifier(false);
+        concreteActionClass.addProperty(screenshot);
         Property counter = new Property("counter", OType.INTEGER);
         counter.setMandatory(true);
         counter.setNullable(false);
