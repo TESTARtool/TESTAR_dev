@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -43,7 +42,6 @@ public class AndroidLogcatOracle implements Oracle {
     private final Settings settings;
     private final String regex;
 
-    private int processedLineCount = 0;
     private int sequenceNumber = 0;
     private Path sequenceLogPath = null;
 
@@ -60,8 +58,6 @@ public class AndroidLogcatOracle implements Oracle {
         }
 
         sequenceNumber = SEQUENCE_COUNTER.incrementAndGet();
-        processedLineCount = 0;
-
         AndroidAppiumFramework.clearLogcat();
 
         try {
@@ -94,14 +90,7 @@ public class AndroidLogcatOracle implements Oracle {
             return Collections.singletonList(Verdict.OK);
         }
 
-        List<String> relevantLines = dump == null ? List.of() : List.of(dump.split("\\r?\\n"));
-
-        if (relevantLines.size() < processedLineCount) {
-            processedLineCount = 0;
-        }
-
-        List<String> newLines = relevantLines.subList(processedLineCount, relevantLines.size());
-        processedLineCount = relevantLines.size();
+        List<String> newLines = List.of(dump.split("\\r?\\n"));
 
         // Save the complete threadtime format in the debug log
         appendToSequenceLog(newLines);
@@ -149,67 +138,11 @@ public class AndroidLogcatOracle implements Oracle {
         }
 
         for (String raw : lines) {
-            String normalized = normalizeThreadtimeLine(raw);
-            try {
-                if (p.matcher(normalized).find()) {
-                    matches.add(normalized);
-                }
-            } catch (Exception ignored) {
+            String message = AndroidLogcatNormalizer.stripThreadtime(raw);
+            if (p.matcher(message).find()) {
+                matches.add(AndroidLogcatNormalizer.normalize(message));
             }
         }
         return matches;
     }
-
-    // logcat threadtime format:
-    // 02-09 08:59:33.844 17550 17575 E Accessibility exception content...
-    private final Pattern THREADTIME_PATTERN = Pattern.compile(
-            "^\\d{2}-\\d{2}\\s+\\d{2}:\\d{2}:\\d{2}\\.\\d{3}\\s+\\d+\\s+\\d+\\s+([VDIWEAF])\\s+([^:]+):\\s*(.*)$"
-    );
-
-    private String normalizeThreadtimeLine(String line) {
-        if (line == null) {
-            return "";
-        }
-        line = line.trim();
-        Matcher m = THREADTIME_PATTERN.matcher(line);
-        if (!m.matches()) {
-            return normalizeNumbers(line.replaceAll("\\s+", " "));
-        }
-
-        String tag = m.group(2).trim();
-        String msg = normalizeNumbers(m.group(3).trim().replaceAll("\\s+", " "));
-
-        return tag + ": " + msg;
-    }
-
-    private String normalizeNumbers(String text) {
-        if (text == null || text.isEmpty()) {
-            return "";
-        }
-        Matcher matcher = Pattern.compile("\\d+").matcher(text);
-        StringBuffer sb = new StringBuffer();
-        while (matcher.find()) {
-            String num = matcher.group();
-            if (isHttpFailureStatus(num)) {
-                matcher.appendReplacement(sb, num);
-            } else {
-                matcher.appendReplacement(sb, "<num>");
-            }
-        }
-        matcher.appendTail(sb);
-        return sb.toString();
-    }
-
-    private boolean isHttpFailureStatus(String num) {
-        if (num.length() != 3) {
-            return false;
-        }
-        try {
-            int value = Integer.parseInt(num);
-            return value >= 300 && value <= 599;
-        } catch (NumberFormatException e) {
-            return false;
-        }
-    }
-
 }

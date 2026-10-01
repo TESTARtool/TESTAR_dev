@@ -124,6 +124,51 @@ public class TestAndroidLogcatOracle {
     }
 
     @Test
+    public void generateModeVerdict_ProcessesNextDumpAfterLogcatIsCleared() {
+        OutputStructure.logsOutputDir = Path.of("target").toString();
+        OutputStructure.startInnerLoopDateString = "YYYY-MM-DD_hh-mm-ss";
+        OutputStructure.executedSUTname = "test-sut";
+
+        Settings settings = buildSettings(TestarMode.Generate, "Exception");
+        AndroidLogcatOracle oracle = new AndroidLogcatOracle(settings);
+        State state = Mockito.mock(State.class);
+        String firstDump = "02-09 08:00:00.000 100 100 E MyTag: Exception first";
+        String secondDump = "02-09 08:00:01.000 100 100 E MyTag: Exception second";
+
+        try (MockedStatic<AndroidAppiumFramework> mocked = Mockito.mockStatic(AndroidAppiumFramework.class)) {
+            mocked.when(AndroidAppiumFramework::getAppPackageFromCapabilitiesOrCurrent).thenReturn("org.testar.app");
+            mocked.when(() -> AndroidAppiumFramework.dumpLogcatThreadtimeForPackage("org.testar.app"))
+                    .thenReturn(firstDump, secondDump);
+
+            oracle.initialize();
+            Assert.assertTrue(oracle.getVerdicts(state).get(0).info().contains("Exception first"));
+            Assert.assertTrue(oracle.getVerdicts(state).get(0).info().contains("Exception second"));
+            mocked.verify(AndroidAppiumFramework::clearLogcat, Mockito.times(3));
+        }
+    }
+
+    @Test
+    public void generateModeVerdict_MatchesRawMessageThenNormalizesResult() {
+        OutputStructure.logsOutputDir = Path.of("target").toString();
+        OutputStructure.startInnerLoopDateString = "YYYY-MM-DD_hh-mm-ss";
+        OutputStructure.executedSUTname = "test-sut";
+
+        Settings settings = buildSettings(TestarMode.Generate, "Exception @1:207875");
+        AndroidLogcatOracle oracle = new AndroidLogcatOracle(settings);
+        State state = Mockito.mock(State.class);
+
+        try (MockedStatic<AndroidAppiumFramework> mocked = Mockito.mockStatic(AndroidAppiumFramework.class)) {
+            mocked.when(AndroidAppiumFramework::getAppPackageFromCapabilitiesOrCurrent).thenReturn("org.testar.app");
+            mocked.when(() -> AndroidAppiumFramework.dumpLogcatThreadtimeForPackage("org.testar.app"))
+                    .thenReturn("02-09 08:59:33.844 17550 17575 E ViewRootImpl: Exception @1:207875");
+
+            oracle.initialize();
+            Assert.assertEquals("Suspicious Android logcat line(s) detected "
+                    + "ViewRootImpl: Exception @<num>:<num>", oracle.getVerdicts(state).get(0).info());
+        }
+    }
+
+    @Test
     public void generateModeVerdict_DeduplicatesAndOrdersMatches() {
         OutputStructure.logsOutputDir = Path.of("target").toString();
         OutputStructure.startInnerLoopDateString = "YYYY-MM-DD_hh-mm-ss";
