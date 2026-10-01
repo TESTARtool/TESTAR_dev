@@ -23,15 +23,15 @@ public final class ExecutionStatusDto {
     }
 
     public ExecutionStatusDto(
-        String backend,
-        String status,
-        String message,
-        String workspace,
-        String mode,
-        String consoleOutput,
-        Long startedAtEpochMillis,
-        Integer plannedSequenceCount,
-        java.util.List<SequenceOutcomeDto> sequenceOutcomes
+            String backend,
+            String status,
+            String message,
+            String workspace,
+            String mode,
+            String consoleOutput,
+            Long startedAtEpochMillis,
+            Integer plannedSequenceCount,
+            java.util.List<SequenceOutcomeDto> sequenceOutcomes
     ) {
         this.backend = backend;
         this.status = status;

@@ -58,7 +58,7 @@ public final class TestOracleService {
     private static final String DSL_SOURCE_ORIGIN = "DSL_SOURCE";
     private static final String TEST_SETTINGS_FILE = "test.settings";
     private static final Pattern ORACLE_CLASS_PATTERN = Pattern.compile(
-        "\\b(?:public\\s+)?(?:static\\s+)?class\\s+([A-Za-z_$][A-Za-z\\d_$]*)\\s+(?:extends|implements)\\s+(?:[A-Za-z_$][A-Za-z\\d_$]*\\.)*(?:DslOracle|Oracle)\\b"
+            "\\b(?:public\\s+)?(?:static\\s+)?class\\s+([A-Za-z_$][A-Za-z\\d_$]*)\\s+(?:extends|implements)\\s+(?:[A-Za-z_$][A-Za-z\\d_$]*\\.)*(?:DslOracle|Oracle)\\b"
     );
 
     private final WorkspaceService workspaceService;
@@ -89,24 +89,24 @@ public final class TestOracleService {
             List<TestOracleItemDto> items = new ArrayList<>();
             for (String builtInOracle : builtInOracles) {
                 items.add(new TestOracleItemDto(
-                    builtInOracle,
-                    BUILT_IN_ORIGIN,
-                    "",
-                    activeOracleSet.contains(builtInOracle),
-                    false,
-                    false
+                        builtInOracle,
+                        BUILT_IN_ORIGIN,
+                        "",
+                        activeOracleSet.contains(builtInOracle),
+                        false,
+                        false
                 ));
             }
 
             workspaceJavaOracles.forEach((fileName, oracleNames) -> {
                 for (String oracleName : oracleNames) {
                     items.add(new TestOracleItemDto(
-                        oracleName,
-                        WORKSPACE_JAVA_ORIGIN,
-                        fileName,
-                        activeOracleSet.contains(oracleName),
-                        true,
-                        builtInOracleSet.contains(oracleName)
+                            oracleName,
+                            WORKSPACE_JAVA_ORIGIN,
+                            fileName,
+                            activeOracleSet.contains(oracleName),
+                            true,
+                            builtInOracleSet.contains(oracleName)
                     ));
                 }
             });
@@ -114,15 +114,15 @@ public final class TestOracleService {
             items.addAll(listDslItems(workspaceDirectory));
 
             items.sort(Comparator
-                .comparing(TestOracleItemDto::origin)
-                .thenComparing(TestOracleItemDto::name)
-                .thenComparing(TestOracleItemDto::path));
+                    .comparing(TestOracleItemDto::origin)
+                    .thenComparing(TestOracleItemDto::name)
+                    .thenComparing(TestOracleItemDto::path));
 
             return new TestOracleInventoryDto(workspaceName, activeOracles, items);
         });
         inventoryCache.put(workspaceName, new CachedOracleInventory(
-            inventoryFingerprint(workspaceDirectory),
-            inventory
+                inventoryFingerprint(workspaceDirectory),
+                inventory
         ));
         return inventory;
     }
@@ -204,8 +204,8 @@ public final class TestOracleService {
         rejectNonDslFile(file, relativePath);
 
         DslOracleOperationResult result = dslOracleCompiler().validate(
-            toRelativePath(dslRoot, file),
-            content == null ? "" : content
+                toRelativePath(dslRoot, file),
+                content == null ? "" : content
         );
 
         return toDslResultDto(result, "");
@@ -221,9 +221,9 @@ public final class TestOracleService {
         Path javaRoot = javaRoot(workspaceName);
         Path generatedJavaFile = generatedJavaPath(javaRoot, savedDslFile.location());
         saveJavaFile(
-            workspaceName,
-            toRelativePath(javaRoot, generatedJavaFile),
-            result.generatedJavaSource()
+                workspaceName,
+                toRelativePath(javaRoot, generatedJavaFile),
+                result.generatedJavaSource()
         );
         enableOracleClassNames(workspaceName, oracleClassNamesFromJavaSource(result.generatedJavaSource()));
 
@@ -289,8 +289,8 @@ public final class TestOracleService {
 
         try {
             String sourceContent = Files.isRegularFile(file)
-                ? Files.readString(file, StandardCharsets.UTF_8)
-                : "";
+                    ? Files.readString(file, StandardCharsets.UTF_8)
+                    : "";
             List<String> deletedOracleNames = oracleClassNamesFromJavaSource(sourceContent);
             if (deletedOracleNames.isEmpty()) {
                 deletedOracleNames = List.of(classNameFromJavaFile(file));
@@ -339,22 +339,22 @@ public final class TestOracleService {
         DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<JavaFileObject>();
         try (StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnostics, null, null)) {
             Iterable<? extends JavaFileObject> compilationUnits = fileManager.getJavaFileObjectsFromFiles(
-                javaFiles.stream().map(Path::toFile).collect(Collectors.toList())
+                    javaFiles.stream().map(Path::toFile).collect(Collectors.toList())
             );
             List<String> options = List.of(
-                "-classpath",
-                System.getProperty("java.class.path"),
-                "-sourcepath",
-                javaRoot.toAbsolutePath().toString(),
-                "-d",
-                compiledRoot.toString()
+                    "-classpath",
+                    System.getProperty("java.class.path"),
+                    "-sourcepath",
+                    javaRoot.toAbsolutePath().toString(),
+                    "-d",
+                    compiledRoot.toString()
             );
 
             Boolean success = compiler.getTask(null, fileManager, diagnostics, options, null, compilationUnits).call();
             List<WorkspaceJavaCompileDiagnosticDto> diagnosticDtos = diagnostics.getDiagnostics()
-                .stream()
-                .map(diagnostic -> toCompileDiagnostic(javaRoot, diagnostic))
-                .collect(Collectors.toList());
+                    .stream()
+                    .map(diagnostic -> toCompileDiagnostic(javaRoot, diagnostic))
+                    .collect(Collectors.toList());
             boolean succeeded = Boolean.TRUE.equals(success);
             if (succeeded) {
                 enableOracleClassNames(workspaceName, oracleClassNamesFromJavaSource(savedFile.content()));
@@ -583,7 +583,7 @@ public final class TestOracleService {
 
     private TestOracleDslResultDto toDslResultDto(DslOracleOperationResult result, String generatedJavaPath) {
         List<TestOracleDslDiagnosticDto> diagnostics = result.diagnostics().stream()
-            .map(diagnostic -> new TestOracleDslDiagnosticDto(
+                .map(diagnostic -> new TestOracleDslDiagnosticDto(
                 diagnostic.severity(),
                 diagnostic.line(),
                 diagnostic.column(),
@@ -591,7 +591,7 @@ public final class TestOracleService {
                 diagnostic.endColumn(),
                 diagnostic.message()
             ))
-            .collect(Collectors.toList());
+                .collect(Collectors.toList());
 
         return new TestOracleDslResultDto(
             result.success(),
@@ -632,10 +632,10 @@ public final class TestOracleService {
 
     private void enableOracleClassNames(String workspaceName, List<String> oracleClassNames) {
         List<String> normalizedNames = oracleClassNames.stream()
-            .map(name -> name == null ? "" : name.trim())
-            .filter(name -> !name.isBlank())
-            .distinct()
-            .collect(Collectors.toList());
+                .map(name -> name == null ? "" : name.trim())
+                .filter(name -> !name.isBlank())
+                .distinct()
+                .collect(Collectors.toList());
         if (normalizedNames.isEmpty()) {
             return;
         }
@@ -643,8 +643,8 @@ public final class TestOracleService {
         Path settingsFile = workspaceService.workspaceDirectory(workspaceName).resolve(TEST_SETTINGS_FILE);
         try {
             String content = Files.isRegularFile(settingsFile)
-                ? Files.readString(settingsFile, StandardCharsets.UTF_8)
-                : "";
+                    ? Files.readString(settingsFile, StandardCharsets.UTF_8)
+                    : "";
             List<String> enabledOracles = new ArrayList<>(readActiveOracles(workspaceService.workspaceDirectory(workspaceName)));
             boolean changed = false;
             for (String oracleName : normalizedNames) {
@@ -658,9 +658,9 @@ public final class TestOracleService {
             }
 
             Files.writeString(
-                settingsFile,
-                settingsContentWithExtendedOracles(content, enabledOracles),
-                StandardCharsets.UTF_8
+                    settingsFile,
+                    settingsContentWithExtendedOracles(content, enabledOracles),
+                    StandardCharsets.UTF_8
             );
             invalidateInventory(workspaceName);
         } catch (IOException exception) {
@@ -670,10 +670,10 @@ public final class TestOracleService {
 
     private void disableOracleClassNames(String workspaceName, List<String> oracleClassNames) {
         List<String> normalizedNames = oracleClassNames.stream()
-            .map(name -> name == null ? "" : name.trim())
-            .filter(name -> !name.isBlank())
-            .distinct()
-            .collect(Collectors.toList());
+                .map(name -> name == null ? "" : name.trim())
+                .filter(name -> !name.isBlank())
+                .distinct()
+                .collect(Collectors.toList());
         if (normalizedNames.isEmpty()) {
             return;
         }
@@ -693,9 +693,9 @@ public final class TestOracleService {
             }
 
             Files.writeString(
-                settingsFile,
-                settingsContentWithExtendedOracles(content, enabledOracles),
-                StandardCharsets.UTF_8
+                    settingsFile,
+                    settingsContentWithExtendedOracles(content, enabledOracles),
+                    StandardCharsets.UTF_8
             );
             invalidateInventory(workspaceName);
         } catch (IOException exception) {
@@ -750,10 +750,10 @@ public final class TestOracleService {
         if (Files.isDirectory(oracleDirectory)) {
             try (Stream<Path> paths = Files.walk(oracleDirectory)) {
                 inventoryInputs.addAll(paths
-                    .filter(Files::isRegularFile)
-                    .filter(this::isOracleInventoryInput)
-                    .sorted()
-                    .collect(Collectors.toList()));
+                        .filter(Files::isRegularFile)
+                        .filter(this::isOracleInventoryInput)
+                        .sorted()
+                        .collect(Collectors.toList()));
             } catch (IOException exception) {
                 throw new IllegalStateException("Unable to fingerprint workspace oracles: " + oracleDirectory, exception);
             }

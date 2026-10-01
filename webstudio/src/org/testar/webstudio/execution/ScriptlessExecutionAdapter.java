@@ -42,13 +42,13 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
     private static final int MAX_CONSOLE_LINES = 250;
     private static final long COMPLETED_RUN_IDLE_GRACE_MILLIS = 8000L;
     private static final Pattern SEQUENCE_START_PATTERN = Pattern.compile(
-        "Starting\\s+sequence\\s+(\\d+)\\s+\\(output\\s+as:\\s+([^\\)]+)\\)"
+            "Starting\\s+sequence\\s+(\\d+)\\s+\\(output\\s+as:\\s+([^\\)]+)\\)"
     );
     private static final Pattern SEQUENCE_SUMMARY_PATTERN = Pattern.compile("_sequence_(\\d+)");
     private static final Pattern SEQUENCE_OUTPUT_PATH_PATTERN = Pattern.compile("Generate\\s+([^\\s]+_sequence_(\\d+))");
     private static final Pattern SEQUENCE_REPORT_PATTERN = Pattern.compile(
-        "(?:.*_)?sequence_(\\d+)_V\\d+_.+\\.html?$",
-        Pattern.CASE_INSENSITIVE
+            "(?:.*_)?sequence_(\\d+)_V\\d+_.+\\.html?$",
+            Pattern.CASE_INSENSITIVE
     );
     private static final Pattern HTML_RESOURCE_ATTRIBUTE_PATTERN = Pattern.compile("(\\b(?:src|href)\\s*=\\s*[\"'])([^\"']*)([\"'])");
     private static final Pattern STATIC_HTML_ASSET_PATTERN = Pattern.compile(".+\\.(?:html?|css|js|png|jpe?g|gif|svg|ico|bmp|webp|woff2?|ttf|eot)$", Pattern.CASE_INSENSITIVE);
@@ -361,7 +361,7 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
     private void startOutputDrain(Process process) {
         Thread drainThread = new Thread(() -> {
             try (BufferedReader reader = new BufferedReader(
-                new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8)
+                    new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8)
             )) {
                 String line;
                 while ((line = reader.readLine()) != null) {
@@ -503,8 +503,8 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
 
         if (line.contains("End of test sequence - shutting down the SUT...")) {
             int sequenceNumber = currentSequenceNumber > 0
-                ? currentSequenceNumber
-                : sequenceOutcomes.size() + 1;
+                    ? currentSequenceNumber
+                    : sequenceOutcomes.size() + 1;
             recordSequenceOutcome(sequenceNumber, currentSequenceFailed ? "failed" : "ok", null);
             currentSequenceFailed = false;
             currentSequenceNumber = 0;
@@ -576,8 +576,8 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
             if (sequenceOutcomes.get(index).sequenceNumber() == sequenceNumber) {
                 String existingStatus = sequenceOutcomes.get(index).status();
                 String resolvedOutputPath = resolvedVerdicts.isEmpty()
-                    ? outputPath
-                    : resolvedVerdicts.get(0).outputPath();
+                        ? outputPath
+                        : resolvedVerdicts.get(0).outputPath();
                 if (resolvedOutputPath == null) {
                     resolvedOutputPath = sequenceOutcomes.get(index).outputPath();
                 }
@@ -590,22 +590,22 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
                     return;
                 }
                 sequenceOutcomes.set(index, new SequenceOutcomeDto(
-                    sequenceNumber,
-                    status,
-                    resolvedOutputPath,
-                    effectiveLabel,
-                    effectiveVerdicts
+                        sequenceNumber,
+                        status,
+                        resolvedOutputPath,
+                        effectiveLabel,
+                        effectiveVerdicts
                 ));
                 return;
             }
         }
 
         sequenceOutcomes.add(new SequenceOutcomeDto(
-            sequenceNumber,
-            status,
-            outputPath,
-            resolvedLabel,
-            resolvedVerdicts
+                sequenceNumber,
+                status,
+                outputPath,
+                resolvedLabel,
+                resolvedVerdicts
         ));
     }
 
@@ -618,8 +618,8 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
                     Path reportsDirectory = runOutputDirectory.resolve("reports");
                     if (Files.isDirectory(reportsDirectory)) {
                         String baseName = outputBasePath.getFileName() == null
-                            ? null
-                            : outputBasePath.getFileName().toString();
+                                ? null
+                                : outputBasePath.getFileName().toString();
                         List<ResultFileSummaryDto> files = new ArrayList<>();
                         collectPreviewableFiles(reportsDirectory, baseName, files);
                         if (!files.isEmpty()) {
@@ -637,16 +637,16 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
 
     private List<SequenceVerdictDto> resolveLatestSequenceVerdicts(int sequenceNumber) {
         Path installBinDirectory = currentInstallBinDirectory != null
-            ? currentInstallBinDirectory
-            : lastInstallBinDirectory;
+                ? currentInstallBinDirectory
+                : lastInstallBinDirectory;
         String workspaceName = currentWorkspace != null ? currentWorkspace : lastWorkspace;
         if (installBinDirectory == null || workspaceName == null || workspaceName.isBlank()) {
             return List.of();
         }
 
         Path outputDirectory = ResultWorkspacePaths.workspaceOutputDirectory(
-            installBinDirectory,
-            workspaceName
+                installBinDirectory,
+                workspaceName
         );
         if (!Files.isDirectory(outputDirectory)) {
             return List.of();
@@ -654,10 +654,10 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
 
         try (var children = Files.list(outputDirectory)) {
             List<Path> outputGroups = children
-                .filter(Files::isDirectory)
-                .filter(path -> !"graphs".equalsIgnoreCase(path.getFileName().toString()))
-                .sorted(Comparator.comparing(path -> path.getFileName().toString(), Comparator.reverseOrder()))
-                .toList();
+                    .filter(Files::isDirectory)
+                    .filter(path -> !"graphs".equalsIgnoreCase(path.getFileName().toString()))
+                    .sorted(Comparator.comparing(path -> path.getFileName().toString(), Comparator.reverseOrder()))
+                    .toList();
 
             for (Path outputGroup : outputGroups) {
                 Path reportsDirectory = outputGroup.resolve("reports");
@@ -680,8 +680,8 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
     }
 
     static List<ResultFileSummaryDto> filterSequenceVerdictFiles(
-        List<ResultFileSummaryDto> files,
-        int sequenceNumber
+            List<ResultFileSummaryDto> files,
+            int sequenceNumber
     ) {
         return files.stream()
             .filter(file -> {
@@ -693,8 +693,8 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
     }
 
     static List<SequenceVerdictDto> buildSequenceVerdicts(
-        List<ResultFileSummaryDto> files,
-        int sequenceNumber
+            List<ResultFileSummaryDto> files,
+            int sequenceNumber
     ) {
         return filterSequenceVerdictFiles(files, sequenceNumber).stream()
             .sorted(Comparator.comparing(ResultFileSummaryDto::path))
@@ -727,14 +727,14 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
     private void destroyProcessTree(Process process) {
         ProcessHandle processHandle = process.toHandle();
         processHandle
-            .descendants()
-            .forEach(descendant -> {
-                try {
-                    descendant.destroyForcibly();
-                } catch (Exception ignored) {
-                    // Ignore failing descendant termination attempts.
-                }
-            });
+                .descendants()
+                .forEach(descendant -> {
+                    try {
+                        descendant.destroyForcibly();
+                    } catch (Exception ignored) {
+                        // Ignore failing descendant termination attempts.
+                    }
+                });
 
         try {
             processHandle.destroyForcibly();
@@ -769,7 +769,7 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
                     contentTypeFor(path),
                     resultStatusFor(path)
                 ))
-                .forEach(files::add);
+                    .forEach(files::add);
         } catch (IOException exception) {
             throw new IllegalStateException("Unable to list scriptless result files under: " + reportsDirectory, exception);
         }
@@ -790,12 +790,12 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
 
         try (var children = Files.list(outputDirectory)) {
             List<ResultOutputGroupDto> groups = children
-                .filter(Files::isDirectory)
-                .filter(path -> !"graphs".equalsIgnoreCase(path.getFileName().toString()))
-                .sorted(Comparator.comparing(path -> path.getFileName().toString()))
-                .map(this::toResultOutputGroup)
-                .filter(group -> group != null && !group.files().isEmpty())
-                .toList();
+                    .filter(Files::isDirectory)
+                    .filter(path -> !"graphs".equalsIgnoreCase(path.getFileName().toString()))
+                    .sorted(Comparator.comparing(path -> path.getFileName().toString()))
+                    .map(this::toResultOutputGroup)
+                    .filter(group -> group != null && !group.files().isEmpty())
+                    .toList();
             return groups;
         } catch (IOException exception) {
             throw new IllegalStateException("Unable to inspect scriptless output directory: " + outputDirectory, exception);
@@ -893,7 +893,7 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
                 String encodedAssetPath = URLEncoder.encode(validAssetPath.toString(), StandardCharsets.UTF_8);
                 String encodedWorkspaceName = URLEncoder.encode(workspaceName, StandardCharsets.UTF_8);
                 String assetUrl = "/api/execution/scriptless/result-asset?workspace=" + encodedWorkspaceName
-                    + "&path=" + encodedAssetPath;
+                        + "&path=" + encodedAssetPath;
                 replacement = attributePrefix + assetUrl + attributeSuffix;
             } catch (IllegalArgumentException ignored) {
                 replacement = matcher.group(0);
@@ -915,26 +915,26 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
         String lowerCaseAssetPath = trimmedAssetPath.toLowerCase();
 
         if (lowerCaseAssetPath.startsWith("http:")
-            || lowerCaseAssetPath.startsWith("https:")
-            || lowerCaseAssetPath.startsWith("data:")
-            || lowerCaseAssetPath.startsWith("javascript:")
-            || lowerCaseAssetPath.startsWith("//")
-            || lowerCaseAssetPath.startsWith("#")) {
+                || lowerCaseAssetPath.startsWith("https:")
+                || lowerCaseAssetPath.startsWith("data:")
+                || lowerCaseAssetPath.startsWith("javascript:")
+                || lowerCaseAssetPath.startsWith("//")
+                || lowerCaseAssetPath.startsWith("#")) {
             return false;
         }
 
         if (trimmedAssetPath.contains("&")
-            || trimmedAssetPath.contains("?")
-            || trimmedAssetPath.contains("+")
-            || trimmedAssetPath.contains("<")
-            || trimmedAssetPath.contains(">")
-            || trimmedAssetPath.contains("{")
-            || trimmedAssetPath.contains("}")
-            || trimmedAssetPath.contains("(")
-            || trimmedAssetPath.contains(")")
-            || trimmedAssetPath.contains("\n")
-            || trimmedAssetPath.contains("\r")
-            || trimmedAssetPath.contains("\t")) {
+                || trimmedAssetPath.contains("?")
+                || trimmedAssetPath.contains("+")
+                || trimmedAssetPath.contains("<")
+                || trimmedAssetPath.contains(">")
+                || trimmedAssetPath.contains("{")
+                || trimmedAssetPath.contains("}")
+                || trimmedAssetPath.contains("(")
+                || trimmedAssetPath.contains(")")
+                || trimmedAssetPath.contains("\n")
+                || trimmedAssetPath.contains("\r")
+                || trimmedAssetPath.contains("\t")) {
             return false;
         }
 

@@ -21,16 +21,16 @@ public class ResultWorkspacePathsTest {
         Path outputDirectory = ResultWorkspacePaths.workspaceOutputDirectory(runtimeHome, "webdriver_generic");
 
         Assert.assertEquals(
-            runtimeHome.resolve("output").resolve("webdriver_generic").toAbsolutePath().normalize(),
-            outputDirectory
+                runtimeHome.resolve("output").resolve("webdriver_generic").toAbsolutePath().normalize(),
+                outputDirectory
         );
     }
 
     @Test
     public void createsWorkspaceOutputSettingValue() {
         Assert.assertEquals(
-            "./output/webdriver_generic",
-            ResultWorkspacePaths.workspaceOutputSettingValue("webdriver_generic")
+                "./output/webdriver_generic",
+                ResultWorkspacePaths.workspaceOutputSettingValue("webdriver_generic")
         );
     }
 

@@ -42,11 +42,11 @@ public final class RemoteSpyDebugLog {
                 builder.append(stringWriter).append(System.lineSeparator());
             }
             Files.writeString(
-                logPath,
-                builder.toString(),
-                StandardCharsets.UTF_8,
-                StandardOpenOption.CREATE,
-                StandardOpenOption.APPEND
+                    logPath,
+                    builder.toString(),
+                    StandardCharsets.UTF_8,
+                    StandardOpenOption.CREATE,
+                    StandardOpenOption.APPEND
             );
         } catch (IOException ignored) {
             // Avoid recursive failures while debugging Spy Mode.

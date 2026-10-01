@@ -53,11 +53,11 @@ public class ScriptlessResultsWorkspaceScopeTest {
                                   String runName,
                                   String fileName) throws IOException {
         Path resultFile = installBin
-            .resolve("output")
-            .resolve(workspaceName)
-            .resolve(runName)
-            .resolve("reports")
-            .resolve(fileName);
+                .resolve("output")
+                .resolve(workspaceName)
+                .resolve(runName)
+                .resolve("reports")
+                .resolve(fileName);
         Files.createDirectories(resultFile.getParent());
         Files.writeString(resultFile, "<html></html>");
     }

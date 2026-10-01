@@ -20,13 +20,13 @@ public class WorkspaceServiceRuntimeHomeTest {
         Files.createDirectories(roots.testarWorkspacesRoot.resolve("webdriver_generic"));
 
         WorkspaceService workspaceService = new WorkspaceService(
-            roots.testarWorkspacesRoot,
-            roots.cliWorkspacesRoot
+                roots.testarWorkspacesRoot,
+                roots.cliWorkspacesRoot
         );
 
         Assert.assertEquals(
-            roots.testarHome,
-            workspaceService.workspaceRuntimeHomeDirectory("webdriver_generic")
+                roots.testarHome,
+                workspaceService.workspaceRuntimeHomeDirectory("webdriver_generic")
         );
     }
 
@@ -55,13 +55,13 @@ public class WorkspaceServiceRuntimeHomeTest {
         Files.createDirectories(roots.cliWorkspacesRoot.resolve("cli_generic"));
 
         WorkspaceService workspaceService = new WorkspaceService(
-            roots.testarWorkspacesRoot,
-            roots.cliWorkspacesRoot
+                roots.testarWorkspacesRoot,
+                roots.cliWorkspacesRoot
         );
 
         Assert.assertEquals(
-            roots.cliHome,
-            workspaceService.workspaceRuntimeHomeDirectory("cli_generic")
+                roots.cliHome,
+                workspaceService.workspaceRuntimeHomeDirectory("cli_generic")
         );
     }
 
@@ -72,13 +72,13 @@ public class WorkspaceServiceRuntimeHomeTest {
         Files.createDirectories(roots.cliWorkspacesRoot.resolve("shared_generic"));
 
         WorkspaceService workspaceService = new WorkspaceService(
-            roots.testarWorkspacesRoot,
-            roots.cliWorkspacesRoot
+                roots.testarWorkspacesRoot,
+                roots.cliWorkspacesRoot
         );
 
         Assert.assertEquals(
-            roots.testarHome,
-            workspaceService.workspaceRuntimeHomeDirectory("shared_generic")
+                roots.testarHome,
+                workspaceService.workspaceRuntimeHomeDirectory("shared_generic")
         );
     }
 
@@ -88,13 +88,13 @@ public class WorkspaceServiceRuntimeHomeTest {
         Files.createDirectories(roots.testarWorkspacesRoot.resolve("webdriver_generic"));
 
         WorkspaceService workspaceService = new WorkspaceService(
-            roots.testarWorkspacesRoot,
-            roots.testarWorkspacesRoot
+                roots.testarWorkspacesRoot,
+                roots.testarWorkspacesRoot
         );
 
         Assert.assertEquals(
-            roots.testarHome,
-            workspaceService.workspaceRuntimeHomeDirectory("webdriver_generic")
+                roots.testarHome,
+                workspaceService.workspaceRuntimeHomeDirectory("webdriver_generic")
         );
     }
 

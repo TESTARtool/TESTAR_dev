@@ -22,16 +22,16 @@ public final class SpyStateDto {
     private final List<SpyActionDto> actions;
 
     public SpyStateDto(
-        String status,
-        String workspace,
-        String platform,
-        String target,
-        String message,
-        String screenshotPath,
-        int screenshotWidth,
-        int screenshotHeight,
-        List<SpyWidgetDto> widgets,
-        List<SpyActionDto> actions
+            String status,
+            String workspace,
+            String platform,
+            String target,
+            String message,
+            String screenshotPath,
+            int screenshotWidth,
+            int screenshotHeight,
+            List<SpyWidgetDto> widgets,
+            List<SpyActionDto> actions
     ) {
         this.status = status;
         this.workspace = workspace;

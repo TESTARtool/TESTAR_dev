@@ -15,9 +15,9 @@ public final class ScriptlessResultsDto {
     private final List<ResultFileSummaryDto> files;
 
     public ScriptlessResultsDto(
-        String latestSequenceOutputPath,
-        List<ResultOutputGroupDto> groups,
-        List<ResultFileSummaryDto> files
+            String latestSequenceOutputPath,
+            List<ResultOutputGroupDto> groups,
+            List<ResultFileSummaryDto> files
     ) {
         this.latestSequenceOutputPath = latestSequenceOutputPath;
         this.groups = groups;

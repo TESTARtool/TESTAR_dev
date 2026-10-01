@@ -20,14 +20,14 @@ public class ScriptlessExecutionAdapterTest {
     @Test
     public void recognizesSpyCompletionSignal() {
         Assert.assertTrue(ScriptlessExecutionAdapter.isSpySessionCompletionSignal(
-            " TESTAR_SPY_SESSION_COMPLETED "
+                " TESTAR_SPY_SESSION_COMPLETED "
         ));
     }
 
     @Test
     public void ignoresUnrelatedConsoleOutput() {
         Assert.assertFalse(ScriptlessExecutionAdapter.isSpySessionCompletionSignal(
-            "User requested to stop monkey!"
+                "User requested to stop monkey!"
         ));
     }
 

@@ -41,9 +41,9 @@ public class WorkspaceIgnoredVerdictsServiceTest {
         Assert.assertEquals(List.of(), service.list("first"));
         Assert.assertEquals(List.of(), service.clear("first"));
         Assert.assertFalse(Files.exists(root.resolve("first")
-            .resolve(VerdictProcessing.LIST_VERDICTS_FAILURES_FILENAME)));
+                .resolve(VerdictProcessing.LIST_VERDICTS_FAILURES_FILENAME)));
         Assert.assertFalse(Files.exists(root.resolve("second")
-            .resolve(VerdictProcessing.LIST_VERDICTS_FAILURES_FILENAME)));
+                .resolve(VerdictProcessing.LIST_VERDICTS_FAILURES_FILENAME)));
     }
 
     private WorkspaceIgnoredVerdictsService service(Path root) {

@@ -105,10 +105,10 @@ public final class WebStudioServer {
     private void registerRoutes(JavalinDefaultRoutingApi routes) {
         routes.get("/", context -> context.redirect("/index.html"));
         routes.get("/api/health", context -> handle(context, () -> Map.of(
-            "name", "TESTAR web studio",
-            "status", "ok",
-            "workspacesRoot", workspaceController.workspacesRoot().toString(),
-            "workspaceCount", workspaceController.listWorkspaces().size()
+                "name", "TESTAR web studio",
+                "status", "ok",
+                "workspacesRoot", workspaceController.workspacesRoot().toString(),
+                "workspaceCount", workspaceController.listWorkspaces().size()
         )));
         routes.get("/api/workspaces", context -> handle(context, workspaceController::listWorkspaces));
         routes.post("/api/workspaces", context -> handle(context, () -> {
@@ -122,7 +122,7 @@ public final class WebStudioServer {
         }));
         routes.get("/api/debug-files", context -> handle(context, workspaceController::listDebugFiles));
         routes.get("/api/debug-files/{fileName}", context -> handle(context, () ->
-            workspaceController.readDebugFile(
+                workspaceController.readDebugFile(
                 context.pathParam("fileName"),
                 context.queryParam("path")
             )
@@ -132,18 +132,18 @@ public final class WebStudioServer {
             return workspaceController.readWorkspaceDocument(workspace);
         }));
         routes.get("/api/settings/abstract-state-tags", context -> handle(context,
-            workspaceController::abstractStateTags));
+                workspaceController::abstractStateTags));
         routes.get("/api/settings/spy-tags", context -> handle(context,
-            workspaceController::spyTags));
+                workspaceController::spyTags));
         routes.get("/api/workspaces/{workspace}/ignored-verdicts", context -> handle(context, () ->
-            workspaceController.ignoredVerdicts(context.pathParam("workspace"))));
+                workspaceController.ignoredVerdicts(context.pathParam("workspace"))));
         routes.post("/api/workspaces/{workspace}/ignored-verdicts/remove", context -> handle(context, () -> {
             String[] selected = gson.fromJson(context.body(), String[].class);
             return workspaceController.removeIgnoredVerdicts(context.pathParam("workspace"),
                 selected == null ? null : List.of(selected));
         }));
         routes.delete("/api/workspaces/{workspace}/ignored-verdicts", context -> handle(context, () ->
-            workspaceController.clearIgnoredVerdicts(context.pathParam("workspace"))));
+                workspaceController.clearIgnoredVerdicts(context.pathParam("workspace"))));
         routes.put("/api/workspaces/{workspace}/test-settings", context -> handle(context, () -> {
             String workspace = context.pathParam("workspace");
             WorkspaceFileUpdateDto update = gson.fromJson(context.body(), WorkspaceFileUpdateDto.class);
@@ -198,10 +198,10 @@ public final class WebStudioServer {
             return validationController.validateWorkspace(workspace);
         }));
         routes.get("/api/workspaces/{workspace}/test-goals", context -> handle(context, () ->
-            testGoalController.tree(context.pathParam("workspace"))
+                testGoalController.tree(context.pathParam("workspace"))
         ));
         routes.get("/api/workspaces/{workspace}/test-goals/file", context -> handle(context, () ->
-            testGoalController.readFile(context.pathParam("workspace"), context.queryParam("path"))
+                testGoalController.readFile(context.pathParam("workspace"), context.queryParam("path"))
         ));
         routes.put("/api/workspaces/{workspace}/test-goals/file", context -> handle(context, () -> {
             WorkspaceFileUpdateDto update = gson.fromJson(context.body(), WorkspaceFileUpdateDto.class);
@@ -212,22 +212,22 @@ public final class WebStudioServer {
             );
         }));
         routes.post("/api/workspaces/{workspace}/test-goals/file", context -> handle(context, () ->
-            testGoalController.createFile(context.pathParam("workspace"), context.queryParam("path"))
+                testGoalController.createFile(context.pathParam("workspace"), context.queryParam("path"))
         ));
         routes.post("/api/workspaces/{workspace}/test-goals/folder", context -> handle(context, () ->
-            testGoalController.createFolder(context.pathParam("workspace"), context.queryParam("path"))
+                testGoalController.createFolder(context.pathParam("workspace"), context.queryParam("path"))
         ));
         routes.delete("/api/workspaces/{workspace}/test-goals", context -> handle(context, () ->
-            testGoalController.delete(context.pathParam("workspace"), context.queryParam("path"))
+                testGoalController.delete(context.pathParam("workspace"), context.queryParam("path"))
         ));
         routes.get("/api/workspaces/{workspace}/test-oracles", context -> handle(context, () ->
-            testOracleController.inventory(context.pathParam("workspace"))
+                testOracleController.inventory(context.pathParam("workspace"))
         ));
         routes.get("/api/test-oracles/dsl/metadata", context -> handle(context,
-            testOracleController::dslMetadata
+                testOracleController::dslMetadata
         ));
         routes.get("/api/workspaces/{workspace}/test-oracles/dsl/file", context -> handle(context, () ->
-            testOracleController.readDslFile(context.pathParam("workspace"), context.queryParam("path"))
+                testOracleController.readDslFile(context.pathParam("workspace"), context.queryParam("path"))
         ));
         routes.put("/api/workspaces/{workspace}/test-oracles/dsl/file", context -> handle(context, () -> {
             WorkspaceFileUpdateDto update = gson.fromJson(context.body(), WorkspaceFileUpdateDto.class);
@@ -238,10 +238,10 @@ public final class WebStudioServer {
             );
         }));
         routes.post("/api/workspaces/{workspace}/test-oracles/dsl/file", context -> handle(context, () ->
-            testOracleController.createDslFile(context.pathParam("workspace"), context.queryParam("path"))
+                testOracleController.createDslFile(context.pathParam("workspace"), context.queryParam("path"))
         ));
         routes.delete("/api/workspaces/{workspace}/test-oracles/dsl/file", context -> handle(context, () ->
-            testOracleController.deleteDslFile(context.pathParam("workspace"), context.queryParam("path"))
+                testOracleController.deleteDslFile(context.pathParam("workspace"), context.queryParam("path"))
         ));
         routes.post("/api/workspaces/{workspace}/test-oracles/dsl/validate", context -> handle(context, () -> {
             WorkspaceFileUpdateDto update = gson.fromJson(context.body(), WorkspaceFileUpdateDto.class);
@@ -260,7 +260,7 @@ public final class WebStudioServer {
             );
         }));
         routes.get("/api/workspaces/{workspace}/test-oracles/java/file", context -> handle(context, () ->
-            testOracleController.readJavaFile(context.pathParam("workspace"), context.queryParam("path"))
+                testOracleController.readJavaFile(context.pathParam("workspace"), context.queryParam("path"))
         ));
         routes.put("/api/workspaces/{workspace}/test-oracles/java/file", context -> handle(context, () -> {
             WorkspaceFileUpdateDto update = gson.fromJson(context.body(), WorkspaceFileUpdateDto.class);
@@ -271,10 +271,10 @@ public final class WebStudioServer {
             );
         }));
         routes.post("/api/workspaces/{workspace}/test-oracles/java/file", context -> handle(context, () ->
-            testOracleController.createJavaFile(context.pathParam("workspace"), context.queryParam("path"))
+                testOracleController.createJavaFile(context.pathParam("workspace"), context.queryParam("path"))
         ));
         routes.delete("/api/workspaces/{workspace}/test-oracles/java/file", context -> handle(context, () ->
-            testOracleController.deleteJavaFile(context.pathParam("workspace"), context.queryParam("path"))
+                testOracleController.deleteJavaFile(context.pathParam("workspace"), context.queryParam("path"))
         ));
         routes.post("/api/workspaces/{workspace}/test-oracles/java/file/compile", context -> handle(context, () -> {
             WorkspaceFileUpdateDto update = gson.fromJson(context.body(), WorkspaceFileUpdateDto.class);
@@ -303,20 +303,20 @@ public final class WebStudioServer {
         routes.post("/api/execution/cli/manual/stop", context -> handle(context, executionController::stopCliManualSession));
         routes.post("/api/execution/cli/agent/stop", context -> handle(context, executionController::stopCliAgentSession));
         routes.get("/api/execution/cli/results", context -> handle(context, () ->
-            executionController.cliResults(context.queryParam("workspace"))
+                executionController.cliResults(context.queryParam("workspace"))
         ));
         routes.get("/api/execution/cli/results/{fileName}", context -> handle(context, () ->
-            executionController.cliResultFile(
+                executionController.cliResultFile(
                 context.queryParam("workspace"),
                 context.pathParam("fileName"),
                 context.queryParam("path")
             )
         ));
         routes.delete("/api/execution/cli/results/{fileName}", context -> handle(context, () ->
-            executionController.deleteCliResultFile(context.queryParam("workspace"), context.queryParam("path"))
+                executionController.deleteCliResultFile(context.queryParam("workspace"), context.queryParam("path"))
         ));
         routes.delete("/api/execution/cli/result-groups", context -> handle(context, () ->
-            executionController.deleteCliResultGroup(context.queryParam("workspace"), context.queryParam("path"))
+                executionController.deleteCliResultGroup(context.queryParam("workspace"), context.queryParam("path"))
         ));
         routes.get("/api/execution/cli/result-asset", context -> {
             String assetPath = context.queryParam("path");
@@ -324,20 +324,20 @@ public final class WebStudioServer {
             context.result(executionController.cliResultAsset(context.queryParam("workspace"), assetPath));
         });
         routes.get("/api/execution/scriptless/results", context -> handle(context, () ->
-            executionController.scriptlessResults(context.queryParam("workspace"))
+                executionController.scriptlessResults(context.queryParam("workspace"))
         ));
         routes.get("/api/execution/scriptless/results/{fileName}", context -> handle(context, () ->
-            executionController.scriptlessResultFile(
+                executionController.scriptlessResultFile(
                 context.queryParam("workspace"),
                 context.pathParam("fileName"),
                 context.queryParam("path")
             )
         ));
         routes.delete("/api/execution/scriptless/results/{fileName}", context -> handle(context, () ->
-            executionController.deleteScriptlessResultFile(context.queryParam("workspace"), context.queryParam("path"))
+                executionController.deleteScriptlessResultFile(context.queryParam("workspace"), context.queryParam("path"))
         ));
         routes.delete("/api/execution/scriptless/result-groups", context -> handle(context, () ->
-            executionController.deleteScriptlessResultGroup(context.queryParam("workspace"), context.queryParam("path"))
+                executionController.deleteScriptlessResultGroup(context.queryParam("workspace"), context.queryParam("path"))
         ));
         routes.get("/api/execution/scriptless/result-asset", context -> {
             String assetPath = context.queryParam("path");
@@ -355,14 +355,14 @@ public final class WebStudioServer {
         routes.post("/api/execution/scriptless/stop", context -> handle(context, executionController::stopScriptlessRun));
         routes.get("/api/spy/status", context -> handle(context, remoteSpyController::remoteSpyStatus));
         routes.post("/api/spy/start/{workspace}", context -> handle(context, () ->
-            remoteSpyController.startRemoteSpy(context.pathParam("workspace"))
+                remoteSpyController.startRemoteSpy(context.pathParam("workspace"))
         ));
         routes.post("/api/spy/refresh", context -> handle(context, remoteSpyController::refreshRemoteSpy));
         routes.post("/api/spy/actions/{actionId}", context -> handle(context, () ->
-            remoteSpyController.executeRemoteSpyAction(context.pathParam("actionId"))
+                remoteSpyController.executeRemoteSpyAction(context.pathParam("actionId"))
         ));
         routes.post("/api/spy/widgets/{widgetId}/default-action", context -> handle(context, () ->
-            remoteSpyController.executeRemoteSpyDefaultWidgetAction(context.pathParam("widgetId"))
+                remoteSpyController.executeRemoteSpyDefaultWidgetAction(context.pathParam("widgetId"))
         ));
         routes.post("/api/spy/widgets/{widgetId}/direct-type", context -> handle(context, () -> {
             SpyTypeRequestDto request = gson.fromJson(context.body(), SpyTypeRequestDto.class);
@@ -378,7 +378,7 @@ public final class WebStudioServer {
             context.result(remoteSpyController.screenshot(screenshotPath));
         });
         routes.post("/api/statemodel/open/{workspace}", context -> handle(context, () ->
-            stateModelAnalysisController.open(context.pathParam("workspace"))
+                stateModelAnalysisController.open(context.pathParam("workspace"))
         ));
         routes.get("/api/statemodel/status", context -> handle(context, stateModelAnalysisController::status));
         routes.post("/api/statemodel/stop", context -> handle(context, stateModelAnalysisController::stop));
@@ -392,8 +392,8 @@ public final class WebStudioServer {
     private void writeError(Context context, int status, Exception exception) {
         context.status(status);
         writeJson(context, Map.of(
-            "error", exception.getClass().getSimpleName(),
-            "message", exception.getMessage()
+                "error", exception.getClass().getSimpleName(),
+                "message", exception.getMessage()
         ));
     }
 

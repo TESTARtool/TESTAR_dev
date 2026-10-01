@@ -27,16 +27,16 @@ public final class WorkspaceSettingsCatalog {
 
     private static final Map<String, String> DEFAULT_VALUES = buildDefaultValues();
     private static final Set<String> REGEX_SETTING_KEYS = Set.of(
-        ConfigTags.SUTProcesses.name(),
-        ConfigTags.ProcessesToKillDuringTest.name(),
-        ConfigTags.ClickFilter.name(),
-        ConfigTags.SuspiciousTags.name(),
-        ConfigTags.SuspiciousProcessOutput.name(),
-        ConfigTags.ProcessLogs.name(),
-        ConfigTags.LogOracleRegex.name(),
-        ConfigTags.WebPathsAllowed.name(),
-        ConfigTags.WebConsoleErrorPattern.name(),
-        ConfigTags.WebConsoleWarningPattern.name()
+            ConfigTags.SUTProcesses.name(),
+            ConfigTags.ProcessesToKillDuringTest.name(),
+            ConfigTags.ClickFilter.name(),
+            ConfigTags.SuspiciousTags.name(),
+            ConfigTags.SuspiciousProcessOutput.name(),
+            ConfigTags.ProcessLogs.name(),
+            ConfigTags.LogOracleRegex.name(),
+            ConfigTags.WebPathsAllowed.name(),
+            ConfigTags.WebConsoleErrorPattern.name(),
+            ConfigTags.WebConsoleWarningPattern.name()
     );
 
     private WorkspaceSettingsCatalog() { }
@@ -250,16 +250,16 @@ public final class WorkspaceSettingsCatalog {
     }
 
     private static WorkspaceSettingsGroupDto group(
-        String id,
-        String title,
-        String description,
-        Properties settingsProperties,
-        Tag<?>... tags
+            String id,
+            String title,
+            String description,
+            Properties settingsProperties,
+            Tag<?>... tags
     ) {
         List<WorkspaceSettingDto> settings = List.of(tags)
-            .stream()
-            .map(tag -> setting(tag, settingsProperties))
-            .collect(Collectors.toList());
+                .stream()
+                .map(tag -> setting(tag, settingsProperties))
+                .collect(Collectors.toList());
 
         return new WorkspaceSettingsGroupDto(id, title, description, settings);
     }

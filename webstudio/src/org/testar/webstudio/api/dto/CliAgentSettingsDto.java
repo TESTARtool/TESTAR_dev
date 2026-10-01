@@ -23,16 +23,16 @@ public final class CliAgentSettingsDto {
     }
 
     public CliAgentSettingsDto(
-        String apiKeyEnvVarName,
-        String baseUrl,
-        String model,
-        String reasoningEffort,
-        String sandboxMode,
-        String approvalPolicy,
-        Boolean allowNetworkAccess,
-        Boolean skipGitRepoCheck,
-        String promptTitle,
-        String promptText
+            String apiKeyEnvVarName,
+            String baseUrl,
+            String model,
+            String reasoningEffort,
+            String sandboxMode,
+            String approvalPolicy,
+            Boolean allowNetworkAccess,
+            Boolean skipGitRepoCheck,
+            String promptTitle,
+            String promptText
     ) {
         this.apiKeyEnvVarName = apiKeyEnvVarName;
         this.baseUrl = baseUrl;

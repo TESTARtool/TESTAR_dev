@@ -21,8 +21,8 @@ public class StateModelAnalysisServiceTest {
         Path graphsDirectory = StateModelAnalysisService.resolveGraphsDirectory(runtimeHome);
 
         Assert.assertEquals(
-            runtimeHome.resolve("output").resolve("graphs").toAbsolutePath().normalize(),
-            graphsDirectory
+                runtimeHome.resolve("output").resolve("graphs").toAbsolutePath().normalize(),
+                graphsDirectory
         );
     }
 }

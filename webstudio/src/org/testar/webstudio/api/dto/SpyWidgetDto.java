@@ -22,16 +22,16 @@ public final class SpyWidgetDto {
     private final Map<String, String> properties;
 
     public SpyWidgetDto(
-        String id,
-        String parentId,
-        String label,
-        String role,
-        double x,
-        double y,
-        double width,
-        double height,
-        boolean enabled,
-        Map<String, String> properties
+            String id,
+            String parentId,
+            String label,
+            String role,
+            double x,
+            double y,
+            double width,
+            double height,
+            boolean enabled,
+            Map<String, String> properties
     ) {
         this.id = id;
         this.parentId = parentId;

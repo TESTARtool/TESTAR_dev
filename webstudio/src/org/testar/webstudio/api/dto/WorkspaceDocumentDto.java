@@ -23,16 +23,16 @@ public final class WorkspaceDocumentDto {
     private final List<WorkspacePolicyDefinitionDto> policyDefinitions;
 
     public WorkspaceDocumentDto(
-        String workspaceName,
-        String location,
-        WorkspaceFileDto testSettings,
-        WorkspaceFileDto compositionProperties,
-        WorkspaceFileDto policiesProperties,
-        List<WorkspaceFileDto> sourceFiles,
-        Map<String, List<String>> references,
-        List<WorkspaceSettingsGroupDto> settingsGroups,
-        List<WorkspaceModuleDefinitionDto> moduleDefinitions,
-        List<WorkspacePolicyDefinitionDto> policyDefinitions
+            String workspaceName,
+            String location,
+            WorkspaceFileDto testSettings,
+            WorkspaceFileDto compositionProperties,
+            WorkspaceFileDto policiesProperties,
+            List<WorkspaceFileDto> sourceFiles,
+            Map<String, List<String>> references,
+            List<WorkspaceSettingsGroupDto> settingsGroups,
+            List<WorkspaceModuleDefinitionDto> moduleDefinitions,
+            List<WorkspacePolicyDefinitionDto> policyDefinitions
     ) {
         this.workspaceName = workspaceName;
         this.location = location;

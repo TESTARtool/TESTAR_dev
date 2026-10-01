@@ -62,8 +62,8 @@ final class ResultArtifactDeletion {
     private static void deleteDirectoryTree(Path directory) throws IOException {
         try (Stream<Path> paths = Files.walk(directory)) {
             List<Path> deletePaths = paths
-                .sorted(Comparator.reverseOrder())
-                .toList();
+                    .sorted(Comparator.reverseOrder())
+                    .toList();
 
             for (Path path : deletePaths) {
                 Files.deleteIfExists(path);

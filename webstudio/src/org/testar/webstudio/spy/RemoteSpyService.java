@@ -86,14 +86,14 @@ public final class RemoteSpyService {
             spyTagSelection = new SpyTagSelection(settings.get(ConfigTags.SpyTagAttributes));
             normalizeSettingsPaths(settings);
             debugLog.log(
-                "RemoteSpyService.startRemoteSpy normalized resources composition="
+                    "RemoteSpyService.startRemoteSpy normalized resources composition="
                     + settings.get(ConfigTags.CustomCompositionResource, "")
                     + " policies="
                     + settings.get(ConfigTags.CustomPoliciesResource, "")
             );
             activeSessionSpec = PlatformSessionSpecFactory.fromSettings(settings);
             debugLog.log(
-                "RemoteSpyService.startRemoteSpy sessionSpec os="
+                    "RemoteSpyService.startRemoteSpy sessionSpec os="
                     + activeSessionSpec.getOperatingSystem()
                     + " target="
                     + activeSessionSpec.getTarget()
@@ -121,7 +121,7 @@ public final class RemoteSpyService {
             debugLog.log("RemoteSpyService.refreshRemoteSpy state captured");
             currentState = toSpyState(state);
             debugLog.log(
-                "RemoteSpyService.refreshRemoteSpy completed in "
+                    "RemoteSpyService.refreshRemoteSpy completed in "
                     + elapsedMillis(startedAt)
                     + " ms screenshot="
                     + currentState.screenshotPath()
@@ -313,8 +313,8 @@ public final class RemoteSpyService {
         String resolvedScreenshotPath = captureSpyScreenshot(state);
         int[] screenshotSize = resolveScreenshotSize(resolvedScreenshotPath);
         widgets.sort(Comparator
-            .comparingDouble((SpyWidgetDto widget) -> widget.width() * widget.height())
-            .thenComparing(SpyWidgetDto::label));
+                .comparingDouble((SpyWidgetDto widget) -> widget.width() * widget.height())
+                .thenComparing(SpyWidgetDto::label));
 
         return new SpyStateDto(
             "running",
@@ -354,13 +354,13 @@ public final class RemoteSpyService {
     }
 
     private void traverseWidgetTree(
-        Widget widget,
-        String parentId,
-        Map<Widget, String> widgetIds,
-        Map<String, Integer> emittedWidgetIds,
-        List<SpyWidgetDto> widgets,
-        double offsetX,
-        double offsetY
+            Widget widget,
+            String parentId,
+            Map<Widget, String> widgetIds,
+            Map<String, Integer> emittedWidgetIds,
+            List<SpyWidgetDto> widgets,
+            double offsetX,
+            double offsetY
     ) {
         String widgetId = buildWidgetId(widget, parentId, widgets.size(), emittedWidgetIds);
         widgetIds.put(widget, widgetId);
@@ -416,8 +416,8 @@ public final class RemoteSpyService {
         }
 
         String parentPrefix = parentId == null || parentId.isBlank()
-            ? "widget"
-            : sanitizeIdentifier(parentId);
+                ? "widget"
+                : sanitizeIdentifier(parentId);
 
         return parentPrefix + "_" + index;
     }
@@ -459,10 +459,10 @@ public final class RemoteSpyService {
                 String actionId = "action_" + index++;
                 actionsById.put(actionId, action);
                 actionDtos.add(new SpyActionDto(
-                    actionId,
-                    action.get(Tags.Desc, action.toShortString()),
-                    String.valueOf(action.get(Tags.Role, null)),
-                    resolveTargetWidgetId(action)
+                        actionId,
+                        action.get(Tags.Desc, action.toShortString()),
+                        String.valueOf(action.get(Tags.Role, null)),
+                        resolveTargetWidgetId(action)
                 ));
             }
             currentDerivedActionsById = actionsById;
@@ -570,9 +570,9 @@ public final class RemoteSpyService {
             Path screenshotDirectory = workspaceService.testarHomeDirectory().resolve("spy-screenshots");
             Files.createDirectories(screenshotDirectory);
             Path screenshotPath = screenshotDirectory
-                .resolve("spy-" + System.currentTimeMillis() + ".png")
-                .toAbsolutePath()
-                .normalize();
+                    .resolve("spy-" + System.currentTimeMillis() + ".png")
+                    .toAbsolutePath()
+                    .normalize();
             screenshot.saveAsPng(screenshotPath.toString());
             debugLog.log("RemoteSpyService.captureSpyScreenshot saved " + screenshotPath);
             return screenshotPath.toString();

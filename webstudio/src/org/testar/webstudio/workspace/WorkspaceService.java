@@ -123,10 +123,10 @@ public final class WorkspaceService {
     }
 
     public WorkspaceSummaryDto createWorkspace(
-        String workspaceName,
-        String baseWorkspaceName,
-        boolean copyTestGoals,
-        boolean copyOracles
+            String workspaceName,
+            String baseWorkspaceName,
+            boolean copyTestGoals,
+            boolean copyOracles
     ) {
         String normalizedWorkspaceName = normalizeNewWorkspaceName(workspaceName);
         String normalizedBaseWorkspaceName = normalizeExistingWorkspaceName(baseWorkspaceName, "Base workspace is required.");
@@ -146,11 +146,11 @@ public final class WorkspaceService {
             copyWorkspaceDirectory(sourceDirectory, targetDirectory, copyTestGoals, copyOracles);
             ensureWorkspaceAssetDirectories(targetDirectory);
             updateWorkspaceResourceSettings(
-                targetDirectory,
-                normalizedBaseWorkspaceName,
-                normalizedWorkspaceName,
-                sourceDirectory,
-                targetDirectory
+                    targetDirectory,
+                    normalizedBaseWorkspaceName,
+                    normalizedWorkspaceName,
+                    sourceDirectory,
+                    targetDirectory
             );
             return listWorkspaces().stream()
                 .filter(workspace -> normalizedWorkspaceName.equals(workspace.name()))
@@ -168,8 +168,8 @@ public final class WorkspaceService {
 
     public WorkspaceSummaryDto renameWorkspace(String currentWorkspaceName, String newWorkspaceName) {
         String normalizedCurrentWorkspaceName = normalizeExistingWorkspaceName(
-            currentWorkspaceName,
-            "Current workspace name is required."
+                currentWorkspaceName,
+                "Current workspace name is required."
         );
         String normalizedNewWorkspaceName = normalizeNewWorkspaceName(newWorkspaceName);
 
@@ -221,16 +221,16 @@ public final class WorkspaceService {
             outputMoved = moveWorkspaceOutputDirectory(sourceOutputDirectory, targetOutputDirectory);
         } catch (IOException exception) {
             rollbackWorkspaceRename(
-                sourceDirectory,
-                targetDirectory,
-                sourceOutputDirectory,
-                targetOutputDirectory,
-                settingsUpdated,
-                workspaceMoved,
-                outputMoved,
-                normalizedCurrentWorkspaceName,
-                normalizedNewWorkspaceName,
-                exception
+                    sourceDirectory,
+                    targetDirectory,
+                    sourceOutputDirectory,
+                    targetOutputDirectory,
+                    settingsUpdated,
+                    workspaceMoved,
+                    outputMoved,
+                    normalizedCurrentWorkspaceName,
+                    normalizedNewWorkspaceName,
+                    exception
             );
             throw new IllegalStateException(
                 "Unable to rename workspace " + normalizedCurrentWorkspaceName + " to " + normalizedNewWorkspaceName,
@@ -260,8 +260,8 @@ public final class WorkspaceService {
     }
 
     private boolean moveWorkspaceOutputDirectory(
-        Path sourceOutputDirectory,
-        Path targetOutputDirectory
+            Path sourceOutputDirectory,
+            Path targetOutputDirectory
     ) throws IOException {
         if (!Files.exists(sourceOutputDirectory)) {
             return false;
@@ -273,16 +273,16 @@ public final class WorkspaceService {
     }
 
     private void rollbackWorkspaceRename(
-        Path sourceWorkspaceDirectory,
-        Path targetWorkspaceDirectory,
-        Path sourceOutputDirectory,
-        Path targetOutputDirectory,
-        boolean settingsUpdated,
-        boolean workspaceMoved,
-        boolean outputMoved,
-        String sourceWorkspaceName,
-        String targetWorkspaceName,
-        IOException originalException
+            Path sourceWorkspaceDirectory,
+            Path targetWorkspaceDirectory,
+            Path sourceOutputDirectory,
+            Path targetOutputDirectory,
+            boolean settingsUpdated,
+            boolean workspaceMoved,
+            boolean outputMoved,
+            String sourceWorkspaceName,
+            String targetWorkspaceName,
+            IOException originalException
     ) {
         if (outputMoved) {
             rollbackMove(targetOutputDirectory, sourceOutputDirectory, originalException);
@@ -295,11 +295,11 @@ public final class WorkspaceService {
         if (settingsUpdated && Files.isDirectory(sourceWorkspaceDirectory)) {
             try {
                 updateWorkspaceResourceSettings(
-                    sourceWorkspaceDirectory,
-                    targetWorkspaceName,
-                    sourceWorkspaceName,
-                    targetWorkspaceDirectory,
-                    sourceWorkspaceDirectory
+                        sourceWorkspaceDirectory,
+                        targetWorkspaceName,
+                        sourceWorkspaceName,
+                        targetWorkspaceDirectory,
+                        sourceWorkspaceDirectory
                 );
             } catch (IOException rollbackException) {
                 originalException.addSuppressed(rollbackException);
@@ -621,16 +621,16 @@ public final class WorkspaceService {
     }
 
     private void copyWorkspaceDirectory(
-        Path sourceDirectory,
-        Path targetDirectory,
-        boolean copyTestGoals,
-        boolean copyOracles
+            Path sourceDirectory,
+            Path targetDirectory,
+            boolean copyTestGoals,
+            boolean copyOracles
     ) throws IOException {
         try (Stream<Path> sourcePaths = Files.walk(sourceDirectory)) {
             List<Path> paths = sourcePaths
-                .filter(path -> shouldCopyWorkspacePath(sourceDirectory, path, copyTestGoals, copyOracles))
-                .sorted(Comparator.comparingInt(path -> path.getNameCount()))
-                .collect(Collectors.toList());
+                    .filter(path -> shouldCopyWorkspacePath(sourceDirectory, path, copyTestGoals, copyOracles))
+                    .sorted(Comparator.comparingInt(path -> path.getNameCount()))
+                    .collect(Collectors.toList());
 
             for (Path sourcePath : paths) {
                 Path relativePath = sourceDirectory.relativize(sourcePath);
@@ -650,11 +650,11 @@ public final class WorkspaceService {
     }
 
     private boolean updateWorkspaceResourceSettings(
-        Path workspaceDirectory,
-        String sourceWorkspaceName,
-        String targetWorkspaceName,
-        Path sourceDirectory,
-        Path targetDirectory
+            Path workspaceDirectory,
+            String sourceWorkspaceName,
+            String targetWorkspaceName,
+            Path sourceDirectory,
+            Path targetDirectory
     ) throws IOException {
         Path testSettingsFile = workspaceDirectory.resolve(TEST_SETTINGS_FILE);
         if (!Files.isRegularFile(testSettingsFile)) {
@@ -663,7 +663,7 @@ public final class WorkspaceService {
 
         List<String> lines = Files.readAllLines(testSettingsFile, StandardCharsets.UTF_8);
         List<String> updatedLines = lines.stream()
-            .map(line -> updateWorkspaceResourceSettingLine(
+                .map(line -> updateWorkspaceResourceSettingLine(
                 line,
                 CUSTOM_COMPOSITION_RESOURCE,
                 sourceWorkspaceName,
@@ -671,7 +671,7 @@ public final class WorkspaceService {
                 sourceDirectory,
                 targetDirectory
             ))
-            .map(line -> updateWorkspaceResourceSettingLine(
+                .map(line -> updateWorkspaceResourceSettingLine(
                 line,
                 CUSTOM_POLICIES_RESOURCE,
                 sourceWorkspaceName,
@@ -679,7 +679,7 @@ public final class WorkspaceService {
                 sourceDirectory,
                 targetDirectory
             ))
-            .collect(Collectors.toList());
+                .collect(Collectors.toList());
 
         if (!lines.equals(updatedLines)) {
             writeSettingsAtomically(testSettingsFile, updatedLines);
@@ -695,10 +695,10 @@ public final class WorkspaceService {
             Files.write(temporaryFile, lines, StandardCharsets.UTF_8);
             try {
                 Files.move(
-                    temporaryFile,
-                    testSettingsFile,
-                    StandardCopyOption.ATOMIC_MOVE,
-                    StandardCopyOption.REPLACE_EXISTING
+                        temporaryFile,
+                        testSettingsFile,
+                        StandardCopyOption.ATOMIC_MOVE,
+                        StandardCopyOption.REPLACE_EXISTING
                 );
             } catch (AtomicMoveNotSupportedException exception) {
                 Files.move(temporaryFile, testSettingsFile, StandardCopyOption.REPLACE_EXISTING);
@@ -709,12 +709,12 @@ public final class WorkspaceService {
     }
 
     private String updateWorkspaceResourceSettingLine(
-        String line,
-        String settingName,
-        String sourceWorkspaceName,
-        String targetWorkspaceName,
-        Path sourceDirectory,
-        Path targetDirectory
+            String line,
+            String settingName,
+            String sourceWorkspaceName,
+            String targetWorkspaceName,
+            Path sourceDirectory,
+            Path targetDirectory
     ) {
         int separatorIndex = line.indexOf('=');
         if (separatorIndex < 0 || !line.substring(0, separatorIndex).trim().equals(settingName)) {
@@ -733,11 +733,11 @@ public final class WorkspaceService {
 
         String configuredValue = line.substring(valueStart, valueEnd);
         String updatedValue = updateWorkspaceResourceValue(
-            configuredValue,
-            sourceWorkspaceName,
-            targetWorkspaceName,
-            sourceDirectory,
-            targetDirectory
+                configuredValue,
+                sourceWorkspaceName,
+                targetWorkspaceName,
+                sourceDirectory,
+                targetDirectory
         );
         if (configuredValue.equals(updatedValue)) {
             return line;
@@ -749,11 +749,11 @@ public final class WorkspaceService {
     }
 
     private String updateWorkspaceResourceValue(
-        String configuredValue,
-        String sourceWorkspaceName,
-        String targetWorkspaceName,
-        Path sourceDirectory,
-        Path targetDirectory
+            String configuredValue,
+            String sourceWorkspaceName,
+            String targetWorkspaceName,
+            Path sourceDirectory,
+            Path targetDirectory
     ) {
         String normalizedValue = configuredValue.replace('\\', '/');
         String relativeSourcePrefix = "./workspaces/" + sourceWorkspaceName + "/";
@@ -784,10 +784,10 @@ public final class WorkspaceService {
     }
 
     private boolean shouldCopyWorkspacePath(
-        Path sourceDirectory,
-        Path sourcePath,
-        boolean copyTestGoals,
-        boolean copyOracles
+            Path sourceDirectory,
+            Path sourcePath,
+            boolean copyTestGoals,
+            boolean copyOracles
     ) {
         Path normalizedSourcePath = sourcePath.normalize();
 
@@ -830,9 +830,9 @@ public final class WorkspaceService {
     }
 
     private List<WorkspaceFileDto> listWorkspaceSourceFiles(
-        Path workspaceDirectory,
-        Properties compositionProperties,
-        Properties policyProperties
+            Path workspaceDirectory,
+            Properties compositionProperties,
+            Properties policyProperties
     ) {
         try (Stream<Path> children = Files.list(workspaceDirectory)) {
             return children
@@ -891,9 +891,9 @@ public final class WorkspaceService {
         }
 
         Path outputDirectory = testarHomeDirectory()
-            .resolve(".runtime")
-            .resolve("webstudio-compile")
-            .resolve(workspaceDirectory.getFileName().toString());
+                .resolve(".runtime")
+                .resolve("webstudio-compile")
+                .resolve(workspaceDirectory.getFileName().toString());
 
         try {
             Files.createDirectories(outputDirectory);
@@ -904,29 +904,29 @@ public final class WorkspaceService {
         DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<JavaFileObject>();
         try (StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnostics, null, null)) {
             Iterable<? extends JavaFileObject> compilationUnits = fileManager.getJavaFileObjectsFromFiles(
-                javaFiles.stream().map(Path::toFile).collect(Collectors.toList())
+                    javaFiles.stream().map(Path::toFile).collect(Collectors.toList())
             );
 
             List<String> options = List.of(
-                "-classpath",
-                System.getProperty("java.class.path"),
-                "-d",
-                outputDirectory.toAbsolutePath().toString()
+                    "-classpath",
+                    System.getProperty("java.class.path"),
+                    "-d",
+                    outputDirectory.toAbsolutePath().toString()
             );
 
             Boolean success = compiler.getTask(
-                null,
-                fileManager,
-                diagnostics,
-                options,
-                null,
-                compilationUnits
+                    null,
+                    fileManager,
+                    diagnostics,
+                    options,
+                    null,
+                    compilationUnits
             ).call();
 
             List<WorkspaceJavaCompileDiagnosticDto> diagnosticDtos = diagnostics.getDiagnostics()
-                .stream()
-                .map(diagnostic -> toCompileDiagnostic(workspaceDirectory, diagnostic))
-                .collect(Collectors.toList());
+                    .stream()
+                    .map(diagnostic -> toCompileDiagnostic(workspaceDirectory, diagnostic))
+                    .collect(Collectors.toList());
 
             return new WorkspaceJavaCompileResultDto(
                 Boolean.TRUE.equals(success),
@@ -988,8 +988,8 @@ public final class WorkspaceService {
         }
 
         long errorCount = diagnostics.stream()
-            .filter(diagnostic -> "ERROR".equals(diagnostic.severity()))
-            .count();
+                .filter(diagnostic -> "ERROR".equals(diagnostic.severity()))
+                .count();
 
         if ("profile".equals(scope)) {
             return "Compile Profile failed with " + errorCount + " error(s).";

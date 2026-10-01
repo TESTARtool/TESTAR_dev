@@ -42,7 +42,7 @@ public class TestOracleServiceTest {
 
         TestOracleInventoryDto inventory = testOracleService.inventory("webdriver_generic");
         Map<String, TestOracleItemDto> itemsByKey = inventory.items().stream()
-            .collect(Collectors.toMap(item -> item.origin() + ":" + item.name(), item -> item));
+                .collect(Collectors.toMap(item -> item.origin() + ":" + item.name(), item -> item));
 
         Assert.assertEquals("webdriver_generic", inventory.workspaceName());
         Assert.assertTrue(inventory.activeOracles().contains("WorkspaceJavaOracle"));
@@ -70,30 +70,30 @@ public class TestOracleServiceTest {
         Assert.assertSame(initialInventory, cachedInventory);
 
         Path existingOracle = workspaceDirectory("webdriver_generic")
-            .resolve("oracles")
-            .resolve("java")
-            .resolve("WorkspaceJavaOracle.java");
+                .resolve("oracles")
+                .resolve("java")
+                .resolve("WorkspaceJavaOracle.java");
         String additionalOracleSource = Files.readString(existingOracle, StandardCharsets.UTF_8)
-            .replace("WorkspaceJavaOracle", "AdditionalWorkspaceOracle");
+                .replace("WorkspaceJavaOracle", "AdditionalWorkspaceOracle");
         Files.writeString(
-            existingOracle.getParent().resolve("AdditionalWorkspaceOracle.java"),
-            additionalOracleSource,
-            StandardCharsets.UTF_8
+                existingOracle.getParent().resolve("AdditionalWorkspaceOracle.java"),
+                additionalOracleSource,
+                StandardCharsets.UTF_8
         );
 
         TestOracleInventoryDto refreshedInventory = testOracleService.inventory("webdriver_generic");
 
         Assert.assertNotSame(initialInventory, refreshedInventory);
         Assert.assertTrue(refreshedInventory.items().stream()
-            .anyMatch(item -> "AdditionalWorkspaceOracle".equals(item.name())));
+                .anyMatch(item -> "AdditionalWorkspaceOracle".equals(item.name())));
     }
 
     @Test
     public void inventoryMarksWorkspaceJavaOracleThatOverridesBuiltInName() throws Exception {
         TestOracleService testOracleService = createServiceWithWorkspace("webdriver_generic");
         String builtInOracleName = OracleSelection.getAvailableBuiltInOracles().stream()
-            .findFirst()
-            .orElse("");
+                .findFirst()
+                .orElse("");
         Assume.assumeFalse("No built-in oracle classes are available for override detection.", builtInOracleName.isBlank());
 
         Path workspaceJavaDir = workspaceDirectory("webdriver_generic").resolve("oracles").resolve("java");
@@ -101,10 +101,10 @@ public class TestOracleServiceTest {
 
         TestOracleInventoryDto inventory = testOracleService.inventory("webdriver_generic");
         TestOracleItemDto overridingOracle = inventory.items().stream()
-            .filter(item -> "WORKSPACE_JAVA".equals(item.origin()))
-            .filter(item -> builtInOracleName.equals(item.name()))
-            .findFirst()
-            .orElseThrow();
+                .filter(item -> "WORKSPACE_JAVA".equals(item.origin()))
+                .filter(item -> builtInOracleName.equals(item.name()))
+                .findFirst()
+                .orElseThrow();
 
         Assert.assertTrue(overridingOracle.overridesBuiltIn());
     }
@@ -119,9 +119,9 @@ public class TestOracleServiceTest {
         Assert.assertEquals("dsl-oracle", createdFile.category());
 
         WorkspaceFileDto savedFile = testOracleService.saveDslFile(
-            "webdriver_generic",
-            "generated/new_rule.testar",
-            "oracle content"
+                "webdriver_generic",
+                "generated/new_rule.testar",
+                "oracle content"
         );
         Assert.assertEquals("oracle content", savedFile.content());
 
@@ -130,7 +130,7 @@ public class TestOracleServiceTest {
 
         TestOracleInventoryDto inventory = testOracleService.deleteDslFile("webdriver_generic", "generated/new_rule.testar");
         boolean deletedFileStillListed = inventory.items().stream()
-            .anyMatch(item -> "generated/new_rule.testar".equals(item.path()));
+                .anyMatch(item -> "generated/new_rule.testar".equals(item.path()));
 
         Assert.assertFalse(deletedFileStillListed);
     }
@@ -170,9 +170,9 @@ public class TestOracleServiceTest {
         Assert.assertTrue(readSettings("webdriver_generic").contains("NewOracle"));
 
         WorkspaceFileDto savedFile = testOracleService.saveJavaFile(
-            "webdriver_generic",
-            "generated/NewOracle.java",
-            "java oracle content"
+                "webdriver_generic",
+                "generated/NewOracle.java",
+                "java oracle content"
         );
         Assert.assertEquals("java oracle content", savedFile.content());
 
@@ -181,7 +181,7 @@ public class TestOracleServiceTest {
 
         TestOracleInventoryDto inventory = testOracleService.deleteJavaFile("webdriver_generic", "generated/NewOracle.java");
         boolean deletedFileStillListed = inventory.items().stream()
-            .anyMatch(item -> "generated/NewOracle.java".equals(item.path()));
+                .anyMatch(item -> "generated/NewOracle.java".equals(item.path()));
 
         Assert.assertFalse(deletedFileStillListed);
         Assert.assertFalse(inventory.activeOracles().contains("NewOracle"));
@@ -204,21 +204,21 @@ public class TestOracleServiceTest {
     public void compileJavaFileReportsSuccessAndDiagnostics() throws Exception {
         TestOracleService testOracleService = createServiceWithWorkspace("webdriver_generic");
         String validSource = String.join(System.lineSeparator(),
-            "import java.util.Collections;",
-            "import java.util.List;",
-            "",
-            "import org.testar.core.state.State;",
-            "import org.testar.core.verdict.Verdict;",
-            "import org.testar.oracle.Oracle;",
-            "",
-            "public class CompiledOracle implements Oracle {",
-            "    @Override",
-            "    public List<Verdict> getVerdicts(State state) {",
-            "        markAsNonVacuous();",
-            "        return Collections.singletonList(Verdict.OK);",
-            "    }",
-            "}",
-            ""
+                "import java.util.Collections;",
+                "import java.util.List;",
+                "",
+                "import org.testar.core.state.State;",
+                "import org.testar.core.verdict.Verdict;",
+                "import org.testar.oracle.Oracle;",
+                "",
+                "public class CompiledOracle implements Oracle {",
+                "    @Override",
+                "    public List<Verdict> getVerdicts(State state) {",
+                "        markAsNonVacuous();",
+                "        return Collections.singletonList(Verdict.OK);",
+                "    }",
+                "}",
+                ""
         );
 
         var result = testOracleService.compileJavaFile("webdriver_generic", "CompiledOracle.java", validSource);
@@ -228,7 +228,7 @@ public class TestOracleServiceTest {
         Assert.assertTrue(result.diagnostics().isEmpty());
         Assert.assertTrue(readSettings("webdriver_generic").contains("CompiledOracle"));
         Assert.assertTrue(Files.isRegularFile(
-            workspaceDirectory("webdriver_generic")
+                workspaceDirectory("webdriver_generic")
                 .resolve("oracles")
                 .resolve("compiled")
                 .resolve("CompiledOracle.class")
@@ -240,9 +240,9 @@ public class TestOracleServiceTest {
         TestOracleService testOracleService = createServiceWithWorkspace("webdriver_generic");
 
         var result = testOracleService.compileJavaFile(
-            "webdriver_generic",
-            "BrokenOracle.java",
-            "public class BrokenOracle { syntax error }"
+                "webdriver_generic",
+                "BrokenOracle.java",
+                "public class BrokenOracle { syntax error }"
         );
 
         Assert.assertFalse(result.success());
@@ -255,9 +255,9 @@ public class TestOracleServiceTest {
         TestOracleService testOracleService = createServiceWithWorkspace("webdriver_generic");
 
         var result = testOracleService.validateDslFile(
-            "webdriver_generic",
-            "broken.testar",
-            "this is not valid testar dsl"
+                "webdriver_generic",
+                "broken.testar",
+                "this is not valid testar dsl"
         );
 
         Assert.assertFalse(result.success());
@@ -272,26 +272,26 @@ public class TestOracleServiceTest {
         String dslSource = "assert button \"Submit\" is enabled \"button Submit must be enabled\".";
 
         var result = testOracleService.generateJavaFromDslFile(
-            "webdriver_generic",
-            "generated/runtime_oracles.testar",
-            dslSource
+                "webdriver_generic",
+                "generated/runtime_oracles.testar",
+                dslSource
         );
 
         Assert.assertTrue(result.message(), result.success());
         Assert.assertEquals("generated/runtime_oracles.java", result.generatedJavaPath());
         Assert.assertTrue(readSettings("webdriver_generic").contains("ButtonSubmitMustBeEnabled"));
         String generatedJava = Files.readString(
-            workspaceDirectory("webdriver_generic")
+                workspaceDirectory("webdriver_generic")
                 .resolve("oracles")
                 .resolve("java")
                 .resolve("generated")
                 .resolve("runtime_oracles.java"),
-            StandardCharsets.UTF_8
+                StandardCharsets.UTF_8
         );
         Assert.assertTrue(generatedJava.contains("Verdict.Severity.DSL_INFRACTION"));
         Assert.assertFalse(generatedJava.contains("Verdict.Severity.FAIL"));
         Assert.assertTrue(Files.isRegularFile(
-            workspaceDirectory("webdriver_generic")
+                workspaceDirectory("webdriver_generic")
                 .resolve("oracles")
                 .resolve("java")
                 .resolve("generated")
@@ -305,9 +305,9 @@ public class TestOracleServiceTest {
         Path workspaceDirectory = Files.createDirectories(workspacesRoot.resolve(workspaceName));
 
         Files.writeString(
-            workspaceDirectory.resolve("test.settings"),
-            "ExtendedOracles = WorkspaceJavaOracle\n",
-            StandardCharsets.UTF_8
+                workspaceDirectory.resolve("test.settings"),
+                "ExtendedOracles = WorkspaceJavaOracle\n",
+                StandardCharsets.UTF_8
         );
 
         Path javaDir = Files.createDirectories(workspaceDirectory.resolve("oracles").resolve("java"));
@@ -329,22 +329,22 @@ public class TestOracleServiceTest {
 
     private void writeWorkspaceOracle(Path javaDir, String className) throws Exception {
         String source = String.join(System.lineSeparator(),
-            "import java.util.Collections;",
-            "import java.util.List;",
-            "",
-            "import org.testar.core.state.State;",
-            "import org.testar.core.verdict.Verdict;",
-            "import org.testar.oracle.Oracle;",
-            "",
-            "public class " + className + " implements Oracle {",
-            "",
-            "    @Override",
-            "    public List<Verdict> getVerdicts(State state) {",
-            "        markAsNonVacuous();",
-            "        return Collections.singletonList(Verdict.OK);",
-            "    }",
-            "}",
-            ""
+                "import java.util.Collections;",
+                "import java.util.List;",
+                "",
+                "import org.testar.core.state.State;",
+                "import org.testar.core.verdict.Verdict;",
+                "import org.testar.oracle.Oracle;",
+                "",
+                "public class " + className + " implements Oracle {",
+                "",
+                "    @Override",
+                "    public List<Verdict> getVerdicts(State state) {",
+                "        markAsNonVacuous();",
+                "        return Collections.singletonList(Verdict.OK);",
+                "    }",
+                "}",
+                ""
         );
 
         Files.writeString(javaDir.resolve(className + ".java"), source, StandardCharsets.UTF_8);

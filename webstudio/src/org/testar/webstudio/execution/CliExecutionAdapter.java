@@ -500,7 +500,7 @@ public final class CliExecutionAdapter implements ExecutionAdapter {
     private List<String> readProcessOutput(Process process) throws IOException {
         List<String> lines = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(
-            new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8)
+                new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8)
         )) {
             String line;
             while ((line = reader.readLine()) != null) {
@@ -669,12 +669,12 @@ public final class CliExecutionAdapter implements ExecutionAdapter {
             .append('\n')
             .append("After the final stopSession command, after one or multiple test goal sessions are finished, execute shutdownDaemon so no TESTAR CLI daemon remains active.")
             .append('\n')
-            .append('\n');
+                .append('\n');
         if (!settings.apiKeyEnvVarName().isBlank()) {
             prompt.append("Expected API key environment variable for Codex authentication: ")
                 .append(settings.apiKeyEnvVarName())
                 .append('\n')
-                .append('\n');
+                    .append('\n');
         }
         prompt.append("Authoritative TESTAR CLI skill instructions:").append('\n');
         prompt.append(skillInstructions).append('\n').append('\n');
@@ -709,9 +709,9 @@ public final class CliExecutionAdapter implements ExecutionAdapter {
 
     private Path resolveCliSkillDirectory() {
         Path skillDirectory = resolveCliInstallDirectory()
-            .resolve(".agents")
-            .resolve("skills")
-            .resolve("testar-cli");
+                .resolve(".agents")
+                .resolve("skills")
+                .resolve("testar-cli");
 
         if (!Files.isDirectory(skillDirectory)) {
             throw new IllegalStateException(
@@ -725,10 +725,10 @@ public final class CliExecutionAdapter implements ExecutionAdapter {
     private String readCliSkillInstructions(Path skillDirectory) {
         try (Stream<Path> files = Files.list(skillDirectory)) {
             List<Path> markdownFiles = files
-                .filter(Files::isRegularFile)
-                .filter(path -> path.getFileName().toString().toLowerCase().endsWith(".md"))
-                .sorted(Comparator.comparing(path -> path.getFileName().toString()))
-                .collect(Collectors.toList());
+                    .filter(Files::isRegularFile)
+                    .filter(path -> path.getFileName().toString().toLowerCase().endsWith(".md"))
+                    .sorted(Comparator.comparing(path -> path.getFileName().toString()))
+                    .collect(Collectors.toList());
 
             if (markdownFiles.isEmpty()) {
                 throw new IllegalStateException("No CLI skill markdown files found in: " + skillDirectory);
@@ -814,9 +814,9 @@ public final class CliExecutionAdapter implements ExecutionAdapter {
 
             appendConsoleLine("[agent] finalizing active session as LLM_INVALID because no explicit agent verdict was declared");
             invokeCliCommand(List.of(
-                "stopSession",
-                "LLM_INVALID",
-                "Agent execution finished without declaring an explicit test-goal verdict."
+                    "stopSession",
+                    "LLM_INVALID",
+                    "Agent execution finished without declaring an explicit test-goal verdict."
             ), true);
         } catch (RuntimeException exception) {
             debugLog.log("finalizeUnstoppedAgentSessionAsInvalidBestEffort failed", exception);
@@ -872,7 +872,7 @@ public final class CliExecutionAdapter implements ExecutionAdapter {
                     contentTypeFor(path),
                     resultStatusFor(path)
                 ))
-                .forEach(files::add);
+                    .forEach(files::add);
         } catch (IOException exception) {
             throw new IllegalStateException("Unable to list CLI result files under: " + reportsDirectory, exception);
         }
@@ -927,7 +927,7 @@ public final class CliExecutionAdapter implements ExecutionAdapter {
                 String encodedAssetPath = URLEncoder.encode(validAssetPath.toString(), StandardCharsets.UTF_8);
                 String encodedWorkspaceName = URLEncoder.encode(workspaceName, StandardCharsets.UTF_8);
                 String assetUrl = "/api/execution/cli/result-asset?workspace=" + encodedWorkspaceName
-                    + "&path=" + encodedAssetPath;
+                        + "&path=" + encodedAssetPath;
                 replacement = attributePrefix + assetUrl + attributeSuffix;
             } catch (IllegalArgumentException ignored) {
                 replacement = matcher.group(0);
@@ -949,26 +949,26 @@ public final class CliExecutionAdapter implements ExecutionAdapter {
         String lowerCaseAssetPath = trimmedAssetPath.toLowerCase();
 
         if (lowerCaseAssetPath.startsWith("http:")
-            || lowerCaseAssetPath.startsWith("https:")
-            || lowerCaseAssetPath.startsWith("data:")
-            || lowerCaseAssetPath.startsWith("javascript:")
-            || lowerCaseAssetPath.startsWith("//")
-            || lowerCaseAssetPath.startsWith("#")) {
+                || lowerCaseAssetPath.startsWith("https:")
+                || lowerCaseAssetPath.startsWith("data:")
+                || lowerCaseAssetPath.startsWith("javascript:")
+                || lowerCaseAssetPath.startsWith("//")
+                || lowerCaseAssetPath.startsWith("#")) {
             return false;
         }
 
         if (trimmedAssetPath.contains("&")
-            || trimmedAssetPath.contains("?")
-            || trimmedAssetPath.contains("+")
-            || trimmedAssetPath.contains("<")
-            || trimmedAssetPath.contains(">")
-            || trimmedAssetPath.contains("{")
-            || trimmedAssetPath.contains("}")
-            || trimmedAssetPath.contains("(")
-            || trimmedAssetPath.contains(")")
-            || trimmedAssetPath.contains("\n")
-            || trimmedAssetPath.contains("\r")
-            || trimmedAssetPath.contains("\t")) {
+                || trimmedAssetPath.contains("?")
+                || trimmedAssetPath.contains("+")
+                || trimmedAssetPath.contains("<")
+                || trimmedAssetPath.contains(">")
+                || trimmedAssetPath.contains("{")
+                || trimmedAssetPath.contains("}")
+                || trimmedAssetPath.contains("(")
+                || trimmedAssetPath.contains(")")
+                || trimmedAssetPath.contains("\n")
+                || trimmedAssetPath.contains("\r")
+                || trimmedAssetPath.contains("\t")) {
             return false;
         }
 

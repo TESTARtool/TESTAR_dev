@@ -28,19 +28,19 @@ public class WorkspaceServiceManagementTest {
         Assert.assertTrue(Files.isDirectory(clonedWorkspace));
         String clonedSettings = Files.readString(clonedWorkspace.resolve("test.settings"));
         Assert.assertTrue(clonedSettings.contains(
-            "CustomCompositionResource = ./workspaces/webdriver_cloned/composition.properties"
+                "CustomCompositionResource = ./workspaces/webdriver_cloned/composition.properties"
         ));
         Assert.assertTrue(clonedSettings.contains(
-            "CustomPoliciesResource = ./workspaces/webdriver_cloned/policies.properties"
+                "CustomPoliciesResource = ./workspaces/webdriver_cloned/policies.properties"
         ));
         Assert.assertTrue(Files.readString(baseWorkspace.resolve("test.settings")).contains(
-            "CustomCompositionResource = ./workspaces/webdriver_generic/composition.properties"
+                "CustomCompositionResource = ./workspaces/webdriver_generic/composition.properties"
         ));
         Assert.assertTrue(Files.isRegularFile(clonedWorkspace.resolve("composition.properties")));
         Assert.assertTrue(Files.isRegularFile(clonedWorkspace.resolve("policies.properties")));
         Assert.assertEquals(
-            Files.readString(baseWorkspace.resolve("WebdriverGenericSystemService.java")),
-            Files.readString(clonedWorkspace.resolve("WebdriverGenericSystemService.java"))
+                Files.readString(baseWorkspace.resolve("WebdriverGenericSystemService.java")),
+                Files.readString(clonedWorkspace.resolve("WebdriverGenericSystemService.java"))
         );
         Assert.assertTrue(Files.isRegularFile(clonedWorkspace.resolve("test_goals").resolve("login.yaml")));
         Assert.assertTrue(Files.isRegularFile(clonedWorkspace.resolve("oracles").resolve("java").resolve("WebOracle.java")));
@@ -86,7 +86,7 @@ public class WorkspaceServiceManagementTest {
         WorkspaceService workspaceService = new WorkspaceService(roots.testarWorkspacesRoot, roots.cliWorkspacesRoot);
 
         IllegalArgumentException exception = expectIllegalArgumentException(
-            () -> workspaceService.createWorkspace("existing_cli_workspace", "webdriver_generic", true)
+                () -> workspaceService.createWorkspace("existing_cli_workspace", "webdriver_generic", true)
         );
 
         Assert.assertTrue(exception.getMessage().contains("Workspace already exists"));
@@ -99,7 +99,7 @@ public class WorkspaceServiceManagementTest {
         WorkspaceService workspaceService = new WorkspaceService(roots.testarWorkspacesRoot, roots.cliWorkspacesRoot);
 
         IllegalArgumentException exception = expectIllegalArgumentException(
-            () -> workspaceService.createWorkspace("../bad", "webdriver_generic", true)
+                () -> workspaceService.createWorkspace("../bad", "webdriver_generic", true)
         );
 
         Assert.assertTrue(exception.getMessage().contains("letters, numbers, underscores, and hyphens"));
@@ -110,7 +110,7 @@ public class WorkspaceServiceManagementTest {
         TestWorkspaceRoots roots = createWorkspaceRoots();
         createBaseWorkspace(roots.testarWorkspacesRoot);
         Path outputFile = roots.testarOutputRoot.resolve("webdriver_generic").resolve("run").resolve("reports")
-            .resolve("sequence_1.html");
+                .resolve("sequence_1.html");
         Files.createDirectories(outputFile.getParent());
         Files.writeString(outputFile, "<html></html>", StandardCharsets.UTF_8);
         WorkspaceService workspaceService = new WorkspaceService(roots.testarWorkspacesRoot, roots.cliWorkspacesRoot);
@@ -121,20 +121,20 @@ public class WorkspaceServiceManagementTest {
         Assert.assertTrue(Files.isDirectory(roots.testarWorkspacesRoot.resolve("webdriver_renamed")));
         Assert.assertTrue(Files.isRegularFile(roots.testarWorkspacesRoot.resolve("webdriver_renamed").resolve("test.settings")));
         Assert.assertTrue(Files.isRegularFile(
-            roots.testarWorkspacesRoot.resolve("webdriver_renamed").resolve("test_goals").resolve("login.yaml")
+                roots.testarWorkspacesRoot.resolve("webdriver_renamed").resolve("test_goals").resolve("login.yaml")
         ));
         Assert.assertFalse(Files.exists(roots.testarOutputRoot.resolve("webdriver_generic")));
         Assert.assertTrue(Files.isRegularFile(
-            roots.testarOutputRoot.resolve("webdriver_renamed").resolve("run").resolve("reports").resolve("sequence_1.html")
+                roots.testarOutputRoot.resolve("webdriver_renamed").resolve("run").resolve("reports").resolve("sequence_1.html")
         ));
         String renamedSettings = Files.readString(
-            roots.testarWorkspacesRoot.resolve("webdriver_renamed").resolve("test.settings")
+                roots.testarWorkspacesRoot.resolve("webdriver_renamed").resolve("test.settings")
         );
         Assert.assertTrue(renamedSettings.contains(
-            "CustomCompositionResource = ./workspaces/webdriver_renamed/composition.properties"
+                "CustomCompositionResource = ./workspaces/webdriver_renamed/composition.properties"
         ));
         Assert.assertTrue(renamedSettings.contains(
-            "CustomPoliciesResource = ./workspaces/webdriver_renamed/policies.properties"
+                "CustomPoliciesResource = ./workspaces/webdriver_renamed/policies.properties"
         ));
     }
 
@@ -150,13 +150,13 @@ public class WorkspaceServiceManagementTest {
         Assert.assertFalse(Files.exists(roots.testarOutputRoot.resolve("webdriver_generic")));
         Assert.assertFalse(Files.exists(roots.testarOutputRoot.resolve("webdriver_renamed")));
         String renamedSettings = Files.readString(
-            roots.testarWorkspacesRoot.resolve("webdriver_renamed").resolve("test.settings")
+                roots.testarWorkspacesRoot.resolve("webdriver_renamed").resolve("test.settings")
         );
         Assert.assertTrue(renamedSettings.contains(
-            "CustomCompositionResource = ./workspaces/webdriver_renamed/composition.properties"
+                "CustomCompositionResource = ./workspaces/webdriver_renamed/composition.properties"
         ));
         Assert.assertTrue(renamedSettings.contains(
-            "CustomPoliciesResource = ./workspaces/webdriver_renamed/policies.properties"
+                "CustomPoliciesResource = ./workspaces/webdriver_renamed/policies.properties"
         ));
     }
 
@@ -164,9 +164,9 @@ public class WorkspaceServiceManagementTest {
     public void renamesWorkspaceAndPreservesCustomResourceFileNames() throws IOException {
         TestWorkspaceRoots roots = createWorkspaceRoots();
         createBaseWorkspace(
-            roots.testarWorkspacesRoot,
-            "custom-composition.properties",
-            "custom-policies.properties"
+                roots.testarWorkspacesRoot,
+                "custom-composition.properties",
+                "custom-policies.properties"
         );
         WorkspaceService workspaceService = new WorkspaceService(roots.testarWorkspacesRoot, roots.cliWorkspacesRoot);
 
@@ -175,10 +175,10 @@ public class WorkspaceServiceManagementTest {
         Path renamedWorkspace = roots.testarWorkspacesRoot.resolve("webdriver_renamed");
         String renamedSettings = Files.readString(renamedWorkspace.resolve("test.settings"));
         Assert.assertTrue(renamedSettings.contains(
-            "CustomCompositionResource = ./workspaces/webdriver_renamed/custom-composition.properties"
+                "CustomCompositionResource = ./workspaces/webdriver_renamed/custom-composition.properties"
         ));
         Assert.assertTrue(renamedSettings.contains(
-            "CustomPoliciesResource = ./workspaces/webdriver_renamed/custom-policies.properties"
+                "CustomPoliciesResource = ./workspaces/webdriver_renamed/custom-policies.properties"
         ));
         Assert.assertTrue(Files.isRegularFile(renamedWorkspace.resolve("custom-composition.properties")));
         Assert.assertTrue(Files.isRegularFile(renamedWorkspace.resolve("custom-policies.properties")));
@@ -193,7 +193,7 @@ public class WorkspaceServiceManagementTest {
         WorkspaceService workspaceService = new WorkspaceService(roots.testarWorkspacesRoot, roots.cliWorkspacesRoot);
 
         IllegalArgumentException exception = expectIllegalArgumentException(
-            () -> workspaceService.renameWorkspace("webdriver_generic", "webdriver_parabank")
+                () -> workspaceService.renameWorkspace("webdriver_generic", "webdriver_parabank")
         );
 
         Assert.assertTrue(exception.getMessage().contains("Output results already exist"));
@@ -211,7 +211,7 @@ public class WorkspaceServiceManagementTest {
         WorkspaceService workspaceService = new WorkspaceService(roots.testarWorkspacesRoot, roots.cliWorkspacesRoot);
 
         IllegalArgumentException exception = expectIllegalArgumentException(
-            () -> workspaceService.renameWorkspace("webdriver_generic", "webdriver_parabank")
+                () -> workspaceService.renameWorkspace("webdriver_generic", "webdriver_parabank")
         );
 
         Assert.assertTrue(exception.getMessage().contains("Output results already exist"));
@@ -228,7 +228,7 @@ public class WorkspaceServiceManagementTest {
         WorkspaceService workspaceService = new WorkspaceService(roots.testarWorkspacesRoot, roots.cliWorkspacesRoot);
 
         IllegalArgumentException exception = expectIllegalArgumentException(
-            () -> workspaceService.renameWorkspace("webdriver_generic", "windows_generic")
+                () -> workspaceService.renameWorkspace("webdriver_generic", "windows_generic")
         );
 
         Assert.assertTrue(exception.getMessage().contains("Workspace already exists"));
@@ -241,7 +241,7 @@ public class WorkspaceServiceManagementTest {
         WorkspaceService workspaceService = new WorkspaceService(roots.testarWorkspacesRoot, roots.cliWorkspacesRoot);
 
         IllegalArgumentException exception = expectIllegalArgumentException(
-            () -> workspaceService.renameWorkspace("cli_only", "cli_renamed")
+                () -> workspaceService.renameWorkspace("cli_only", "cli_renamed")
         );
 
         Assert.assertTrue(exception.getMessage().contains("shared workspaces root"));
@@ -252,50 +252,50 @@ public class WorkspaceServiceManagementTest {
     }
 
     private Path createBaseWorkspace(
-        Path workspacesRoot,
-        String compositionFileName,
-        String policiesFileName
+            Path workspacesRoot,
+            String compositionFileName,
+            String policiesFileName
     ) throws IOException {
         Path baseWorkspace = workspacesRoot.resolve("webdriver_generic");
         Files.createDirectories(baseWorkspace.resolve("test_goals"));
         Files.createDirectories(baseWorkspace.resolve("oracles").resolve("java"));
         Files.createDirectories(baseWorkspace.resolve("oracles").resolve("dsl"));
         Files.writeString(
-            baseWorkspace.resolve("test.settings"),
-            "SUTConnector = WEB_DRIVER\n"
+                baseWorkspace.resolve("test.settings"),
+                "SUTConnector = WEB_DRIVER\n"
                 + "CustomCompositionResource = ./workspaces/webdriver_generic/" + compositionFileName + "\n"
                 + "CustomPoliciesResource = ./workspaces/webdriver_generic/" + policiesFileName + "\n",
-            StandardCharsets.UTF_8
+                StandardCharsets.UTF_8
         );
         Files.writeString(
-            baseWorkspace.resolve(compositionFileName),
-            "systemServiceClass = WebdriverGenericSystemService\n",
-            StandardCharsets.UTF_8
+                baseWorkspace.resolve(compositionFileName),
+                "systemServiceClass = WebdriverGenericSystemService\n",
+                StandardCharsets.UTF_8
         );
         Files.writeString(
-            baseWorkspace.resolve(policiesFileName),
-            "clickablePolicies = WebdriverGenericClickablePolicy\n",
-            StandardCharsets.UTF_8
+                baseWorkspace.resolve(policiesFileName),
+                "clickablePolicies = WebdriverGenericClickablePolicy\n",
+                StandardCharsets.UTF_8
         );
         Files.writeString(
-            baseWorkspace.resolve("WebdriverGenericSystemService.java"),
-            "public final class WebdriverGenericSystemService {}\n",
-            StandardCharsets.UTF_8
+                baseWorkspace.resolve("WebdriverGenericSystemService.java"),
+                "public final class WebdriverGenericSystemService {}\n",
+                StandardCharsets.UTF_8
         );
         Files.writeString(
-            baseWorkspace.resolve("test_goals").resolve("login.yaml"),
-            "id: login\n",
-            StandardCharsets.UTF_8
+                baseWorkspace.resolve("test_goals").resolve("login.yaml"),
+                "id: login\n",
+                StandardCharsets.UTF_8
         );
         Files.writeString(
-            baseWorkspace.resolve("oracles").resolve("java").resolve("WebOracle.java"),
-            "public final class WebOracle {}\n",
-            StandardCharsets.UTF_8
+                baseWorkspace.resolve("oracles").resolve("java").resolve("WebOracle.java"),
+                "public final class WebOracle {}\n",
+                StandardCharsets.UTF_8
         );
         Files.writeString(
-            baseWorkspace.resolve("oracles").resolve("dsl").resolve("web_oracle.testar"),
-            "module web_oracle\n",
-            StandardCharsets.UTF_8
+                baseWorkspace.resolve("oracles").resolve("dsl").resolve("web_oracle.testar"),
+                "module web_oracle\n",
+                StandardCharsets.UTF_8
         );
         return baseWorkspace;
     }
@@ -303,10 +303,10 @@ public class WorkspaceServiceManagementTest {
     private TestWorkspaceRoots createWorkspaceRoots() throws IOException {
         Path root = temporaryFolder.newFolder("workspace-clone").toPath();
         Path testarWorkspacesRoot = root.resolve("testar").resolve("target").resolve("install").resolve("testar")
-            .resolve("bin").resolve("workspaces");
+                .resolve("bin").resolve("workspaces");
         Path testarOutputRoot = testarWorkspacesRoot.getParent().resolve("output");
         Path cliWorkspacesRoot = root.resolve("cli").resolve("target").resolve("install").resolve("testar-cli")
-            .resolve("workspaces");
+                .resolve("workspaces");
         Files.createDirectories(testarWorkspacesRoot);
         Files.createDirectories(cliWorkspacesRoot);
         return new TestWorkspaceRoots(testarWorkspacesRoot, testarOutputRoot, cliWorkspacesRoot);

@@ -16,17 +16,17 @@ import java.util.Set;
 public final class AbstractStateTagCatalog {
 
     private static final Set<Tag<?>> COMMON_TAGS = Set.of(
-        StateManagementTags.WidgetControlType,
-        StateManagementTags.WidgetTitle,
-        StateManagementTags.WidgetIsEnabled,
-        StateManagementTags.WidgetPath,
-        StateManagementTags.WidgetHelpText,
-        StateManagementTags.WidgetAutomationId,
-        StateManagementTags.WidgetClassName,
-        StateManagementTags.WidgetFrameworkId,
-        StateManagementTags.WidgetBoundary,
-        StateManagementTags.WidgetIsContentElement,
-        StateManagementTags.WidgetIsControlElement
+            StateManagementTags.WidgetControlType,
+            StateManagementTags.WidgetTitle,
+            StateManagementTags.WidgetIsEnabled,
+            StateManagementTags.WidgetPath,
+            StateManagementTags.WidgetHelpText,
+            StateManagementTags.WidgetAutomationId,
+            StateManagementTags.WidgetClassName,
+            StateManagementTags.WidgetFrameworkId,
+            StateManagementTags.WidgetBoundary,
+            StateManagementTags.WidgetIsContentElement,
+            StateManagementTags.WidgetIsControlElement
     );
 
     private AbstractStateTagCatalog() {

@@ -139,8 +139,8 @@ public final class StateModelAnalysisService {
             config.setUser(settings.get(StateModelTags.DataStoreUser, ""));
             config.setPassword(settings.get(StateModelTags.DataStorePassword, ""));
             config.setDatabaseDirectory(resolveAgainstTestarHome(
-                runtimeHome,
-                settings.get(StateModelTags.DataStoreDirectory, "")
+                    runtimeHome,
+                    settings.get(StateModelTags.DataStoreDirectory, "")
             ).toString());
 
             analysisManager = new AnalysisManager(config, graphsDirectory.toString() + File.separator);

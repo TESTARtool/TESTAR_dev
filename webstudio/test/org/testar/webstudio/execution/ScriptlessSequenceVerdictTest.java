@@ -19,9 +19,9 @@ public class ScriptlessSequenceVerdictTest {
     @Test
     public void preservesAllSequenceVerdictReports() {
         List<ResultFileSummaryDto> reportFiles = List.of(
-            resultFile("sequence_1_V002_SUSPICIOUS_TAG.html", "failed"),
-            resultFile("sequence_1_V001_WARNING_ACCESSIBILITY_FAULT.html", "failed"),
-            resultFile("sequence_1_V003_WARNING_UI_VISUAL_OR_RENDERING_FAULT.html", "failed")
+                resultFile("sequence_1_V002_SUSPICIOUS_TAG.html", "failed"),
+                resultFile("sequence_1_V001_WARNING_ACCESSIBILITY_FAULT.html", "failed"),
+                resultFile("sequence_1_V003_WARNING_UI_VISUAL_OR_RENDERING_FAULT.html", "failed")
         );
 
         List<SequenceVerdictDto> verdicts = ScriptlessExecutionAdapter.buildSequenceVerdicts(reportFiles, 1);
@@ -37,14 +37,14 @@ public class ScriptlessSequenceVerdictTest {
     @Test
     public void selectsOnlyReportsForTheCurrentSequenceWhenOutputPathIsUnavailable() {
         List<ResultFileSummaryDto> reportFiles = List.of(
-            resultFile("sequence_1_V001_WARNING_ACCESSIBILITY_FAULT.html", "failed"),
-            resultFile("sequence_2_V001_WARNING_ACCESSIBILITY_FAULT.html", "failed"),
-            resultFile("sequence_1_V002_SUSPICIOUS_TAG.html", "failed")
+                resultFile("sequence_1_V001_WARNING_ACCESSIBILITY_FAULT.html", "failed"),
+                resultFile("sequence_2_V001_WARNING_ACCESSIBILITY_FAULT.html", "failed"),
+                resultFile("sequence_1_V002_SUSPICIOUS_TAG.html", "failed")
         );
 
         List<ResultFileSummaryDto> sequenceFiles = ScriptlessExecutionAdapter.filterSequenceVerdictFiles(
-            reportFiles,
-            1
+                reportFiles,
+                1
         );
 
         Assert.assertEquals(2, sequenceFiles.size());

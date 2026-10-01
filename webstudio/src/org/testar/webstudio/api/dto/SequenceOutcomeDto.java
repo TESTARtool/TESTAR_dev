@@ -26,16 +26,16 @@ public final class SequenceOutcomeDto {
 
     public SequenceOutcomeDto(int sequenceNumber, String status, String outputPath, String label) {
         this(sequenceNumber, status, outputPath, label, label == null
-            ? List.of()
-            : List.of(new SequenceVerdictDto(label, status, outputPath)));
+                ? List.of()
+                : List.of(new SequenceVerdictDto(label, status, outputPath)));
     }
 
     public SequenceOutcomeDto(
-        int sequenceNumber,
-        String status,
-        String outputPath,
-        String label,
-        List<SequenceVerdictDto> verdicts
+            int sequenceNumber,
+            String status,
+            String outputPath,
+            String label,
+            List<SequenceVerdictDto> verdicts
     ) {
         this.sequenceNumber = sequenceNumber;
         this.status = status;
