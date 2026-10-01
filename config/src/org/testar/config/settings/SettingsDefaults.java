@@ -40,6 +40,8 @@ import static org.testar.config.ConfigTags.AppiumUiautomator2ServerLaunchTimeout
 import static org.testar.config.ConfigTags.AndroidClickableClasses;
 import static org.testar.config.ConfigTags.AndroidTypeableClasses;
 import static org.testar.config.ConfigTags.BrowserFullScreen;
+import static org.testar.config.ConfigTags.WebChromeUserDataDir;
+import static org.testar.config.ConfigTags.WebChromeProfileDirectory;
 import static org.testar.config.ConfigTags.ClickFilter;
 import static org.testar.config.ConfigTags.CompositionProfile;
 import static org.testar.config.ConfigTags.WebClickableClasses;
@@ -274,6 +276,8 @@ public class SettingsDefaults {
 
         defaults.add(Pair.from(FollowLinks, true));
         defaults.add(Pair.from(BrowserFullScreen, true));
+        defaults.add(Pair.from(WebChromeUserDataDir, ""));
+        defaults.add(Pair.from(WebChromeProfileDirectory, ""));
         defaults.add(Pair.from(SwitchNewTabs, true));
         defaults.add(Pair.from(WebForcedPopupClickAttributes, new ArrayList<String>()));
 

@@ -211,6 +211,12 @@ public final class ConfigTags {
     public static final Tag<Boolean> BrowserFullScreen = Tag.from("BrowserFullScreen", Boolean.class,
             "Indicate if perform the web testing with the browser in full screen");
 
+    public static final Tag<String> WebChromeUserDataDir = Tag.from("WebChromeUserDataDir", String.class,
+            "Chrome user data directory to use for WebDriver sessions (empty uses a temporary profile)");
+
+    public static final Tag<String> WebChromeProfileDirectory = Tag.from("WebChromeProfileDirectory", String.class,
+            "Chrome profile directory within WebChromeUserDataDir (empty uses the default profile)");
+
     public static final Tag<Boolean> SwitchNewTabs = Tag.from("SwitchNewTabs", Boolean.class,
             "Indicate if switch to a new web tab if opened");
 

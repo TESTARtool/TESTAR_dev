@@ -268,6 +268,8 @@ public class SettingsFileStructure {
                 , "# WebPathsAllowed: " + ConfigTags.WebPathsAllowed.getDescription()
                 , "# FollowLinks: " + ConfigTags.FollowLinks.getDescription()
                 , "# BrowserFullScreen: " + ConfigTags.BrowserFullScreen.getDescription()
+                , "# WebChromeUserDataDir: " + ConfigTags.WebChromeUserDataDir.getDescription()
+                , "# WebChromeProfileDirectory: " + ConfigTags.WebChromeProfileDirectory.getDescription()
                 , "# SwitchNewTabs: " + ConfigTags.SwitchNewTabs.getDescription()
                 , "# WebForcedPopupClickAttributes: " + ConfigTags.WebForcedPopupClickAttributes.getDescription()
                 , "#################################################################"
@@ -279,6 +281,8 @@ public class SettingsFileStructure {
                 , ConfigTags.WebPathsAllowed.name() + " = "
                 , ConfigTags.FollowLinks.name() + " = "
                 , ConfigTags.BrowserFullScreen.name() + " = "
+                , ConfigTags.WebChromeUserDataDir.name() + " = "
+                , ConfigTags.WebChromeProfileDirectory.name() + " = "
                 , ConfigTags.SwitchNewTabs.name() + " = "
                 , ConfigTags.WebForcedPopupClickAttributes.name() + " = "
                 , ""
