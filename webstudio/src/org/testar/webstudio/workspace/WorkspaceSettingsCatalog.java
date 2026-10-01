@@ -183,6 +183,8 @@ public final class WorkspaceSettingsCatalog {
                 ConfigTags.WebPathsAllowed,
                 ConfigTags.FollowLinks,
                 ConfigTags.BrowserFullScreen,
+                ConfigTags.WebChromeUserDataDir,
+                ConfigTags.WebChromeProfileDirectory,
                 ConfigTags.SwitchNewTabs,
                 ConfigTags.WebForcedPopupClickAttributes,
                 ConfigTags.WebIgnoredTags,
