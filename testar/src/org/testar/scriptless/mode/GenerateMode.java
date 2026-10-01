@@ -111,8 +111,8 @@ public class GenerateMode {
                 protocol.visualizationListener().visualizeSelectedAction(state, action);
             }
 
-            protocol.runtimeContext().stateModelManager().notifyActionExecution(action);
             protocol.executeAction(system, state, action);
+            protocol.runtimeContext().stateModelManager().notifyActionExecution(action);
             protocol.runtimeContext().setActionCount(protocol.runtimeContext().actionCount() + 1);
 
             Util.clear(protocol.runtimeContext().canvas());
