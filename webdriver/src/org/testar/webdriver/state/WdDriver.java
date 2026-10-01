@@ -65,6 +65,8 @@ public class WdDriver extends SUTBase {
     public static boolean disableSecurity = false;
     public static boolean remoteDebugging = false;
     public static boolean disableGPU = true;
+    public static String chromeUserDataDir = "";
+    public static String chromeProfileDirectory = "";
 
     private final Keyboard kbd = AWTKeyboard.build();
     private final Mouse mouse = WdMouse.build();
@@ -258,6 +260,8 @@ public class WdDriver extends SUTBase {
 
         followLinks = settings.get(ConfigTags.FollowLinks);
         fullScreen = settings.get(ConfigTags.BrowserFullScreen);
+        chromeUserDataDir = settings.get(ConfigTags.WebChromeUserDataDir, "").trim();
+        chromeProfileDirectory = settings.get(ConfigTags.WebChromeProfileDirectory, "").trim();
         forceActivateTab = settings.get(ConfigTags.SwitchNewTabs);
         WdConstants.setIgnoredTags(settings.get(ConfigTags.WebIgnoredTags));
         WdConstants.setIgnoredAttributes(settings.get(ConfigTags.WebIgnoredAttributes));

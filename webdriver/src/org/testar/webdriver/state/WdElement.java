@@ -400,12 +400,8 @@ public class WdElement extends TaggableBase implements Serializable {
 
     public boolean visibleAt(double x, double y) {
         int scrollLeft = (root == null) ? 0 : (int) root.scrollLeft;
-        int scrollHeight = (root == null) ? 0 : (int) root.scrollHeight;
-        return rect != null && rect.contains(x - scrollLeft, y - scrollHeight);
-    }
-
-    public boolean visibleAt(double x, double y, boolean obscuredByChildFeature) {
-        return visibleAt(x, y);
+        int scrollTop = (root == null) ? 0 : (int) root.scrollTop;
+        return rect != null && rect.contains(x - scrollLeft, y - scrollTop);
     }
 
     private boolean isFullyVisible(Rect rect) {
@@ -416,7 +412,7 @@ public class WdElement extends TaggableBase implements Serializable {
                rect.y() + rect.height() <= WdCanvasDimensions.getInnerHeight();
     }
 
-    private boolean isFullVisibleAtCanvasBrowser() {
+    boolean isFullVisibleAtCanvasBrowser() {
         if (rect == null) {
             return false;
         }
@@ -424,21 +420,13 @@ public class WdElement extends TaggableBase implements Serializable {
         boolean isVisibleAtCanvas = isFullyVisible(rect);
 
         // If the web element is a <select><option>, check the selected option visibility
-        if (tagName != null && tagName.equalsIgnoreCase("option") && outerHTML != null) {
-
+        if ("option".equalsIgnoreCase(tagName) && parent != null && "select".equalsIgnoreCase(parent.tagName)) {
             // In multi-selects, visibility is determined only by canvas visibility
-            if (parent != null && parent.multiple) {
+            if (parent.multiple) {
                 return isVisibleAtCanvas;
             }
-
-            boolean isSelected = outerHTML.contains("selected>") || outerHTML.contains("selected=");
-            if (outerHTML.contains("<option") && isSelected) {
-                // Select web elements have empty rect values (0,0,0,0)
-                // We need to check the parent element rect values
-                return parent != null ? isFullyVisible(parent.rect) : isVisibleAtCanvas;
-            } else {
-                return false;
-            }
+            // Collapsed native selects expose only the selected option; its own rectangle may be empty.
+            return (selected || Boolean.TRUE.equals(ariaSelected)) && isFullyVisible(parent.rect);
         }
 
         // For other web elements, only check if fully visible in the canvas

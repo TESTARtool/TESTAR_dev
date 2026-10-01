@@ -21,9 +21,9 @@ public class WdHitTester implements HitTester, Serializable {
     }
 
     /**
-     * Runs the hit test action for a certain point on the element.
+     * Runs the geometric hit test for a point on the element.
      *
-     * @param x The x-coordiante of the point.
+     * @param x The x-coordinate of the point.
      * @param y The y-coordinate of the point.
      * @return True if the element can be hit at the supplied point on the screen
      */
@@ -32,15 +32,15 @@ public class WdHitTester implements HitTester, Serializable {
     }
 
     /**
-     * Runs the hit test action for a certain point on the element.
+     * Runs the geometric hit test for a point on the element.
      *
-     * @param x                      The x-coordiante of the point.
-     * @param y                      The y-coordinate of the point.
-     * @param obscuredByChildFeature The element is obscured by a child??
-     * @return True if the element can be hit at the supplied point on the screen
+     * @param x The x-coordinate of the point.
+     * @param y The y-coordinate of the point.
+     * @param obscuredByChildFeature Shared API flag; WebDriver uses geometric hit testing.
+     * @return True if the point is inside the element's scroll-adjusted rectangle
      */
     public boolean apply(double x, double y, boolean obscuredByChildFeature) {
-        return element.visibleAt(x, y, obscuredByChildFeature);
+        return element.visibleAt(x, y);
     }
 
     public String toString() {

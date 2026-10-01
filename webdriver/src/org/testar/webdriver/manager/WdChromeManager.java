@@ -53,6 +53,10 @@ public class WdChromeManager implements WdBrowserManager {
             WebDriverManager.chromedriver().setup();
         }
 
+        return new ChromeDriver(createOptions(chromeForTestingPath, extensionPath));
+    }
+
+    static ChromeOptions createOptions(String chromeForTestingPath, String extensionPath) {
         ChromeOptions options = new ChromeOptions();
         options.setBinary(chromeForTestingPath);
 
@@ -81,13 +85,19 @@ public class WdChromeManager implements WdBrowserManager {
         if (WdDriver.disableGPU) {
             options.addArguments("--disable-gpu");
         }
+        if (WdDriver.chromeUserDataDir != null && !WdDriver.chromeUserDataDir.isEmpty()) {
+            options.addArguments("--user-data-dir=" + WdDriver.chromeUserDataDir);
+        }
+        if (WdDriver.chromeProfileDirectory != null && !WdDriver.chromeProfileDirectory.isEmpty()) {
+            options.addArguments("--profile-directory=" + WdDriver.chromeProfileDirectory);
+        }
 
         Map<String, Object> prefs = new HashMap<>();
         prefs.put("profile.default_content_setting_values.notifications", 1);
         prefs.put("profile.password_manager_leak_detection", false);
         options.setExperimentalOption("prefs", prefs);
 
-        return new ChromeDriver(options);
+        return options;
     }
 
     private String getChromeMajorVersion(String chromePath) {
