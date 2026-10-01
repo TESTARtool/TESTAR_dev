@@ -56,6 +56,23 @@ public class TestLlmParseActionResponse {
     }
 
     @Test
+    public void test_parsing_hit_escape_action() {
+        String llmResponse = "```json{\"actionId\":\"AID_HitEsc\",\"input\":\"\"}```";
+        Set<Action> derivedActions = createDefaultDerivedActions(createState());
+        Action escapeAction = derivedActions.stream()
+                .filter(action -> "AID_HitEsc".equals(action.get(Tags.AbstractID, "")))
+                .findFirst()
+                .orElseThrow();
+        String originalDescription = escapeAction.get(Tags.Desc, null);
+
+        LlmParseActionResult result = new LlmParseActionResponse().parseLlmResponse(derivedActions, llmResponse);
+
+        Assert.isTrue(result.getParseResult() == LlmParseActionResult.ParseResult.SUCCESS);
+        Assert.isTrue(result.getActionToExecute().get(Tags.AbstractID).equals("AID_HitEsc"));
+        Assert.isTrue(result.getActionToExecute().get(Tags.Desc, null).equals(originalDescription));
+    }
+
+    @Test
     public void test_llm_selects_type_action() {
         String llmResponse = "{\"actionId\":\"AID_type\",\"input\":\"testar\"}";
         Set<Action> derivedActions = createDefaultDerivedActions(createState());
@@ -243,6 +260,9 @@ public class TestLlmParseActionResponse {
         derivedActions.add(createSelectAction(state, "combobox_widget_desc", "combobox_widget_web_id",
                 "CID_combobox_widget", "AID_combobox_widget", "CID_select", "AID_select", "Saab"));
         derivedActions.add(createAndroidTypeAction(state));
+        Action escapeAction = ac.hitESC(state);
+        escapeAction.set(Tags.AbstractID, "AID_HitEsc");
+        derivedActions.add(escapeAction);
         return derivedActions;
     }
 

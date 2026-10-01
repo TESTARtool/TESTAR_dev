@@ -63,11 +63,11 @@ public class LlmParseActionResponse {
             }
 
             String input = llmSelectedAction.getInput();
-            Widget widget = selectedAction.get(Tags.OriginWidget);
+            Widget widget = selectedAction.get(Tags.OriginWidget, null);
 
             // For interacting with select combobox web widgets
             // A WdSelectListAction is created to change the active value of the combobox
-            if (Objects.equals(widget.get(WdTags.WebTagName, ""), "select")) {
+            if (widget != null && Objects.equals(widget.get(WdTags.WebTagName, ""), "select")) {
                 if (Objects.equals(input, "")) {
                     return new LlmParseActionResult(null, LlmParseActionResult.ParseResult.SL_MISSING_INPUT);
                 }
@@ -80,7 +80,9 @@ public class LlmParseActionResponse {
                 return new LlmParseActionResult(selectAction, LlmParseActionResult.ParseResult.SUCCESS);
             }
 
-            setCompoundActionInputText(selectedAction, input);
+            if (widget != null) {
+                setCompoundActionInputText(selectedAction, input);
+            }
             return new LlmParseActionResult(selectedAction, LlmParseActionResult.ParseResult.SUCCESS);
 
         } catch (JsonParseException e) {
@@ -145,9 +147,13 @@ public class LlmParseActionResponse {
                     return updateTextAction(action, innerAction, inputText);
                 }
             }
+            return false;
         }
 
-        return updateTextAction(action, action, inputText);
+        if (action instanceof WdRemoteTypeAction || action.get(Tags.InputText, null) != null) {
+            return updateTextAction(action, action, inputText);
+        }
+        return false;
     }
 
     private boolean updateTextAction(Action action, Action innerAction, String inputText) {
@@ -161,7 +167,7 @@ public class LlmParseActionResponse {
         String widgetDesc = action.get(Tags.OriginWidget).get(Tags.Desc, "<no description>");
         action.set(Tags.Desc, innerAction.getClass().getSimpleName() + " '" + inputText + "' into '" + widgetDesc + "'");
 
-        if (action.get(Tags.Visualizer) instanceof TextVisualizer) {
+        if (action.get(Tags.Visualizer, null) instanceof TextVisualizer) {
             TextVisualizer textVisualizer = (TextVisualizer) action.get(Tags.Visualizer);
             Pen newPen = Pen.newPen().setColor(Color.Red).setFillPattern(FillPattern.Solid).setStrokeWidth(50).build();
             action.set(Tags.Visualizer, textVisualizer.withText(inputText, newPen));
