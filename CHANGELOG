@@ -12,6 +12,70 @@
 - Refactor llm into custom module
 
 
+#TESTAR v2.8.17 (30-Sep-2026)
+- Bump io.github.bonigarcia:webdrivermanager from 6.3.4 to 6.4.0
+
+
+#TESTAR v2.8.16 (15-Sep-2026)
+- Bump org.seleniumhq.selenium:selenium-java from 4.48.0 to 4.49.0
+- Update devtools dependencies to v153
+- Add state feedback tag
+- Add log, screenshots, and test serialiser null guards
+- Calculate WdElement visibleAt logic with scrollTop
+- Extend web ensureCanvasOnTop logic
+- Extend AndroidLogcatOracle to normalize file paths and object IDs
+- Update android actions toString description, which constitutes the action's concrete ID. This also fixes an issue with HTML report action screenshots
+- Delete unused AndroidActionPinch
+- Catch potential android driver initialization and non responsive issues to avoid breaking TESTAR execution
+
+
+#TESTAR v2.8.15 (14-Sep-2026)
+- Bump org.seleniumhq.selenium:selenium-java from 4.46.0 to 4.48.0
+- Update devtools dependencies to v152
+
+
+#TESTAR v2.8.14 (13-Jul-2026)
+- Bump org.seleniumhq.selenium:selenium-java from 4.45.0 to 4.46.0
+- Update devtools dependencies to v150
+
+
+#TESTAR v2.8.13 (29-Jun-2026)
+- Bump org.seleniumhq.selenium:selenium-java from 4.44.0 to 4.45.0
+- Update devtools dependencies to v149
+
+
+#TESTAR v2.8.12 (1-Jun-2026)
+- Add executeTriggeredAction in GenericUtilsProtocol
+- Update parabank protocol to save login sequence in the state model
+- Set Tag.InputText to action and concrete action
+- Add screenshot to ConcreteAction
+- Update web isFullVisibleAtCanvasBrowser logic
+
+
+#TESTAR v2.8.11 (25-May-2026)
+- Bump org.seleniumhq.selenium:selenium-java from 4.43.0 to 4.44.0
+- Update devtools dependencies to v148
+
+
+#TESTAR v2.8.10 (12-May-2026)
+- Bump io.appium:java-client from 10.1.0 to 10.1.1
+
+
+#TESTAR v2.8.9 (21-Apr-2026)
+- Bump org.seleniumhq.selenium:selenium-java from 4.41.0 to 4.43.0
+- Fix id bug when analyzing state models
+
+
+#TESTAR v2.8.8 (16-Apr-2026)
+- Update dockerfiles
+
+
+#TESTAR v2.8.7 (6-Apr-2026)
+- Bump io.github.bonigarcia:webdrivermanager from 6.3.3 to 6.3.4
+- Fix parse llm selected ESC action
+- Add WdDriver configurable user data and profile
+
+
 #TESTAR v2.8.6 (24-Mar-2026)
 - Remove linux AtSpi subproject
 - Remove unused Tags
