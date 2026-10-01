@@ -80,6 +80,8 @@ public class AndroidAppiumFramework extends SUTBase {
     public static String androidAppiumURL = "http://127.0.0.1:4723/wd/hub";
 
     public AndroidAppiumFramework(DesiredCapabilities cap) {
+        resetDriverUnresponsive();
+        driver = null;
         try {
             driver = new AndroidDriver(new URL(androidAppiumURL), cap);
             // Next few lines of code enable the show touches in Android.
@@ -114,8 +116,19 @@ public class AndroidAppiumFramework extends SUTBase {
             driver.executeScript("mobile: shell", showPointerCmd);
              */
         } catch (MalformedURLException e) {
-            System.err.println("ERROR: Exception with Android Driver URL: http://0.0.0.0:4723/wd/hub");
-            e.printStackTrace();
+            markDriverUnresponsive(e);
+            throw new IllegalArgumentException("Invalid Android Appium URL: " + androidAppiumURL, e);
+        } catch (RuntimeException e) {
+            markDriverUnresponsive(e);
+            if (driver != null) {
+                try {
+                    driver.quit();
+                } catch (RuntimeException cleanupFailure) {
+                    e.addSuppressed(cleanupFailure);
+                }
+                driver = null;
+            }
+            throw e;
         }
     }
 
@@ -158,7 +171,26 @@ public class AndroidAppiumFramework extends SUTBase {
         driverUnresponsive = false;
     }
 
+    private static boolean hasDriver(String operation) {
+        if (driver != null) {
+            return true;
+        }
+        if (!driverUnresponsive) {
+            markDriverUnresponsive(new IllegalStateException("Android driver is null while executing " + operation));
+        }
+        return false;
+    }
+
+    private static void requireDriver(String operation) {
+        if (!hasDriver(operation)) {
+            throw new IllegalStateException("Android driver is null while executing " + operation);
+        }
+    }
+
     public static List<WebElement> findElements(By by) {
+        if (!hasDriver("findElements")) {
+            return Collections.emptyList();
+        }
         return driver.findElements(by);
     }
 
@@ -171,6 +203,7 @@ public class AndroidAppiumFramework extends SUTBase {
      * @return android web element
      */
     public static WebElement resolveElementByIdOrXPath(Widget w) {
+        requireDriver("resolveElementByIdOrXPath");
         String id = w.get(AndroidTags.AndroidAccessibilityId, "");
         if (id != null && !id.isEmpty()) {
             // Try by accessibility id only if non-null and non-empty
@@ -194,11 +227,13 @@ public class AndroidAppiumFramework extends SUTBase {
      * @return android web element
      */
     public static WebElement resolveElementByXPath(Widget w) {
+        requireDriver("resolveElementByXPath");
         String xpathString = w.get(AndroidTags.AndroidXpath);
         return driver.findElement(new By.ByXPath(xpathString));
     }
 
     public static void scrollElementById(Widget w, int scrollDistance) {
+        requireDriver("scrollElementById");
         Duration NO_TIME = Duration.ofMillis(0);
         Duration STEP_DURATION = Duration.ofMillis(20);
 
@@ -233,6 +268,7 @@ public class AndroidAppiumFramework extends SUTBase {
     }
 
     public static void longClickElementById(Widget w) {
+        requireDriver("longClickElementById");
         String id = w.get(AndroidTags.AndroidAccessibilityId, "");
         WebElement el;
         if (!id.equals("")) {
@@ -248,6 +284,7 @@ public class AndroidAppiumFramework extends SUTBase {
     }
 
     public static void clickBackButton() {
+        requireDriver("clickBackButton");
         driver.navigate().back();
     }
 
@@ -317,6 +354,7 @@ public class AndroidAppiumFramework extends SUTBase {
 
     //System actions:
     public static void changeOrientation() {
+        requireDriver("changeOrientation");
         ScreenOrientation orientation = driver.getOrientation();
 
         if (orientation.value().equals("portrait")) {
@@ -329,6 +367,7 @@ public class AndroidAppiumFramework extends SUTBase {
     }
 
     public static void generatePhoneCall() {
+        requireDriver("generatePhoneCall");
         String phoneNumber = "1234567890";
         driver.makeGsmCall(phoneNumber, GsmCallActions.CALL);
 
@@ -342,6 +381,7 @@ public class AndroidAppiumFramework extends SUTBase {
     }
 
     public static void generateText() {
+        requireDriver("generateText");
         String phoneNumber = "1234567890";
         String textMessage = "Hallo Tester, Testar says hi!";
         driver.sendSMS(phoneNumber, textMessage);
@@ -354,8 +394,12 @@ public class AndroidAppiumFramework extends SUTBase {
     }
 
     public static String getCurrentPackage() {
+        if (!hasDriver("getCurrentPackage")) {
+            return "";
+        }
         try {
-            return driver.getCurrentPackage();
+            String currentPackage = driver.getCurrentPackage();
+            return currentPackage == null ? "" : currentPackage;
         } catch (WebDriverException wde) {
             markDriverUnresponsive(wde);
             return "";
@@ -363,19 +407,23 @@ public class AndroidAppiumFramework extends SUTBase {
     }
 
     public static void pressKeyEvent(KeyEvent keyEvent) {
+        requireDriver("pressKeyEvent");
         driver.pressKey(keyEvent);
     }
 
     // Utility Interactions
     public static void hideKeyboard() {
+        requireDriver("hideKeyboard");
         driver.hideKeyboard();
     }
 
     public static void wakeUpKeyCode() {
+        requireDriver("wakeUpKeyCode");
         driver.pressKey(new KeyEvent(AndroidKey.WAKEUP));
     }
 
     public static void activateAppByBundleId(String bundleId) {
+        requireDriver("activateAppByBundleId");
         driver.activateApp(bundleId);
     }
 
@@ -385,18 +433,26 @@ public class AndroidAppiumFramework extends SUTBase {
     }*/
 
     public static Set<String> getWindowHandles() {
+        if (!hasDriver("getWindowHandles")) {
+            return Collections.emptySet();
+        }
         return driver.getWindowHandles();
     }
 
     public static String getTitleOfCurrentPage() {
+        if (!hasDriver("getTitleOfCurrentPage")) {
+            return "";
+        }
         return driver.getTitle();
     }
 
     public static void runAppInBackground(Duration duration) {
+        requireDriver("runAppInBackground");
         driver.runAppInBackground(duration);
     }
 
     public static void pushFile(String remotePath, File file) {
+        requireDriver("pushFile");
         try {
             driver.pushFile(remotePath, file);
         } catch (IOException e) {
@@ -405,8 +461,12 @@ public class AndroidAppiumFramework extends SUTBase {
     }
 
     public static String getActivity() {
+        if (!hasDriver("getActivity")) {
+            return "";
+        }
         try {
-            return driver.currentActivity();
+            String activity = driver.currentActivity();
+            return activity == null ? "" : activity;
         } catch (WebDriverException wde) {
             markDriverUnresponsive(wde);
             return "";
@@ -414,6 +474,9 @@ public class AndroidAppiumFramework extends SUTBase {
     }
 
     public static String getScreenshotSpyMode(String stateID) throws IOException {
+        if (!hasDriver("getScreenshotSpyMode")) {
+            throw new IOException("Android driver is null while capturing a Spy screenshot");
+        }
         String scrshotOutputFolder = "output" + File.separator + "android_spy_screenshots";
         String statePath = scrshotOutputFolder + File.separator + stateID + ".png";
         File srcFile = driver.getScreenshotAs(OutputType.FILE);
@@ -423,6 +486,9 @@ public class AndroidAppiumFramework extends SUTBase {
     }
 
     public static String getScreenshotState(State state) throws IOException {
+        if (!hasDriver("getScreenshotState")) {
+            throw new IOException("Android driver is null while capturing a state screenshot");
+        }
         try {
             byte[] byteImage = driver.getScreenshotAs(OutputType.BYTES);
             InputStream is = new ByteArrayInputStream(byteImage);
@@ -435,6 +501,9 @@ public class AndroidAppiumFramework extends SUTBase {
     }
 
     public static String getScreenshotAction(State state, Action action) throws IOException {
+        if (!hasDriver("getScreenshotAction")) {
+            throw new IOException("Android driver is null while capturing an action screenshot");
+        }
         byte[] byteImage;
         InputStream is;
         try {
@@ -489,6 +558,9 @@ public class AndroidAppiumFramework extends SUTBase {
     }
 
     public static AWTCanvas getScreenshotBinary(State state) throws IOException {
+        if (!hasDriver("getScreenshotBinary")) {
+            throw new IOException("Android driver is null while capturing a screenshot");
+        }
         try {
             byte[] byteImage = driver.getScreenshotAs(OutputType.BYTES);
             InputStream is = new ByteArrayInputStream(byteImage);
@@ -500,6 +572,7 @@ public class AndroidAppiumFramework extends SUTBase {
     }
 
     public static void terminateApp(String bundleId) {
+        requireDriver("terminateApp");
         driver.terminateApp(bundleId);
     }
 
@@ -509,21 +582,39 @@ public class AndroidAppiumFramework extends SUTBase {
      * Information is about loaded page/application in the foreground,
      * not about specific process or SUT.
      *
-     * @return Document with DOM representation
+     * @return page source document and feedback
      */
-    public static Document getAndroidPageSource() {
+    public static AndroidPageSourceResult getAndroidPageSource() {
+        if (!hasDriver("getAndroidPageSource")) {
+            return new AndroidPageSourceResult(null, "Exception trying to obtain driver.getPageSource(): Android driver is null");
+        }
         try {
             String appiumState = driver.getPageSource();
-            return loadXML(appiumState);
+            return new AndroidPageSourceResult(loadXML(appiumState), "");
         } catch (WebDriverException wde) {
-            System.err.println("ERROR: Exception trying to obtain driver.getPageSource()");
+            markDriverUnresponsive(wde);
+            String feedback = "Exception trying to obtain driver.getPageSource()";
+            if (wde.getMessage() != null && !wde.getMessage().isEmpty()) {
+                feedback += ": " + wde.getMessage();
+            }
+            System.err.println("ERROR: " + feedback);
+            return new AndroidPageSourceResult(null, feedback);
         } catch (ParserConfigurationException | SAXException | IOException doce) {
-            System.err.println("ERROR: Exception parsing Android Driver Page Source to XML Document");
+            String feedback = "Exception parsing Android Driver Page Source to XML Document";
+            if (doce.getMessage() != null && !doce.getMessage().isEmpty()) {
+                feedback += ": " + doce.getMessage();
+            }
+            System.err.println("ERROR: " + feedback);
+            return new AndroidPageSourceResult(null, feedback);
         } catch (Exception e) {
-            System.err.println("ERROR: Unknown Exception AppiumFramework getAndroidPageSource()");
+            String feedback = "Unknown Exception AppiumFramework getAndroidPageSource()";
+            if (e.getMessage() != null && !e.getMessage().isEmpty()) {
+                feedback += ": " + e.getMessage();
+            }
+            System.err.println("ERROR: " + feedback);
             e.printStackTrace();
+            return new AndroidPageSourceResult(null, feedback);
         }
-        return null;
     }
 
     private static Document loadXML(String xml) throws ParserConfigurationException, SAXException, IOException {
@@ -534,6 +625,7 @@ public class AndroidAppiumFramework extends SUTBase {
     }
 
     public static void uninstallApp(String appName) {
+        requireDriver("uninstallApp");
         System.out.println("Uninstalling app: " + appName);
         driver.removeApp(appName);
 
@@ -545,6 +637,9 @@ public class AndroidAppiumFramework extends SUTBase {
     }
 
     public static LogEntries getAppiumLogs() {
+        if (!hasDriver("getAppiumLogs")) {
+            return new LogEntries(Collections.emptyList());
+        }
         return driver.manage().logs().get("driver");
     }
 
@@ -561,6 +656,7 @@ public class AndroidAppiumFramework extends SUTBase {
      * Execute an Android shell command on the device via Appium ("mobile: shell").
      */
     private static void mobileShell(String command, List<String> args, Duration timeout) {
+        requireDriver("mobileShell");
         Map<String, Object> m = new HashMap<>();
         m.put("command", command);
         m.put("args", args);
@@ -594,6 +690,9 @@ public class AndroidAppiumFramework extends SUTBase {
      * Execute an Android shell command on the device via Appium ("mobile: shell") and return stdout.
      */
     private static String mobileShellStdout(String command, List<String> args, Duration timeout) {
+        if (!hasDriver("mobileShellStdout")) {
+            return "";
+        }
         Map<String, Object> m = new HashMap<>();
         m.put("command", command);
         m.put("args", args);
@@ -659,6 +758,9 @@ public class AndroidAppiumFramework extends SUTBase {
 
     @Override
     public boolean isRunning() {
+        if (driver == null) {
+            return false;
+        }
         //TODO: Check and select proper method to verify if running
         try {
             // Need to know appId to use this.
@@ -676,6 +778,9 @@ public class AndroidAppiumFramework extends SUTBase {
 
     @Override
     public String getStatus() {
+        if (driver == null) {
+            return "Android current package : <unavailable>";
+        }
         //TODO: Check and select proper method to print the status
         try {
             return "Android current package : " + driver.getCurrentPackage();
@@ -686,6 +791,9 @@ public class AndroidAppiumFramework extends SUTBase {
     }
 
     public static ApplicationState getStatus(String appId) {
+        if (!hasDriver("getStatus")) {
+            return ApplicationState.NOT_RUNNING;
+        }
         try {
             return driver.queryAppState(appId);
         } catch (WebDriverException wde) {

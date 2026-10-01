@@ -43,11 +43,7 @@ public class AndroidStateBuilder implements StateBuilder {
             // If the driver became unresponsive during non-state fetcher calls like actions or logcat
             if (AndroidAppiumFramework.isDriverUnresponsive()) {
                 AndroidAppiumFramework.resetDriverUnresponsive();
-                AndroidRootElement rootElement = AndroidStateFetcher.buildRoot(system);
-                AndroidState androidState = new AndroidState(rootElement);
-                androidState.set(Tags.Role, Roles.Process);
-                androidState.set(Tags.NotResponding, true);
-                return androidState;
+                return buildNotRespondingState("");
             }
 
             Future<AndroidState> future = executor.submit(new AndroidStateFetcher(system));
@@ -55,12 +51,9 @@ public class AndroidStateBuilder implements StateBuilder {
 
             // If the driver became unresponsive during state fetch calls
             if (AndroidAppiumFramework.isDriverUnresponsive()) {
+                String stateFeedback = state.get(Tags.StateFeedback, "");
                 AndroidAppiumFramework.resetDriverUnresponsive();
-                AndroidRootElement rootElement = AndroidStateFetcher.buildRoot(system);
-                AndroidState androidState = new AndroidState(rootElement);
-                androidState.set(Tags.Role, Roles.Process);
-                androidState.set(Tags.NotResponding, true);
-                return androidState;
+                return buildNotRespondingState(stateFeedback);
             }
 
             return state;
@@ -68,12 +61,23 @@ public class AndroidStateBuilder implements StateBuilder {
             e.printStackTrace();
             throw new StateBuildException(e.getMessage());
         } catch (TimeoutException e) {
-            AndroidRootElement rootElement = AndroidStateFetcher.buildRoot(system);
-            AndroidState androidState = new AndroidState(rootElement);
-            androidState.set(Tags.Role, Roles.Process);
-            androidState.set(Tags.NotResponding, true);
-
-            return androidState;
+            return buildNotRespondingState("");
         }
+    }
+
+    private AndroidState buildNotRespondingState(String feedback) {
+        AndroidRootElement rootElement = new AndroidRootElement();
+        rootElement.timeStamp = System.currentTimeMillis();
+        rootElement.pid = -1;
+        rootElement.isRunning = false;
+        rootElement.isForeground = false;
+
+        AndroidState androidState = new AndroidState(rootElement);
+        androidState.set(Tags.Role, Roles.Process);
+        androidState.set(Tags.NotResponding, true);
+        if (feedback != null && !feedback.isEmpty()) {
+            androidState.set(Tags.StateFeedback, feedback);
+        }
+        return androidState;
     }
 }

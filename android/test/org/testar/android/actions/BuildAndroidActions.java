@@ -2,6 +2,7 @@ package org.testar.android.actions;
 
 import org.junit.Test;
 import org.junit.Before;
+import org.testar.core.CodingManager;
 import org.testar.android.action.AndroidActionClick;
 import org.testar.android.action.AndroidActionLongClick;
 import org.testar.android.action.AndroidActionScroll;
@@ -13,10 +14,18 @@ import org.testar.android.action.AndroidSystemActionText;
 import org.testar.android.tag.AndroidTags;
 import org.testar.core.Assert;
 import org.testar.core.action.Action;
+import org.testar.core.action.ActionRoles;
 import org.testar.core.alayer.Rect;
 import org.testar.core.tag.Tags;
 import org.testar.stub.StateStub;
 import org.testar.stub.WidgetStub;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 public class BuildAndroidActions {
 
@@ -165,5 +174,79 @@ public class BuildAndroidActions {
         Assert.notNull(androidSystemText.get(Tags.OriginWidget));
         Assert.isTrue(androidSystemText.get(Tags.OriginWidget).get(AndroidTags.AndroidXpath).equals(statePath));
         Assert.isTrue(androidSystemText.get(Tags.Desc).equals("Android system event: text message"));
+    }
+
+    @Test
+    public void widgetActionsHaveDistinctConcreteIdsAndSemanticRoles() {
+        state.set(Tags.ConcreteID, "state-concrete-id");
+        state.set(Tags.AbstractID, "state-abstract-id");
+        widget.set(Tags.ConcreteID, "widget-concrete-id");
+        widget.set(Tags.Path, widgetPath);
+
+        Action click = new AndroidActionClick(state, widget);
+        Action longClick = new AndroidActionLongClick(state, widget);
+        Action scroll = new AndroidActionScroll(state, widget);
+        Action typeFirst = new AndroidActionType(state, widget, "first");
+        Action typeSecond = new AndroidActionType(state, widget, "second");
+        Set<Action> actions = new HashSet<>(Set.of(click, longClick, scroll, typeFirst, typeSecond));
+
+        CodingManager.buildIDs(state, actions);
+
+        Set<String> concreteIds = new HashSet<>();
+        for (Action action : actions) {
+            concreteIds.add(action.get(Tags.ConcreteID));
+            Assert.isTrue(!action.toParametersString().isEmpty());
+            Assert.isTrue(action.toString(new org.testar.core.alayer.Role[0]).equals(action.toParametersString()));
+        }
+        assertEquals(actions.size(), concreteIds.size());
+        assertEquals(ActionRoles.LeftClickAt, longClick.get(Tags.Role));
+        assertEquals(ActionRoles.Drag, scroll.get(Tags.Role));
+        assertNotEquals(click.get(Tags.ConcreteID), longClick.get(Tags.ConcreteID));
+    }
+
+    @Test
+    public void systemActionsHaveDistinctConcreteIds() {
+        state.set(Tags.ConcreteID, "state-concrete-id");
+        state.set(Tags.AbstractID, "state-abstract-id");
+        Action[] actions = {
+            new AndroidBackAction(state),
+            new AndroidSystemActionCall(state),
+            new AndroidSystemActionOrientation(state),
+            new AndroidSystemActionText(state)
+        };
+
+        Set<String> concreteIds = new HashSet<>();
+        for (Action action : actions) {
+            CodingManager.buildEnvironmentActionIDs(state, action);
+            concreteIds.add(action.get(Tags.ConcreteID));
+            assertEquals(ActionRoles.Action, action.get(Tags.Role));
+        }
+        assertEquals(actions.length, concreteIds.size());
+    }
+
+    @Test
+    public void abstractActionIdsDoNotDependOnSetInsertionOrder() {
+        state.set(Tags.ConcreteID, "state-concrete-id");
+        state.set(Tags.AbstractID, "state-abstract-id");
+        widget.set(Tags.ConcreteID, "widget-concrete-id");
+        widget.set(Tags.Path, widgetPath);
+
+        Action firstClick = new AndroidActionClick(state, widget);
+        Action firstLongClick = new AndroidActionLongClick(state, widget);
+        Set<Action> forward = new LinkedHashSet<>();
+        forward.add(firstClick);
+        forward.add(firstLongClick);
+        CodingManager.buildIDs(state, forward);
+
+        Action secondClick = new AndroidActionClick(state, widget);
+        Action secondLongClick = new AndroidActionLongClick(state, widget);
+        Set<Action> reverse = new LinkedHashSet<>();
+        reverse.add(secondLongClick);
+        reverse.add(secondClick);
+        CodingManager.buildIDs(state, reverse);
+
+        assertEquals(firstClick.get(Tags.AbstractID), secondClick.get(Tags.AbstractID));
+        assertEquals(firstLongClick.get(Tags.AbstractID), secondLongClick.get(Tags.AbstractID));
+        assertNotEquals(firstClick.get(Tags.AbstractID), firstLongClick.get(Tags.AbstractID));
     }
 }

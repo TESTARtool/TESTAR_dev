@@ -7,8 +7,8 @@
 package org.testar.android.action;
 
 import org.testar.android.AndroidAppiumFramework;
-import org.testar.android.alayer.AndroidRoles;
 import org.testar.core.action.Action;
+import org.testar.core.action.ActionRoles;
 import org.testar.core.alayer.Role;
 import org.testar.core.exceptions.ActionFailedException;
 import org.testar.core.state.SUT;
@@ -21,7 +21,7 @@ public class AndroidBackAction extends TaggableBase implements Action {
     private static final long serialVersionUID = 6808185819403073531L;
 
     public AndroidBackAction(State state) {
-        this.set(Tags.Role, AndroidRoles.AndroidWidget);
+        this.set(Tags.Role, ActionRoles.Action);
         this.mapOriginWidget(state);
         this.set(Tags.Desc, toShortString());
     }
@@ -44,11 +44,11 @@ public class AndroidBackAction extends TaggableBase implements Action {
 
     @Override
     public String toParametersString() {
-        return "";
+        return AndroidActionParameters.forSystem(this, "back");
     }
 
     @Override
     public String toString(Role... discardParameters) {
-        return "";
+        return toParametersString();
     }
 }

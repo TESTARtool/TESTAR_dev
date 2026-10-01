@@ -37,7 +37,11 @@ public final class AndroidSystemService implements SystemService {
 
     @Override
     public SUT startSystem() throws SystemStartException {
-        return starter.start();
+        try {
+            return starter.start();
+        } catch (RuntimeException exception) {
+            throw new SystemStartException("Unable to start Android Appium session", exception);
+        }
     }
 
     @Override

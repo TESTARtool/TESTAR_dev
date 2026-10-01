@@ -69,12 +69,13 @@ public class AndroidActionType extends TaggableBase implements Action {
 
     @Override
     public String toParametersString() {
-        return "";
+        return AndroidActionParameters.forWidget(this, widget, "type")
+                + ",inputText=" + get(Tags.InputText, "");
     }
 
     @Override
     public String toString(Role... discardParameters) {
-        return "";
+        return toParametersString();
     }
 
     public Widget getWidget() {

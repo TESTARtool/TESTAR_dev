@@ -24,6 +24,21 @@ public final class AndroidSystemServiceTest {
     }
 
     @Test
+    public void startSystemReportsInitializationFailure() {
+        IllegalStateException failure = new IllegalStateException("Appium unavailable");
+        AndroidSystemService service = new AndroidSystemService(() -> {
+            throw failure;
+        });
+
+        try {
+            service.startSystem();
+            Assert.fail("Expected SystemStartException");
+        } catch (SystemStartException expected) {
+            Assert.assertSame(failure, expected.getCause());
+        }
+    }
+
+    @Test
     public void stopSystemStopsProvidedSystem() {
         TestSut system = new TestSut();
         AndroidSystemService service = new AndroidSystemService(TestSut::new);

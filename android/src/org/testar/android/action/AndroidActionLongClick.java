@@ -7,8 +7,8 @@
 package org.testar.android.action;
 
 import org.testar.android.AndroidAppiumFramework;
-import org.testar.android.alayer.AndroidRoles;
 import org.testar.core.action.Action;
+import org.testar.core.action.ActionRoles;
 import org.testar.core.alayer.Role;
 import org.testar.core.exceptions.ActionFailedException;
 import org.testar.core.state.SUT;
@@ -24,7 +24,7 @@ public class AndroidActionLongClick extends TaggableBase implements Action {
     private final Widget widget;
 
     public AndroidActionLongClick(State state, Widget w) {
-        this.set(Tags.Role, AndroidRoles.AndroidWidget);
+        this.set(Tags.Role, ActionRoles.LeftClickAt);
         this.mapOriginWidget(w);
         this.widget = w;
         this.set(Tags.Desc, toShortString());
@@ -48,12 +48,12 @@ public class AndroidActionLongClick extends TaggableBase implements Action {
 
     @Override
     public String toParametersString() {
-        return "";
+        return AndroidActionParameters.forWidget(this, widget, "longClick");
     }
 
     @Override
     public String toString(Role... discardParameters) {
-        return "";
+        return toParametersString();
     }
 
     public Widget getWidget() {

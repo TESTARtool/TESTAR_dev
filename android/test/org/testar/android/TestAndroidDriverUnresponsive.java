@@ -1,12 +1,17 @@
 package org.testar.android;
 
 import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.appmanagement.ApplicationState;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.MockedConstruction;
 import org.mockito.Mockito;
+import org.openqa.selenium.By;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.testar.core.state.Widget;
 import org.testar.core.state.State;
 import org.testar.android.state.AndroidStateBuilder;
 import org.testar.core.state.SUT;
@@ -93,6 +98,146 @@ public class TestAndroidDriverUnresponsive {
 
         State notResponding = buildStateWithUnresponsiveFlag();
         Assert.assertTrue(notResponding.get(Tags.NotResponding, false));
+    }
+
+    @Test
+    public void pageSourceFailurePreservesFeedbackInNotRespondingState() throws Exception {
+        AndroidDriver driver = mock(AndroidDriver.class);
+        when(driver.getPageSource()).thenThrow(new WebDriverException("page source timeout"));
+        when(driver.currentActivity()).thenReturn("TestActivity");
+        setStaticDriver(driver);
+
+        SUT system = mock(SUT.class);
+        when(system.isRunning()).thenReturn(true);
+        when(system.get(Tags.PID, (long) -1)).thenReturn((long) -1);
+
+        State state = new AndroidStateBuilder(1.0).apply(system);
+
+        Assert.assertTrue(state.get(Tags.NotResponding, false));
+        Assert.assertTrue(state.get(Tags.StateFeedback, "").contains("page source timeout"));
+        Assert.assertFalse(AndroidAppiumFramework.isDriverUnresponsive());
+    }
+
+    @Test
+    public void alreadyUnresponsiveDriverDoesNotQuerySystemAgain() throws Exception {
+        setStaticDriver(null);
+        AndroidAppiumFramework.markDriverUnresponsive(new IllegalStateException("driver lost"));
+
+        SUT system = mock(SUT.class);
+        State state = new AndroidStateBuilder(1.0).apply(system);
+
+        Assert.assertTrue(state.get(Tags.NotResponding, false));
+        Assert.assertFalse(AndroidAppiumFramework.isDriverUnresponsive());
+        Mockito.verify(system, Mockito.never()).isRunning();
+    }
+
+    @Test
+    public void missingDriverReturnsPageSourceFeedback() throws Exception {
+        setStaticDriver(null);
+
+        AndroidPageSourceResult result = AndroidAppiumFramework.getAndroidPageSource();
+
+        Assert.assertNull(result.getDocument());
+        Assert.assertTrue(result.getFeedback().contains("Android driver is null"));
+        Assert.assertTrue(AndroidAppiumFramework.isDriverUnresponsive());
+    }
+
+    @Test
+    public void missingDriverReturnsEmptyActivityAndPackage() throws Exception {
+        setStaticDriver(null);
+
+        Assert.assertEquals("", AndroidAppiumFramework.getActivity());
+        Assert.assertEquals("", AndroidAppiumFramework.getCurrentPackage());
+        Assert.assertEquals(ApplicationState.NOT_RUNNING, AndroidAppiumFramework.getStatus("test.app"));
+        Assert.assertTrue(AndroidAppiumFramework.isDriverUnresponsive());
+    }
+
+    @Test
+    public void missingDriverFailsScreenshotWithIoException() throws Exception {
+        setStaticDriver(null);
+
+        try {
+            AndroidAppiumFramework.getScreenshotState(mock(State.class));
+            Assert.fail("Expected IOException");
+        } catch (IOException expected) {
+            Assert.assertTrue(expected.getMessage().contains("Android driver is null"));
+        }
+        Assert.assertTrue(AndroidAppiumFramework.isDriverUnresponsive());
+    }
+
+    @Test
+    public void missingDriverFailsElementResolutionExplicitly() throws Exception {
+        setStaticDriver(null);
+
+        try {
+            AndroidAppiumFramework.resolveElementByIdOrXPath(mock(Widget.class));
+            Assert.fail("Expected IllegalStateException");
+        } catch (IllegalStateException expected) {
+            Assert.assertTrue(expected.getMessage().contains("Android driver is null"));
+        }
+        Assert.assertTrue(AndroidAppiumFramework.isDriverUnresponsive());
+    }
+
+    @Test
+    public void missingDriverDoesNotSilentlyExecuteActions() throws Exception {
+        setStaticDriver(null);
+
+        try {
+            AndroidAppiumFramework.clickBackButton();
+            Assert.fail("Expected IllegalStateException");
+        } catch (IllegalStateException expected) {
+            Assert.assertTrue(expected.getMessage().contains("clickBackButton"));
+        }
+        Assert.assertTrue(AndroidAppiumFramework.isDriverUnresponsive());
+    }
+
+    @Test
+    public void missingDriverReturnsEmptyReadOnlyResults() throws Exception {
+        setStaticDriver(null);
+
+        Assert.assertTrue(AndroidAppiumFramework.findElements(By.id("widget")).isEmpty());
+        Assert.assertTrue(AndroidAppiumFramework.getWindowHandles().isEmpty());
+        Assert.assertEquals("", AndroidAppiumFramework.getTitleOfCurrentPage());
+        Assert.assertTrue(AndroidAppiumFramework.isDriverUnresponsive());
+    }
+
+    @Test
+    public void invalidAppiumUrlFailsDuringInitialization() {
+        String previousUrl = AndroidAppiumFramework.androidAppiumURL;
+        AndroidAppiumFramework.androidAppiumURL = "not-a-url";
+        try {
+            new AndroidAppiumFramework(new DesiredCapabilities());
+            Assert.fail("Expected IllegalArgumentException");
+        } catch (IllegalArgumentException expected) {
+            Assert.assertTrue(expected.getMessage().contains("Invalid Android Appium URL"));
+            Assert.assertTrue(AndroidAppiumFramework.isDriverUnresponsive());
+        } finally {
+            AndroidAppiumFramework.androidAppiumURL = previousUrl;
+        }
+    }
+
+    @Test
+    public void initializationFailureClosesPartiallyCreatedDriver() {
+        String previousUrl = AndroidAppiumFramework.androidAppiumURL;
+        AndroidAppiumFramework.androidAppiumURL = "http://127.0.0.1:4723/wd/hub";
+        try (MockedConstruction<AndroidDriver> construction = Mockito.mockConstruction(
+                AndroidDriver.class,
+                (driver, context) -> when(driver.executeScript(eq("mobile: shell"), any()))
+                        .thenThrow(new WebDriverException("show touches failed")))) {
+            try {
+                new AndroidAppiumFramework(new DesiredCapabilities());
+                Assert.fail("Expected WebDriverException");
+            } catch (WebDriverException expected) {
+                Assert.assertTrue(expected.getMessage().contains("show touches failed"));
+            }
+
+            AndroidDriver createdDriver = construction.constructed().get(0);
+            Mockito.verify(createdDriver).quit();
+            Assert.assertNull(AndroidAppiumFramework.getDriver());
+            Assert.assertTrue(AndroidAppiumFramework.isDriverUnresponsive());
+        } finally {
+            AndroidAppiumFramework.androidAppiumURL = previousUrl;
+        }
     }
 
     private State buildStateWithUnresponsiveFlag() throws Exception {

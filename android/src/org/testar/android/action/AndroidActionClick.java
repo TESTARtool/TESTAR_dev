@@ -50,12 +50,12 @@ public class AndroidActionClick extends TaggableBase implements Action {
 
     @Override
     public String toParametersString() {
-        return "";
+        return AndroidActionParameters.forWidget(this, widget, "click");
     }
 
     @Override
     public String toString(Role... discardParameters) {
-        return "";
+        return toParametersString();
     }
 
     public Widget getWidget() {

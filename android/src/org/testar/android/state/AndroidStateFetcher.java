@@ -7,6 +7,7 @@
 package org.testar.android.state;
 
 import org.testar.android.AndroidAppiumFramework;
+import org.testar.android.AndroidPageSourceResult;
 import org.testar.android.tag.AndroidTags;
 import org.testar.android.util.AndroidNodeParser;
 import org.testar.android.util.AndroidXpathUtil;
@@ -30,6 +31,7 @@ public class AndroidStateFetcher implements Callable<AndroidState> {
     private Rect biggestRect = Rect.from(0, 0, 0, 0);
 
     private String androidActivityVar;
+    private String stateFeedback = "";
 
     public AndroidStateFetcher(SUT system) {
         this.system = system;
@@ -60,6 +62,9 @@ public class AndroidStateFetcher implements Callable<AndroidState> {
         AndroidState root = createWidgetTree(rootElement);
         root.set(Tags.Role, Roles.Process);
         root.set(Tags.NotResponding, false);
+        if (!stateFeedback.isEmpty()) {
+            root.set(Tags.StateFeedback, stateFeedback);
+        }
 
         root.set(Tags.Title, androidActivityVar);
         root.set(Tags.Desc, "Android system");
@@ -84,8 +89,10 @@ public class AndroidStateFetcher implements Callable<AndroidState> {
 
         rootElement.pid = system.get(Tags.PID, (long)-1);
 
-        Document xmlAndroid;
-        if ((xmlAndroid = AndroidAppiumFramework.getAndroidPageSource()) != null) {
+        AndroidPageSourceResult pageSourceResult = AndroidAppiumFramework.getAndroidPageSource();
+        stateFeedback = pageSourceResult.getFeedback();
+        Document xmlAndroid = pageSourceResult.getDocument();
+        if (xmlAndroid != null) {
             Node stateNode = xmlAndroid.getDocumentElement();
 
             if (stateNode.hasChildNodes()) {
