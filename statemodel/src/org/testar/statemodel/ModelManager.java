@@ -45,6 +45,8 @@ public class ModelManager implements StateModelManager {
     private int nrOfNonDeterministicActions;
     // should the widgets of concrete states be stored in the model?
     private final boolean storeWidgets;
+    private final Runnable testingEndedAction;
+    private boolean testingEnded;
     /**
      * Constructor
      * @param abstractStateModel
@@ -52,6 +54,11 @@ public class ModelManager implements StateModelManager {
      */
     public ModelManager(AbstractStateModel abstractStateModel, ActionSelector actionSelector, PersistenceManager persistenceManager,
                         SequenceManager sequenceManager, boolean storeWidgets) {
+        this(abstractStateModel, actionSelector, persistenceManager, sequenceManager, storeWidgets, () -> { });
+    }
+
+    public ModelManager(AbstractStateModel abstractStateModel, ActionSelector actionSelector, PersistenceManager persistenceManager,
+                        SequenceManager sequenceManager, boolean storeWidgets, Runnable testingEndedAction) {
         this.abstractStateModel = abstractStateModel;
         this.actionSelector = actionSelector;
         this.persistenceManager = persistenceManager;
@@ -59,6 +66,7 @@ public class ModelManager implements StateModelManager {
         errorMessages = new StringJoiner(", ");
         nrOfNonDeterministicActions = 0;
         this.storeWidgets = storeWidgets;
+        this.testingEndedAction = testingEndedAction;
         init();
     }
     /**
@@ -181,8 +189,14 @@ public class ModelManager implements StateModelManager {
         }
     }
     @Override
-    public void notifyTestingEnded() {
+    public synchronized void notifyTestingEnded() {
+        if (testingEnded) {
+            return;
+        }
+        // Flush delayed persistence and release the datastore before opening an export connection.
         persistenceManager.shutdown();
+        testingEnded = true;
+        testingEndedAction.run();
     }
     /**
      * This method uses the abstract state model to return the abstract id of an action to execute

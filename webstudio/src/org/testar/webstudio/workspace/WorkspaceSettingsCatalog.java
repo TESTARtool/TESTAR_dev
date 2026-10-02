@@ -127,6 +127,7 @@ public final class WorkspaceSettingsCatalog {
                 "State model persistence configuration.",
                 settingsProperties,
                 StateModelTags.StateModelInference,
+                StateModelTags.StateModelExportStaticGraph,
                 StateModelTags.DataStore,
                 StateModelTags.DataStoreType,
                 StateModelTags.DataStoreServer,

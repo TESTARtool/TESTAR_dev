@@ -132,6 +132,7 @@ AbstractStateAttributes = WidgetControlType,WebWidgetId
 # ApplicationVersion: Version to identify the SUT. Especially important to identify a State Model
 #
 # StateModelInference: Enable or disable the State Model feature
+# StateModelExportStaticGraph: Export a portable model viewer after Generate or CLI execution ends
 # DataStore: The graph database we use to store the State Model: OrientDB
 # DataStoreType: The mode we use to connect to the database: remote or plocal
 # DataStoreServer: IP address to connect if we desired to use remote mode
@@ -149,6 +150,7 @@ ApplicationName = webdriver_parabank
 ApplicationVersion = 1
 
 StateModelInference = false
+StateModelExportStaticGraph = false
 DataStore = OrientDB
 DataStoreType = plocal
 DataStoreServer = 

@@ -2,3 +2,19 @@ dependencies {
     implementation project(':core')
     implementation project(':config')
 }
+
+sourceSets.main.resources {
+    srcDir 'resources'
+    include 'graphs-static/**'
+}
+
+tasks.register('staticGraphViewerTest', Exec) {
+    group = 'verification'
+    description = 'Run portable static graph viewer tests (requires Node.js).'
+    commandLine 'node', '--test', 'test/js/static-graph-viewer.test.cjs'
+}
+
+tasks.named('test') {
+    // OrientDB's generated SQL parser exceeds instrumentation limits; coverage targets TESTAR code.
+    jacoco.excludes = ['com.orientechnologies.*']
+}

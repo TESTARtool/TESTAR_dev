@@ -38,6 +38,8 @@ At a high level, the architecture separates responsibilities by layer:
 
 Supporting modules such as `config`, `statemodel`, `reporting`, `dialog`, `oracle`, `coverage`, and `llm` provide additional capabilities around this main service-and-policy architecture.
 
+The `statemodel` module owns model persistence, live database analysis, and optional portable static graph export. Model-session shutdown flushes and releases persistence before the optional exporter opens its temporary analysis connection. The plugin supplies the current run output directory; the export implementation and viewer assets remain in `statemodel`. See [State model documentation](./statemodel/README.md).
+
 ### Interaction modes
 
 The architecture exposes two main ways to interact with TESTAR:

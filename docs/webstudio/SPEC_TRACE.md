@@ -295,6 +295,8 @@ Keep the main functional and UX specs readable. Use this file when a reader need
 - [StateModelAnalysisController.java](../../webstudio/src/org/testar/webstudio/api/StateModelAnalysisController.java)
 - [StateModelAnalysisService.java](../../webstudio/src/org/testar/webstudio/analysis/StateModelAnalysisService.java)
 - [StateModelStatusDto.java](../../webstudio/src/org/testar/webstudio/api/dto/StateModelStatusDto.java)
+- [StaticGraphExporter.java](../../statemodel/src/org/testar/statemodel/analysis/export/StaticGraphExporter.java)
+- [StateModelManagerFactory.java](../../statemodel/src/org/testar/statemodel/StateModelManagerFactory.java)
 
 **Frontend implementation**
 
@@ -304,12 +306,15 @@ Keep the main functional and UX specs readable. Use this file when a reader need
 **Unit tests**
 
 - [StateModelAnalysisServiceTest.java](../../webstudio/test/org/testar/webstudio/analysis/StateModelAnalysisServiceTest.java)
+- [StaticGraphExporterTest.java](../../statemodel/test/org/testar/statemodel/analysis/export/StaticGraphExporterTest.java)
+- [ModelManagerLifecycleTest.java](../../statemodel/test/org/testar/statemodel/ModelManagerLifecycleTest.java)
+- [WorkspaceSettingsCatalogStateModelTest.java](../../webstudio/test/org/testar/webstudio/workspace/WorkspaceSettingsCatalogStateModelTest.java)
 - [stateModelApi.test.js](../../webstudio/frontend/test/app/stateModelApi.test.js)
 - [stateModelNavigation.test.js](../../webstudio/frontend/test/app/stateModelNavigation.test.js)
 
 **Integration tests**
 
-- None yet.
+- [StaticGraphExporterIntegrationTest.java](../../statemodel/test/org/testar/statemodel/analysis/export/StaticGraphExporterIntegrationTest.java)
 
 **Related requirements**
 

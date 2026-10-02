@@ -323,6 +323,7 @@ public class SettingsDefaults {
 
         // State Model settings defaults
         defaults.add(Pair.from(StateModelTags.StateModelInference, false));
+        defaults.add(Pair.from(StateModelTags.StateModelExportStaticGraph, false));
         defaults.add(Pair.from(StateModelTags.DataStore, ""));
         defaults.add(Pair.from(StateModelTags.DataStoreType, ""));
         defaults.add(Pair.from(StateModelTags.DataStoreServer, ""));

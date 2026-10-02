@@ -188,6 +188,7 @@ public class SettingsFileStructure {
                 , "# State model inference settings"
                 , "#"
                 , "# StateModelInference: " + StateModelTags.StateModelInference.getDescription()
+                , "# StateModelExportStaticGraph: " + StateModelTags.StateModelExportStaticGraph.getDescription()
                 , "# DataStore: " + StateModelTags.DataStore.getDescription()
                 , "# DataStoreType: " + StateModelTags.DataStoreType.getDescription()
                 , "# DataStoreServer: " + StateModelTags.DataStoreServer.getDescription()
@@ -202,6 +203,7 @@ public class SettingsFileStructure {
                 , "#################################################################"
                 , ""
                 , StateModelTags.StateModelInference.name() + " = "
+                , StateModelTags.StateModelExportStaticGraph.name() + " = "
                 , StateModelTags.DataStore.name() + " = "
                 , StateModelTags.DataStoreType.name() + " = "
                 , StateModelTags.DataStoreServer.name() + " = "

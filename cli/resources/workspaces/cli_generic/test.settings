@@ -15,6 +15,7 @@ OutputDir = ./output
 ReportInHTML = true
 
 StateModelInference = false
+StateModelExportStaticGraph = false
 DataStore = OrientDB
 DataStoreType = plocal
 DataStoreServer =

@@ -18,9 +18,11 @@ import org.testar.plugin.configuration.ServiceSessionConfiguration;
 import org.testar.plugin.policy.PlatformPolicyContexts;
 
 import java.time.LocalDateTime;
+import java.nio.file.Path;
 import java.time.format.DateTimeFormatter;
 
 import org.testar.config.ConfigTags;
+import org.testar.OutputStructure;
 import org.testar.config.CliStateProjectionMode;
 import org.testar.config.StateModelTags;
 import org.testar.config.TestarMode;
@@ -343,7 +345,8 @@ public final class PlatformOrchestrator {
             modelVersion = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm_ss"));
         }
 
-        return StateModelManagerFactory.getStateModelManager(modelName, modelVersion, settings);
+        return StateModelManagerFactory.getStateModelManager(modelName, modelVersion, settings,
+                () -> OutputStructure.outerLoopOutputDir == null ? null : Path.of(OutputStructure.outerLoopOutputDir));
     }
 
     private static void bootstrapStateModelStorage(Settings settings) {

@@ -52,6 +52,7 @@ public class PlatformOrchestratorStateModelTest {
     @Test
     public void spyModeUsesDummyStateModelManagerWhenStateModelInferenceIsEnabled() {
         Settings settings = defaultSettings();
+        settings.set(StateModelTags.StateModelExportStaticGraph, true);
         settings.set(ConfigTags.Mode, TestarMode.Spy);
         settings.set(ConfigTags.SUTConnector, Settings.SUT_CONNECTOR_WEBDRIVER);
         settings.set(ConfigTags.SUTConnectorValue, "https://example.test");

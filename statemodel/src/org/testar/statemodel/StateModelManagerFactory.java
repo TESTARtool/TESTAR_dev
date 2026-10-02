@@ -11,6 +11,7 @@ import org.testar.config.ConfigTags;
 import org.testar.core.state.StateIdentity;
 import org.testar.statemodel.actionselector.ActionSelector;
 import org.testar.statemodel.actionselector.CompoundFactory;
+import org.testar.statemodel.analysis.export.StaticGraphExporter;
 import org.testar.statemodel.event.StateModelEventListener;
 import org.testar.statemodel.persistence.PersistenceManager;
 import org.testar.statemodel.persistence.PersistenceManagerFactory;
@@ -20,13 +21,20 @@ import org.testar.core.tag.Tag;
 import org.testar.core.tag.TaggableBase;
 
 import java.util.Arrays;
+import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.function.Supplier;
 
 public class StateModelManagerFactory {
 
     public static StateModelManager getStateModelManager(String applicationName, String applicationVersion, TaggableBase configTags) {
+        return getStateModelManager(applicationName, applicationVersion, configTags, () -> null);
+    }
+
+    public static StateModelManager getStateModelManager(String applicationName, String applicationVersion, TaggableBase configTags,
+                                                        Supplier<Path> runDirectory) {
         // first check if the state model module is enabled
         if (!configTags.get(StateModelTags.StateModelInference)) {
             return new DummyModelManager();
@@ -64,7 +72,11 @@ public class StateModelManagerFactory {
         // should we store widgets?
         boolean storeWidgets = configTags.get(StateModelTags.StateModelStoreWidgets);
 
-        return new ModelManager(abstractStateModel, actionSelector, persistenceManager, sequenceManager, storeWidgets);
+        Runnable testingEndedAction = () -> { };
+        if (configTags.get(StateModelTags.StateModelExportStaticGraph, false)) {
+            testingEndedAction = new StaticGraphExporter(configTags, modelIdentifier, runDirectory)::export;
+        }
+        return new ModelManager(abstractStateModel, actionSelector, persistenceManager, sequenceManager, storeWidgets, testingEndedAction);
     }
 
 }

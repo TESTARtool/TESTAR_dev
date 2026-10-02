@@ -12,13 +12,17 @@ Scriptless Generate and CLI modes can generate state models when state model set
 
 Spy mode uses the no-op state model manager and only inspects the current SUT state.
 
+The State Model settings form exposes `StateModelExportStaticGraph`, disabled by default. Enabling it produces a portable model snapshot at `<run>/state-model/index.html` after Generate or CLI model-session shutdown. The current run's output workspace contains a `state-models.html` index. The snapshot opens directly in a browser using local assets and embedded graph/screenshot data. Its contents reflect the persisted model, which can include earlier runs. The [state-model module specification](../../statemodel/state-model.md) defines the export lifecycle and acceptance scenarios.
+
+While a completed Generate run is exporting its static graph, WebStudio keeps the process running and shows export progress. Normal idle-process cleanup resumes after export finishes.
+
 `View State Model` opens the external analysis URL after server-side preparation. Startup can take time while OrientDB initializes or recovers a datastore, so WebStudio keeps a visible startup status until the service is running or has failed.
 
 State model analysis resolves from the selected workspace and the shared distribution runtime home:
 
 - runtime home: `testar/target/install/testar/bin`
 - workspace datastore paths are resolved against that runtime home
-- analysis assets are served from `output/graphs` under the runtime home
+- analysis assets are served from `.runtime/graphs` under the runtime home
 - Generate and CLI can contribute to the same datastore when they use the same workspace and datastore settings
 
 When analysis is running, WebStudio provides an action to open the analysis URL and an action to stop the analysis server owned by the current WebStudio process.

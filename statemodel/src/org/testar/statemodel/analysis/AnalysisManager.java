@@ -6,7 +6,6 @@
 
 package org.testar.statemodel.analysis;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.orientechnologies.orient.core.db.ODatabaseSession;
 import com.orientechnologies.orient.core.db.OrientDB;
@@ -31,8 +30,9 @@ import org.testar.statemodel.sequence.SequenceVerdict;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.text.DateFormat;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -67,6 +67,9 @@ public class AnalysisManager {
         // check if the credentials are valid
         try (ODatabaseSession db = orientDB.open(dbConfig.getDatabase(), dbConfig.getUser(), dbConfig.getPassword())) {
             // if there is no connection possible this will throw an exception
+        } catch (RuntimeException exception) {
+            shutdown();
+            throw exception;
         }
 
         // if the connection type is local, we have to shutdown the orientdb connection now, because it will interfere
@@ -755,25 +758,19 @@ public class AnalysisManager {
     // this helper method will write elements to a file in json format
     private String writeJson(ArrayList<Element> elements, String filename, String subFolderName) {
         // check if the subfolder already exists
-        File subFolder = new File(outputDir + subFolderName);
-        if (!subFolder.isDirectory() && !subFolder.mkdir()) {
+        File subFolder = new File(outputDir, subFolderName);
+        if (!subFolder.isDirectory() && !subFolder.mkdirs()) {
             return "";
         }
 
         File output = new File(subFolder, filename);
-        try {
+        try (BufferedWriter writer = Files.newBufferedWriter(output.toPath(), StandardCharsets.UTF_8)) {
             ObjectMapper mapper = new ObjectMapper();
-            String result = mapper.writeValueAsString(elements);
             // let's write the resulting json to a file
-            if (output.exists() || output.createNewFile()) {
-                BufferedWriter writer = new BufferedWriter(new FileWriter(output.getAbsolutePath()));
-                writer.write(result);
-                writer.close();
-            }
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            mapper.writeValue(writer, elements);
         } catch (IOException e) {
             e.printStackTrace();
+            return "";
         }
         return filename;
     }
