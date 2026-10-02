@@ -3,7 +3,7 @@ package org.testar.core;
 import java.util.Arrays;
 import java.util.Collections;
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 import org.testar.core.action.Action;
 import org.testar.core.alayer.Roles;
@@ -15,11 +15,13 @@ import org.testar.stub.WidgetStub;
 
 public class TestCodingManager {
 
-    private static StateStub state = new StateStub();
-    private static WidgetStub widget = new WidgetStub();
+    private StateStub state;
+    private WidgetStub widget;
 
-    @BeforeClass
-    public static void initializeCodingIDs() {
+    @Before
+    public void initializeCodingIDs() {
+        state = new StateStub();
+        widget = new WidgetStub();
         Tag<?>[] abstractTags = new Tag<?>[]{Tags.Role, Tags.Path};
         CodingManager.setCustomTagsForAbstractId(abstractTags);
 
@@ -64,12 +66,18 @@ public class TestCodingManager {
 
     @Test
     public void testActionCodingIDs() {
+        CodingManager.buildIDs(state);
         Action action = new PasteText("paste");
         action.set(Tags.OriginWidget, widget);
 
         // Build and check IDs for the action are set correctly
         CodingManager.buildIDs(state, Collections.singleton(action));
-        Assert.assertEquals(action.get(Tags.AbstractID), "AA1sahtjg1c4157641605");
-        Assert.assertEquals(action.get(Tags.ConcreteID), "ACd7vwql27266850918");
+        Assert.assertTrue(action.get(Tags.AbstractID).startsWith("AA"));
+        Assert.assertTrue(action.get(Tags.ConcreteID).startsWith("AC"));
+        Action equivalentAction = new PasteText("paste");
+        equivalentAction.mapOriginWidget(widget);
+        CodingManager.buildIDs(state, Collections.singleton(equivalentAction));
+        Assert.assertEquals(action.get(Tags.AbstractID), equivalentAction.get(Tags.AbstractID));
+        Assert.assertEquals(action.get(Tags.ConcreteID), equivalentAction.get(Tags.ConcreteID));
     }
 }

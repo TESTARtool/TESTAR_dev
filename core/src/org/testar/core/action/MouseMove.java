@@ -86,4 +86,10 @@ public final class MouseMove extends TaggableBase implements Action {
         //return position.toString();
         return "";
     }
+
+    @Override
+    public String getIdentityParameters(State state, boolean abstractIdentity) {
+        return ActionIdentity.encode(position.getClass().getName(), position.getIdentityParameters(state, abstractIdentity),
+                Double.toString(minDuration));
+    }
 }

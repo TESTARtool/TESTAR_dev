@@ -139,4 +139,14 @@ public final class CompoundAction extends TaggableBase implements Action {
         }
         return params.toString();
     }
+
+    @Override
+    public String getIdentityParameters(State state, boolean abstractIdentity) {
+        StringBuilder parameters = new StringBuilder();
+        for (int index = 0; index < actions.size(); index++) {
+            parameters.append(ActionIdentity.encode(ActionIdentity.describe(state, actions.get(index), abstractIdentity),
+                    Double.toString(relativeDurations.get(index))));
+        }
+        return parameters.toString();
+    }
 }

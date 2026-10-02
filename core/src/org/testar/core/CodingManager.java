@@ -6,20 +6,17 @@
 
 package org.testar.core;
 
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.zip.CRC32;
 
-import org.testar.core.alayer.Role;
-import org.testar.core.alayer.Roles;
 import org.testar.core.action.Action;
-import org.testar.core.action.ActionRoles;
-import org.testar.core.exceptions.NoSuchTagException;
+import org.testar.core.action.ActionIdentity;
 import org.testar.core.state.State;
 import org.testar.core.state.Widget;
 import org.testar.core.tag.Tag;
@@ -53,13 +50,6 @@ public class CodingManager {
     private static final Tag<?>[] TAGS_ABSTRACT_R_ID = new Tag<?>[] { Tags.Role };
     private static final Tag<?>[] TAGS_ABSTRACT_R_T_ID = new Tag<?>[] { Tags.Role, Tags.Title };
     private static final Tag<?>[] TAGS_ABSTRACT_R_T_P_ID = new Tag<?>[] { Tags.Role, Tags.Title, Tags.Path };
-
-    public static final Role[] ROLES_ABSTRACT_ACTION = new Role[] { // discard parameters
-        /// ActionRoles.MouseMove,
-        ActionRoles.Type,
-        ActionRoles.KeyDown,
-        ActionRoles.KeyUp
-    };
 
     // two arrays to hold the tags that will be used in constructing the concrete and abstract state id's
     private static Tag<?>[] customTagsForConcreteId = new Tag<?>[] { };
@@ -182,84 +172,25 @@ public class CodingManager {
      * @param actions The actions.
      */
     public static synchronized void buildIDs(State state, Set<Action> actions) {
-        for (Action a : actions) {
-            a.set(Tags.ConcreteID, ID_PREFIX_ACTION + ID_PREFIX_CONCRETE +
-                    CodingManager.codify(state.get(Tags.ConcreteID), a));
+        Assert.notNull(state, actions);
+        for (Action action : actions) {
+            buildActionIDs(state, Assert.notNull(action));
         }
-
-        // TODO: Replace the path/counter-based abstract ID with a stable ID derived from
-        // the state and origin widget abstract IDs plus the action role. Distinguish
-        // different actions on the same widget with the same role (such as click and
-        // long-click, or selecting different options) without depending on set order.
-        // Keep input values out of the abstract ID when they represent the same action;
-        // derive the concrete ID from the state and widget concrete IDs, action role,
-        // and stable action parameters rather than Object.toString().
-
-        // for the abstract action identifier, we first sort the actions by their path in the widget tree
-        // and then set their ids using incremental counters
-        Map<Role, Integer> roleCounter = new HashMap<>();
-        actions.stream()
-                .filter(action -> {
-                    try {
-                        action.get(Tags.OriginWidget).get(Tags.Path);
-                        return true;
-                    } catch (NoSuchTagException ex) {
-                        System.out.println("Coding Action AbstractID: No origin widget found for action role: " + action.get(Tags.Role));
-                        System.out.println("Coding Action AbstractID: " + action.get(Tags.Desc));
-                        return false;
-                    }
-                })
-                .sorted(Comparator.comparing((Action action) -> action.get(Tags.OriginWidget).get(Tags.Path))
-                        .thenComparing(action -> action.get(Tags.Role, Roles.Invalid).toString())
-                        .thenComparing(Action::toParametersString))
-                .forEach(action -> {
-                    updateRoleCounter(action, roleCounter);
-                    action.set(Tags.AbstractID, ID_PREFIX_ACTION + ID_PREFIX_ABSTRACT +
-                            lowCollisionID(state.get(Tags.AbstractID) + getAbstractActionIdentifier(action, roleCounter)));
-                });
     }
 
     /**
-     * Builds IDs (abstract, concrete, precise) for an environment action.
+     * Builds IDs (abstract, concrete) for an environment action using the same identity contract.
      * @param action An action.
      */
     public static synchronized void buildEnvironmentActionIDs(State state, Action action) {
-        action.set(Tags.ConcreteID, ID_PREFIX_ACTION + ID_PREFIX_CONCRETE +
-                   CodingManager.codify(state.get(Tags.ConcreteID), action));
-        action.set(Tags.AbstractID, ID_PREFIX_ACTION + ID_PREFIX_ABSTRACT +
-                   CodingManager.codify(state.get(Tags.AbstractID), action, ROLES_ABSTRACT_ACTION));
+        buildActionIDs(Assert.notNull(state), Assert.notNull(action));
     }
 
-    /**
-     * This method will increment or initialize a role counter mapping for a given action.
-     * @param action
-     * @param roleCounter
-     */
-    private static void updateRoleCounter(Action action, Map<Role, Integer> roleCounter) {
-        Role role;
-        try {
-            role = action.get(Tags.OriginWidget).get(Tags.Role);
-        } catch (NoSuchTagException e) {
-            role = action.get(Tags.Role, Roles.Invalid);
-        }
-        // if the role as key is not present, this will initialize with 1, otherwise it will increment with 1
-        roleCounter.merge(role, 1, Integer::sum);
-    }
-
-    /**
-     * This method will return a string that identifies each action (abstractly).
-     * @param action
-     * @param roleCounter
-     * @return
-     */
-    private static String getAbstractActionIdentifier(Action action, Map<Role, Integer> roleCounter) {
-        Role role;
-        try {
-            role = action.get(Tags.OriginWidget).get(Tags.Role);
-        } catch (NoSuchTagException e) {
-            role = action.get(Tags.Role, Roles.Invalid);
-        }
-        return role.toString() + roleCounter.getOrDefault(role, 999);
+    private static void buildActionIDs(State state, Action action) {
+        String abstractIdentity = ActionIdentity.encode(state.get(Tags.AbstractID), ActionIdentity.describe(state, action, true));
+        String concreteIdentity = ActionIdentity.encode(state.get(Tags.ConcreteID), ActionIdentity.describe(state, action, false));
+        action.set(Tags.AbstractID, ID_PREFIX_ACTION + ID_PREFIX_ABSTRACT + lowCollisionID(abstractIdentity, StandardCharsets.UTF_8));
+        action.set(Tags.ConcreteID, ID_PREFIX_ACTION + ID_PREFIX_CONCRETE + lowCollisionID(concreteIdentity, StandardCharsets.UTF_8));
     }
 
     // ###############
@@ -283,21 +214,17 @@ public class CodingManager {
         return sb.toString();
     }
 
-    // ################
-    //  ACTIONS CODING
-    // ################
-
-    private static String codify(String stateID, Action action, Role... discardParameters) {
-        return lowCollisionID(stateID + action.toString(discardParameters));
-    }
-
     // ############
     //  IDS CODING
     // ############
 
     private static String lowCollisionID(String text) { // reduce ID collision probability
+        return lowCollisionID(text, Charset.defaultCharset());
+    }
+
+    private static String lowCollisionID(String text, Charset charset) {
         CRC32 crc32 = new CRC32();
-        crc32.update(text.getBytes());
+        crc32.update(text.getBytes(charset));
         return Integer.toUnsignedString(text.hashCode(), Character.MAX_RADIX) +
                Integer.toHexString(text.length()) +
                crc32.getValue();

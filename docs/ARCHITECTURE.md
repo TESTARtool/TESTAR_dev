@@ -454,6 +454,10 @@ The primary runtime service contracts are in `org.testar.core.service`.
 
 These contracts intentionally stay small. They define the capability boundary, not the implementation strategy.
 
+### Action identity
+
+Action identity is owned by `core`, through `CodingManager` and the `Action`/`Position` parameter contracts. The engine's `DefaultActionIdentifierService` applies that shared contract to widget and environment actions, and state-model consumers retain the assigned IDs. The [action identity specification](./core/action-identity.md) defines the behavioral rules, extension responsibilities, acceptance scenarios, and verification.
+
 ### Policy contracts
 
 The main policy contracts are in `org.testar.core.policy`.

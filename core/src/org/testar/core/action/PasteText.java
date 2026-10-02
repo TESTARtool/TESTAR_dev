@@ -90,4 +90,9 @@ public final class PasteText extends TaggableBase implements Action {
         return "(" + this.get(Tags.InputText, this.text) + ")";
     }
 
+    @Override
+    public String getIdentityParameters(State state, boolean abstractIdentity) {
+        return abstractIdentity ? "" : get(Tags.InputText, text);
+    }
+
 }

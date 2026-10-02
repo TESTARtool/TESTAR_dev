@@ -132,6 +132,15 @@ public interface Action extends Taggable, Serializable {
      */
     String toParametersString();
 
+    /**
+     * Returns deterministic execution parameters, excluding descriptions and object identities.
+     * Abstract parameters distinguish behavior (e.g. selected options), not interchangeable input text.
+     * Override this for behavior variants or when the reporting parameters are not canonical.
+     */
+    default String getIdentityParameters(State state, boolean abstractIdentity) {
+        return abstractIdentity ? "" : toParametersString();
+    }
+
     String toString(Role... discardParameters);
 
     /**

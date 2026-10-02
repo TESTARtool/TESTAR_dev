@@ -304,6 +304,8 @@ public final class ComposedActionDerivationServiceTest {
         child.setParent(parent);
         child.set(Tags.Desc, description);
         child.set(Tags.Path, path);
+        child.set(Tags.AbstractID, "widget-abstract-" + path);
+        child.set(Tags.ConcreteID, "widget-concrete-" + path);
         ((WidgetStub) parent).addChild(child);
         return child;
     }

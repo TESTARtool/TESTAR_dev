@@ -7,6 +7,7 @@
 package org.testar.core.state;
 
 import org.testar.core.Assert;
+import org.testar.core.action.ActionIdentity;
 import org.testar.core.alayer.AbstractPosition;
 import org.testar.core.alayer.Finder;
 import org.testar.core.alayer.Point;
@@ -76,5 +77,13 @@ public final class WidgetPosition extends AbstractPosition {
         } else {
             return cachedWidgetPoint.toString();
         }
+    }
+
+    @Override
+    public String getIdentityParameters(State state, boolean abstractIdentity) {
+        Widget widget = finder.apply(state);
+        String widgetId = widget.get(abstractIdentity ? Tags.AbstractID : Tags.ConcreteID);
+        return ActionIdentity.encode(widgetId, shapeTag.name(), Double.toString(relX), Double.toString(relY),
+                Boolean.toString(hitTest), Boolean.toString(obscuredByChildEnabled));
     }
 }

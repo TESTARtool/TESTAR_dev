@@ -10,6 +10,7 @@ import org.openqa.selenium.WebElement;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testar.core.action.Action;
+import org.testar.core.action.ActionIdentity;
 import org.testar.core.alayer.Role;
 import org.testar.core.state.SUT;
 import org.testar.core.state.State;
@@ -87,6 +88,11 @@ public class WdSelectListAction extends TaggableBase implements Action {
     @Override
     public String toParametersString() {
         return toShortString();
+    }
+
+    @Override
+    public String getIdentityParameters(State state, boolean abstractIdentity) {
+        return abstractIdentity ? value : ActionIdentity.encode(targetMethod.name(), target, value);
     }
 
     @Override

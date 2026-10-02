@@ -124,4 +124,9 @@ public final class Type extends TaggableBase implements Action {
     public String toParametersString() {
         return "(" + this.get(Tags.InputText, this.text) + ")";
     }
+
+    @Override
+    public String getIdentityParameters(State state, boolean abstractIdentity) {
+        return abstractIdentity ? "" : get(Tags.InputText, text);
+    }
 }

@@ -1,12 +1,14 @@
 package org.testar.engine.service;
 
 import java.util.Collections;
+import java.util.Set;
 
 import org.junit.Test;
 import org.testar.core.CodingManager;
 import org.testar.core.action.Action;
 import org.testar.core.action.ActivateSystem;
 import org.testar.core.action.AnnotatingActionCompiler;
+import org.testar.core.action.Type;
 import org.testar.core.alayer.Rect;
 import org.testar.core.alayer.Roles;
 import org.testar.core.state.State;
@@ -15,6 +17,8 @@ import org.testar.stub.StateStub;
 import org.testar.stub.WidgetStub;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertSame;
 
 public final class DefaultActionIdentifierServiceTest {
@@ -42,6 +46,32 @@ public final class DefaultActionIdentifierServiceTest {
 
         assertNotNull(action.get(Tags.AbstractID, null));
         assertNotNull(action.get(Tags.ConcreteID, null));
+    }
+
+    @Test
+    public void identifiesMixedActionSetWithoutRequiringWidgetPaths() {
+        StateStub state = new StateStub();
+        state.set(Tags.AbstractID, "state-abstract");
+        state.set(Tags.ConcreteID, "state-concrete");
+        WidgetStub widget = new WidgetStub();
+        widget.set(Tags.AbstractID, "widget-abstract");
+        widget.set(Tags.ConcreteID, "widget-concrete");
+        Action first = new Type("first");
+        Action second = new Type("second");
+        first.mapOriginWidget(widget);
+        second.mapOriginWidget(widget);
+        Action environment = new ActivateSystem();
+        Set<Action> actions = Set.of(first, second, environment);
+        DefaultActionIdentifierService service = new DefaultActionIdentifierService();
+
+        assertSame(actions, service.identifyActions(state, actions));
+        assertEquals(first.get(Tags.AbstractID), second.get(Tags.AbstractID));
+        assertNotEquals(first.get(Tags.ConcreteID), second.get(Tags.ConcreteID));
+        String abstractId = environment.get(Tags.AbstractID);
+        String concreteId = environment.get(Tags.ConcreteID);
+        assertSame(environment, service.identifyEnvironmentAction(state, environment));
+        assertEquals(abstractId, environment.get(Tags.AbstractID));
+        assertEquals(concreteId, environment.get(Tags.ConcreteID));
     }
 
     private StateStub stateWithWidget() {

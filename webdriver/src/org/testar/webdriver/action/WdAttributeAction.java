@@ -9,6 +9,7 @@ package org.testar.webdriver.action;
 import org.testar.core.exceptions.ActionFailedException;
 import org.testar.webdriver.state.WdDriver;
 import org.testar.core.action.Action;
+import org.testar.core.action.ActionIdentity;
 import org.testar.core.alayer.Role;
 import org.testar.core.state.SUT;
 import org.testar.core.state.State;
@@ -49,6 +50,11 @@ public class WdAttributeAction extends TaggableBase implements Action {
     @Override
     public String toParametersString() {
         return toShortString();
+    }
+
+    @Override
+    public String getIdentityParameters(State state, boolean abstractIdentity) {
+        return ActionIdentity.encode(elementId, key, value);
     }
 
     @Override

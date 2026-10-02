@@ -7,6 +7,7 @@
 package org.testar.webdriver.action;
 
 import org.testar.core.action.Action;
+import org.testar.core.action.ActionIdentity;
 import org.testar.core.action.CompoundAction;
 import org.testar.core.action.NOP;
 import org.testar.core.action.StdActionCompiler;
@@ -94,6 +95,11 @@ public class WdFillFormAction extends TaggableBase implements Action {
     @Override
     public String toParametersString() {
         return toShortString();
+    }
+
+    @Override
+    public String getIdentityParameters(State state, boolean abstractIdentity) {
+        return ActionIdentity.describe(state, formFillingAction, abstractIdentity);
     }
 
     @Override

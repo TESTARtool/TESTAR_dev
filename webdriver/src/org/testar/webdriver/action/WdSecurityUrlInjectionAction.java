@@ -50,6 +50,11 @@ public class WdSecurityUrlInjectionAction extends TaggableBase implements Action
     }
 
     @Override
+    public String getIdentityParameters(State state, boolean abstractIdentity) {
+        return text;
+    }
+
+    @Override
     public String toString(Role... discardParameters) {
         return toShortString();
     }

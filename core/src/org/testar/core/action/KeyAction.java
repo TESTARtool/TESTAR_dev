@@ -111,6 +111,11 @@ public abstract class KeyAction extends TaggableBase implements Action {
         return "(" + key.toString() + ")";
     }
 
+    @Override
+    public String getIdentityParameters(State state, boolean abstractIdentity) {
+        return key.name();
+    }
+
     public abstract boolean equals(Object o);
 
 }

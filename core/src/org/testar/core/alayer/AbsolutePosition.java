@@ -29,4 +29,9 @@ public final class AbsolutePosition extends AbstractPosition {
     public String toString() {
         return p.toString();
     }
+
+    @Override
+    public String getIdentityParameters(State state, boolean abstractIdentity) {
+        return Double.toString(p.x()) + "," + Double.toString(p.y());
+    }
 }

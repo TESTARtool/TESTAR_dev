@@ -84,4 +84,9 @@ public class KillProcess extends TaggableBase implements Action {
     public String toParametersString() {
         return "";
     }
+
+    @Override
+    public String getIdentityParameters(State state, boolean abstractIdentity) {
+        return ActionIdentity.encode(name, pid == null ? null : pid.toString(), Double.toString(waitTime));
+    }
 }

@@ -74,6 +74,11 @@ public class AndroidActionType extends TaggableBase implements Action {
     }
 
     @Override
+    public String getIdentityParameters(State state, boolean abstractIdentity) {
+        return abstractIdentity ? "" : get(Tags.InputText, "");
+    }
+
+    @Override
     public String toString(Role... discardParameters) {
         return toParametersString();
     }

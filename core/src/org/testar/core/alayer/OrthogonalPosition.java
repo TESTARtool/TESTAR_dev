@@ -7,6 +7,7 @@
 package org.testar.core.alayer;
 
 import org.testar.core.Assert;
+import org.testar.core.action.ActionIdentity;
 import org.testar.core.state.State;
 import org.testar.core.util.Util;
 
@@ -32,5 +33,12 @@ public final class OrthogonalPosition extends AbstractPosition {
         double centerY = (p1.y() + p2.y()) * .5;
         double l = Util.length(p1.x(), p1.y(), p2.x(), p2.y());
         return Util.OrthogonalPoint(centerX, centerY, p2.x(), p2.y(), relR * l + absR);
+    }
+
+    @Override
+    public String getIdentityParameters(State state, boolean abstractIdentity) {
+        return ActionIdentity.encode(pos1.getClass().getName(), pos1.getIdentityParameters(state, abstractIdentity),
+                pos2.getClass().getName(), pos2.getIdentityParameters(state, abstractIdentity),
+                Double.toString(relR), Double.toString(absR));
     }
 }

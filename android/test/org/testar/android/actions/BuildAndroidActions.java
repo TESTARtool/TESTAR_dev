@@ -49,6 +49,7 @@ public class BuildAndroidActions {
         widget.set(AndroidTags.AndroidAccessibilityId, "AccessibilityIdValue");
         widget.set(AndroidTags.AndroidClassName, "android.widget.CheckBox");
         widget.set(AndroidTags.AndroidXpath, widgetPath);
+        widget.set(Tags.AbstractID, "widget-abstract-id");
     }
 
     @Test
@@ -202,6 +203,8 @@ public class BuildAndroidActions {
         assertEquals(ActionRoles.LeftClickAt, longClick.get(Tags.Role));
         assertEquals(ActionRoles.Drag, scroll.get(Tags.Role));
         assertNotEquals(click.get(Tags.ConcreteID), longClick.get(Tags.ConcreteID));
+        assertNotEquals(click.get(Tags.AbstractID), longClick.get(Tags.AbstractID));
+        assertEquals(typeFirst.get(Tags.AbstractID), typeSecond.get(Tags.AbstractID));
     }
 
     @Test

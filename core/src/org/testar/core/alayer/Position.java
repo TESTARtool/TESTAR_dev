@@ -23,4 +23,7 @@ public interface Position extends Serializable {
     Point apply(State state) throws PositionException;
 
     public void obscuredByChildFeature(boolean enable);
+
+    /** Returns stable position parameters without hit testing or updating cached screen coordinates. */
+    String getIdentityParameters(State state, boolean abstractIdentity);
 }

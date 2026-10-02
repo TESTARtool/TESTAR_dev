@@ -69,4 +69,9 @@ public final class MouseDown extends TaggableBase implements Action {
         //return "(" + btn.toString() + ")";
         return "";
     }
+
+    @Override
+    public String getIdentityParameters(State state, boolean abstractIdentity) {
+        return btn.name();
+    }
 }

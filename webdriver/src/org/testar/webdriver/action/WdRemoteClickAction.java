@@ -103,6 +103,11 @@ public class WdRemoteClickAction extends TaggableBase implements Action {
     }
 
     @Override
+    public String getIdentityParameters(State state, boolean abstractIdentity) {
+        return "";
+    }
+
+    @Override
     public String toString(Role... discardParameters) {
         return toShortString();
     }
