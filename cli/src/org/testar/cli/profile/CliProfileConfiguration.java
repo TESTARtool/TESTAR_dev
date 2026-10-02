@@ -8,6 +8,7 @@ package org.testar.cli.profile;
 
 import java.util.List;
 
+import org.testar.config.ConfigTags;
 import org.testar.config.composition.CompositionDescriptor;
 import org.testar.config.composition.CompositionLoader;
 import org.testar.config.settings.Settings;
@@ -19,6 +20,7 @@ import org.testar.core.service.ActionSelectorService;
 import org.testar.core.service.StateIdentifierService;
 import org.testar.core.service.StateService;
 import org.testar.core.service.SystemService;
+import org.testar.core.state.StateIdentity;
 import org.testar.engine.service.DefaultActionIdentifierService;
 import org.testar.engine.service.DefaultStateIdentifierService;
 import org.testar.plugin.PlatformServices;
@@ -97,7 +99,7 @@ public final class CliProfileConfiguration {
                 compositionDescriptor.stateIdentifierServiceClass(),
                 compositionDescriptor.customCompositionResource(),
                 StateIdentifierService.class,
-                new DefaultStateIdentifierService(),
+                new DefaultStateIdentifierService(StateIdentity.fromAttributes(settings.get(ConfigTags.AbstractStateAttributes))),
                 new Object[]{settings},
                 new Object[]{}
         );

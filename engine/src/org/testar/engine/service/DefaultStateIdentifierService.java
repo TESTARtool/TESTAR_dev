@@ -10,12 +10,23 @@ import org.testar.core.Assert;
 import org.testar.core.CodingManager;
 import org.testar.core.service.StateIdentifierService;
 import org.testar.core.state.State;
+import org.testar.core.state.StateIdentity;
 
 public final class DefaultStateIdentifierService implements StateIdentifierService {
 
+    private final StateIdentity identity;
+
+    public DefaultStateIdentifierService() {
+        this(CodingManager.getStateIdentity());
+    }
+
+    public DefaultStateIdentifierService(StateIdentity identity) {
+        this.identity = Assert.notNull(identity);
+    }
+
     @Override
     public State identifyState(State state) {
-        CodingManager.buildIDs(Assert.notNull(state));
+        identity.buildIDs(Assert.notNull(state));
         return state;
     }
 }

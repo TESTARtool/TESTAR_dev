@@ -7,7 +7,8 @@
 package org.testar.statemodel;
 
 import org.testar.config.StateModelTags;
-import org.testar.core.CodingManager;
+import org.testar.config.ConfigTags;
+import org.testar.core.state.StateIdentity;
 import org.testar.statemodel.actionselector.ActionSelector;
 import org.testar.statemodel.actionselector.CompoundFactory;
 import org.testar.statemodel.event.StateModelEventListener;
@@ -31,10 +32,8 @@ public class StateModelManagerFactory {
             return new DummyModelManager();
         }
 
-        Set<Tag<?>> abstractTags = Arrays.stream(CodingManager.getCustomTagsForAbstractId()).collect(Collectors.toSet());
-        if (abstractTags.isEmpty()) {
-            throw new IllegalArgumentException("No Abstract State Attributes were provided in the settings file");
-        }
+        StateIdentity identity = StateIdentity.fromAttributes(configTags.get(ConfigTags.AbstractStateAttributes));
+        Set<Tag<?>> abstractTags = Arrays.stream(identity.abstractTags()).collect(Collectors.toSet());
 
         // get a persistence manager
         PersistenceManagerFactoryBuilder.ManagerType managerType;
@@ -47,7 +46,7 @@ public class StateModelManagerFactory {
         PersistenceManager persistenceManager = persistenceManagerFactory.getPersistenceManager(configTags);
 
         // get the abstraction level identifier that uniquely identifies the state model we are testing against.
-        String modelIdentifier = CodingManager.getAbstractStateModelHash(applicationName, applicationVersion);
+        String modelIdentifier = identity.modelHash(applicationName, applicationVersion);
 
         // we need a sequence manager to record the sequences
         Set<StateModelEventListener> eventListeners = new HashSet<>();

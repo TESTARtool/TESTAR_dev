@@ -17,6 +17,8 @@ import org.testar.core.service.StateIdentifierService;
 import org.testar.core.service.StateService;
 import org.testar.core.service.SystemService;
 import org.testar.config.settings.Settings;
+import org.testar.config.ConfigTags;
+import org.testar.core.state.StateIdentity;
 import org.testar.engine.action.derivation.ActionDerivationPlan;
 import org.testar.engine.action.execution.ActionExecutionPlan;
 import org.testar.engine.action.resolver.ActionResolverPlan;
@@ -102,7 +104,7 @@ public final class SessionServiceComposer {
                 "oracle evaluation"
         );
         StateIdentifierService stateIdentifierService = configuration.stateIdentifierServiceOverride()
-                .orElseGet(DefaultStateIdentifierService::new);
+                .orElseGet(() -> new DefaultStateIdentifierService(StateIdentity.fromAttributes(settings.get(ConfigTags.AbstractStateAttributes))));
         ActionIdentifierService actionIdentifierService = configuration.actionIdentifierServiceOverride()
                 .orElseGet(DefaultActionIdentifierService::new);
 

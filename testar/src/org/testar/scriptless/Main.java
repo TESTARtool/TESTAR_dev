@@ -11,7 +11,6 @@ import org.testar.config.TestarDirectories;
 import org.testar.config.TestarInfo;
 import org.testar.config.settings.Settings;
 import org.testar.core.CodingManager;
-import org.testar.core.StateManagementTags;
 import org.testar.core.environment.Environment;
 import org.testar.core.environment.UnknownEnvironment;
 import org.testar.core.serialisation.LogSerialiser;
@@ -26,7 +25,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.Set;
 
 public class Main {
@@ -257,19 +255,7 @@ public class Main {
     }
 
     private static void initCodingManager(Settings settings) {
-        Set<org.testar.core.tag.Tag<?>> stateManagementTags = StateManagementTags.getAllTags();
-        if (!stateManagementTags.isEmpty()) {
-            CodingManager.setCustomTagsForConcreteId(stateManagementTags.toArray(new org.testar.core.tag.Tag<?>[0]));
-        }
-
-        if (!settings.get(ConfigTags.AbstractStateAttributes).isEmpty()) {
-            org.testar.core.tag.Tag<?>[] abstractTags = settings.get(ConfigTags.AbstractStateAttributes)
-                    .stream()
-                    .map(StateManagementTags::getTagFromSettingsString)
-                    .filter(Objects::nonNull)
-                    .toArray(org.testar.core.tag.Tag<?>[]::new);
-            CodingManager.setCustomTagsForAbstractId(abstractTags);
-        }
+        CodingManager.initCodingManager(settings.get(ConfigTags.AbstractStateAttributes));
     }
 
     private static void initOperatingSystem() {

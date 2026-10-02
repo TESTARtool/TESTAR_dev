@@ -10,6 +10,7 @@ import org.testar.core.state.State;
 import org.testar.core.state.Widget;
 import org.testar.core.tag.Tag;
 import org.testar.core.tag.Tags;
+import org.testar.core.util.IdentityEncoding;
 
 /** Stable, length-delimited identity data shared by individual and compound actions. */
 public final class ActionIdentity {
@@ -25,14 +26,6 @@ public final class ActionIdentity {
     }
 
     public static String encode(String... fields) {
-        StringBuilder identity = new StringBuilder();
-        for (String field : fields) {
-            if (field == null) {
-                identity.append("-1:");
-            } else {
-                identity.append(field.length()).append(':').append(field);
-            }
-        }
-        return identity.toString();
+        return IdentityEncoding.encode(fields);
     }
 }

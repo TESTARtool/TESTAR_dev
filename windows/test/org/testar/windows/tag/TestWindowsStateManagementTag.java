@@ -1,6 +1,8 @@
 package org.testar.windows.tag;
 
 import org.junit.Assert;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.testar.core.CodingManager;
 import org.testar.core.StateManagementTags;
@@ -11,6 +13,18 @@ import org.testar.windows.state.UIAState;
 import org.testar.windows.state.UIAWidget;
 
 public class TestWindowsStateManagementTag {
+
+    private Tag<?>[] previousAbstractTags;
+
+    @Before
+    public void preserveConfiguration() {
+        previousAbstractTags = CodingManager.getCustomTagsForAbstractId();
+    }
+
+    @After
+    public void restoreConfiguration() {
+        CodingManager.setCustomTagsForAbstractId(previousAbstractTags);
+    }
 
     @Test
     public void testWindowsMapping() {
@@ -34,19 +48,24 @@ public class TestWindowsStateManagementTag {
 
         // Build the first AbstractID and check the StateManagementTags uses the UIA values
         CodingManager.buildIDs(uiaWidget);
-        Assert.assertEquals(uiaWidget.get(Tags.AbstractID), "WA1sw1qpad773173131");
+        String originalId = uiaWidget.get(Tags.AbstractID);
+        Assert.assertTrue(originalId.startsWith("WA"));
+        CodingManager.buildIDs(uiaWidget);
+        Assert.assertEquals(originalId, uiaWidget.get(Tags.AbstractID));
 
         // Change UIAName value to verify the AbstractID changes
         uiaWidget.set(UIATags.UIAName, "CustomNameNEW");
         uiaWidget.set(UIATags.UIAControlType, 123L);
         CodingManager.buildIDs(uiaWidget);
-        Assert.assertEquals(uiaWidget.get(Tags.AbstractID), "WA12t05le101416017485");
+        String changedNameId = uiaWidget.get(Tags.AbstractID);
+        Assert.assertNotEquals(originalId, changedNameId);
 
         // Change UIAControlType value to verify the AbstractID changes
         uiaWidget.set(UIATags.UIAName, "CustomNameNEW");
         uiaWidget.set(UIATags.UIAControlType, 122L);
         CodingManager.buildIDs(uiaWidget);
-        Assert.assertEquals(uiaWidget.get(Tags.AbstractID), "WA1b6014j103379124027");
+        Assert.assertNotEquals(originalId, uiaWidget.get(Tags.AbstractID));
+        Assert.assertNotEquals(changedNameId, uiaWidget.get(Tags.AbstractID));
     }
 
 }

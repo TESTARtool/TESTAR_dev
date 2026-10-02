@@ -1,15 +1,57 @@
 package org.testar.webdriver.tag;
 
+import java.util.List;
+
 import org.junit.Assert;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.testar.core.CodingManager;
 import org.testar.core.StateManagementTags;
 import org.testar.core.tag.Tag;
 import org.testar.core.tag.Tags;
+import org.testar.core.state.StateIdentity;
 import org.testar.webdriver.state.WdState;
 import org.testar.webdriver.state.WdWidget;
 
 public class TestWebdriverStateManagementTag {
+
+    private Tag<?>[] previousAbstractTags;
+
+    @Before
+    public void preserveConfiguration() {
+        previousAbstractTags = CodingManager.getCustomTagsForAbstractId();
+    }
+
+    @After
+    public void restoreConfiguration() {
+        CodingManager.setCustomTagsForAbstractId(previousAbstractTags);
+    }
+
+    @Test
+    public void rootUrlChangesConcreteIdentityAndOnlySelectedAbstractIdentity() {
+        StateIdentity defaultIdentity = StateIdentity.fromAttributes(List.of("WidgetControlType", "WebWidgetId"));
+        StateIdentity urlIdentity = StateIdentity.fromAttributes(List.of("WidgetControlType", "WebWidgetHref"));
+        WdState state = new WdState(null);
+        WdWidget widget = new WdWidget(state, state, null);
+        widget.set(WdTags.WebTagName, "button");
+        widget.set(WdTags.WebId, "submit");
+        state.set(WdTags.WebHref, "https://example.org/first");
+        defaultIdentity.buildIDs(state);
+        String defaultAbstractId = state.get(Tags.AbstractID);
+        String concreteId = state.get(Tags.ConcreteID);
+        String widgetId = widget.get(Tags.AbstractID);
+        urlIdentity.buildIDs(state);
+        String urlAbstractId = state.get(Tags.AbstractID);
+
+        state.set(WdTags.WebHref, "https://example.org/second");
+        defaultIdentity.buildIDs(state);
+        Assert.assertEquals(defaultAbstractId, state.get(Tags.AbstractID));
+        Assert.assertNotEquals(concreteId, state.get(Tags.ConcreteID));
+        Assert.assertEquals(widgetId, widget.get(Tags.AbstractID));
+        urlIdentity.buildIDs(state);
+        Assert.assertNotEquals(urlAbstractId, state.get(Tags.AbstractID));
+    }
 
     @Test
     public void test_WebdriverCodingIDs_mapping() {

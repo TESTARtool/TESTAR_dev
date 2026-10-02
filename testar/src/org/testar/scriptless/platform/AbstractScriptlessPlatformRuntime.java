@@ -10,6 +10,8 @@ import java.util.Optional;
 
 import org.testar.config.composition.CompositionDescriptor;
 import org.testar.config.composition.CompositionLoader;
+import org.testar.config.ConfigTags;
+import org.testar.core.state.StateIdentity;
 import org.testar.core.action.resolver.ActionResolver;
 import org.testar.core.service.ActionIdentifierService;
 import org.testar.core.service.ActionDerivationService;
@@ -97,7 +99,7 @@ abstract class AbstractScriptlessPlatformRuntime implements ScriptlessPlatformRu
                 compositionDescriptor.stateIdentifierServiceClass(),
                 compositionDescriptor,
                 StateIdentifierService.class,
-                new DefaultStateIdentifierService(),
+                new DefaultStateIdentifierService(StateIdentity.fromAttributes(runtimeContext.settings().get(ConfigTags.AbstractStateAttributes))),
                 new Object[]{runtimeContext},
                 new Object[]{runtimeContext.settings()},
                 new Object[]{}

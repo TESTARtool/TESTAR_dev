@@ -4,6 +4,7 @@ This directory specifies shared TESTAR behavior owned by the `core` module. Spec
 
 ## Specifications
 
+- [State identity](./state-identity.md): widget/state attribute encoding, root context, ordered hierarchy, and session-owned identification configuration.
 - [Action identity](./action-identity.md): stable abstract and concrete action IDs, parameter abstraction, and widget/environment action identification.
 
 ## Documentation Structure

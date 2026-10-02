@@ -6,21 +6,17 @@
 
 package org.testar.core;
 
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
-import java.util.zip.CRC32;
 
 import org.testar.core.action.Action;
 import org.testar.core.action.ActionIdentity;
 import org.testar.core.state.State;
+import org.testar.core.state.StateIdentity;
 import org.testar.core.state.Widget;
 import org.testar.core.tag.Tag;
 import org.testar.core.tag.Tags;
+import org.testar.core.util.IdentityEncoding;
 
 /**
  * Core coding manager.
@@ -47,31 +43,15 @@ public class CodingManager {
     public static final String ID_PREFIX_WIDGET = "W";
     public static final String ID_PREFIX_ACTION = "A";
 
-    private static final Tag<?>[] TAGS_ABSTRACT_R_ID = new Tag<?>[] { Tags.Role };
-    private static final Tag<?>[] TAGS_ABSTRACT_R_T_ID = new Tag<?>[] { Tags.Role, Tags.Title };
-    private static final Tag<?>[] TAGS_ABSTRACT_R_T_P_ID = new Tag<?>[] { Tags.Role, Tags.Title, Tags.Path };
-
-    // two arrays to hold the tags that will be used in constructing the concrete and abstract state id's
-    private static Tag<?>[] customTagsForConcreteId = new Tag<?>[] { };
-    private static Tag<?>[] customTagsForAbstractId = new Tag<?>[] { };
-    private static Tag<?>[] defaultAbstractStateTags = new Tag<?>[] { StateManagementTags.WidgetControlType };
+    // Runtime services own their configuration; these defaults support direct CodingManager callers.
+    private static StateIdentity stateIdentity = StateIdentity.fromAttributes(List.of("WidgetControlType"));
 
     /**
      * This method initializes the coding manager with custom tags to use for constructing
      * concrete and abstract state ids.
      */
-    public static void initCodingManager(List<String> abstractStateAttributes) {
-        Set<Tag<?>> stateManagementTags = StateManagementTags.getAllTags();
-        // for the concrete state tags we use all the state management tags that are available
-        if (!stateManagementTags.isEmpty()) {
-            setCustomTagsForConcreteId(stateManagementTags.toArray(new Tag<?>[0]));
-        }
-
-        // then the attributes for the abstract state id
-        if (!abstractStateAttributes.isEmpty()) {
-            Tag<?>[] abstractTags = abstractStateAttributes.stream().map(StateManagementTags::getTagFromSettingsString).filter(Objects::nonNull).toArray(Tag<?>[]::new);
-            setCustomTagsForAbstractId(abstractTags);
-        }
+    public static synchronized void initCodingManager(List<String> abstractStateAttributes) {
+        stateIdentity = StateIdentity.fromAttributes(abstractStateAttributes);
     }
 
     /**
@@ -80,8 +60,7 @@ public class CodingManager {
      * @param tags array
      */
     public static synchronized void setCustomTagsForConcreteId(Tag<?>[] tags) {
-        customTagsForConcreteId = tags;
-        Arrays.sort(customTagsForConcreteId,Comparator.comparing(Tag::name));
+        stateIdentity = new StateIdentity(stateIdentity.abstractTags(), tags);
     }
 
     /**
@@ -90,24 +69,23 @@ public class CodingManager {
      * @param tags
      */
     public static synchronized void setCustomTagsForAbstractId(Tag<?>[] tags) {
-        customTagsForAbstractId = tags;
-        Arrays.sort(customTagsForAbstractId, Comparator.comparing(Tag::name));
+        stateIdentity = new StateIdentity(tags, stateIdentity.concreteTags());
     }
 
     /**
      * Returns the tags that are currently being used to create a custom abstract state id
      * @return
      */
-    public static Tag<?>[] getCustomTagsForAbstractId() {
-        return customTagsForAbstractId;
+    public static synchronized Tag<?>[] getCustomTagsForAbstractId() {
+        return stateIdentity.abstractTags();
     }
 
     /**
-     * Returns the tags that are currently being used to create a custom abstract state id
+     * Returns the tags that are currently being used to create a custom concrete state id
      * @return
      */
-    public static Tag<?>[] getCustomTagsForConcreteId() {
-        return customTagsForConcreteId;
+    public static synchronized Tag<?>[] getCustomTagsForConcreteId() {
+        return stateIdentity.concreteTags();
     }
 
     /**
@@ -115,7 +93,11 @@ public class CodingManager {
      * @return
      */
     public static Tag<?>[] getDefaultAbstractStateTags() {
-        return defaultAbstractStateTags;
+        return new Tag<?>[] {StateManagementTags.WidgetControlType};
+    }
+
+    public static synchronized StateIdentity getStateIdentity() {
+        return stateIdentity;
     }
 
     // ###########################################
@@ -126,44 +108,11 @@ public class CodingManager {
      * Builds IDs for a widget or state.
      * @param widget A widget or a State (widget-tree, or widget with children)
      *
-     * An identifier (alphanumeric) for a state is built as: f(w1 + ... + wn),
-     * where wi (i=1..n) is the identifier for a widget in the widget-tree
-     * and the + operator is the concatenation of identifiers (alphanumeric).
-     * The order of the widgets in f is determined by the UI structure.
-     * f is a formula that converts, with low collision, a text of varying length
-     * to a shorter representation: hashcode(text) + length(text) + crc32(text).
-     *
-     * An identifier (alphanumeric) for a widget is calculated based on
-     * the concatenation of a set of accessibility properties (e.g. ROLE, TITLE, ENABLED and PATH).
-     * An example for an enabled "ok" button could be: Buttonoktrue0,0,1 ("0,0,1" being the path in the widget-tree).
-      *
+     * Widget IDs encode selected attribute names, types, and values with explicit boundaries.
+     * State IDs also encode root attributes and the ordered parent/child structure.
      */
     public static synchronized void buildIDs(Widget widget) {
-        if (widget.parent() != null) {
-            widget.set(Tags.ConcreteID, ID_PREFIX_WIDGET + ID_PREFIX_CONCRETE + CodingManager.codify(widget, customTagsForConcreteId));
-            widget.set(Tags.AbstractID, ID_PREFIX_WIDGET + ID_PREFIX_ABSTRACT + CodingManager.codify(widget, customTagsForAbstractId));
-            widget.set(Tags.Abstract_R_ID, ID_PREFIX_WIDGET + ID_PREFIX_ABSTRACT_R + CodingManager.codify(widget, CodingManager.TAGS_ABSTRACT_R_ID));
-            widget.set(Tags.Abstract_R_T_ID, ID_PREFIX_WIDGET + ID_PREFIX_ABSTRACT_R_T + CodingManager.codify(widget, CodingManager.TAGS_ABSTRACT_R_T_ID));
-            widget.set(Tags.Abstract_R_T_P_ID, ID_PREFIX_WIDGET + ID_PREFIX_ABSTRACT_R_T_P + CodingManager.codify(widget, CodingManager.TAGS_ABSTRACT_R_T_P_ID));
-        } else if (widget instanceof State) { // UI root
-            StringBuilder concreteId, abstractId, abstractRoleId, abstractRoleTitleId, abstractRoleTitlePathId;
-            concreteId = new StringBuilder(abstractId = new StringBuilder(abstractRoleId = new StringBuilder(abstractRoleTitleId = new StringBuilder(abstractRoleTitlePathId = new StringBuilder()))));
-            for (Widget childWidget : (State) widget) {
-                if (childWidget != widget) {
-                    buildIDs(childWidget);
-                    concreteId.append(childWidget.get(Tags.ConcreteID));
-                    abstractId.append(childWidget.get(Tags.AbstractID));
-                    abstractRoleId.append(childWidget.get(Tags.Abstract_R_ID));
-                    abstractRoleTitleId.append(childWidget.get(Tags.Abstract_R_T_ID));
-                    abstractRoleTitlePathId.append(childWidget.get(Tags.Abstract_R_T_P_ID));
-                }
-            }
-            widget.set(Tags.ConcreteID, ID_PREFIX_STATE + ID_PREFIX_CONCRETE + CodingManager.lowCollisionID(concreteId.toString()));
-            widget.set(Tags.AbstractID, ID_PREFIX_STATE + ID_PREFIX_ABSTRACT + CodingManager.lowCollisionID(abstractId.toString()));
-            widget.set(Tags.Abstract_R_ID, ID_PREFIX_STATE + ID_PREFIX_ABSTRACT_R + CodingManager.lowCollisionID(abstractRoleId.toString()));
-            widget.set(Tags.Abstract_R_T_ID, ID_PREFIX_STATE + ID_PREFIX_ABSTRACT_R_T + CodingManager.lowCollisionID(abstractRoleTitleId.toString()));
-            widget.set(Tags.Abstract_R_T_P_ID, ID_PREFIX_STATE + ID_PREFIX_ABSTRACT_R_T_P + CodingManager.lowCollisionID(abstractRoleTitlePathId.toString()));
-        }
+        stateIdentity.buildIDs(widget);
     }
 
     /**
@@ -189,45 +138,8 @@ public class CodingManager {
     private static void buildActionIDs(State state, Action action) {
         String abstractIdentity = ActionIdentity.encode(state.get(Tags.AbstractID), ActionIdentity.describe(state, action, true));
         String concreteIdentity = ActionIdentity.encode(state.get(Tags.ConcreteID), ActionIdentity.describe(state, action, false));
-        action.set(Tags.AbstractID, ID_PREFIX_ACTION + ID_PREFIX_ABSTRACT + lowCollisionID(abstractIdentity, StandardCharsets.UTF_8));
-        action.set(Tags.ConcreteID, ID_PREFIX_ACTION + ID_PREFIX_CONCRETE + lowCollisionID(concreteIdentity, StandardCharsets.UTF_8));
-    }
-
-    // ###############
-    //  STATES CODING
-    // ###############
-
-    private static String codify(Widget state, Tag<?>... tags) {
-        return lowCollisionID(getTaggedString(state, tags));
-    }
-
-    private static String getTaggedString(Widget leaf, Tag<?>... tags) {
-        StringBuilder sb = new StringBuilder();
-        for (Tag<?> t : tags) {
-            sb.append(leaf.get(t, null));
-            // check if we are dealing with a state management tag and, if so, if it has child tags
-            // that we need to incorporate
-            if (StateManagementTags.isStateManagementTag(t) && StateManagementTags.getTagGroup(t).equals(StateManagementTags.Group.ControlPattern)) {
-                StateManagementTags.getChildTags(t).stream().sorted(Comparator.comparing(Tag::name)).forEach(tag -> sb.append(leaf.get(tag, null)));
-            }
-        }
-        return sb.toString();
-    }
-
-    // ############
-    //  IDS CODING
-    // ############
-
-    private static String lowCollisionID(String text) { // reduce ID collision probability
-        return lowCollisionID(text, Charset.defaultCharset());
-    }
-
-    private static String lowCollisionID(String text, Charset charset) {
-        CRC32 crc32 = new CRC32();
-        crc32.update(text.getBytes(charset));
-        return Integer.toUnsignedString(text.hashCode(), Character.MAX_RADIX) +
-               Integer.toHexString(text.length()) +
-               crc32.getValue();
+        action.set(Tags.AbstractID, ID_PREFIX_ACTION + ID_PREFIX_ABSTRACT + IdentityEncoding.hash(abstractIdentity));
+        action.set(Tags.ConcreteID, ID_PREFIX_ACTION + ID_PREFIX_CONCRETE + IdentityEncoding.hash(concreteIdentity));
     }
 
     // #####################################
@@ -238,19 +150,8 @@ public class CodingManager {
      * This method will return the unique hash to identify the abstract state model
      * @return String A unique hash
      */
-    public static String getAbstractStateModelHash(String applicationName, String applicationVersion) {
-        // we calculate the hash using the tags that are used in constructing the abstract state id
-        // for now, an easy way is to order them alphabetically by name
-        Tag<?>[] abstractTags = getCustomTagsForAbstractId().clone();
-        Arrays.sort(abstractTags, Comparator.comparing(Tag::name));
-        StringBuilder hashInput = new StringBuilder();
-        for (Tag<?> tag : abstractTags) {
-            hashInput.append(tag.name());
-        }
-        // we add the application name and version to the hash input
-        hashInput.append(applicationName);
-        hashInput.append(applicationVersion);
-        return lowCollisionID(hashInput.toString());
+    public static synchronized String getAbstractStateModelHash(String applicationName, String applicationVersion) {
+        return stateIdentity.modelHash(applicationName, applicationVersion);
     }
 
 }

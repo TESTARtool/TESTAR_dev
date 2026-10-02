@@ -454,6 +454,10 @@ The primary runtime service contracts are in `org.testar.core.service`.
 
 These contracts intentionally stay small. They define the capability boundary, not the implementation strategy.
 
+### State identity
+
+State identity is owned by `core`, through immutable `StateIdentity` configurations and the `CodingManager` entry points. The engine applies session-owned configurations through `DefaultStateIdentifierService`; the state-model factory derives its model configuration from session settings. The [state identity specification](./core/state-identity.md) defines attribute encoding, root context, ordered hierarchy, and verification.
+
 ### Action identity
 
 Action identity is owned by `core`, through `CodingManager` and the `Action`/`Position` parameter contracts. The engine's `DefaultActionIdentifierService` applies that shared contract to widget and environment actions, and state-model consumers retain the assigned IDs. The [action identity specification](./core/action-identity.md) defines the behavioral rules, extension responsibilities, acceptance scenarios, and verification.

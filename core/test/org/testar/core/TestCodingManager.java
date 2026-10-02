@@ -3,6 +3,7 @@ package org.testar.core;
 import java.util.Arrays;
 import java.util.Collections;
 import org.junit.Assert;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.testar.core.action.Action;
@@ -17,9 +18,13 @@ public class TestCodingManager {
 
     private StateStub state;
     private WidgetStub widget;
+    private Tag<?>[] previousAbstractTags;
+    private Tag<?>[] previousConcreteTags;
 
     @Before
     public void initializeCodingIDs() {
+        previousAbstractTags = CodingManager.getCustomTagsForAbstractId();
+        previousConcreteTags = CodingManager.getCustomTagsForConcreteId();
         state = new StateStub();
         widget = new WidgetStub();
         Tag<?>[] abstractTags = new Tag<?>[]{Tags.Role, Tags.Path};
@@ -37,6 +42,12 @@ public class TestCodingManager {
         widget.set(Tags.Path, "0,0,1");
     }
 
+    @After
+    public void restoreConfiguration() {
+        CodingManager.setCustomTagsForAbstractId(previousAbstractTags);
+        CodingManager.setCustomTagsForConcreteId(previousConcreteTags);
+    }
+
     @Test
     public void testInitialCodingIDs() {
         Assert.assertEquals(CodingManager.getDefaultAbstractStateTags()[0].toString(), "Widget control type");
@@ -52,16 +63,31 @@ public class TestCodingManager {
     public void testWidgetCodingIDs() {
         // Build and check IDs for the widget are set correctly
         CodingManager.buildIDs(widget);
-        Assert.assertEquals(widget.get(Tags.AbstractID), "WAane37vb337119275");
-        Assert.assertEquals(widget.get(Tags.ConcreteID), "WCxrhgw3113942939805");
+        String abstractId = widget.get(Tags.AbstractID);
+        String concreteId = widget.get(Tags.ConcreteID);
+        Assert.assertTrue(abstractId.startsWith("WA"));
+        Assert.assertTrue(concreteId.startsWith("WC"));
+        CodingManager.buildIDs(widget);
+        Assert.assertEquals(abstractId, widget.get(Tags.AbstractID));
+        Assert.assertEquals(concreteId, widget.get(Tags.ConcreteID));
+
+        widget.set(Tags.Title, "Cancel");
+        CodingManager.buildIDs(widget);
+        Assert.assertEquals(abstractId, widget.get(Tags.AbstractID));
+        Assert.assertNotEquals(concreteId, widget.get(Tags.ConcreteID));
     }
 
     @Test
     public void testStateCodingIDs() {
         // Build and check IDs for the state are set correctly
         CodingManager.buildIDs(state);
-        Assert.assertEquals(state.get(Tags.AbstractID), "SA1fl7scw122940428572");
-        Assert.assertEquals(state.get(Tags.ConcreteID), "SCr5r0gz142938361104");
+        String abstractId = state.get(Tags.AbstractID);
+        String concreteId = state.get(Tags.ConcreteID);
+        Assert.assertTrue(abstractId.startsWith("SA"));
+        Assert.assertTrue(concreteId.startsWith("SC"));
+        CodingManager.buildIDs(state);
+        Assert.assertEquals(abstractId, state.get(Tags.AbstractID));
+        Assert.assertEquals(concreteId, state.get(Tags.ConcreteID));
     }
 
     @Test
