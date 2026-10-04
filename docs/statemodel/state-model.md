@@ -10,7 +10,7 @@ The datastore is configured through `DataStore`, `DataStoreType`, `DataStoreDire
 
 Spy sessions use the dummy manager. Generate finishes recording its sequences before ending the model session. CLI finalizes its sequence and reports before closing its platform session. Session shutdown flushes the configured persistence manager and releases its database connection.
 
-Live analysis opens the persisted datastore through a separately managed analysis service, normally at `http://localhost:8090/models`. It provides graph and sequence analysis against the datastore. WebStudio exposes opening and stopping this service. Its packaged runtime assets are under `.runtime/graphs`; the exact analysis-service path is separate from generated run outputs.
+Live analysis opens the persisted datastore through a separately managed analysis service, normally at `http://localhost:8090/models`. It provides graph and sequence analysis against the datastore. WebStudio exposes opening and stopping this service. Its packaged runtime assets are under `output/graphs`, separate from workspace-scoped run outputs.
 
 ## Optional Static Export
 
@@ -34,6 +34,7 @@ output/<workspace>/
     reports/
     state-model/
       index.html
+      widget-tree.html
       run.json
       run.js
       css/
@@ -42,6 +43,8 @@ output/<workspace>/
         elements.json
         elements.js
         images.js
+        widget-trees.json
+        widget-trees.js
         <state-or-action-id>.png
 ```
 
@@ -49,9 +52,53 @@ Open `<run>/state-model/index.html` directly in a browser. The workspace `state-
 
 Export reads its connection configuration from the session settings and validates that the destination run belongs to the configured workspace output directory. Temporary files are removed after failure, and existing snapshots are preserved. Export failures are reported in the console and leave the completed execution's existing reports and persistence result intact.
 
-WebStudio waits while static export is active rather than treating a quiet export as a stuck completed Generate run. Export completion, including failure cleanup, releases this protection; normal idle-process cleanup can then resume.
+The live graph and static viewer also provide [configurable Abstract, Hybrid, Concrete, and Sequence Traces JSON exports](./json-export.md), including available screenshots. Static snapshots can optionally capture persisted concrete widget trees for offline downloads and inspection.
+
+In a snapshot with captured trees, selecting a concrete state exposes `Inspect Widget Tree`, which opens `widget-tree.html` in a separate browser tab. The page identifies the selected concrete state, snapshot run, and model. It shows the recorded hierarchy and the selected widget's read-only attributes and IDs side by side, with independent scrolling; narrow screens stack the panels. Child branches render on expansion in numeric path order. SUT text is rendered as text rather than executable markup. Trees omitted during capture and requested but unavailable trees have distinct explanations. The page loads embedded snapshot data independently and remains usable after the graph tab closes, on reload, and with OrientDB and the analysis server stopped.
+
+WebStudio waits throughout model finalization, starting before persistence flush and datastore shutdown and continuing through optional static export. Console progress explains when the datastore is closing and when export is running. Finalization completion, including failure cleanup, releases this protection and restarts the normal idle grace period. The explicit Stop control remains available.
+
+## Snapshot Content and Preparation Cost
+
+`StateModelExportStaticGraphIncludeWidgetTrees` defaults to `false`. The State Model form places `StateModelExportStaticGraph` and `StateModelExportStaticGraphIncludeWidgetTrees` at the bottom of the panel, in that order. The tree-capture checkbox is enabled only while static export is enabled. Both choices use the normal settings save flow.
+
+```properties
+StateModelExportStaticGraph = true
+StateModelExportStaticGraphIncludeWidgetTrees = false
+```
+
+This configuration creates a lightweight portable graph. The new setting controls snapshot capture, while `StateModelStoreWidgets` controls recording during inference and the JSON export dialog controls each subsequent download. Enabling capture includes only trees available in the persisted model; it does not enable recording retroactively.
+
+When tree capture is disabled, preparation skips tree queries and tree serialization. The graph and available images remain captured. `run.json` records `widgetTreesCaptured` and `screenshotsCaptured`, allowing the offline export dialog to explain which options are usable. The viewer retains a small empty tree-loader script, while `widget-trees.json` is created only when tree capture is enabled.
+
+Static preparation must retain the abstract, concrete, and sequence graph layers and their relationships independently of a later JSON format selection. Abstract, Hybrid, Concrete, and Sequence Traces are download choices, rather than settings that restrict the portable graph. Shared preparation options and separate output lifecycles are defined in the [JSON export contract](./json-export.md#shared-preparation-and-separate-outputs).
+
+When tree capture is enabled, preparation retrieves persisted trees for the selected accumulated model using one database session. Console progress reports completed/total trees, and static export completion reports preparation duration. Connections and query results are released after success or failure. Existing snapshots remain immutable. Captured trees are currently accumulated in memory before packaging.
 
 ## Acceptance Scenarios
+
+### Static Tree Capture Is an Independent Setting
+
+Verification: [`StateModelExportSettingsTest.java`](../../config/test/org/testar/config/settings/StateModelExportSettingsTest.java), [`WorkspaceSettingsCatalogStateModelTest.java`](../../webstudio/test/org/testar/webstudio/workspace/WorkspaceSettingsCatalogStateModelTest.java), [`settingsFieldState.test.js`](../../webstudio/frontend/test/views/settings/settingsFieldState.test.js).
+
+Given a workspace uses default settings\
+When its State Model form is shown\
+Then the two static-export controls appear at the bottom of the panel\
+And tree capture is unchecked and disabled while static export is unchecked\
+When the user enables static export, enables tree capture, and saves settings\
+Then `StateModelExportStaticGraphIncludeWidgetTrees = true` is persisted\
+And `StateModelStoreWidgets` remains unchanged
+
+### Lightweight Snapshot Skips Tree Capture
+
+Verification: [`StaticGraphExporterTest.java`](../../statemodel/test/org/testar/statemodel/analysis/export/StaticGraphExporterTest.java), [`ModelExportSnapshotTest.java`](../../statemodel/test/org/testar/statemodel/analysis/export/ModelExportSnapshotTest.java), [`StaticGraphExporterIntegrationTest.java`](../../statemodel/test/org/testar/statemodel/analysis/export/StaticGraphExporterIntegrationTest.java).
+
+Given `StateModelExportStaticGraph = true`\
+And `StateModelExportStaticGraphIncludeWidgetTrees = false`\
+When snapshot preparation runs\
+Then widget-tree retrieval and serialization are skipped\
+And all graph layers and captured screenshots remain available\
+And snapshot metadata indicates that trees were intentionally excluded
 
 ### Static Export Is Optional
 
@@ -101,6 +148,33 @@ When the user selects that graph element\
 Then its attributes remain visible\
 And the viewer shows `State screenshot unavailable` or `Action screenshot unavailable` instead of a broken image
 
+### Captured Widget Trees Are Inspectable Offline
+
+Verification: [`static-graph-viewer.test.cjs`](../../statemodel/test/js/static-graph-viewer.test.cjs), [`widget-tree-inspector.test.cjs`](../../statemodel/test/js/widget-tree-inspector.test.cjs), [`StaticGraphExporterTest.java`](../../statemodel/test/org/testar/statemodel/analysis/export/StaticGraphExporterTest.java), [`StaticGraphExporterIntegrationTest.java`](../../statemodel/test/org/testar/statemodel/analysis/export/StaticGraphExporterIntegrationTest.java).
+
+Given a static snapshot includes a concrete state's captured widget tree\
+And the analysis server and OrientDB are stopped\
+When the user selects that state and opens `Inspect Widget Tree`\
+Then a separate browser tab shows that state's captured hierarchy without a network request\
+And it identifies the concrete state, snapshot run, and model\
+And the original graph selection remains unchanged\
+When the user expands a branch and selects a child\
+Then children follow numeric sibling path order\
+And the selected widget's captured attributes and IDs are shown read-only beside the hierarchy\
+And inspecting the tree leaves the embedded snapshot unchanged
+
+Given the user has opened a captured tree in its own browser tab\
+When the user closes the original graph tab and reloads the inspector\
+Then the same state's hierarchy and attributes remain available from local snapshot files
+
+Given tree capture was disabled or a state has no available tree\
+When the user selects that concrete state\
+Then the viewer explains whether the tree was not captured or is unavailable
+
+Given the standalone inspector URL has a missing, unknown, or non-concrete state ID\
+When the page opens\
+Then it explains how to select a concrete state in the graph
+
 ### Export Failure Preserves Execution Artifacts
 
 Verification: [`StaticGraphExporterTest.java`](../../statemodel/test/org/testar/statemodel/analysis/export/StaticGraphExporterTest.java)
@@ -111,16 +185,33 @@ Then the temporary connection is closed\
 And temporary snapshot files are removed\
 And existing snapshots and execution reports remain unchanged
 
-### WebStudio Waits for Export
+### WebStudio Waits for Datastore Shutdown and Export
 
-Verification: [`ScriptlessExecutionAdapterTest.java`](../../webstudio/test/org/testar/webstudio/execution/ScriptlessExecutionAdapterTest.java)
+Verification: [`ScriptlessStateModelFinalizationTest.java`](../../webstudio/test/org/testar/webstudio/execution/ScriptlessStateModelFinalizationTest.java), [`ScriptlessExecutionAdapterTest.java`](../../webstudio/test/org/testar/webstudio/execution/ScriptlessExecutionAdapterTest.java), [`ModelManagerLifecycleTest.java`](../../statemodel/test/org/testar/statemodel/ModelManagerLifecycleTest.java)
 
 Given Generate has completed its configured sequences\
-And static graph export has started\
+And model finalization is flushing persistence and closing OrientDB before static export starts\
 When console output remains quiet beyond the normal completed-run idle grace period\
-Then WebStudio keeps the process running and shows export progress\
-When export signals completion\
-Then the usual idle cleanup can stop a process that remains stuck
+Then WebStudio keeps the process running and shows finalization progress\
+When datastore shutdown succeeds and static export starts\
+Then WebStudio shows export progress and continues protecting the process\
+And export completion alone keeps protection active until model finalization ends\
+When model finalization ends\
+Then the usual idle grace period restarts\
+And idle cleanup can stop a process that remains stuck after that grace period
+
+Given static export is disabled\
+When model finalization takes longer than the completed-run idle grace period\
+Then WebStudio waits for datastore shutdown before resuming idle cleanup
+
+Given persistence shutdown or export fails\
+When model finalization exits through failure cleanup\
+Then its idle-cleanup protection is released\
+And the failure remains available to the caller
+
+Given model finalization is still running\
+When the user explicitly stops Generate\
+Then WebStudio stops the runtime process
 
 ### Unavailable Models and Runs Skip Export
 
@@ -136,5 +227,3 @@ Then analysis does not open and a console message explains the skipped or reject
 - [StaticGraphExporter.java](../../statemodel/src/org/testar/statemodel/analysis/export/StaticGraphExporter.java) packages the snapshot using [AnalysisManager.java](../../statemodel/src/org/testar/statemodel/analysis/AnalysisManager.java).
 - [PlatformOrchestrator.java](../../plugin/src/org/testar/plugin/PlatformOrchestrator.java) supplies the current run directory for both Generate and CLI.
 - [graphs-static](../../statemodel/resources/graphs-static) contains the portable viewer; Gradle packages these resources in the state-model JAR.
-
-Run Java verification with `./gradlew :statemodel:test :config:test :webstudio:test`. Run the dependency-free viewer tests with `./gradlew :statemodel:staticGraphViewerTest` (requires Node.js). A manual browser smoke check can use a Generate or CLI run with static export enabled, followed by opening the exported `index.html` after runtime shutdown.

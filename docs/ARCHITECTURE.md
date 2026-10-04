@@ -38,7 +38,11 @@ At a high level, the architecture separates responsibilities by layer:
 
 Supporting modules such as `config`, `statemodel`, `reporting`, `dialog`, `oracle`, `coverage`, and `llm` provide additional capabilities around this main service-and-policy architecture.
 
-The `statemodel` module owns model persistence, live database analysis, and optional portable static graph export. Model-session shutdown flushes and releases persistence before the optional exporter opens its temporary analysis connection. The plugin supplies the current run output directory; the export implementation and viewer assets remain in `statemodel`. See [State model documentation](./statemodel/README.md).
+The `statemodel` module owns model persistence, live database analysis, and optional portable static graph export. Model-session shutdown flushes and releases persistence before the optional exporter opens its temporary analysis connection. Lifecycle signals bracket this entire finalization phase so WebStudio's completed-run idle cleanup waits for both datastore shutdown and export, including their failure cleanup. The plugin supplies the current run output directory; the export implementation and viewer assets remain in `statemodel`. See [State model documentation](./statemodel/README.md).
+
+Abstract, Hybrid, Concrete, and Sequence Traces JSON downloads share a transformation and ZIP packager running in a browser worker. Live analysis streams preparation progress before its graph data and format-scoped artifacts; static viewing supplies embedded graph, widget-tree, and image data. Sequence exports follow recorded occurrences and exact concrete transition associations. The static viewer inspects captured widget trees locally; OrientDB is needed to prepare that data, not to inspect or download it from an existing portable snapshot. See [State-model JSON exports](./statemodel/json-export.md).
+
+Static snapshots and live JSON exports share backend data preparation with explicit artifact and format options. Static creation remains an after-session operation capturing the complete graph; live JSON export remains an on-demand operation driven by format and download choices. `StateModelExportStaticGraphIncludeWidgetTrees`, defaulting to `false`, controls static tree capture independently of inference storage and JSON downloads. See [Shared preparation and separate outputs](./statemodel/json-export.md#shared-preparation-and-separate-outputs).
 
 ### Interaction modes
 

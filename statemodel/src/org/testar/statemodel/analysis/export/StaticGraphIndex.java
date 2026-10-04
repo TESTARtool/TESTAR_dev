@@ -18,12 +18,13 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.JsonNode;
 
 final class StaticGraphIndex {
 
     private StaticGraphIndex() { }
 
-    static void writeMetadata(Path snapshot, Path run, String modelIdentifier, String applicationName, String applicationVersion) throws IOException {
+    static void writeMetadata(Path snapshot, Path run, String modelIdentifier, String applicationName, String applicationVersion, JsonNode artifactMetadata) throws IOException {
         Map<String, Object> metadata = new LinkedHashMap<>();
         metadata.put("runId", run.getFileName().toString());
         metadata.put("modelIdentifier", modelIdentifier);
@@ -31,6 +32,8 @@ final class StaticGraphIndex {
         metadata.put("applicationVersion", applicationVersion);
         metadata.put("generatedAt", Instant.now().toString());
         metadata.put("modelScope", "Persisted model snapshot; may include earlier runs.");
+        metadata.put("widgetTreesCaptured", artifactMetadata.path("widgetTreesCaptured").asBoolean());
+        metadata.put("screenshotsCaptured", artifactMetadata.path("screenshotsCaptured").asBoolean());
         Path reports = run.resolve("reports");
         List<String> reportFiles = List.of();
         if (Files.isDirectory(reports)) {

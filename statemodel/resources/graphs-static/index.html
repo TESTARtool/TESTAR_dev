@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>State Model Viewer</title>
   <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/model-export.css" />
 </head>
 <body>
   <div class="topbar">
@@ -28,7 +29,9 @@
         <span class="checkmark"></span>
       </label>
       <button id="fit-graph" type="button">Fit</button>
+      <button id="export-model" type="button">Export Model</button>
     </div>
+    <p id="model-export-status" role="status" aria-live="polite"></p>
 
     <div class="legend">
       <div class="legend-item"><span class="legend-box abstract-state"></span>Abstract state</div>
@@ -60,7 +63,19 @@
   <script src="js/cytoscape-cola.js"></script>
   <script src="model/elements.js"></script>
   <script src="model/images.js"></script>
+  <script src="model/widget-trees.js"></script>
   <script src="run.js"></script>
+  <script src="js/model-json-export.js"></script>
+  <script src="js/model-export-runtime.js"></script>
+  <script src="js/model-export-controls.js"></script>
   <script src="js/viewer.js"></script>
+  <script>
+    TestarModelExportControls.attach(() => Promise.resolve({
+        metadata: window.__TESTAR_RUN__,
+        elements: window.__TESTAR_ELEMENTS__,
+        widgetTrees: window.__TESTAR_WIDGET_TREES__,
+        images: window.__TESTAR_IMAGES__
+    }));
+  </script>
 </body>
 </html>

@@ -36,11 +36,16 @@ public class GraphServlet extends HttpServlet {
         AnalysisManager analysisManager = (AnalysisManager) servletContext.getAttribute("analysisManager");
 
         if (modelIdentifier != null) {
+            if (!modelIdentifier.matches("[A-Za-z0-9_-]+")) {
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid model identifier.");
+                return;
+            }
             // this is the controller logic for the overall model graph
 
             // check if there were any layers requested
             if (!(abstractLayerRequired || concreteLayerRequired || sequenceLayerRequired)) {
                 response.sendRedirect("/models");
+                return;
             }
 
             // fetch the model
@@ -49,6 +54,7 @@ public class GraphServlet extends HttpServlet {
             try {
                 request.setAttribute("graphContentFile", jsonFileName);
                 request.setAttribute("contentFolder", modelIdentifier);
+                request.setAttribute("exportModelIdentifier", modelIdentifier);
                 RequestDispatcher dispatcher = servletContext.getRequestDispatcher("/graph.jsp");
                 dispatcher.forward(request, response);
             } catch (Throwable throwable) {

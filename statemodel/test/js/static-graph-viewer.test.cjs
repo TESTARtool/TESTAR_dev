@@ -7,7 +7,7 @@ const cytoscape = require('../../resources/graphs-static/js/cytoscape.min.js');
 
 const script = fs.readFileSync(path.resolve(__dirname, '../../resources/graphs-static/js/viewer.js'), 'utf8');
 
-function openViewer(images = {}) {
+function openViewer(images = {}, trees = {}, metadata = {}) {
     const controls = new Map();
     const handlers = new Map();
     let options;
@@ -35,7 +35,8 @@ function openViewer(images = {}) {
     const elements = [{group: 'nodes', data: {id: 'n1'}, classes: 'ConcreteState'}];
     vm.runInNewContext(script, {
         document,
-        window: {__TESTAR_ELEMENTS__: elements, __TESTAR_IMAGES__: images},
+        window: {__TESTAR_ELEMENTS__: elements, __TESTAR_IMAGES__: images,
+            __TESTAR_WIDGET_TREES__: trees, __TESTAR_RUN__: metadata},
         cytoscape(configuration) {
             options = configuration;
             return graph;
@@ -47,6 +48,7 @@ function openViewer(images = {}) {
     return {
         options,
         controls,
+        elements,
         select(className, id = 'n1', value = 'value') {
             handlers.get('tap')({target: {
                 isNode: () => className === 'ConcreteState',
@@ -100,4 +102,33 @@ test('packaged graph library loads the exported node and edge format', () => {
     assert.equal(graph.edges().length, 1);
     assert.equal(graph.getElementById('e1').target().id(), 'n1');
     graph.destroy();
+});
+
+test('concrete selection links to an independent browser tab without touching the embedded source', () => {
+    const tree = [{classes: 'Widget', data: {id: 'root', ConcreteID: 'WC1', Role: 'page'}}];
+    const viewer = openViewer({}, {n1: tree}, {widgetTreesCaptured: true});
+    const html = viewer.select('ConcreteState');
+    assert.match(html, /<a class="inspect-widget-tree" href="widget-tree.html\?state=n1" target="_blank" rel="noopener noreferrer">Inspect Widget Tree<\/a>/);
+    assert.doesNotMatch(html, /captured-widget-tree|<button/);
+    assert.doesNotMatch(viewer.select('AbstractState'), /Inspect Widget Tree/);
+    assert.doesNotMatch(viewer.select('ConcreteAction'), /Inspect Widget Tree/);
+    assert.notEqual(viewer.options.elements[0].data, viewer.elements[0].data);
+    viewer.options.elements[0].data.customLabel = 'CS-1';
+    assert.equal(viewer.elements[0].data.customLabel, undefined);
+});
+
+test('inspection links encode the graph record ID rather than interpreting it as markup or a path', () => {
+    const id = '#12:34 & "state"/../?';
+    const tree = [{classes: 'Widget', data: {id: 'root', ConcreteID: 'WC1', Role: 'page'}}];
+    const viewer = openViewer({}, {[id]: tree}, {widgetTreesCaptured: true});
+    assert.ok(viewer.select('ConcreteState', id).includes(`href="widget-tree.html?state=${encodeURIComponent(id)}"`));
+});
+
+test('omitted and unavailable trees have distinct feedback and no unusable inspection button', () => {
+    const omitted = openViewer({}, {}, {widgetTreesCaptured: false}).select('ConcreteState');
+    assert.match(omitted, /not captured/);
+    assert.doesNotMatch(omitted, /Inspect Widget Tree/);
+    const unavailable = openViewer({}, {n1: []}, {widgetTreesCaptured: true}).select('ConcreteState');
+    assert.match(unavailable, /unavailable/);
+    assert.doesNotMatch(unavailable, /Inspect Widget Tree/);
 });

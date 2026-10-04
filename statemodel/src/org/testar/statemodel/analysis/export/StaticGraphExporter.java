@@ -12,9 +12,9 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.util.Base64;
 import java.util.List;
+import java.util.Iterator;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -22,6 +22,7 @@ import java.util.stream.Stream;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.testar.config.ConfigTags;
 import org.testar.config.StateModelTags;
 import org.testar.core.tag.TaggableBase;
@@ -38,12 +39,16 @@ public final class StaticGraphExporter {
 
     private static final List<String> ASSETS = List.of(
             "index.html",
+            "widget-tree.html",
             "css/style.css",
+            "css/widget-tree.css",
             "js/viewer.js",
+            "js/widget-tree-inspector.js",
             "js/cytoscape.min.js",
             "js/cola.min.js",
             "js/cytoscape-cola.js"
     );
+    private static final List<String> EXPORT_ASSETS = List.of("model-json-export.js", "model-export-runtime.js", "model-export-controls.js");
 
     private final Config databaseConfig;
     private final Path outputRoot;
@@ -51,6 +56,7 @@ public final class StaticGraphExporter {
     private final String applicationName;
     private final String applicationVersion;
     private final boolean persistedModel;
+    private final boolean includeWidgetTrees;
     private final Supplier<Path> runDirectory;
     private final BiFunction<Config, Path, AnalysisManager> analysisFactory;
 
@@ -67,6 +73,7 @@ public final class StaticGraphExporter {
         outputRoot = RuntimePathsUtil.resolveAgainstTestarHome(settings.get(ConfigTags.OutputDir, "./output"));
         applicationName = settings.get(ConfigTags.ApplicationName, "");
         applicationVersion = settings.get(ConfigTags.ApplicationVersion, "");
+        includeWidgetTrees = settings.get(StateModelTags.StateModelExportStaticGraphIncludeWidgetTrees, false);
         persistedModel = settings.get(StateModelTags.StateModelInference, false)
                 && "OrientDB".equalsIgnoreCase(settings.get(StateModelTags.DataStore, ""))
                 && !PersistenceManager.DATA_STORE_MODE_NONE.equals(settings.get(StateModelTags.DataStoreMode, "none"));
@@ -104,31 +111,32 @@ public final class StaticGraphExporter {
             System.out.println(EXPORT_STARTED_SIGNAL);
             exportStarted = true;
             System.out.println("Exporting static state model " + modelIdentifier + "...");
+            long preparationStarted = System.nanoTime();
             staging = Files.createTempDirectory(run, ".state-model-");
             Path graphRoot = Files.createDirectory(staging.resolve("graph"));
-            String graphFile;
+            ObjectNode exportData;
             AnalysisManager analysis = analysisFactory.apply(databaseConfig, graphRoot);
             try {
-                graphFile = analysis.fetchGraphForModel(modelIdentifier, true, true, true, false);
+                exportData = ModelExportSnapshot.read(analysis, graphRoot, modelIdentifier,
+                        new ModelExportOptions("snapshot", includeWidgetTrees, true));
             } finally {
                 analysis.shutdown();
             }
-            if (graphFile == null || graphFile.isBlank() || !Path.of(graphFile).getFileName().toString().equals(graphFile)) {
-                throw new IOException("Graph generation did not return a valid graph file.");
-            }
-            Path generatedModel = graphRoot.resolve(modelIdentifier);
             Path model = Files.createDirectory(staging.resolve("model"));
-            String graphJson = Files.readString(generatedModel.resolve(graphFile), StandardCharsets.UTF_8);
             ObjectMapper mapper = new ObjectMapper();
-            JsonNode elements = mapper.readTree(graphJson);
-            if (elements == null || !elements.isArray() || elements.isEmpty()) {
-                throw new IOException("No graph elements were generated for this model.");
-            }
+            JsonNode elements = exportData.get("elements");
+            String graphJson = mapper.writeValueAsString(elements);
             Files.writeString(model.resolve("elements.json"), graphJson, StandardCharsets.UTF_8);
             Files.writeString(model.resolve("elements.js"), "window.__TESTAR_ELEMENTS__ = " + graphJson + ";\n", StandardCharsets.UTF_8);
-            copyImages(generatedModel, model, mapper);
+            String treesJson = "{}";
+            if (includeWidgetTrees) {
+                treesJson = mapper.writeValueAsString(exportData.get("widgetTrees"));
+                Files.writeString(model.resolve("widget-trees.json"), treesJson, StandardCharsets.UTF_8);
+            }
+            Files.writeString(model.resolve("widget-trees.js"), "window.__TESTAR_WIDGET_TREES__ = " + treesJson + ";\n", StandardCharsets.UTF_8);
+            copyImages(exportData.path("images"), model, mapper);
             copyViewerAssets(staging);
-            StaticGraphIndex.writeMetadata(staging, run, modelIdentifier, applicationName, applicationVersion);
+            StaticGraphIndex.writeMetadata(staging, run, modelIdentifier, applicationName, applicationVersion, exportData.path("metadata"));
             deleteDirectory(graphRoot);
             Files.move(staging, snapshot);
             staging = null;
@@ -138,6 +146,7 @@ public final class StaticGraphExporter {
                 System.err.println("Static snapshot created, but workspace index could not be updated: " + exception.getMessage());
             }
             System.out.println("Static state model viewer: " + snapshot.resolve("index.html"));
+            System.out.println("Static state model preparation completed in " + (System.nanoTime() - preparationStarted) / 1_000_000 + " ms.");
             return snapshot.resolve("index.html");
         } catch (Exception exception) {
             System.err.println("Static state model export failed: " + exception.getMessage());
@@ -156,18 +165,22 @@ public final class StaticGraphExporter {
         }
     }
 
-    private static void copyImages(Path source, Path model, ObjectMapper mapper) throws IOException {
+    private static void copyImages(JsonNode imageData, Path model, ObjectMapper mapper) throws IOException {
         StringBuilder images = new StringBuilder("window.__TESTAR_IMAGES__ = {};\n");
-        try (Stream<Path> files = Files.list(source)) {
-            for (Path image : files.filter(path -> Files.isRegularFile(path) && path.toString().endsWith(".png"))
-                    .sorted().collect(Collectors.toList())) {
-                String name = image.getFileName().toString();
-                String id = name.substring(0, name.length() - 4);
-                String dataUrl = "data:image/png;base64," + Base64.getEncoder().encodeToString(Files.readAllBytes(image));
-                Files.copy(image, model.resolve(name), StandardCopyOption.REPLACE_EXISTING);
-                images.append("window.__TESTAR_IMAGES__[").append(mapper.writeValueAsString(id)).append("] = ")
-                        .append(mapper.writeValueAsString(dataUrl)).append(";\n");
+        Iterator<String> identifiers = imageData.fieldNames();
+        while (identifiers.hasNext()) {
+            String id = identifiers.next();
+            if (!id.matches("[A-Za-z0-9_-]+")) {
+                throw new IOException("Invalid screenshot identifier.");
             }
+            String dataUrl = imageData.path(id).asText();
+            String prefix = "data:image/png;base64,";
+            if (!dataUrl.startsWith(prefix)) {
+                throw new IOException("Invalid screenshot data.");
+            }
+            Files.write(model.resolve(id + ".png"), Base64.getDecoder().decode(dataUrl.substring(prefix.length())));
+            images.append("window.__TESTAR_IMAGES__[").append(mapper.writeValueAsString(id)).append("] = ")
+                    .append(mapper.writeValueAsString(dataUrl)).append(";\n");
         }
         Files.writeString(model.resolve("images.js"), images, StandardCharsets.UTF_8);
     }
@@ -182,6 +195,20 @@ public final class StaticGraphExporter {
                 Files.createDirectories(target.getParent());
                 Files.copy(input, target);
             }
+        }
+        for (String asset : EXPORT_ASSETS) {
+            try (InputStream input = StaticGraphExporter.class.getResourceAsStream("/graphs/js/" + asset)) {
+                if (input == null) {
+                    throw new IOException("Missing packaged model export asset: " + asset);
+                }
+                Files.copy(input, destination.resolve("js").resolve(asset));
+            }
+        }
+        try (InputStream input = StaticGraphExporter.class.getResourceAsStream("/graphs/css/model-export.css")) {
+            if (input == null) {
+                throw new IOException("Missing packaged model export stylesheet.");
+            }
+            Files.copy(input, destination.resolve("css/model-export.css"));
         }
     }
 

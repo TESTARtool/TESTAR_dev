@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
+import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
@@ -30,6 +32,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.never;
+import static org.mockito.ArgumentMatchers.anyList;
 import static com.github.stefanbirkner.systemlambda.SystemLambda.tapSystemOut;
 
 public class StaticGraphExporterTest {
@@ -57,7 +61,7 @@ public class StaticGraphExporterTest {
         settings.set(ConfigTags.ApplicationName, "Example \"SUT\" caf\u00e9");
         settings.set(ConfigTags.ApplicationVersion, "1");
         analysis = mock(AnalysisManager.class);
-        when(analysis.fetchGraphForModel("model-1", true, true, true, false)).thenReturn("graph.json");
+        when(analysis.fetchGraphForModel("model-1", true, true, true, false, false)).thenReturn("graph.json");
     }
 
     @Test
@@ -75,18 +79,38 @@ public class StaticGraphExporterTest {
         Path snapshot = viewer.getParent();
         assertTrue(Files.readString(viewer).contains("model/elements.js"));
         assertTrue(Files.readString(viewer).contains("model/images.js"));
+        assertTrue(Files.readString(viewer).contains("model/widget-trees.js"));
+        assertFalse(Files.exists(snapshot.resolve("model/widget-trees.json")));
+        assertEquals("window.__TESTAR_WIDGET_TREES__ = {};\n", Files.readString(snapshot.resolve("model/widget-trees.js")));
+        assertTrue(Files.isRegularFile(snapshot.resolve("js/model-json-export.js")));
+        assertTrue(Files.isRegularFile(snapshot.resolve("js/model-export-controls.js")));
+        assertTrue(Files.isRegularFile(snapshot.resolve("js/model-export-runtime.js")));
+        assertTrue(Files.readString(viewer).contains("js/model-export-runtime.js"));
+        assertTrue(Files.isRegularFile(snapshot.resolve("js/widget-tree-inspector.js")));
+        assertFalse(Files.readString(viewer).contains("js/widget-tree-inspector.js"));
+        Path inspector = snapshot.resolve("widget-tree.html");
+        assertTrue(Files.isRegularFile(inspector));
+        String inspectorHtml = Files.readString(inspector);
+        assertTrue(inspectorHtml.contains("model/elements.js"));
+        assertTrue(inspectorHtml.contains("model/widget-trees.js"));
+        assertTrue(inspectorHtml.contains("run.js"));
+        assertTrue(inspectorHtml.contains("js/model-json-export.js"));
+        assertTrue(inspectorHtml.contains("js/widget-tree-inspector.js"));
+        assertTrue(inspectorHtml.contains("css/widget-tree.css"));
+        assertTrue(Files.isRegularFile(snapshot.resolve("css/widget-tree.css")));
         assertTrue(Files.isRegularFile(snapshot.resolve("js/cytoscape.min.js")));
         assertTrue(Files.isRegularFile(snapshot.resolve("js/cola.min.js")));
         assertTrue(Files.isRegularFile(snapshot.resolve("js/cytoscape-cola.js")));
         assertTrue(Files.isRegularFile(snapshot.resolve("css/style.css")));
-        assertEquals("[{\"group\":\"nodes\",\"data\":{\"id\":\"n1\"},\"classes\":\"ConcreteState\"}]",
-                Files.readString(snapshot.resolve("model/elements.json")));
+        assertEquals(2, new ObjectMapper().readTree(snapshot.resolve("model/elements.json").toFile()).size());
         assertTrue(Files.readString(snapshot.resolve("model/elements.js")).startsWith("window.__TESTAR_ELEMENTS__ = ["));
         assertTrue(Files.readString(snapshot.resolve("model/images.js")).contains("data:image/png;base64,"));
         assertTrue(Files.isRegularFile(snapshot.resolve("model/n1.png")));
         assertTrue(Files.isRegularFile(snapshot.resolve("model/e1.png")));
         JsonNode metadata = new ObjectMapper().readTree(snapshot.resolve("run.json").toFile());
         assertEquals("model-1", metadata.get("modelIdentifier").asText());
+        assertFalse(metadata.path("widgetTreesCaptured").asBoolean());
+        assertTrue(metadata.path("screenshotsCaptured").asBoolean());
         assertEquals("Example \"SUT\" caf\u00e9", metadata.get("applicationName").asText());
         assertEquals("sequence_1_V001_SUSPICIOUS_TAG.html", metadata.get("reports").get(0).asText());
         assertTrue(metadata.get("modelScope").asText().contains("earlier runs"));
@@ -94,9 +118,27 @@ public class StaticGraphExporterTest {
         assertTrue(Files.readString(workspaceOutput.resolve("state-models.html")).contains("2026_generate_example/state-model/index.html"));
         assertFalse(Files.exists(snapshot.resolve("graph")));
         verify(analysis, times(1)).shutdown();
+        verify(analysis, never()).fetchWidgetTrees(anyList());
         try (Stream<Path> directories = Files.list(run)) {
             assertFalse(directories.anyMatch(path -> path.getFileName().toString().startsWith(".state-model-")));
         }
+    }
+
+    @Test
+    public void enabledTreeCapturePackagesTreesAndFreezesTheSessionChoice() throws Exception {
+        settings.set(StateModelTags.StateModelExportStaticGraphIncludeWidgetTrees, true);
+        when(analysis.fetchWidgetTrees(List.of("n1"))).thenReturn(Map.of("n1", List.of()));
+        StaticGraphExporter exporter = exporter(false);
+        settings.set(StateModelTags.StateModelExportStaticGraphIncludeWidgetTrees, false);
+
+        Path viewer = exporter.export();
+
+        assertNotNull(viewer);
+        assertTrue(Files.exists(viewer.getParent().resolve("model/widget-trees.json")));
+        JsonNode metadata = new ObjectMapper().readTree(viewer.getParent().resolve("run.json").toFile());
+        assertTrue(metadata.path("widgetTreesCaptured").asBoolean());
+        verify(analysis).fetchWidgetTrees(List.of("n1"));
+        verify(analysis).shutdown();
     }
 
     @Test
@@ -137,7 +179,7 @@ public class StaticGraphExporterTest {
     @Test
     public void graphFailureClosesAnalysisAndRemovesPartialSnapshot() throws Exception {
         StaticGraphExporter exporter = exporter(false);
-        when(analysis.fetchGraphForModel("model-1", true, true, true, false)).thenThrow(new IllegalStateException("query failed"));
+        when(analysis.fetchGraphForModel("model-1", true, true, true, false, false)).thenThrow(new IllegalStateException("query failed"));
 
         String output = tapSystemOut(() -> assertNull(exporter.export()));
 
@@ -154,7 +196,7 @@ public class StaticGraphExporterTest {
     @Test
     public void generatedFileMustExistAndExistingSnapshotIsPreserved() throws Exception {
         StaticGraphExporter exporter = exporter(false);
-        when(analysis.fetchGraphForModel("model-1", true, true, true, false)).thenReturn("missing.json");
+        when(analysis.fetchGraphForModel("model-1", true, true, true, false, false)).thenReturn("missing.json");
         assertNull(exporter.export());
         verify(analysis).shutdown();
         assertFalse(Files.exists(run.resolve("state-model")));
@@ -211,16 +253,15 @@ public class StaticGraphExporterTest {
     }
 
     private StaticGraphExporter exporter(boolean includeImages) {
+        when(analysis.fetchExportImages(List.of("e1", "n1"))).thenReturn(includeImages
+                ? Map.of("n1", "data:image/png;base64,AQID", "e1", "data:image/png;base64,BAUG") : Map.of());
         return new StaticGraphExporter(settings, "model-1", () -> run, (config, directory) -> {
             try {
                 assertEquals(temporary.getRoot().toPath().resolve("datastore").toString(), config.getDatabaseDirectory());
                 Path model = Files.createDirectories(directory.resolve("model-1"));
                 Files.writeString(model.resolve("graph.json"),
-                        "[{\"group\":\"nodes\",\"data\":{\"id\":\"n1\"},\"classes\":\"ConcreteState\"}]", StandardCharsets.UTF_8);
-                if (includeImages) {
-                    Files.write(model.resolve("n1.png"), new byte[] {1, 2, 3});
-                    Files.write(model.resolve("e1.png"), new byte[] {4, 5, 6});
-                }
+                        "[{\"group\":\"nodes\",\"data\":{\"id\":\"n1\"},\"classes\":\"ConcreteState\"},"
+                                + "{\"data\":{\"id\":\"e1\"},\"classes\":\"ConcreteAction\"}]", StandardCharsets.UTF_8);
                 return analysis;
             } catch (IOException exception) {
                 throw new IllegalStateException(exception);

@@ -25,6 +25,8 @@ Run controls are available when a shared workspace is selected and no Generate e
 
 Each Generate sequence outcome preserves every generated verdict report for that sequence. The sequence status remains the aggregate status used by progress and sequence indicators, while the detailed outcome list exposes one entry for each verdict report.
 
+Completed runs remain active while [state-model finalization](./state-model.md#ws-func-state-model-001---state-model-analysis-lifecycle) closes persistence and prepares optional exports. Runtime status and console output distinguish this work from sequence execution; the user can still explicitly stop the process.
+
 ### Spy Mode
 
 Spy Mode supports:

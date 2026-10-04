@@ -17,10 +17,15 @@ public class StateModelExportSettingsTest {
         properties.setProperty(ConfigTags.SUTConnectorValue.name(), "notepad.exe");
         Settings defaults = new Settings(SettingsDefaults.getSettingsDefaults(), properties);
         assertFalse(defaults.get(StateModelTags.StateModelExportStaticGraph));
+        assertFalse(defaults.get(StateModelTags.StateModelExportStaticGraphIncludeWidgetTrees));
 
         properties.setProperty(StateModelTags.StateModelExportStaticGraph.name(), "true");
+        properties.setProperty(StateModelTags.StateModelExportStaticGraphIncludeWidgetTrees.name(), "true");
         Settings enabled = new Settings(SettingsDefaults.getSettingsDefaults(), properties);
         assertTrue(enabled.get(StateModelTags.StateModelExportStaticGraph));
         assertTrue(enabled.toFileString().contains("StateModelExportStaticGraph = true"));
+        assertTrue(enabled.get(StateModelTags.StateModelExportStaticGraphIncludeWidgetTrees));
+        assertTrue(enabled.toFileString().contains("StateModelExportStaticGraphIncludeWidgetTrees = true"));
+        assertFalse(enabled.get(StateModelTags.StateModelStoreWidgets));
     }
 }

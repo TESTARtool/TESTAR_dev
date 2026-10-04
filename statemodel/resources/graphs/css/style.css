@@ -41,6 +41,14 @@ div.layout > div.column > div {
     margin-bottom: 10px;
 }
 
+#model-export-controls {
+    max-width: 230px;
+}
+
+#model-export-status {
+    font-size: 0.85em;
+}
+
 div.extra-margin-left {
     margin-left: 30px;
 }

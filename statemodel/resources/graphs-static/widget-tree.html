@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Captured Widget Tree</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/widget-tree.css" />
+</head>
+<body class="widget-tree-page">
+    <header class="topbar">
+        <h1>Captured Widget Tree</h1>
+        <p id="state-summary"></p>
+        <p id="snapshot-summary" class="muted"></p>
+        <a href="index.html">View State Model</a>
+    </header>
+    <main id="widget-tree-content" aria-label="Captured widget inspection"></main>
+    <script src="model/elements.js"></script>
+    <script src="model/widget-trees.js"></script>
+    <script src="run.js"></script>
+    <script src="js/model-json-export.js"></script>
+    <script src="js/widget-tree-inspector.js"></script>
+    <script>
+        TestarWidgetTreeInspector.initializePage();
+    </script>
+</body>
+</html>

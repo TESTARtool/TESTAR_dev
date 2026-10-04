@@ -189,6 +189,7 @@ public class SettingsFileStructure {
                 , "#"
                 , "# StateModelInference: " + StateModelTags.StateModelInference.getDescription()
                 , "# StateModelExportStaticGraph: " + StateModelTags.StateModelExportStaticGraph.getDescription()
+                , "# StateModelExportStaticGraphIncludeWidgetTrees: " + StateModelTags.StateModelExportStaticGraphIncludeWidgetTrees.getDescription()
                 , "# DataStore: " + StateModelTags.DataStore.getDescription()
                 , "# DataStoreType: " + StateModelTags.DataStoreType.getDescription()
                 , "# DataStoreServer: " + StateModelTags.DataStoreServer.getDescription()
@@ -204,6 +205,7 @@ public class SettingsFileStructure {
                 , ""
                 , StateModelTags.StateModelInference.name() + " = "
                 , StateModelTags.StateModelExportStaticGraph.name() + " = "
+                , StateModelTags.StateModelExportStaticGraphIncludeWidgetTrees.name() + " = "
                 , StateModelTags.DataStore.name() + " = "
                 , StateModelTags.DataStoreType.name() + " = "
                 , StateModelTags.DataStoreServer.name() + " = "

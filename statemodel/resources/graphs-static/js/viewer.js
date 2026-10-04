@@ -52,7 +52,8 @@
   function initCy(elements) {
     const cy = cytoscape({
       container: document.getElementById("cy"),
-      elements,
+      // Viewer labels belong to presentation, not the embedded export source.
+      elements: elements.map(element => ({...element, data: {...element.data}})),
       style: [
         {
           selector: "node",
@@ -300,6 +301,14 @@
 
       let imageHtml = "";
       let imageSrc = "";
+      let treeHtml = "";
+      const tree = (window.__TESTAR_WIDGET_TREES__ || {})[id];
+      if (el.hasClass("ConcreteState")) {
+        treeHtml = tree?.length
+          ? `<div class="info-section"><a class="inspect-widget-tree" href="widget-tree.html?state=${escapeHtml(encodeURIComponent(id))}" target="_blank" rel="noopener noreferrer">Inspect Widget Tree</a></div>`
+          : `<p class="muted">${window.__TESTAR_RUN__?.widgetTreesCaptured === false
+            ? "Widget trees were not captured in this snapshot." : "Widget tree unavailable in this snapshot."}</p>`;
+      }
       if (el.hasClass("ConcreteState") || el.hasClass("ConcreteAction")) {
         imageSrc = (window.__TESTAR_IMAGES__ && window.__TESTAR_IMAGES__[id]) || "";
         imageHtml = imageSrc
@@ -313,6 +322,7 @@
         `  <div class="info-row"><span class="info-label">Classes</span><span class="info-value">${escapeHtml(classes)}</span></div>`,
         `</div>`,
         imageHtml,
+        treeHtml,
         `<div class="info-section">${renderDataTable(data)}</div>`
       ].join("");
       setInfo(content);

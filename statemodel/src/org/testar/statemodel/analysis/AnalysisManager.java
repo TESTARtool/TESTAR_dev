@@ -7,6 +7,7 @@
 package org.testar.statemodel.analysis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.orientechnologies.orient.core.db.ODatabaseSession;
 import com.orientechnologies.orient.core.db.OrientDB;
 import com.orientechnologies.orient.core.db.OrientDBConfig;
@@ -14,11 +15,16 @@ import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.ODirection;
 import com.orientechnologies.orient.core.record.OEdge;
 import com.orientechnologies.orient.core.record.OVertex;
+import com.orientechnologies.orient.core.record.OElement;
+import com.orientechnologies.orient.core.id.ORecordId;
 import com.orientechnologies.orient.core.record.impl.ORecordBytes;
 import com.orientechnologies.orient.core.record.impl.OVertexDocument;
 import com.orientechnologies.orient.core.sql.executor.OResult;
 import com.orientechnologies.orient.core.sql.executor.OResultSet;
 import org.testar.statemodel.analysis.jsonformat.Edge;
+import org.testar.statemodel.analysis.export.ModelExportSnapshot;
+import org.testar.statemodel.analysis.export.ModelExportOptions;
+import org.testar.statemodel.analysis.export.ModelExportProgress;
 import org.testar.statemodel.analysis.jsonformat.Element;
 import org.testar.statemodel.analysis.jsonformat.Vertex;
 import org.testar.statemodel.analysis.representation.AbstractStateModel;
@@ -33,15 +39,20 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.text.DateFormat;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeSet;
+import java.util.Base64;
+import java.util.function.Consumer;
 
 public class AnalysisManager {
 
@@ -338,20 +349,25 @@ public class AnalysisManager {
      * @return
      */
     public String fetchGraphForModel(String modelIdentifier, boolean abstractLayerRequired, boolean concreteLayerRequired, boolean sequenceLayerRequired, boolean showCompoundGraph) {
+        return fetchGraphForModel(modelIdentifier, abstractLayerRequired, concreteLayerRequired, sequenceLayerRequired, showCompoundGraph, true);
+    }
+
+    public String fetchGraphForModel(String modelIdentifier, boolean abstractLayerRequired, boolean concreteLayerRequired,
+                                     boolean sequenceLayerRequired, boolean showCompoundGraph, boolean includeScreenshots) {
         startUp();
         ArrayList<Element> elements = new ArrayList<>();
         if (abstractLayerRequired || concreteLayerRequired || sequenceLayerRequired) {
             try (ODatabaseSession db = orientDB.open(dbConfig.getDatabase(), dbConfig.getUser(), dbConfig.getPassword())) {
                 if (abstractLayerRequired) {
-                    elements.addAll(fetchAbstractLayer(modelIdentifier, db, showCompoundGraph));
+                    elements.addAll(fetchAbstractLayer(modelIdentifier, db, showCompoundGraph, includeScreenshots));
                 }
 
                 if (concreteLayerRequired) {
-                    elements.addAll(fetchConcreteLayer(modelIdentifier, db, showCompoundGraph));
+                    elements.addAll(fetchConcreteLayer(modelIdentifier, db, showCompoundGraph, includeScreenshots));
                 }
 
                 if (sequenceLayerRequired) {
-                    elements.addAll(fetchSequenceLayer(modelIdentifier, db, showCompoundGraph));
+                    elements.addAll(fetchSequenceLayer(modelIdentifier, db, showCompoundGraph, includeScreenshots));
                 }
 
                 if (abstractLayerRequired && concreteLayerRequired) {
@@ -389,7 +405,7 @@ public class AnalysisManager {
      * @param db
      * @return
      */
-    private List<Element> fetchAbstractLayer(String modelIdentifier, ODatabaseSession db, boolean showCompoundGraph) {
+    private List<Element> fetchAbstractLayer(String modelIdentifier, ODatabaseSession db, boolean showCompoundGraph, boolean includeScreenshots) {
         ArrayList<Element> elements = new ArrayList<>();
 
         // optionally add a parent node for the abstract layer
@@ -403,25 +419,25 @@ public class AnalysisManager {
         Map<String, Object> params = new HashMap<>();
         params.put("identifier", modelIdentifier);
         OResultSet resultSet = db.query(stmt, params);
-        elements.addAll(fetchNodes(resultSet, "AbstractState", showCompoundGraph ? "AbstractLayer" : null, modelIdentifier));
+        elements.addAll(fetchNodes(resultSet, "AbstractState", showCompoundGraph ? "AbstractLayer" : null, modelIdentifier, includeScreenshots));
         resultSet.close();
 
         // abstract actions
         stmt = "SELECT FROM AbstractAction WHERE modelIdentifier = :identifier";
         resultSet = db.query(stmt, params);
-        elements.addAll(fetchEdges(resultSet, "AbstractAction", modelIdentifier));
+        elements.addAll(fetchEdges(resultSet, "AbstractAction", modelIdentifier, includeScreenshots));
         resultSet.close();
 
         // Black hole class
         stmt = "SELECT FROM (TRAVERSE out() FROM  (SELECT FROM AbstractState WHERE modelIdentifier = :identifier)) WHERE @class = 'BlackHole'";
         resultSet = db.query(stmt, params);
-        elements.addAll(fetchNodes(resultSet, "BlackHole", showCompoundGraph ? "AbstractLayer" : null, modelIdentifier));
+        elements.addAll(fetchNodes(resultSet, "BlackHole", showCompoundGraph ? "AbstractLayer" : null, modelIdentifier, includeScreenshots));
         resultSet.close();
 
         // unvisited abstract actions
         stmt = "SELECT FROM UnvisitedAbstractAction WHERE modelIdentifier = :identifier";
         resultSet = db.query(stmt, params);
-        elements.addAll(fetchEdges(resultSet, "UnvisitedAbstractAction", modelIdentifier));
+        elements.addAll(fetchEdges(resultSet, "UnvisitedAbstractAction", modelIdentifier, includeScreenshots));
         resultSet.close();
 
         return elements;
@@ -433,7 +449,7 @@ public class AnalysisManager {
      * @param db
      * @return
      */
-    private List<Element> fetchConcreteLayer(String modelIdentifier, ODatabaseSession db, boolean showCompoundGraph) {
+    private List<Element> fetchConcreteLayer(String modelIdentifier, ODatabaseSession db, boolean showCompoundGraph, boolean includeScreenshots) {
         ArrayList<Element> elements = new ArrayList<>();
 
         // optionally add a parent node for the concrete layer
@@ -447,13 +463,13 @@ public class AnalysisManager {
         Map<String, Object> params = new HashMap<>();
         params.put("identifier", modelIdentifier);
         OResultSet resultSet = db.query(stmt, params);
-        elements.addAll(fetchNodes(resultSet, "ConcreteState", showCompoundGraph ? "ConcreteLayer" : null, modelIdentifier));
+        elements.addAll(fetchNodes(resultSet, "ConcreteState", showCompoundGraph ? "ConcreteLayer" : null, modelIdentifier, includeScreenshots));
         resultSet.close();
 
         // concrete actions
         stmt = "SELECT FROM (TRAVERSE in('isAbstractedBy').outE('ConcreteAction') FROM (SELECT FROM AbstractState WHERE modelIdentifier = :identifier)) WHERE @class = 'ConcreteAction'";
         resultSet = db.query(stmt, params);
-        elements.addAll(fetchEdges(resultSet, "ConcreteAction", modelIdentifier));
+        elements.addAll(fetchEdges(resultSet, "ConcreteAction", modelIdentifier, includeScreenshots));
         resultSet.close();
 
         return elements;
@@ -465,7 +481,7 @@ public class AnalysisManager {
      * @param db
      * @return
      */
-    private List<Element> fetchSequenceLayer(String modelIdentifier, ODatabaseSession db, boolean showCompoundGraph) {
+    private List<Element> fetchSequenceLayer(String modelIdentifier, ODatabaseSession db, boolean showCompoundGraph, boolean includeScreenshots) {
         ArrayList<Element> elements = new ArrayList<>();
 
         // optionally add a parent node for the sequence layer
@@ -479,25 +495,27 @@ public class AnalysisManager {
         Map<String, Object> params = new HashMap<>();
         params.put("identifier", modelIdentifier);
         OResultSet resultSet = db.query(stmt, params);
-        elements.addAll(fetchNodes(resultSet, "TestSequence", showCompoundGraph ? "SequenceLayer" : null, modelIdentifier));
+        elements.addAll(fetchNodes(resultSet, "TestSequence", showCompoundGraph ? "SequenceLayer" : null, modelIdentifier, includeScreenshots));
         resultSet.close();
 
         // sequence nodes
-        stmt = "SELECT FROM (TRAVERSE in('isAbstractedBy').in('Accessed') FROM (SELECT FROM AbstractState WHERE modelIdentifier = :identifier)) WHERE @class = 'SequenceNode'";
+        stmt = "SELECT FROM (TRAVERSE out('FirstNode'), out('SequenceStep') FROM "
+                + "(SELECT FROM TestSequence WHERE modelIdentifier = :identifier)) WHERE @class = 'SequenceNode'";
         resultSet = db.query(stmt, params);
-        elements.addAll(fetchNodes(resultSet, "SequenceNode", showCompoundGraph ? "SequenceLayer" : null, modelIdentifier));
+        elements.addAll(fetchNodes(resultSet, "SequenceNode", showCompoundGraph ? "SequenceLayer" : null, modelIdentifier, includeScreenshots));
         resultSet.close();
 
         // sequence steps
-        stmt = "SELECT FROM (TRAVERSE in('isAbstractedBy').in('Accessed').outE('SequenceStep') FROM (SELECT FROM AbstractState WHERE modelIdentifier = :identifier)) WHERE @class = 'SequenceStep'";
+        stmt = "SELECT FROM (TRAVERSE outE('SequenceStep') FROM (TRAVERSE out('FirstNode'), out('SequenceStep') FROM "
+                + "(SELECT FROM TestSequence WHERE modelIdentifier = :identifier))) WHERE @class = 'SequenceStep'";
         resultSet = db.query(stmt, params);
-        elements.addAll(fetchEdges(resultSet, "SequenceStep", modelIdentifier));
+        elements.addAll(fetchEdges(resultSet, "SequenceStep", modelIdentifier, includeScreenshots));
         resultSet.close();
 
         // first node
         stmt = "SELECT FROM (TRAVERSE outE('FirstNode') FROM (SELECT FROM TestSequence WHERE modelIdentifier = :identifier)) WHERE @class = 'FirstNode'";
         resultSet = db.query(stmt, params);
-        elements.addAll(fetchEdges(resultSet, "FirstNode", modelIdentifier));
+        elements.addAll(fetchEdges(resultSet, "FirstNode", modelIdentifier, includeScreenshots));
         resultSet.close();
 
         return elements;
@@ -550,24 +568,7 @@ public class AnalysisManager {
     public String fetchWidgetTree(String concreteStateIdentifier) {
         startUp();
         try (ODatabaseSession db = orientDB.open(dbConfig.getDatabase(), dbConfig.getUser(), dbConfig.getPassword())) {
-            ArrayList<Element> elements = new ArrayList<>();
-
-            // convert the concrete state identifier to an internal id if needed
-            String internalId = concreteStateIdentifier.indexOf("n") == 0 ? unformatId(concreteStateIdentifier) : concreteStateIdentifier;
-
-            // first get all the widgets
-            String stmt = "SELECT FROM (TRAVERSE IN('isChildOf') FROM (SELECT FROM Widget WHERE @RID = :rid))";
-            Map<String, Object> params = new HashMap<>();
-            params.put("rid", internalId);
-            OResultSet resultSet = db.query(stmt, params);
-            elements.addAll(fetchNodes(resultSet, "Widget", null, concreteStateIdentifier));
-            resultSet.close();
-
-            // then get the parent/child relationship between the widgets
-            stmt = "SELECT FROM isChildOf WHERE in IN(SELECT @RID FROM (TRAVERSE in('isChildOf') FROM (SELECT FROM Widget WHERE @RID = :rid)))";
-            resultSet = db.query(stmt, params);
-            elements.addAll(fetchEdges(resultSet, "isChildOf", concreteStateIdentifier));
-            resultSet.close();
+            ArrayList<Element> elements = fetchWidgetTreeElements(db, concreteStateIdentifier);
 
             // create a filename
             StringBuilder builder = new StringBuilder(concreteStateIdentifier);
@@ -575,9 +576,133 @@ public class AnalysisManager {
             builder.append(Instant.now().toEpochMilli());
             builder.append("_elements.json");
             String filename = builder.toString();
-            checkShutDown();
             return writeJson(elements, filename, concreteStateIdentifier);
+        } finally {
+            checkShutDown();
         }
+    }
+
+    /** Prepares optional artifacts independently of the layers selected in the live viewer. */
+    public synchronized ObjectNode fetchExportSnapshot(String modelIdentifier, ModelExportOptions options) throws IOException {
+        try {
+            return ModelExportSnapshot.read(this, Path.of(outputDir), modelIdentifier, options);
+        } finally {
+            checkShutDown();
+        }
+    }
+
+    public synchronized ObjectNode fetchExportSnapshot(String modelIdentifier, ModelExportOptions options,
+                                                       Consumer<ModelExportProgress> progress) throws IOException {
+        try {
+            return ModelExportSnapshot.read(this, Path.of(outputDir), modelIdentifier, options, progress);
+        } finally {
+            checkShutDown();
+        }
+    }
+
+    /** Retrieves screenshot bytes only for the concrete records needed by this export. */
+    public Map<String, String> fetchExportImages(List<String> identifiers) {
+        return fetchExportImages(identifiers, progress -> { });
+    }
+
+    public Map<String, String> fetchExportImages(List<String> identifiers, Consumer<ModelExportProgress> progress) {
+        Map<String, String> images = new LinkedHashMap<>();
+        if (identifiers.isEmpty()) {
+            return images;
+        }
+        startUp();
+        int completed = 0;
+        try (ODatabaseSession db = orientDB.open(dbConfig.getDatabase(), dbConfig.getUser(), dbConfig.getPassword())) {
+            for (String identifier : identifiers) {
+                if (!identifier.matches("[ne][0-9]+_[0-9]+")) {
+                    throw new IllegalArgumentException("Invalid screenshot record identifier.");
+                }
+                Object record = db.load(new ORecordId("#" + identifier.substring(1).replace('_', ':')));
+                if (record instanceof OElement element) {
+                    Object screenshot = element.getProperty("screenshot");
+                    if (screenshot instanceof ORecordBytes bytes) {
+                        byte[] image = bytes.toStream();
+                        if (image.length > 0) {
+                            images.put(identifier, "data:image/png;base64," + Base64.getEncoder().encodeToString(image));
+                        }
+                    }
+                }
+                completed++;
+                if (completed == 1 || completed % 25 == 0 || completed == identifiers.size()) {
+                    progress.accept(new ModelExportProgress("screenshots", completed, identifiers.size()));
+                }
+            }
+        } finally {
+            checkShutDown();
+        }
+        return images;
+    }
+
+    /** Reads names only, keeping widget values and screenshot bytes out of the dialog inventory. */
+    public List<String> fetchWidgetPropertyNames(String modelIdentifier) {
+        Set<String> names = new TreeSet<>();
+        startUp();
+        String query = "SELECT @this.keys() AS names FROM (TRAVERSE in('isAbstractedBy'), in('isChildOf') FROM "
+                + "(SELECT FROM AbstractState WHERE modelIdentifier = :identifier)) WHERE @class IN ['Widget', 'ConcreteState']";
+        try (ODatabaseSession db = orientDB.open(dbConfig.getDatabase(), dbConfig.getUser(), dbConfig.getPassword());
+                OResultSet result = db.query(query, Map.of("identifier", modelIdentifier))) {
+            while (result.hasNext()) {
+                Iterable<String> fields = result.next().getProperty("names");
+                for (String field : fields) {
+                    if (!field.startsWith("in_") && !field.startsWith("out_") && !field.equals("screenshot")) {
+                        names.add(exportPropertyName(field));
+                    }
+                }
+            }
+        } finally {
+            checkShutDown();
+        }
+        return new ArrayList<>(names);
+    }
+
+    /** Uses one database session for all concrete widget trees in an export. */
+    public Map<String, List<Element>> fetchWidgetTrees(List<String> concreteStateIdentifiers) {
+        return fetchWidgetTrees(concreteStateIdentifiers, progress -> { });
+    }
+
+    public Map<String, List<Element>> fetchWidgetTrees(List<String> concreteStateIdentifiers,
+                                                     Consumer<ModelExportProgress> progress) {
+        Map<String, List<Element>> trees = new LinkedHashMap<>();
+        if (concreteStateIdentifiers.isEmpty()) {
+            return trees;
+        }
+        startUp();
+        int completed = 0;
+        try (ODatabaseSession db = orientDB.open(dbConfig.getDatabase(), dbConfig.getUser(), dbConfig.getPassword())) {
+            for (String identifier : concreteStateIdentifiers) {
+                trees.put(identifier, fetchWidgetTreeElements(db, identifier));
+                completed++;
+                if (completed == 1 || completed % 25 == 0 || completed == concreteStateIdentifiers.size()) {
+                    System.out.println("Preparing state model widget trees: " + completed + "/" + concreteStateIdentifiers.size());
+                    progress.accept(new ModelExportProgress("trees", completed, concreteStateIdentifiers.size()));
+                }
+            }
+        } finally {
+            checkShutDown();
+        }
+        return trees;
+    }
+
+    private ArrayList<Element> fetchWidgetTreeElements(ODatabaseSession db, String identifier) {
+        ArrayList<Element> elements = new ArrayList<>();
+        String internalId = identifier.startsWith("n") ? unformatId(identifier) : identifier;
+        Map<String, Object> params = new HashMap<>();
+        params.put("rid", internalId);
+        String nodes = "SELECT FROM (TRAVERSE IN('isChildOf') FROM (SELECT FROM Widget WHERE @RID = :rid))";
+        try (OResultSet result = db.query(nodes, params)) {
+            elements.addAll(fetchNodes(result, "Widget", null, identifier, false));
+        }
+        String edges = "SELECT FROM isChildOf WHERE in IN(SELECT @RID FROM "
+                + "(TRAVERSE in('isChildOf') FROM (SELECT FROM Widget WHERE @RID = :rid)))";
+        try (OResultSet result = db.query(edges, params)) {
+            elements.addAll(fetchEdges(result, "isChildOf", identifier, false));
+        }
+        return elements;
     }
 
     /**
@@ -586,7 +711,7 @@ public class AnalysisManager {
      * @param className
      * @return
      */
-    private ArrayList<Element> fetchNodes(OResultSet resultSet, String className, String parent, String modelIdentifier) {
+    private ArrayList<Element> fetchNodes(OResultSet resultSet, String className, String parent, String modelIdentifier, boolean includeScreenshots) {
         ArrayList<Element> elements = new ArrayList<>();
 
         while (resultSet.hasNext()) {
@@ -606,7 +731,9 @@ public class AnalysisManager {
                     }
                     if (propertyName.equals("screenshot")) {
                         // process the screenshot separately
-                        processScreenShot(stateVertex.getProperty("screenshot"), "n" + formatId(stateVertex.getIdentity().toString()), modelIdentifier);
+                        if (includeScreenshots) {
+                            processScreenShot(stateVertex.getProperty("screenshot"), "n" + formatId(stateVertex.getIdentity().toString()), modelIdentifier);
+                        }
                         continue;
                     }
                     jsonVertex.addProperty(exportPropertyName(propertyName), stateVertex.getProperty(propertyName).toString());
@@ -634,6 +761,10 @@ public class AnalysisManager {
      * @return
      */
     private ArrayList<Element> fetchEdges(OResultSet resultSet, String className, String modelIdentifier) {
+        return fetchEdges(resultSet, className, modelIdentifier, true);
+    }
+
+    private ArrayList<Element> fetchEdges(OResultSet resultSet, String className, String modelIdentifier, boolean includeScreenshots) {
         ArrayList<Element> elements = new ArrayList<>();
         while (resultSet.hasNext()) {
             OResult result = resultSet.next();
@@ -648,18 +779,20 @@ public class AnalysisManager {
                 OVertexDocument target = actionEdge.getProperty("in");
                 Edge jsonEdge = new Edge("e" + formatId(actionEdge.getIdentity().toString()), "n" + formatId(source.getIdentity().toString()), "n" + formatId(target.getIdentity().toString()));
                 for (String propertyName : actionEdge.getPropertyNames()) {
-                    if (propertyName.contains("in") || propertyName.contains("out")) {
+                    if (propertyName.equals("in") || propertyName.equals("out")
+                            || propertyName.startsWith("in_") || propertyName.startsWith("out_")) {
                         // these are edge indicators. Ignore
                         continue;
                     }
-                    Object propertyValue = actionEdge.getProperty(propertyName);
                     if ("ConcreteAction".equals(className) && "screenshot".equals(propertyName)) {
+                        Object propertyValue = includeScreenshots ? actionEdge.getProperty(propertyName) : null;
                         if (propertyValue instanceof ORecordBytes
                                 && processScreenShot((ORecordBytes) propertyValue, jsonEdge.getId(), modelIdentifier)) {
                             jsonEdge.addProperty("hasScreenshot", "true");
                         }
                         continue;
                     }
+                    Object propertyValue = actionEdge.getProperty(propertyName);
                     if (propertyValue != null) {
                         jsonEdge.addProperty(exportPropertyName(propertyName), propertyValue.toString());
                     }

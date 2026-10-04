@@ -3,6 +3,7 @@
     import { contentChanged } from "../../models/editorDirtyState.js";
     import { shouldShowBlankSelectOption } from "./settingsSelectOptions.js";
     import { textInputTypeForSetting } from "./settingsInputType.js";
+    import { isSettingDisabled } from "./settingsFieldState.js";
     import AbstractIdentificationEditor from "./AbstractIdentificationEditor.svelte";
     import IgnoredVerdictsPanel from "./IgnoredVerdictsPanel.svelte";
     import SpyTagEditor from "./SpyTagEditor.svelte";
@@ -266,7 +267,7 @@
                                     {#each settingsGroup.settings as setting}
                                         <div
                                             class="settings-field"
-                                            class:settings-field-wide={setting.type === "list"}
+                                            class:settings-field-wide={setting.type === "list" || setting.key.startsWith("StateModelExportStaticGraph")}
                                             class:settings-field-boolean={setting.type === "boolean"}
                                         >
                                             <div class="settings-field-header">
@@ -314,6 +315,7 @@
                                                     <input
                                                         type="checkbox"
                                                         checked={setting.value === "true"}
+                                                        disabled={isSettingDisabled(setting, workspaceDocument.settingsGroups)}
                                                         on:change={(event) => {
                                                             setSettingValue(setting, event.currentTarget.checked ? "true" : "false");
                                                         }}

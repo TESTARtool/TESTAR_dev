@@ -28,6 +28,7 @@ import java.util.regex.Pattern;
 
 import org.testar.core.verdict.Verdict;
 import org.testar.scriptless.ComposedProtocol;
+import org.testar.statemodel.ModelManager;
 import org.testar.statemodel.analysis.export.StaticGraphExporter;
 import org.testar.webstudio.api.dto.ExecutionStatusDto;
 import org.testar.webstudio.api.dto.ResultFileDto;
@@ -67,6 +68,7 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
     private int currentSequenceNumber;
     private boolean currentSequenceFailed;
     private boolean spySessionCompleted;
+    private boolean stateModelFinalizationRunning;
     private boolean staticGraphExportRunning;
     private String lastMessage = "Scriptless execution adapter is available";
     private final List<String> consoleLines = new ArrayList<>();
@@ -99,9 +101,13 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
             return buildStatus("idle", lastMessage);
         }
 
-        return buildStatus("running", staticGraphExportRunning
-                ? "Exporting static state model for workspace " + currentWorkspace
-                : "Running " + currentMode + " for workspace " + currentWorkspace);
+        if (staticGraphExportRunning) {
+            return buildStatus("running", "Exporting static state model for workspace " + currentWorkspace);
+        }
+        if (stateModelFinalizationRunning) {
+            return buildStatus("running", "Finalizing state model for workspace " + currentWorkspace);
+        }
+        return buildStatus("running", "Running " + currentMode + " for workspace " + currentWorkspace);
     }
 
     public synchronized ExecutionStatusDto startGenerate(String workspaceName, Path workspacesRoot) {
@@ -161,6 +167,8 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
     }
 
     public synchronized ExecutionStatusDto stop() {
+        stateModelFinalizationRunning = false;
+        staticGraphExportRunning = false;
         if (currentProcess == null || !currentProcess.isAlive()) {
             currentProcess = null;
             currentInstallBinDirectory = null;
@@ -403,6 +411,7 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
         currentSequenceNumber = 0;
         currentSequenceFailed = false;
         spySessionCompleted = false;
+        stateModelFinalizationRunning = false;
         staticGraphExportRunning = false;
         startedAtEpochMillis = 0L;
         lastOutputEpochMillis = 0L;
@@ -410,6 +419,16 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
 
     synchronized void acceptProcessOutputLine(String line) {
         String signal = line == null ? "" : line.trim();
+        if (ModelManager.FINALIZATION_STARTED_SIGNAL.equals(signal)) {
+            stateModelFinalizationRunning = true;
+            lastOutputEpochMillis = System.currentTimeMillis();
+            return;
+        }
+        if (ModelManager.FINALIZATION_FINISHED_SIGNAL.equals(signal)) {
+            stateModelFinalizationRunning = false;
+            lastOutputEpochMillis = System.currentTimeMillis();
+            return;
+        }
         if (StaticGraphExporter.EXPORT_STARTED_SIGNAL.equals(signal)) {
             staticGraphExportRunning = true;
             lastOutputEpochMillis = System.currentTimeMillis();
@@ -455,6 +474,7 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
         currentSequenceNumber = 0;
         currentSequenceFailed = false;
         spySessionCompleted = false;
+        stateModelFinalizationRunning = false;
         staticGraphExportRunning = false;
         lastMessage = message;
     }
@@ -569,7 +589,7 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
     }
 
     private boolean shouldStopCompletedButStuckRun() {
-        if (staticGraphExportRunning) {
+        if (stateModelFinalizationRunning || staticGraphExportRunning) {
             return false;
         }
         if (plannedSequenceCount <= 0) {

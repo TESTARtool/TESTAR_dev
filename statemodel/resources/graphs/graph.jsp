@@ -13,10 +13,14 @@
     <script src="js/cytoscape-dagre.js"></script>
     <script src="js/klay.js"></script>
     <script src="js/cytoscape-klay.js"></script>
+    <script src="js/model-json-export.js"></script>
+    <script src="js/model-export-runtime.js"></script>
+    <script src="js/model-export-controls.js"></script>
     <script src="js/jquery-3.2.1.slim.min.js"></script>
     <script src="js/jquery.magnific-popup.min.js"></script>
     <link rel="stylesheet" href="css/magnific-popup.css">
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/model-export.css">
 </head>
 <body>
 
@@ -44,6 +48,11 @@
             <div>
                 <button id="show-all" type="button" class="button_custom">Show all nodes</button>
             </div>
+        </div>
+
+        <div class="column" id="model-export-controls" hidden>
+            <div><button id="export-model" type="button">Export Model</button></div>
+            <div id="model-export-status" role="status" aria-live="polite"></div>
         </div>
 
         <div class="column">
@@ -108,6 +117,15 @@
 
 
 <script>
+
+    if ("${exportModelIdentifier}" !== "") {
+        document.getElementById("model-export-controls").hidden = false;
+        TestarModelExportControls.attach(async (options, progress) => {
+            const query = new URLSearchParams({modelIdentifier: "${exportModelIdentifier}", format: options.format,
+                includeWidgetTrees: options.includeWidgetTrees, includeScreenshots: options.includeScreenshots});
+            return TestarModelExportRuntime.loadSnapshot("model-export-data?" + query, options.format === "inventory", progress);
+        });
+    }
 
     // global object that will hold some config values
     let appStatus = {};

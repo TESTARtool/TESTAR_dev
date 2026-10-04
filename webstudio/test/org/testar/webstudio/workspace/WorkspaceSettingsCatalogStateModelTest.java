@@ -23,5 +23,11 @@ public class WorkspaceSettingsCatalogStateModelTest {
         assertEquals("boolean", setting.type());
         assertEquals("true", setting.value());
         assertTrue(setting.description().contains("Generate or CLI"));
+        int size = group.settings().size();
+        assertEquals("StateModelExportStaticGraph", group.settings().get(size - 2).key());
+        WorkspaceSettingDto trees = group.settings().get(size - 1);
+        assertEquals("StateModelExportStaticGraphIncludeWidgetTrees", trees.key());
+        assertEquals("boolean", trees.type());
+        assertEquals("false", trees.defaultValue());
     }
 }

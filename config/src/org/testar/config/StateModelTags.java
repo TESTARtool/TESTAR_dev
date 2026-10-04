@@ -25,6 +25,9 @@ public class StateModelTags extends TaggableBase {
     public static final Tag<Boolean> StateModelExportStaticGraph = Tag.from("StateModelExportStaticGraph", Boolean.class,
             "Export a portable state model viewer after Generate or CLI execution ends; requires persisted state model inference");
 
+    public static final Tag<Boolean> StateModelExportStaticGraphIncludeWidgetTrees = Tag.from("StateModelExportStaticGraphIncludeWidgetTrees", Boolean.class,
+            "Include persisted widget trees in the static snapshot; increases preparation time and snapshot size");
+
     public static final Tag<String> DataStore = Tag.from("DataStore", String.class,
             "The graph database we use to store the State Model: OrientDB");
 

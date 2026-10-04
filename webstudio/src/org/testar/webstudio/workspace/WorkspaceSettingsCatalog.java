@@ -127,7 +127,6 @@ public final class WorkspaceSettingsCatalog {
                 "State model persistence configuration.",
                 settingsProperties,
                 StateModelTags.StateModelInference,
-                StateModelTags.StateModelExportStaticGraph,
                 StateModelTags.DataStore,
                 StateModelTags.DataStoreType,
                 StateModelTags.DataStoreServer,
@@ -138,7 +137,9 @@ public final class WorkspaceSettingsCatalog {
                 StateModelTags.DataStoreMode,
                 StateModelTags.ActionSelectionAlgorithm,
                 StateModelTags.StateModelStoreWidgets,
-                StateModelTags.ResetDataStore
+                StateModelTags.ResetDataStore,
+                StateModelTags.StateModelExportStaticGraph,
+                StateModelTags.StateModelExportStaticGraphIncludeWidgetTrees
             ),
             group(
                 "state-identification",

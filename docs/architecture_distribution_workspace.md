@@ -268,6 +268,8 @@ The YAML contract is intentionally structured so WebStudio can validate required
 
 Optional static state-model exports belong to the run that creates the snapshot: `output/<workspace>/<run>/state-model/`. A workspace `state-models.html` index links to completed snapshots. The `statemodel` JAR packages the portable viewer assets; export requires no shared `output/graphs-static` installation directory. Live database analysis remains a separate runtime service. See [State model inference and analysis](./statemodel/state-model.md).
 
+Snapshots package the shared configurable JSON exporter and optionally capture persisted concrete widget trees through `StateModelExportStaticGraphIncludeWidgetTrees` (default `false`). Both live analysis and the offline viewer download ZIP packages with selected properties, trees, and screenshots. Browser downloads use the user's download destination; snapshot preparation remains workspace/run-scoped. See [State-model JSON exports](./statemodel/json-export.md).
+
 Generated output results are workspace assets.
 
 Each workspace writes and reads results under its own output directory:
@@ -361,7 +363,7 @@ State model analysis should resolve the datastore associated with the selected w
 State model analysis web assets are served from the shared runtime graph assets directory:
 
 ```text
-target/install/testar/bin/.runtime/graphs/
+target/install/testar/bin/output/graphs/
 ```
 
 ## WebStudio Behavior

@@ -248,3 +248,20 @@ button:hover {
 .muted {
   color: #888;
 }
+.inspect-widget-tree {
+    display: inline-block;
+    background: #1c9099;
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 4px;
+    text-decoration: none;
+}
+
+.inspect-widget-tree:hover {
+    background: #16757c;
+}
+
+.inspect-widget-tree:focus-visible {
+    outline: 2px solid #263449;
+    outline-offset: 2px;
+}

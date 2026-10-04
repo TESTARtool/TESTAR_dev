@@ -22,6 +22,9 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.StringJoiner;
 public class ModelManager implements StateModelManager {
+    public static final String FINALIZATION_STARTED_SIGNAL = "TESTAR_STATE_MODEL_FINALIZATION_STARTED";
+    public static final String FINALIZATION_FINISHED_SIGNAL = "TESTAR_STATE_MODEL_FINALIZATION_FINISHED";
+
     // the abstract state model that this class is managing
     private final AbstractStateModel abstractStateModel;
     // current abstract state of the SUT
@@ -193,10 +196,17 @@ public class ModelManager implements StateModelManager {
         if (testingEnded) {
             return;
         }
-        // Flush delayed persistence and release the datastore before opening an export connection.
-        persistenceManager.shutdown();
-        testingEnded = true;
-        testingEndedAction.run();
+        // Protect datastore shutdown as well as export from completed-run idle cleanup.
+        System.out.println(FINALIZATION_STARTED_SIGNAL);
+        try {
+            System.out.println("Finalizing state model: flushing persistence and closing the datastore...");
+            persistenceManager.shutdown();
+            testingEnded = true;
+            testingEndedAction.run();
+            System.out.println("State model finalization finished.");
+        } finally {
+            System.out.println(FINALIZATION_FINISHED_SIGNAL);
+        }
     }
     /**
      * This method uses the abstract state model to return the abstract id of an action to execute

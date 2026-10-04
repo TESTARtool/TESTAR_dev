@@ -140,6 +140,7 @@ AbstractStateAttributes = WidgetControlType
 #
 # StateModelInference: Enable or disable the State Model feature
 # StateModelExportStaticGraph: Export a portable model viewer after Generate or CLI execution ends
+# StateModelExportStaticGraphIncludeWidgetTrees: Include persisted widget trees in the static snapshot; increases preparation time and snapshot size
 # DataStore: The graph database we use to store the State Model: OrientDB
 # DataStoreType: The mode we use to connect to the database: remote or plocal
 # DataStoreServer: IP address to connect if we desired to use remote mode
@@ -158,6 +159,7 @@ ApplicationVersion =
 
 StateModelInference = false
 StateModelExportStaticGraph = false
+StateModelExportStaticGraphIncludeWidgetTrees = false
 DataStore =
 DataStoreType = remote
 DataStoreServer =

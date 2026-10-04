@@ -6,12 +6,16 @@ dependencies {
 sourceSets.main.resources {
     srcDir 'resources'
     include 'graphs-static/**'
+    include 'graphs/js/model-json-export.js', 'graphs/js/model-export-controls.js', 'graphs/js/model-export-runtime.js'
+    include 'graphs/css/model-export.css'
 }
 
 tasks.register('staticGraphViewerTest', Exec) {
     group = 'verification'
     description = 'Run portable static graph viewer tests (requires Node.js).'
-    commandLine 'node', '--test', 'test/js/static-graph-viewer.test.cjs'
+    commandLine 'node', '--test', 'test/js/static-graph-viewer.test.cjs', 'test/js/model-json-export.test.cjs',
+            'test/js/model-export-controls.test.cjs', 'test/js/model-export-browser.test.cjs',
+            'test/js/model-export-runtime.test.cjs', 'test/js/widget-tree-inspector.test.cjs'
 }
 
 tasks.named('test') {

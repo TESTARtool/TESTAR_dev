@@ -24,6 +24,7 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.testar.statemodel.analysis.AnalysisManager;
 import org.testar.statemodel.analysis.GraphServlet;
+import org.testar.statemodel.analysis.ModelExportServlet;
 import org.testar.statemodel.analysis.StateModelDebugLog;
 import org.testar.statemodel.analysis.StateModelServlet;
 
@@ -83,6 +84,7 @@ public class JettyServer {
         });
         webAppContext.addServlet(new ServletHolder(new StateModelServlet()), "/models");
         webAppContext.addServlet(new ServletHolder(new GraphServlet()), "/graph");
+        webAppContext.addServlet(new ServletHolder(new ModelExportServlet()), "/model-export-data");
         webAppContext.setAttribute("analysisManager", analysisManager);
 
         server.setHandler(webAppContext);
