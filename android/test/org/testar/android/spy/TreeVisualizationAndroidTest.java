@@ -7,7 +7,9 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
+import org.junit.Assume;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.testar.android.tag.AndroidTags;
 import org.testar.core.alayer.Rect;
@@ -20,10 +22,16 @@ import org.testar.stub.WidgetStub;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import java.awt.GraphicsEnvironment;
 
 public class TreeVisualizationAndroidTest {
 
     private TreeVisualizationAndroid treeVisualization;
+
+    @BeforeClass
+    public static void requireNotHeadless() {
+        Assume.assumeFalse("Android tree visualization requires a graphical environment", GraphicsEnvironment.isHeadless());
+    }
 
     private StateStub createState(String xpath, String title, Rect bounds) {
         StateStub state = new StateStub();
