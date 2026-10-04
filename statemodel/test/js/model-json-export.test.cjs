@@ -83,6 +83,24 @@ test('semantic defaults preserve essential identities and let advanced selection
     assert.equal(advanced.jsonModel.ConcreteStates.find(state => state.ConcreteStateID === 'SC1').Properties.WebComputedColor, '#fff');
 });
 
+test('CSS selectors flow through widget property inventory, semantic defaults and selection', () => {
+    const snapshot = fixture();
+    snapshot.widgetTrees.cs1[0].data.WebCssSelector = '#shipping > select:nth-of-type(2)';
+    const inventory = propertyInventory(snapshot);
+    assert.ok(inventory.widgets.includes('WebCssSelector'));
+    const selected = defaultProperties(inventory);
+    assert.ok(selected.widgets.includes('WebCssSelector'));
+
+    const bundle = buildBundle(snapshot, 'concrete', {properties: selected, includeWidgetTrees: true});
+    const exported = bundle.jsonModel.ConcreteStates.find(state => state.ConcreteStateID === 'SC1');
+    assert.equal(exported.WidgetTree[0].Properties.WebCssSelector, '#shipping > select:nth-of-type(2)');
+
+    selected.widgets = [];
+    const filtered = buildBundle(snapshot, 'concrete', {properties: selected, includeWidgetTrees: true});
+    const filteredState = filtered.jsonModel.ConcreteStates.find(state => state.ConcreteStateID === 'SC1');
+    assert.equal(filteredState.WidgetTree[0].Properties.WebCssSelector, undefined);
+});
+
 test('abstract export keeps one deterministic artifact and every abstract transition', () => {
     const {jsonModel, files} = buildBundle(fixture(), 'abstract');
     assert.deepEqual(jsonModel.InitialStates, ['SA1']);

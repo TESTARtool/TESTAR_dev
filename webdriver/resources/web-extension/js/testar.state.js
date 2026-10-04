@@ -217,11 +217,51 @@ function wrapElementTestar(element, xOffset, yOffset, ignoredAttributes) {
         isShadowElement: shadowElement,
         hasKeyboardFocus: document.activeElement === element,
         xpath: ignoredAttributes.includes("xpath") ? "" : getXPath(element),
+        cssSelector: ignoredAttributes.includes("cssSelector") ? "" : getCssSelectorTestar(element),
 
         wrappedChildren: [],
         xOffset: xOffset,
         yOffset: yOffset
     };
+}
+
+function getCssSelectorTestar(element) {
+    try {
+        // A document selector cannot cross an iframe or shadow-root boundary.
+        if (!element || element.ownerDocument !== document || typeof element.getRootNode !== "function" ||
+            element.getRootNode() !== document || typeof CSS === "undefined" || typeof CSS.escape !== "function") {
+            return "";
+        }
+
+        const parts = [];
+        for (let current = element; current; current = current.parentElement) {
+            if (current.id) {
+                const idSelector = "#" + CSS.escape(current.id);
+                const matches = document.querySelectorAll(idSelector);
+                if (matches.length === 1 && matches[0] === current) {
+                    parts.unshift(idSelector);
+                    break;
+                }
+            }
+
+            let part = CSS.escape(current.localName);
+            const parent = current.parentElement;
+            if (parent) {
+                const siblings = Array.from(parent.children).filter(sibling => sibling.localName === current.localName);
+                if (siblings.length > 1) {
+                    part += ":nth-of-type(" + (siblings.indexOf(current) + 1) + ")";
+                }
+            }
+            parts.unshift(part);
+        }
+
+        const selector = parts.join(" > ");
+        const matches = document.querySelectorAll(selector);
+        return matches.length === 1 && matches[0] === element ? selector : "";
+    } catch (error) {
+        console.warn("Unable to obtain TESTAR CSS selector:", error);
+        return "";
+    }
 }
 
 function getEffectiveBackgroundColor(el) {

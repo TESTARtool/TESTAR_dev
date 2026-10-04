@@ -68,7 +68,7 @@ public class LlmParseActionResponse {
             // For interacting with select combobox web widgets
             // A WdSelectListAction is created to change the active value of the combobox
             if (widget != null && Objects.equals(widget.get(WdTags.WebTagName, ""), "select")) {
-                if (Objects.equals(input, "")) {
+                if (input == null || input.isEmpty()) {
                     return new LlmParseActionResult(null, LlmParseActionResult.ParseResult.SL_MISSING_INPUT);
                 }
                 Action selectAction = WebdriverSelectListSupport.createActionForInput(widget, input);

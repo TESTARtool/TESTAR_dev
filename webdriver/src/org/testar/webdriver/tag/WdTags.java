@@ -147,6 +147,11 @@ public class WdTags extends TagsBase {
     public static final Tag<String> WebXPath = from("WebXPath", String.class);
 
     /**
+     * Unique CSS selector in the current document; empty when ignored or unavailable.
+     */
+    public static final Tag<String> WebCssSelector = from("WebCssSelector", String.class);
+
+    /**
      * Web element is displayed in the screen or not.
      */
     public static final Tag<Boolean> WebIsDisplayed = from("WebIsDisplayed", Boolean.class);

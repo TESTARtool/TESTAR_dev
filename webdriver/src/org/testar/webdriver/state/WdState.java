@@ -228,6 +228,8 @@ public final class WdState extends WdWidget implements State {
             ret = w.element.isHidden();
         } else if (t.equals(WdTags.WebXPath)) {
             ret = w.element.xpath;
+        } else if (t.equals(WdTags.WebCssSelector)) {
+            ret = w.element.cssSelector;
         } else if (t.equals(WdTags.WebIsDisplayed)) {
             ret = w.element.isDisplayed();
         } else if (t.equals(WdTags.WebComputedFontSize)) {

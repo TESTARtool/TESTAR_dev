@@ -6,12 +6,16 @@
 
 package org.testar.webdriver.action;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+
 import org.openqa.selenium.WebElement;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.testar.core.action.Action;
 import org.testar.core.action.ActionIdentity;
 import org.testar.core.alayer.Role;
+import org.testar.core.exceptions.ActionFailedException;
 import org.testar.core.state.SUT;
 import org.testar.core.state.State;
 import org.testar.core.tag.TaggableBase;
@@ -22,7 +26,7 @@ import org.testar.webdriver.tag.WdTags;
 
 public class WdSelectListAction extends TaggableBase implements Action {
     private static final long serialVersionUID = -5522966388178892530L;
-    protected static final Logger logger = LogManager.getLogger();
+    private static final String SELECT_SCRIPT = loadSelectScript();
 
     private String target;
     private String value;
@@ -30,7 +34,9 @@ public class WdSelectListAction extends TaggableBase implements Action {
 
     public enum JsTargetMethod {
         ID,
-        NAME
+        NAME,
+        CSS,
+        ELEMENT
     }
 
     public WdSelectListAction(String target, String value, Widget widget, JsTargetMethod targetMethod) {
@@ -38,6 +44,7 @@ public class WdSelectListAction extends TaggableBase implements Action {
         this.value = value;
         this.targetMethod = targetMethod;
         this.set(Tags.Role, WdActionRoles.SelectListAction);
+        this.set(Tags.InputText, value);
         this.set(Tags.Desc, "Set Webdriver select list script to set into " + targetMethod.toString() + " " + target + " : " + value);
         this.mapOriginWidget(widget);
     }
@@ -45,38 +52,38 @@ public class WdSelectListAction extends TaggableBase implements Action {
     @Override
     public void run(SUT system, State state, double duration) {
         Widget originWidget = get(Tags.OriginWidget, null);
-        WebElement fallbackElement = originWidget == null ? null : originWidget.get(WdTags.WebElementSelenium, null);
+        WebElement capturedElement = originWidget == null ? null : originWidget.get(WdTags.WebElementSelenium, null);
+        Object result;
+        try {
+            result = executeSelection(capturedElement);
+        } catch (RuntimeException exception) {
+            throw new ActionFailedException("Unable to execute " + toShortString(), exception);
+        }
+        if (!Boolean.TRUE.equals(result)) {
+            String reason = result instanceof String ? (String) result : "WebDriver did not execute the selection";
+            throw new ActionFailedException(toShortString() + ": " + reason);
+        }
+    }
 
-        switch (targetMethod) {
-            case ID:
-                WdDriver.executeScript(
-                        "const field = document.getElementById(arguments[0]);"
-                                + " const targetField = field || arguments[1];"
-                                + " if (!targetField) { throw new Error('Unable to locate select field by id or fallback element'); }"
-                                + " targetField.value = arguments[2];"
-                                + " const event = new Event('change', { bubbles: true });"
-                                + " targetField.dispatchEvent(event);",
-                        target,
-                        fallbackElement,
-                        value
-                );
-                break;
-            case NAME:
-                // Problematic if multiple widgets match the same name, should only be used as last resort.
-                WdDriver.executeScript(
-                        "const field = document.getElementsByName(arguments[0])[0];"
-                                + " const targetField = field || arguments[1];"
-                                + " if (!targetField) { throw new Error('Unable to locate select field by name or fallback element'); }"
-                                + " targetField.value = arguments[2];"
-                                + " const event = new Event('change', { bubbles: true });"
-                                + " targetField.dispatchEvent(event);",
-                        target,
-                        fallbackElement,
-                        value
-                );
-                break;
-            default:
-                logger.warn("WdSelectListAction targetMethod is null!");
+    private Object executeSelection(WebElement capturedElement) {
+        try {
+            return WdDriver.executeScript(SELECT_SCRIPT, target, capturedElement, value, targetMethod.name());
+        } catch (StaleElementReferenceException exception) {
+            if (targetMethod == JsTargetMethod.ELEMENT) {
+                throw exception;
+            }
+            return WdDriver.executeScript(SELECT_SCRIPT, target, null, value, targetMethod.name());
+        }
+    }
+
+    private static String loadSelectScript() {
+        try (InputStream stream = WdSelectListAction.class.getResourceAsStream("/select-list.js")) {
+            if (stream == null) {
+                throw new IllegalStateException("Missing WebDriver select-list.js resource");
+            }
+            return new String(stream.readAllBytes(), StandardCharsets.UTF_8);
+        } catch (IOException exception) {
+            throw new IllegalStateException("Unable to load WebDriver select-list.js", exception);
         }
     }
 
@@ -106,5 +113,9 @@ public class WdSelectListAction extends TaggableBase implements Action {
 
     public String getTarget() {
         return target;
+    }
+
+    public JsTargetMethod getTargetMethod() {
+        return targetMethod;
     }
 }

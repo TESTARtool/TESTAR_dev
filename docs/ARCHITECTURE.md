@@ -2,7 +2,7 @@
 
 This document defines the current modular architecture of `TESTAR_dev`.
 
-It describes the active architecture of the codebase. The contracts and layering described here are the foundation that new modules follow.
+It describes module responsibilities, dependency boundaries, runtime composition, and extension points. Observable feature behavior, configuration defaults, data formats, and acceptance scenarios belong in the module specifications linked below.
 
 ## Overview
 
@@ -36,13 +36,17 @@ At a high level, the architecture separates responsibilities by layer:
 6. `testar`
    Exposes the architecture through the classic TESTAR runtime and user-interface driven execution model.
 
-Supporting modules such as `config`, `statemodel`, `reporting`, `dialog`, `oracle`, `coverage`, and `llm` provide additional capabilities around this main service-and-policy architecture.
+Supporting modules provide configuration, reporting, state modeling, oracle evaluation, language tooling, coverage, and agent integration. WebStudio provides the workspace management and execution interface. Their ownership and integration boundaries are summarized under [Module roles](#module-roles).
 
-The `statemodel` module owns model persistence, live database analysis, and optional portable static graph export. Model-session shutdown flushes and releases persistence before the optional exporter opens its temporary analysis connection. Lifecycle signals bracket this entire finalization phase so WebStudio's completed-run idle cleanup waits for both datastore shutdown and export, including their failure cleanup. The plugin supplies the current run output directory; the export implementation and viewer assets remain in `statemodel`. See [State model documentation](./statemodel/README.md).
+### Module documentation
 
-Abstract, Hybrid, Concrete, and Sequence Traces JSON downloads share a transformation and ZIP packager running in a browser worker. Live analysis streams preparation progress before its graph data and format-scoped artifacts; static viewing supplies embedded graph, widget-tree, and image data. Sequence exports follow recorded occurrences and exact concrete transition associations. The static viewer inspects captured widget trees locally; OrientDB is needed to prepare that data, not to inspect or download it from an existing portable snapshot. See [State-model JSON exports](./statemodel/json-export.md).
+- [Core](./core/README.md): shared domain contracts and identification behavior.
+- [WebDriver](./webdriver/README.md): browser state capture and interaction behavior.
+- [State model](./statemodel/README.md): persistence, analysis, and model artifacts.
+- [WebStudio](./webstudio/README.md): workspace configuration, authoring, execution, and result viewing.
+- [Rascal](../rascal/README.md): oracle DSL tooling and integration.
 
-Static snapshots and live JSON exports share backend data preparation with explicit artifact and format options. Static creation remains an after-session operation capturing the complete graph; live JSON export remains an on-demand operation driven by format and download choices. `StateModelExportStaticGraphIncludeWidgetTrees`, defaulting to `false`, controls static tree capture independently of inference storage and JSON downloads. See [Shared preparation and separate outputs](./statemodel/json-export.md#shared-preparation-and-separate-outputs).
+Module documentation owns the detailed behavioral contracts and verification. This architecture document records how those modules collaborate.
 
 ### Interaction modes
 
@@ -54,7 +58,7 @@ The architecture exposes two main ways to interact with TESTAR:
   - suitable for external automation, scripting, and AI-agent usage
 - `testar-scriptless`
   - interactive TESTAR runtime
-  - dialog and settings driven
+  - workspace settings driven
   - the runtime behind the `testar` launcher
   - supports scriptless runtime modes such as `Spy` and `Generate`
 
@@ -82,12 +86,12 @@ The internal runtime boundaries remain:
 The intended workspace model is shared:
 
 - WebStudio shows one workspace list, such as `webdriver_generic`, `windows_generic`, and `android_generic`
-- both entry points can use the same `settings` workspaces
+- both entry points can use the same `workspaces/<name>` resources
 - shared runtime paths such as `.runtime`, `output`, and state model storage are resolved from the installed distribution
 
 The detailed distribution and workspace rules are documented in:
 
-- `docs/architecture_distribution_workspace.md`
+- [Distribution and workspace architecture](./architecture_distribution_workspace.md)
 
 ### Service and policy flow
 
@@ -163,24 +167,27 @@ The practical distinction is:
 
 ### Module roles
 
-The modules play these roles:
+| Module | Responsibility | Integration boundary |
+| --- | --- | --- |
+| `core` | Stable contracts, shared domain objects, tags, and identification. | Other modules implement or consume its platform-independent contracts. |
+| `engine` | Reusable service pipelines, policy composition, and state/action processing. | Native access is delegated through contracts; session assembly belongs to `plugin`. |
+| `windows` | Windows-native system access, state capture, interactions, and policies. | Exposes platform capabilities to the composed runtime. |
+| `webdriver` | Browser automation, native web state capture, interactions, and policies. | Owns browser-side extraction and interaction resources; consumers use shared state/action contracts. |
+| `android` | Android-native system access, state capture, interactions, and policies. | Exposes platform capabilities to the composed runtime. |
+| `plugin` | Platform selection, session composition, and shared session coordination. | Assembles engine and native implementations for entry points. |
+| `cli` | Command parsing, daemon communication, settings loading, and automation sessions. | Invokes composed services through a command-oriented lifecycle. |
+| `testar` | Scriptless runtime modes, protocol orchestration, and lifecycle capabilities. | Wraps shared services with session/sequence behavior and workspace customization. |
+| `config` | Settings, runtime paths, and composition/policy resource loading. | Supplies configuration to runtime owners and resolves external resource descriptors. |
+| `reporting` | Report formats, writers, and reporting artifacts. | Runtime/session owners coordinate when reporting occurs. |
+| `statemodel` | Model persistence, datastore lifecycle, analysis, and model artifact preparation. | Consumes identified runtime states/actions; owns its storage and analysis resources. |
+| `oracle` | Oracle contracts, reusable evaluation support, and workspace oracle loading. | Produces verdicts for the runtime's oracle composition pipeline. |
+| `rascal` | Oracle DSL parsing, validation, and Java generation. | Supplies language tooling to callers; generated oracles use the normal oracle runtime. |
+| `coverage` | Coverage collection and analysis support. | Integrates with runtime execution and reporting through configured instrumentation. |
+| `llm` | Model communication, response interpretation, and goal-condition evaluation. | Uses shared runtime and platform contracts for model-assisted testing. |
+| `agent` | External agent runners and packaged agent integration resources. | Connects agent execution with TESTAR's command-oriented interface. |
+| `webstudio` | Web frontend, workspace management APIs, and execution/result controls. | Delegates execution and model operations to their runtime/module owners. |
 
-- `core`
-  Owns the stable contracts and base domain model.
-- `engine`
-  Owns reusable logic such as default action derivation, action execution, action resolution, policy composition, and state processing.
-- `windows`
-  Owns Windows-native system, state, and policy implementations.
-- `webdriver`
-  Owns WebDriver-native system, state, and policy implementations.
-- `android`
-  Owns Android-native system, state, and policy implementations.
-- `plugin`
-  Owns platform orchestration and session composition.
-- `cli`
-  Owns command parsing, daemon communication, settings loading, and session-oriented automation commands.
-- `testar`
-  Owns the classic TESTAR runtime modes and higher-level protocol orchestration.
+Session owners coordinate initialization and finalization across these modules. Each module owns cleanup of its resources, and runtime completion includes that finalization. Workspace and output path rules belong to the distribution architecture rather than individual feature implementations.
 
 For the scriptless runtime path inside `testar`, the role split is:
 
@@ -415,7 +422,9 @@ The loading path is documented in:
 
 ## WebStudio extension model
 
-WebStudio exposes workspace customization through Test Settings, Composition Flow, and Policies. Test Settings edits the connector and workspace settings. Composition Flow edits `CompositionProfile`, `CustomCompositionResource`, and service or capability classes. Policies edits `CustomPoliciesResource` and policy classes. The editors and templates create workspace-local wrappers that the scriptless loaders use at runtime.
+WebStudio owns the configuration interface and management APIs for workspace resources. Workspace-authored wrappers are loaded through the existing configuration and runtime composition boundaries. Runtime services, native platform access, and model storage remain owned by their respective modules.
+
+View behavior, role-based access, editor workflows, and verification belong in the [WebStudio documentation](./webstudio/README.md).
 
 ## Core contracts
 
@@ -1142,30 +1151,12 @@ Examples:
 
 ### WebDriver example
 
-The current WebDriver path shows the intended layering clearly.
+The WebDriver path illustrates the same ownership boundaries:
 
-Policy-level customization:
+- `webdriver` owns browser-native state capture and interaction implementations.
+- Policies express widget eligibility and can be extended through workspace resources.
+- Engine plans and composed services own reusable traversal and derivation orchestration.
+- `plugin` assembles the effective platform services and policies.
+- Scriptless capabilities own session and sequence lifecycle behavior around those services.
 
-- `WebdriverLinkDeniedFilterPolicy`
-  - external `WidgetFilterPolicy`
-  - filters denied navigation links early
-- `WebdriverCanvasVisiblePolicy`
-  - external `VisiblePolicy`
-  - keeps only widgets fully visible on the browser canvas
-
-Plan-level runtime flow:
-
-- `WebdriverActionDerivationPlan`
-  - owns forced/default/fallback derivation phases
-- `WebdriverForcedActionDeriver`
-  - prioritizes foreground activation first
-  - then denied-current-url recovery
-- `WdDeniedUrlForcedActionDeriver`
-  - returns recovery actions such as history-back or close-tab for denied current pages
-
-The architectural meaning of this example is:
-
-- URL and link filtering is policy logic
-- action recovery ordering is derivation-plan logic
-- the scriptless service wrapper stays thin
-- individual scriptless runtime modes such as `Generate` and `Spy`
+Browser-specific behavioral contracts belong in the [WebDriver documentation](./webdriver/README.md). Workspace customization instructions belong in the [Scriptless Configuration Guide](./SCRIPTLESS_CONFIGURATION_GUIDE.md).

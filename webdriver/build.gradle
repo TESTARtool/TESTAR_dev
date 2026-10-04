@@ -11,7 +11,18 @@ dependencies {
     implementation project(':config')
     implementation project(':engine')
     implementation project(':windows')
+    testImplementation project(':statemodel')
 
     // https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient
     implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.13'
+}
+
+tasks.register('testJavaScript', Exec) {
+    group = 'verification'
+    description = 'Run WebDriver state, select-action, and canvas JavaScript tests.'
+    commandLine 'node', '--test', 'test/js/testar.state.test.cjs', 'test/js/select-list.test.cjs', 'test/js/testar.canvas.test.cjs'
+}
+
+tasks.named('check') {
+    dependsOn tasks.named('testJavaScript')
 }

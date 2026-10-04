@@ -233,7 +233,7 @@ public final class ConfigTags {
     @SuppressWarnings("unchecked")
     public static final Tag<List<String>> WebIgnoredAttributes = Tag.from("WebIgnoredAttributes",
             (Class<List<String>>) (Class<?>) List.class,
-            "List of web attributes that TESTAR should ignore when obtaining the web state (e.g., to reduce state high-performance workloads)");
+            "List of web attributes to skip during state capture to reduce computation (e.g., xpath, cssSelector, innerHTML, outerHTML)");
 
     public static final Tag<Boolean> WebConsoleErrorOracle = Tag.from("WebConsoleErrorOracle", Boolean.class,
             "Enable or Disable applying ORACLES to the browser error console");

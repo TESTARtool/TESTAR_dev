@@ -48,6 +48,7 @@ public class WdElement extends TaggableBase implements Serializable {
 
     public String id, name, genericTitle, tagName, textContent, helpText, title, placeholder, innerText;
     public String xpath = "";
+    public String cssSelector = "";
     public List<String> cssClasses = new ArrayList<>();
     public String display, type;
     public String innerHTML, outerHTML;
@@ -146,6 +147,7 @@ public class WdElement extends TaggableBase implements Serializable {
         disabled = attributeMap.containsKey("disabled");
         visibility = (packedElement.get("visibility") == null) ? "" : (String) packedElement.get("visibility");
         xpath = (packedElement.get("xpath") == null) ? "" : (String) packedElement.get("xpath");
+        cssSelector = (packedElement.get("cssSelector") == null) ? "" : (String) packedElement.get("cssSelector");
 
         ariaLabel = getAttribute("aria-label");
         ariaLabelledBy = getAttribute("aria-labelledby");

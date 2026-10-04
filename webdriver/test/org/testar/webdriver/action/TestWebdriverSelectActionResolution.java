@@ -42,6 +42,26 @@ public class TestWebdriverSelectActionResolution {
         Assert.assertEquals("13011", ((WdSelectListAction) resolvedAction.action()).getValue());
     }
 
+    @Test
+    public void resolvesSelectWithOnlyCssTargetAndPreservesIdentity() {
+        WidgetStub widget = createSelectWidget();
+        widget.set(WdTags.WebId, "");
+        widget.set(WdTags.WebCssSelector, "#shipping > select:nth-of-type(2)");
+        Action template = WebdriverSelectListSupport.createSelectAction(widget);
+        template.set(Tags.AbstractID, "AAselect123");
+        template.set(Tags.ConcreteID, "ACselect123");
+
+        ResolvedAction resolved = new DescriptionActionResolver().resolve(
+                Collections.singleton(template), List.of("select", "select_12345_13011", "13011"));
+
+        WdSelectListAction selected = (WdSelectListAction) resolved.action();
+        Assert.assertEquals(WdSelectListAction.JsTargetMethod.CSS, selected.getTargetMethod());
+        Assert.assertEquals("#shipping > select:nth-of-type(2)", selected.getTarget());
+        Assert.assertEquals("13011", selected.getValue());
+        Assert.assertEquals("AAselect123", selected.get(Tags.AbstractID));
+        Assert.assertEquals("ACselect123", selected.get(Tags.ConcreteID));
+    }
+
     private WidgetStub createSelectWidget() {
         StateStub state = new StateStub();
         WidgetStub widget = new WidgetStub();

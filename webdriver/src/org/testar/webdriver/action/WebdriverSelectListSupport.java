@@ -9,6 +9,7 @@ package org.testar.webdriver.action;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -132,9 +133,20 @@ public final class WebdriverSelectListSupport {
             return new SelectTarget(target, WdSelectListAction.JsTargetMethod.ID);
         }
 
-        target = widget.get(WdTags.WebName, "");
+        // WebName can contain generated descriptive text rather than the DOM name attribute.
+        Map<String, String> attributes = widget.get(WdTags.WebAttributeMap, null);
+        target = attributes == null ? widget.get(WdTags.WebName, "") : attributes.getOrDefault("name", "");
         if (!target.isBlank()) {
             return new SelectTarget(target, WdSelectListAction.JsTargetMethod.NAME);
+        }
+
+        target = widget.get(WdTags.WebCssSelector, "");
+        if (!target.isBlank()) {
+            return new SelectTarget(target, WdSelectListAction.JsTargetMethod.CSS);
+        }
+
+        if (widget.get(WdTags.WebElementSelenium, null) != null) {
+            return new SelectTarget("", WdSelectListAction.JsTargetMethod.ELEMENT);
         }
 
         return null;

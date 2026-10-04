@@ -1,7 +1,11 @@
 
 package org.testar.llm.action;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.junit.Test;
@@ -165,6 +169,63 @@ public class TestLlmParseActionResponse {
         // For WdSelectListActions we internally create a new one instead of select existing
         Assert.isTrue(llmParseResult.getActionToExecute() instanceof WdSelectListAction);
         Assert.isTrue(((WdSelectListAction) llmParseResult.getActionToExecute()).getValue().equals("Saab"));
+    }
+
+    @Test
+    public void createsCssSelectActionAndPreservesSelectedIdentity() {
+        Action template = createSelectAction(createState(), "cars", "", "WC1", "WA1", "AC1", "AA1", "Saab");
+        WidgetStub widget = (WidgetStub) template.get(Tags.OriginWidget);
+        widget.set(WdTags.WebName, "Volvo Saab");
+        widget.set(WdTags.WebAttributeMap, Map.of());
+        widget.set(WdTags.WebCssSelector, "#shipping > select:nth-of-type(2)");
+
+        LlmParseActionResult result = new LlmParseActionResponse().parseLlmResponse(
+                Set.of(template), "{\"actionId\":\"AA1\",\"input\":\"Saab\"}");
+
+        assertEquals(LlmParseActionResult.ParseResult.SUCCESS, result.getParseResult());
+        WdSelectListAction selected = (WdSelectListAction) result.getActionToExecute();
+        assertEquals(WdSelectListAction.JsTargetMethod.CSS, selected.getTargetMethod());
+        assertEquals("#shipping > select:nth-of-type(2)", selected.getTarget());
+        assertEquals("Saab", selected.getValue());
+        assertEquals("AA1", selected.get(Tags.AbstractID));
+        assertEquals("AC1", selected.get(Tags.ConcreteID));
+        assertEquals("Saab", selected.get(Tags.InputText));
+    }
+
+    @Test
+    public void mapsLabelToActualCaseSensitiveValueForNamelessSelect() {
+        Action template = createSelectAction(createState(), "cars", "", "WC1", "WA1", "AC1", "AA1", "saab");
+        WidgetStub widget = (WidgetStub) template.get(Tags.OriginWidget);
+        widget.set(WdTags.WebCssSelector, "#cars");
+        widget.set(WdTags.WebInnerHTML, "<option value=\"saab\">Saab</option><option value=\"TESTAR\">TESTAR</option>");
+
+        LlmParseActionResponse parser = new LlmParseActionResponse();
+        LlmParseActionResult result = parser.parseLlmResponse(Set.of(template), "{\"actionId\":\"AA1\",\"input\":\"Saab\"}");
+        assertEquals("saab", ((WdSelectListAction) result.getActionToExecute()).getValue());
+
+        result = parser.parseLlmResponse(Set.of(template), "{\"actionId\":\"AA1\",\"input\":\"TESTAR\"}");
+        assertEquals("TESTAR", ((WdSelectListAction) result.getActionToExecute()).getValue());
+    }
+
+    @Test
+    public void reportsInvalidActionWhenSelectHasNoLocatorOrCapturedElement() {
+        Action template = createSelectAction(createState(), "cars", "", "WC1", "WA1", "AC1", "AA1", "Saab");
+
+        LlmParseActionResult result = new LlmParseActionResponse().parseLlmResponse(
+                Set.of(template), "{\"actionId\":\"AA1\",\"input\":\"Saab\"}");
+
+        assertEquals(LlmParseActionResult.ParseResult.INVALID_ACTION, result.getParseResult());
+        assertNull(result.getActionToExecute());
+    }
+
+    @Test
+    public void reportsMissingInputWhenSelectInputIsOmitted() {
+        Action template = createSelectAction(createState(), "cars", "cars", "WC1", "WA1", "AC1", "AA1", "Saab");
+
+        LlmParseActionResult result = new LlmParseActionResponse().parseLlmResponse(Set.of(template), "{\"actionId\":\"AA1\"}");
+
+        assertEquals(LlmParseActionResult.ParseResult.SL_MISSING_INPUT, result.getParseResult());
+        assertNull(result.getActionToExecute());
     }
 
     @Test
