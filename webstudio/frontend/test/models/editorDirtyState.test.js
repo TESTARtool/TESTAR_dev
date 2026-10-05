@@ -27,21 +27,21 @@ test("detects visual settings changes even when raw content is unchanged", () =>
 
 test("detects changed object content for Agent CLI save button", () => {
     assert.equal(
-        objectChanged({ model: "gpt-5.4-mini" }, { model: "gpt-5.4-mini" }),
+        objectChanged({ model: "gpt-6-luna" }, { model: "gpt-6-luna" }),
         false
     );
     assert.equal(
-        objectChanged({ model: "gpt-5.4-mini" }, { model: "gpt-5.4" }),
+        objectChanged({ model: "gpt-6-luna" }, { model: "gpt-6" }),
         true
     );
 });
 
 test("snapshots object content so later edits do not mutate the saved baseline", () => {
-    const currentSettings = { model: "gpt-5.4-mini" };
+    const currentSettings = { model: "gpt-6-luna" };
     const savedSettings = objectSnapshot(currentSettings);
 
-    currentSettings.model = "gpt-5.4";
+    currentSettings.model = "gpt-6";
 
-    assert.equal(savedSettings.model, "gpt-5.4-mini");
+    assert.equal(savedSettings.model, "gpt-6-luna");
     assert.equal(objectChanged(currentSettings, savedSettings), true);
 });

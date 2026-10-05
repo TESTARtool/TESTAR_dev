@@ -434,7 +434,7 @@ public final class CliExecutionAdapter implements ExecutionAdapter {
         return new CliAgentSettingsDto(
             "OPENAI_API_KEY",
             "",
-            "gpt-5.4-mini",
+            "gpt-6-luna",
             "medium",
             "danger-full-access",
             "never",

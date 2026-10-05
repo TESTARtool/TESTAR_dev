@@ -55,7 +55,7 @@ public final class CliAgentSettingsDto {
     }
 
     public String model() {
-        return valueOrDefault(model, "gpt-5.4-mini");
+        return valueOrDefault(model, "gpt-6-luna");
     }
 
     public String reasoningEffort() {

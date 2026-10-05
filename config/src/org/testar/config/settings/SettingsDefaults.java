@@ -224,7 +224,7 @@ public class SettingsDefaults {
         defaults.add(Pair.from(CliStateProjectionMode, INTERACTIVE_SEMANTIC_WIDGETS));
         defaults.add(Pair.from(AgentCLIApiKeyEnvVar, "OPENAI_API_KEY"));
         defaults.add(Pair.from(AgentCLIBaseUrl, ""));
-        defaults.add(Pair.from(AgentCLIModel, "gpt-5.4-mini"));
+        defaults.add(Pair.from(AgentCLIModel, "gpt-6-luna"));
         defaults.add(Pair.from(AgentCLIReasoningEffort, "medium"));
         defaults.add(Pair.from(AgentCLISandboxMode, "danger-full-access"));
         defaults.add(Pair.from(AgentCLIApprovalPolicy, "never"));

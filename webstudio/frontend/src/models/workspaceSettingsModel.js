@@ -14,7 +14,7 @@ export const CLI_AGENT_SETTING_KEYS = {
 export const DEFAULT_CLI_AGENT_SETTINGS = {
     apiKeyEnvVarName: "OPENAI_API_KEY",
     baseUrl: "",
-    model: "gpt-5.4-mini",
+    model: "gpt-6-luna",
     reasoningEffort: "medium",
     sandboxMode: "danger-full-access",
     approvalPolicy: "never",

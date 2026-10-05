@@ -32,7 +32,7 @@ public class CliAgentSettingsDefaultsTest {
         Settings settings = new Settings(SettingsDefaults.getSettingsDefaults(), verifiedProperties());
 
         Assert.isTrue(settings.get(ConfigTags.AgentCLIApiKeyEnvVar).equals("OPENAI_API_KEY"));
-        Assert.isTrue(settings.get(ConfigTags.AgentCLIModel).equals("gpt-5.4-mini"));
+        Assert.isTrue(settings.get(ConfigTags.AgentCLIModel).equals("gpt-6-luna"));
         Assert.isTrue(settings.get(ConfigTags.AgentCLIReasoningEffort).equals("medium"));
         Assert.isTrue(settings.get(ConfigTags.AgentCLISandboxMode).equals("danger-full-access"));
         Assert.isTrue(settings.get(ConfigTags.AgentCLIApprovalPolicy).equals("never"));
