@@ -374,6 +374,7 @@ public class EntityManager {
                 for (String propertyName : entity.getPropertyNames()) {
                     setProperty(edge, propertyName, entity.getPropertyValue(propertyName).getValue(), db);
                 }
+                edge.save();
             }
             // that's all we need to do. An edge has a unique identifier, no need to continue processing.
             return;

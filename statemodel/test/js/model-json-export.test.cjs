@@ -133,6 +133,42 @@ test('hybrid export preserves concrete states and distinct transitions for actio
     assert.equal(new Set(files.map(file => file.name)).size, files.length);
 });
 
+test('repeated observations retain all concrete transitions under one abstract self-loop', () => {
+    const ids = ['AC_OBSERVATION_SC1_SC2', 'AC_OBSERVATION_SC2_SC3', 'AC_OBSERVATION_SC3_SC4'];
+    const snapshot = {elements: [
+        node('as1', 'AbstractState', {stateId: 'SA1'}),
+        ...['SC1', 'SC2', 'SC3', 'SC4'].flatMap((stateId, index) => [
+            node(`cs${index + 1}`, 'ConcreteState', {stateId}),
+            edge(`connector${index + 1}`, 'isAbstractedBy', `cs${index + 1}`, 'as1')
+        ]),
+        edge('aa1', 'AbstractAction', 'as1', 'as1', {actionId: 'AA_OBSERVATION', concreteActionIds: `[${ids.join(', ')}]`}),
+        ...ids.map((actionId, index) => edge(`ca${index + 1}`, 'ConcreteAction', `cs${index + 1}`, `cs${index + 2}`,
+            {actionId, AbstractID: 'SA1', Role: 'Process'}))
+    ]};
+    const options = {includeWidgetTrees: false, includeScreenshots: false};
+
+    const hybrid = buildBundle(snapshot, 'hybrid', options).jsonModel;
+    assert.equal(hybrid.AbstractActions.length, 1);
+    assert.equal(hybrid.AbstractActions[0].AbstractActionID, 'AA_OBSERVATION');
+    assert.deepEqual(hybrid.AbstractActions[0].ConcreteInstances.map(action => action.ConcreteActionID), ids);
+    assert.deepEqual(hybrid.AbstractStates[0].ConcreteStates.map(state => state.ConcreteStateID), ['SC1', 'SC2', 'SC3', 'SC4']);
+    assert.equal(hybrid.AbstractTransitions.length, 1);
+    assert.deepEqual(hybrid.AbstractTransitions[0].ConcreteInstances, ids.map((actionId, index) => ({
+        ConcreteActionID: actionId, SourceConcreteStateID: `SC${index + 1}`, TargetConcreteStateID: `SC${index + 2}`
+    })));
+    assert.deepEqual(hybrid.Warnings, []);
+
+    const abstract = buildBundle(snapshot, 'abstract', options).jsonModel;
+    assert.equal(abstract.AbstractActions[0].RepresentativeConcreteAction.ConcreteActionID, ids[0]);
+    assert.equal(abstract.AbstractTransitions[0].AbstractActionID, 'AA_OBSERVATION');
+    assert.deepEqual(abstract.Warnings, []);
+
+    snapshot.elements.find(element => element.data.id === 'aa1').data.concreteActionIds = `[${ids[0]}]`;
+    for (const format of ['abstract', 'hybrid']) {
+        assert.throws(() => buildBundle(snapshot, format, options), /Cannot uniquely resolve the abstract action/);
+    }
+});
+
 test('unvisited actions and missing artifacts have explicit representations', () => {
     const {jsonModel} = buildBundle(fixture(), 'hybrid');
     const unvisited = jsonModel.AbstractTransitions.find(transition => transition.AbstractActionID === 'AAunvisited');

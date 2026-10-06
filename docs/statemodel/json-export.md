@@ -82,6 +82,8 @@ A hybrid export attaches all persisted concrete states under each abstract state
 
 `AbstractStateID`/`ConcreteStateID` identify states. `AbstractActionID`/`ConcreteActionID` identify actions. `AbstractWidgetID`/`ConcreteWidgetID` identify the action's origin widget. Graph-element IDs identify stored records and select screenshots, separately from these logical IDs. In particular, the concrete graph edge's `AbstractID` is an origin-widget ID, not an abstract action ID. Action association uses the source/target relationships and exact membership of `concreteActionIds`.
 
+Updating an existing abstract transition must persist every accumulated concrete-action reference. This includes observation transitions recording state changes between agent commands, even when several concrete states share the same abstract state. Those associations must remain available after the datastore is closed and reopened.
+
 Unvisited abstract actions have `Visited = false`, `TargetAbstractStateID = null`, and no executed concrete artifact. A missing or ambiguous action association is reported as an export error instead of guessing an identity.
 
 Concrete transition records describe the persisted graph, not an ordered history of every execution. Repeated execution can update one record; sequence chronology remains in the sequence layer.
@@ -334,6 +336,17 @@ When the user exports Hybrid JSON with widget trees and screenshots included\
 Then the entry for `SA1` includes both `SC1` and `SC2` in its `ConcreteStates` list, each with its own tree and screenshot\
 And both concrete source/action/target relationships remain under their corresponding abstract transitions\
 And the concrete action instances retain distinct screenshot references for `ca1` and `ca4`
+
+### Repeated Observations Preserve Their Abstract Association
+
+Verification: [`OrientDBManagerIntegrationTest.java`](../../statemodel/test/org/testar/statemodel/persistence/orientdb/OrientDBManagerIntegrationTest.java), [`model-json-export.test.cjs`](../../statemodel/test/js/model-json-export.test.cjs).
+
+Given four concrete states `SC1`, `SC2`, `SC3`, and `SC4` share abstract state `SA1`\
+And three observations record `SC1 -> SC2`, `SC2 -> SC3`, and `SC3 -> SC4` under action `AA_OBSERVATION`\
+When the model is persisted and its datastore is reopened for export\
+Then the abstract self-loop retains all three concrete-action references\
+And Hybrid export preserves all three concrete source/action/target relationships\
+And Abstract export retains `AA_OBSERVATION` with one deterministic representative concrete observation
 
 ### Actions Sharing a Widget Retain Separate Identities
 
