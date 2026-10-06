@@ -1,0 +1,16 @@
+version: 1
+goals:
+  - id: spark_change_organisation_language
+    title: Change organisation language
+    category: functional
+    narrative: >
+      As a registered user, I want to change the organisation language, so that I can select an understandable language for me.
+    inputs:
+      sut: https://spark.testar.org/
+      platform: webdriver
+      username: user
+      password: pass
+    prerequisites:
+      - Log in successfully using username and password.
+    expected_outcomes:
+      - The executed GUI test execution contains enough evidence to verify the user story.

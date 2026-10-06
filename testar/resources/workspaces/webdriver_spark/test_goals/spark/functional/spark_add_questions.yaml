@@ -1,0 +1,16 @@
+version: 1
+goals:
+  - id: spark_add_questions
+    title: Add questions to a question set
+    category: functional
+    narrative: >
+      As a researcher, I want to add questions to a question set, so that I can collect the data I need from participants.
+    inputs:
+      sut: https://spark.testar.org/
+      platform: webdriver
+      username: user
+      password: pass
+    prerequisites:
+      - Log in successfully using username and password.
+    expected_outcomes:
+      - The executed GUI test execution contains enough evidence to verify the user story.

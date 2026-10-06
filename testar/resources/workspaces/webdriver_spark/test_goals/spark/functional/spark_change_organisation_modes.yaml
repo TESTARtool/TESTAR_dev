@@ -1,0 +1,16 @@
+version: 1
+goals:
+  - id: spark_change_organisation_modes
+    title: Change organisation modes
+    category: functional
+    narrative: >
+      As a researcher, I want to change the organisation modes, so that I have access to the right functionalities.
+    inputs:
+      sut: https://spark.testar.org/
+      platform: webdriver
+      username: user
+      password: pass
+    prerequisites:
+      - Log in successfully using username and password.
+    expected_outcomes:
+      - The executed GUI test execution contains enough evidence to verify the user story.

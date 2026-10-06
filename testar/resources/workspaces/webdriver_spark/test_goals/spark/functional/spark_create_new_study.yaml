@@ -1,0 +1,16 @@
+version: 1
+goals:
+  - id: spark_create_new_study
+    title: Create a new study
+    category: functional
+    narrative: >
+      As a researcher, I want to create a new study on the platform, so that I can start a new research project.
+    inputs:
+      sut: https://spark.testar.org/
+      platform: webdriver
+      username: user
+      password: pass
+    prerequisites:
+      - Log in successfully using username and password.
+    expected_outcomes:
+      - The executed GUI test execution contains enough evidence to verify the user story.
