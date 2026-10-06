@@ -382,6 +382,8 @@ public class EntityClassFactory {
         verdict.setNullable(false);
         verdict.setIndexAble(true);
         entityClass.addProperty(verdict);
+        entityClass.addProperty(new Property("finalVerdicts", OType.EMBEDDEDLIST));
+        entityClass.addProperty(new Property("finalStateOccurrenceId", OType.STRING));
         Property terminationMessage = new Property("terminationMessage", OType.STRING);
         terminationMessage.setMandatory(false);
         terminationMessage.setNullable(true);

@@ -3,6 +3,7 @@ package org.testar.statemodel;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
@@ -11,6 +12,7 @@ import org.mockito.InOrder;
 import org.testar.statemodel.actionselector.ActionSelector;
 import org.testar.statemodel.persistence.PersistenceManager;
 import org.testar.statemodel.sequence.SequenceManager;
+import org.testar.core.verdict.Verdict;
 
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
@@ -42,6 +44,18 @@ public class ModelManagerLifecycleTest {
     public void restoreOutput() {
         System.setOut(originalOutput);
         capturedOutput.close();
+    }
+
+    @Test
+    public void stoppingSequenceForwardsEveryFinalVerdict() {
+        SequenceManager sequences = mock(SequenceManager.class);
+        ModelManager manager = new ModelManager(mock(AbstractStateModel.class), mock(ActionSelector.class),
+                mock(PersistenceManager.class), sequences, false);
+        List<Verdict> verdicts = List.of(new Verdict(Verdict.Severity.LLM_COMPLETE, "Goal achieved."), Verdict.OK);
+
+        manager.notifyTestSequenceStopped(verdicts);
+
+        verify(sequences).stopSequence(verdicts);
     }
 
     @Test

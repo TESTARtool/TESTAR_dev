@@ -8,7 +8,9 @@ package org.testar.statemodel;
 
 import org.testar.core.action.Action;
 import org.testar.core.state.State;
+import org.testar.core.verdict.Verdict;
 
+import java.util.List;
 import java.util.Set;
 
 public interface StateModelManager {
@@ -24,6 +26,10 @@ public interface StateModelManager {
     void notifyTestSequencedStarted();
 
     void notifyTestSequenceStopped();
+
+    default void notifyTestSequenceStopped(List<Verdict> finalVerdicts) {
+        notifyTestSequenceStopped();
+    }
 
     void notifyTestSequenceInterruptedByUser();
 

@@ -7,7 +7,7 @@ const cytoscape = require('../../resources/graphs-static/js/cytoscape.min.js');
 
 const script = fs.readFileSync(path.resolve(__dirname, '../../resources/graphs-static/js/viewer.js'), 'utf8');
 
-function openViewer(images = {}, trees = {}, metadata = {}) {
+function openViewer(images = {}, trees = {}, metadata = {}, records = []) {
     const controls = new Map();
     const handlers = new Map();
     let options;
@@ -32,7 +32,7 @@ function openViewer(images = {}, trees = {}, metadata = {}) {
             return controls.get(id);
         }
     };
-    const elements = [{group: 'nodes', data: {id: 'n1'}, classes: 'ConcreteState'}];
+    const elements = [{group: 'nodes', data: {id: 'n1'}, classes: 'ConcreteState'}, ...records];
     vm.runInNewContext(script, {
         document,
         window: {__TESTAR_ELEMENTS__: elements, __TESTAR_IMAGES__: images,
@@ -51,9 +51,9 @@ function openViewer(images = {}, trees = {}, metadata = {}) {
         elements,
         select(className, id = 'n1', value = 'value') {
             handlers.get('tap')({target: {
-                isNode: () => className === 'ConcreteState',
+                isNode: () => !['ConcreteAction', 'AbstractAction', 'SequenceStep'].includes(className),
                 classes: () => className,
-                data: () => ({id, title: value}),
+                data: () => ({...elements.find(element => element.data.id === id)?.data, id, title: value}),
                 hasClass: name => name === className
             }});
             return controls.get('info-content').innerHTML;
@@ -90,6 +90,50 @@ test('selection information escapes captured SUT text', () => {
     const html = viewer.select('ConcreteState', 'n1', '<script>alert("SUT")</script>');
     assert.match(html, /&lt;script&gt;alert\(&quot;SUT&quot;\)&lt;\/script&gt;/);
     assert.doesNotMatch(html, /<script>/);
+});
+
+test('final verdicts are shown with sequence context on the final occurrence and its shared concrete state', () => {
+    const viewer = openViewer({}, {}, {}, [
+        {classes: 'TestSequence', data: {id: 'seq1', sequenceId: 'SEQ1', finalStateOccurrenceId: 'SEQ1-N2',
+            finalVerdicts: [{Severity: 'LLM_COMPLETE', SeverityValue: 0.04, Info: 'Goal achieved <script>unsafe</script>'}]}},
+        {classes: ['TestSequence'], data: {id: 'seq2', sequenceId: 'SEQ2', finalStateOccurrenceId: 'SEQ2-N1',
+            finalVerdicts: [{Severity: 'LLM_INVALID', SeverityValue: 0.91, Info: 'Other goal failed.'}]}},
+        {classes: 'SequenceNode', data: {id: 'sn1', nodeId: 'SEQ1-N1', sequenceId: 'SEQ1'}},
+        {classes: 'SequenceNode', data: {id: 'sn2', nodeId: 'SEQ1-N2', sequenceId: 'SEQ1'}},
+        {classes: ['SequenceNode'], data: {id: 'sn3', nodeId: 'SEQ2-N1', sequenceId: 'SEQ2'}},
+        {classes: 'Accessed', data: {id: 'access1', source: 'sn1', target: 'n1'}},
+        {classes: 'Accessed', data: {id: 'access2', source: 'sn2', target: 'n1'}},
+        {classes: 'Accessed', data: {id: 'access3', source: 'sn3', target: 'n1'}}
+    ]);
+    const stateHtml = viewer.select('ConcreteState');
+    assert.match(stateHtml, /Final Verdicts/);
+    assert.match(stateHtml, /Sequence: SEQ1/);
+    assert.match(stateHtml, /Sequence: SEQ2/);
+    assert.match(stateHtml, /Final occurrence: SEQ1-N2/);
+    assert.match(stateHtml, /LLM_COMPLETE/);
+    assert.match(stateHtml, /LLM_INVALID/);
+    assert.match(stateHtml, /&lt;script&gt;unsafe&lt;\/script&gt;/);
+    assert.doesNotMatch(stateHtml, /<script>/);
+    assert.doesNotMatch(viewer.select('SequenceNode', 'sn1'), /Final Verdicts/);
+    const finalHtml = viewer.select('SequenceNode', 'sn2');
+    assert.match(finalHtml, /LLM_COMPLETE/);
+    assert.doesNotMatch(finalHtml, /LLM_INVALID/);
+    const sequenceHtml = viewer.select('TestSequence', 'seq2');
+    assert.match(sequenceHtml, /LLM_INVALID/);
+    assert.doesNotMatch(sequenceHtml, /\[object Object\]/);
+    assert.equal(viewer.elements[0].data.finalVerdicts, undefined);
+});
+
+test('unresolved final verdicts remain on their sequence without attaching to an unrelated occurrence', () => {
+    const viewer = openViewer({}, {}, {}, [
+        {classes: 'TestSequence', data: {id: 'seq1', sequenceId: 'SEQ1', finalStateOccurrenceId: 'SEQ2-N1',
+            finalVerdicts: [{Severity: 'LLM_COMPLETE', SeverityValue: 0.04, Info: 'Goal achieved.'}]}},
+        {classes: 'SequenceNode', data: {id: 'sn1', nodeId: 'SEQ2-N1', sequenceId: 'SEQ2'}},
+        {classes: 'Accessed', data: {id: 'access1', source: 'sn1', target: 'n1'}}
+    ]);
+    assert.match(viewer.select('TestSequence', 'seq1'), /Final state occurrence unavailable/);
+    assert.doesNotMatch(viewer.select('ConcreteState'), /Final Verdicts/);
+    assert.doesNotMatch(viewer.select('SequenceNode', 'sn1'), /Final Verdicts/);
 });
 
 test('packaged graph library loads the exported node and edge format', () => {

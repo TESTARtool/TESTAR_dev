@@ -14,6 +14,7 @@ import org.testar.statemodel.event.StateModelEventType;
 import org.testar.statemodel.persistence.Persistable;
 import org.testar.core.tag.Tag;
 import org.testar.core.tag.Tags;
+import org.testar.core.verdict.Verdict;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -70,6 +71,10 @@ public class Sequence implements Persistable {
      * The execution verdict, ie: did the sequence execute succesfully.
      */
     private SequenceVerdict verdict;
+
+    // Test outcomes belong to this sequence's final occurrence, not its reusable concrete state.
+    private List<Verdict> finalVerdicts = List.of();
+    private String finalStateOccurrenceId;
 
     /**
      * If the sequence was interrupted by the system, this should hold the termination message generated.
@@ -208,6 +213,20 @@ public class Sequence implements Persistable {
      */
     public SequenceVerdict getSequenceVerdict() {
         return verdict;
+    }
+
+    public void setFinalVerdicts(List<Verdict> finalVerdicts) {
+        this.finalVerdicts = List.copyOf(finalVerdicts);
+        SequenceNode finalNode = getLastNode();
+        finalStateOccurrenceId = finalNode == null ? null : finalNode.getNodeId();
+    }
+
+    public List<Verdict> getFinalVerdicts() {
+        return finalVerdicts;
+    }
+
+    public String getFinalStateOccurrenceId() {
+        return finalStateOccurrenceId;
     }
 
     /**

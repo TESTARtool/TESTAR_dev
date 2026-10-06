@@ -133,7 +133,7 @@ public class GenerateMode {
 
     private void finishGeneratedSequence(ComposedProtocol protocol, SUT system, List<Verdict> finalVerdicts) {
         finalVerdicts = filterSequenceVerdicts(protocol, finalVerdicts);
-        protocol.runtimeContext().stateModelManager().notifyTestSequenceStopped();
+        protocol.runtimeContext().stateModelManager().notifyTestSequenceStopped(finalVerdicts);
 
         if (!Verdict.helperAreAllVerdictsOK(finalVerdicts)) {
             LogSerialiser.log("Sequence contained faults!\n", LogSerialiser.LogLevel.Critical);

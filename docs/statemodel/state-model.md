@@ -12,6 +12,14 @@ Spy sessions use the dummy manager. Generate finishes recording its sequences be
 
 Live analysis opens the persisted datastore through a separately managed analysis service, normally at `http://localhost:8090/models`. It provides graph and sequence analysis against the datastore. WebStudio exposes opening and stopping this service. Its packaged runtime assets are under `output/graphs`, separate from workspace-scoped run outputs.
 
+## Final Verdicts and State Occurrences
+
+CLI and Generate sessions pass their final test verdicts to the state model before sequence completion and datastore shutdown. Each sequence stores the complete verdict list, including severity name, numeric severity, and explanation, together with the ID of its final recorded state occurrence. The sequence's execution status, such as `COMPLETED_SUCCESFULLY`, describes its lifecycle independently of these test outcomes.
+
+The association identifies an occurrence rather than a concrete state: revisiting one state creates different occurrences, and different goals can finish at the same concrete state with different decisions. Final verdicts remain sequence-local and leave state-oracle results unchanged. A sequence without an observed state can retain verdicts with no final occurrence reference; stopping again preserves the already recorded decision.
+
+Static snapshots retain these records. Selecting a sequence or its final occurrence shows `Final Verdicts` with the sequence and occurrence IDs. Selecting a concrete state shows the decisions associated with its final occurrences, grouped by sequence. Missing occurrence references are explained on the sequence rather than attached to an unrelated state. [Sequence Traces JSON](./json-export.md#sequence-traces) preserves the verdicts and their occurrence reference independently of optional property selection.
+
 ## Optional Static Export
 
 Set this workspace setting to enable automatic export:
@@ -76,6 +84,19 @@ Static preparation must retain the abstract, concrete, and sequence graph layers
 When tree capture is enabled, preparation retrieves persisted trees for the selected accumulated model using one database session. Console progress reports completed/total trees, and static export completion reports preparation duration. Connections and query results are released after success or failure. Existing snapshots remain immutable. Captured trees are currently accumulated in memory before packaging.
 
 ## Acceptance Scenarios
+
+### Final Decisions Are Visible in Their Sequence Context
+
+Verification: [`DefaultPlatformSessionReportingTest.java`](../../plugin/test/org/testar/plugin/DefaultPlatformSessionReportingTest.java), [`static-graph-viewer.test.cjs`](../../statemodel/test/js/static-graph-viewer.test.cjs).
+
+Given a CLI session ends with an agent decision\
+When the session stops\
+Then its final observation is recorded before the final verdicts are passed to sequence completion\
+When the user selects that sequence or its final occurrence in the static snapshot\
+Then `Final Verdicts` shows the decision and explanation with the sequence and occurrence IDs\
+And earlier occurrences do not inherit that decision\
+When the user selects the associated concrete state\
+Then final decisions are shown separately for each sequence that finished there
 
 ### Static Tree Capture Is an Independent Setting
 
@@ -226,4 +247,5 @@ Then analysis does not open and a console message explains the skipped or reject
 - [StateModelManagerFactory.java](../../statemodel/src/org/testar/statemodel/StateModelManagerFactory.java) attaches optional export to the model lifecycle; [ModelManager.java](../../statemodel/src/org/testar/statemodel/ModelManager.java) orders shutdown and completion.
 - [StaticGraphExporter.java](../../statemodel/src/org/testar/statemodel/analysis/export/StaticGraphExporter.java) packages the snapshot using [AnalysisManager.java](../../statemodel/src/org/testar/statemodel/analysis/AnalysisManager.java).
 - [PlatformOrchestrator.java](../../plugin/src/org/testar/plugin/PlatformOrchestrator.java) supplies the current run directory for both Generate and CLI.
+- [Sequence.java](../../statemodel/src/org/testar/statemodel/sequence/Sequence.java) and [SequenceHydrator.java](../../statemodel/src/org/testar/statemodel/persistence/orientdb/hydrator/SequenceHydrator.java) retain final verdicts and the final state-occurrence reference independently of concrete-state identity.
 - [graphs-static](../../statemodel/resources/graphs-static) contains the portable viewer; Gradle packages these resources in the state-model JAR.

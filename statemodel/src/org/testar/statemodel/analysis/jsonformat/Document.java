@@ -18,19 +18,19 @@ abstract class Document {
     private String id;
 
     // a mapping of properties that the document contains
-    private Map<String, String> properties;
+    private Map<String, Object> properties;
 
     public Document(String id) {
         this.id = id;
         properties = new HashMap<>();
     }
 
-    public void addProperty(String key, String value) {
+    public void addProperty(String key, Object value) {
         properties.put(key, value);
     }
 
     @JsonAnyGetter
-    public Map<String, String> getProperties() {
+    public Map<String, Object> getProperties() {
         return properties;
     }
 

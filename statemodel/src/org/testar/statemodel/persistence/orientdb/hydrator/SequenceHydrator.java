@@ -15,6 +15,8 @@ import org.testar.statemodel.sequence.Sequence;
 import org.testar.statemodel.sequence.SequenceVerdict;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 public class SequenceHydrator implements EntityHydrator<VertexEntity> {
 
@@ -44,6 +46,16 @@ public class SequenceHydrator implements EntityHydrator<VertexEntity> {
         // fetch the sequence's verdict and if needed, a termination message
         SequenceVerdict verdict = ((Sequence) source).getSequenceVerdict();
         entity.addPropertyValue("verdict", new PropertyValue(OType.STRING, verdict.toString()));
+
+        Sequence sequence = (Sequence) source;
+        List<Map<String, Object>> finalVerdicts = sequence.getFinalVerdicts().stream()
+                .map(result -> Map.<String, Object>of("Severity", result.verdictSeverityTitle(),
+                        "SeverityValue", result.severity(), "Info", result.info()))
+                .toList();
+        entity.addPropertyValue("finalVerdicts", new PropertyValue(OType.EMBEDDEDLIST, finalVerdicts));
+        if (sequence.getFinalStateOccurrenceId() != null) {
+            entity.addPropertyValue("finalStateOccurrenceId", new PropertyValue(OType.STRING, sequence.getFinalStateOccurrenceId()));
+        }
 
         if (verdict == SequenceVerdict.INTERRUPTED_BY_ERROR) {
             entity.addPropertyValue("terminationMessage", new PropertyValue(OType.STRING, ((Sequence) source).getTerminationMessage()));

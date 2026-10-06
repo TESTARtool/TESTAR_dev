@@ -104,6 +104,8 @@ Sequence Traces exports contain the referenced concrete state/action/transition 
 
 Each sequence contains `SequenceID`, `GraphNodeID`, recorded `StartTime`, selected sequence properties, `StartOccurrenceIDs`, ordered `StateOccurrences`, and ordered `Steps`. A start-only sequence has one state occurrence and no steps; a sequence with no recorded observations has empty occurrence and step lists.
 
+Sequences also contain `FinalVerdicts`, `FinalStateOccurrenceID`, and `FinalStateAssociationStatus`. Each final verdict retains `Severity`, `SeverityValue`, and `Info`. The final occurrence reference identifies the recorded `nodeId`, not a concrete-state ID or an assumed last array entry. These fields remain present when optional properties are cleared. The association is `resolved` when the reference belongs to the sequence, `unresolved` when a decision or reference lacks a matching occurrence, and `none` when neither was recorded. An unresolved link retains the original verdicts and reference with a warning.
+
 State occurrences retain `OccurrenceID` (the recorded `nodeId`, or the graph ID when absent), `GraphNodeID`, numeric `Order` from `nodeNr`, recorded `Timestamp`, concrete/abstract state references, `StateGraphNodeID`, `AssociationStatus`, and selected sequence properties. Steps retain their recorded `stepId` or graph ID as `OccurrenceID`, `GraphEdgeID`, source/target graph and occurrence references, target occurrence `Order`, recorded `Timestamp`, `ConcreteActionID`, `ConcreteActionUID`, resolved `ConcreteTransitionID`, `AssociationStatus`, and selected transition properties. IDs, chronology, and start references remain present when optional properties are cleared.
 
 State association uses the occurrence's `Accessed` edge and checks its recorded concrete-state ID. When that edge is absent, an exact, unique recorded state-ID match is accepted. Action association requires exact concrete action ID and resolved source/target states; when a concrete action UID is recorded it must also match. A missing or ambiguous association retains the occurrence with a `null` resolved reference, explicit status, and warning. Steps without an assignable sequence remain in `UnassignedSteps`; cross-sequence edges fail export instead of inventing a trace.
@@ -268,6 +270,29 @@ When the user exports Sequence Traces\
 Then the steps in `SEQ1` reference `ca1`\
 And the step in `SEQ2` references `ca2`\
 And their source and target occurrence references remain within their own sequences
+
+### Final Decisions Reference the Correct State Occurrence
+
+Verification: [`SequenceManagerTest.java`](../../statemodel/test/org/testar/statemodel/sequence/SequenceManagerTest.java), [`OrientDBManagerIntegrationTest.java`](../../statemodel/test/org/testar/statemodel/persistence/orientdb/OrientDBManagerIntegrationTest.java), [`model-json-export.test.cjs`](../../statemodel/test/js/model-json-export.test.cjs).
+
+Given a sequence visits concrete state `SC1` more than once\
+And ends with an `LLM_COMPLETE` verdict and an additional warning\
+When the model is persisted, reopened, and exported as Sequence Traces with optional properties cleared\
+Then both final verdicts retain their severity and explanation\
+And `FinalStateOccurrenceID` references the last recorded occurrence rather than the earlier visit to `SC1`\
+And `FinalStateAssociationStatus = resolved`\
+And another sequence ending at `SC1` retains its own decision and occurrence reference\
+And the reusable concrete state's oracle verdict remains unchanged
+
+### Missing Final Occurrences Remain Explicit
+
+Verification: [`SequenceManagerTest.java`](../../statemodel/test/org/testar/statemodel/sequence/SequenceManagerTest.java), [`model-json-export.test.cjs`](../../statemodel/test/js/model-json-export.test.cjs), [`static-graph-viewer.test.cjs`](../../statemodel/test/js/static-graph-viewer.test.cjs).
+
+Given a sequence has final verdicts but its final occurrence is missing or belongs to another sequence\
+When the user exports Sequence Traces or selects that sequence in the static viewer\
+Then its verdicts and recorded reference are retained\
+And the unresolved association is explained\
+And the decision remains unassociated with another occurrence or concrete state
 
 ### Trace Property Selection Preserves Recorded History
 

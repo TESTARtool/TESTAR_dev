@@ -101,7 +101,7 @@ final class DefaultPlatformSession implements PlatformSession {
                 sessionReportingManager.addActions(actions);
             }
             stateModelSessionFlow.finalizePendingObservation(state, actions);
-            services.stateModelManager().notifyTestSequenceStopped();
+            services.stateModelManager().notifyTestSequenceStopped(finalVerdicts);
             services.systemService().stopSystem(system);
         } finally {
             if (reportingEnabled) {

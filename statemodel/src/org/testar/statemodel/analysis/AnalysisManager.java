@@ -736,7 +736,11 @@ public class AnalysisManager {
                         }
                         continue;
                     }
-                    jsonVertex.addProperty(exportPropertyName(propertyName), stateVertex.getProperty(propertyName).toString());
+                    Object propertyValue = stateVertex.getProperty(propertyName);
+                    if (propertyValue != null) {
+                        jsonVertex.addProperty(exportPropertyName(propertyName), "finalVerdicts".equals(propertyName)
+                                ? propertyValue : propertyValue.toString());
+                    }
                 }
                 // optionally add a parent
                 if (parent != null) {

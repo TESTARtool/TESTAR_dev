@@ -17,8 +17,10 @@ import com.orientechnologies.orient.core.sql.executor.OResultSet;
 import org.testar.core.action.Action;
 import org.testar.core.state.State;
 import org.testar.core.tag.Tags;
+import org.testar.core.verdict.Verdict;
 import org.testar.core.exceptions.NoSuchTagException;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import java.util.StringJoiner;
 public class ModelManager implements StateModelManager {
@@ -246,11 +248,16 @@ public class ModelManager implements StateModelManager {
     }
     @Override
     public void notifyTestSequenceStopped() {
+        notifyTestSequenceStopped(List.of());
+    }
+
+    @Override
+    public void notifyTestSequenceStopped(List<Verdict> finalVerdicts) {
         currentAbstractState = null;
         currentConcreteState = null;
         actionUnderExecution = null;
         concreteActionUnderExecution = null;
-        sequenceManager.stopSequence();
+        sequenceManager.stopSequence(finalVerdicts);
     }
     @Override
     public void notifyTestSequenceInterruptedByUser() {

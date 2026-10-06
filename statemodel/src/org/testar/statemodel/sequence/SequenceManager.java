@@ -11,7 +11,9 @@ import org.testar.statemodel.ConcreteState;
 import org.testar.statemodel.event.StateModelEvent;
 import org.testar.statemodel.event.StateModelEventListener;
 import org.testar.statemodel.event.StateModelEventType;
+import org.testar.core.verdict.Verdict;
 
+import java.util.List;
 import java.util.Set;
 
 public class SequenceManager {
@@ -78,6 +80,14 @@ public class SequenceManager {
      * Stop the currently executing test sequence. This particular sequence can no longer be restarted after it has been stopped.
      */
     public void stopSequence() {
+        stopSequence(List.of());
+    }
+
+    public void stopSequence(List<Verdict> finalVerdicts) {
+        if (currentSequence == null || !currentSequence.isRunning()) {
+            return;
+        }
+        currentSequence.setFinalVerdicts(finalVerdicts);
         currentSequence.setSequenceVerdict(SequenceVerdict.COMPLETED_SUCCESFULLY);
         currentSequence.stop();
     }

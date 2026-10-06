@@ -15,7 +15,7 @@
     }
 
     const sequenceIdentityFields = ["sequenceId", "nodeId", "stepId", "nodeNr", "timestamp", "startDateTime",
-        "concreteStateId", "concreteActionId", "concreteActionUid"];
+        "concreteStateId", "concreteActionId", "concreteActionUid", "finalVerdicts", "finalStateOccurrenceId"];
 
     const semanticProperties = new Set([
         "Role", "Title", "Name", "Text", "Value", "Desc", "Description", "InputText", "Path", "ToolTipText", "TargetID",
@@ -175,7 +175,13 @@
             if (sequences.has(id)) {
                 throw new Error(`Duplicate sequence ID: ${id}.`);
             }
+            const finalVerdicts = record.data.finalVerdicts || [];
+            if (!Array.isArray(finalVerdicts)) {
+                throw new Error(`Invalid final verdict list: ${id}.`);
+            }
             sequences.set(id, {SequenceID: id, GraphNodeID: record.data.id, StartTime: record.data.startDateTime || null,
+                FinalVerdicts: finalVerdicts.map(verdict => ({...verdict})),
+                FinalStateOccurrenceID: record.data.finalStateOccurrenceId || null,
                 Properties: properties(record.data, selections.sequences, sequenceIdentityFields),
                 StartOccurrenceIDs: [], StateOccurrences: [], Steps: []});
         }
@@ -184,6 +190,7 @@
             if (!sequences.has(sequenceId)) {
                 warnings.add(`Sequence record unavailable: ${sequenceId}`);
                 sequences.set(sequenceId, {SequenceID: sequenceId, GraphNodeID: null, StartTime: null,
+                    FinalVerdicts: [], FinalStateOccurrenceID: null,
                     Properties: {}, StartOccurrenceIDs: [], StateOccurrences: [], Steps: []});
             }
             const state = occurrenceState(record, elements, concreteNodes);
@@ -249,6 +256,12 @@
             sequence.StartOccurrenceIDs = [...new Set(sequence.StartOccurrenceIDs)].sort();
             sequence.StateOccurrences.sort(byOrder);
             sequence.Steps.sort(byOrder);
+            const finalOccurrence = sequence.StateOccurrences.find(occurrence => occurrence.OccurrenceID === sequence.FinalStateOccurrenceID);
+            sequence.FinalStateAssociationStatus = finalOccurrence ? "resolved"
+                : sequence.FinalStateOccurrenceID || sequence.FinalVerdicts.length ? "unresolved" : "none";
+            if (sequence.FinalStateAssociationStatus === "unresolved") {
+                warnings.add(`Final state occurrence unresolved: ${sequence.SequenceID}`);
+            }
             if (sequence.StateOccurrences.length && !sequence.StartOccurrenceIDs.length) {
                 warnings.add(`Sequence start unavailable: ${sequence.SequenceID}`);
             }

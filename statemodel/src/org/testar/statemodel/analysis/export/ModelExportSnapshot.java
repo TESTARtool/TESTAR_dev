@@ -209,7 +209,7 @@ public final class ModelExportSnapshot {
         Set<String> identities = Set.of("id", "source", "target", "parent", "stateId", "actionId",
                 "AbstractID", "ConcreteID", "concreteActionIds", "isInitial");
         Set<String> sequenceIdentities = Set.of("sequenceId", "nodeId", "stepId", "nodeNr", "timestamp",
-                "startDateTime", "concreteStateId", "concreteActionId", "concreteActionUid");
+                "startDateTime", "concreteStateId", "concreteActionId", "concreteActionUid", "finalVerdicts", "finalStateOccurrenceId");
         for (JsonNode element : elements) {
             String group = hasClass(element, "AbstractState") || hasClass(element, "ConcreteState") ? "states"
                     : hasClass(element, "ConcreteAction") ? "actions"

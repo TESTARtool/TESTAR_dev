@@ -21,7 +21,7 @@
     if (keys.length === 0) return "<div class=\"muted\">No data fields.</div>";
     const rows = keys.map((k) => {
       const v = data[k];
-      return `<tr><td>${escapeHtml(k)}</td><td>${escapeHtml(String(v))}</td></tr>`;
+      return `<tr><td>${escapeHtml(k)}</td><td>${escapeHtml(typeof v === "object" ? JSON.stringify(v) : String(v))}</td></tr>`;
     }).join("");
     return `<table class="data-table"><thead><tr><th>Attribute</th><th>Value</th></tr></thead><tbody>${rows}</tbody></table>`;
   }
@@ -50,6 +50,32 @@
   }
 
   function initCy(elements) {
+    const hasClass = (element, name) => (Array.isArray(element.classes)
+      ? element.classes : String(element.classes || "").split(/\s+/)).includes(name);
+    const occurrences = new Map(elements.filter(element => hasClass(element, "SequenceNode"))
+      .map(element => [element.data.nodeId, element.data]));
+    const finalDecisions = elements.filter(element => hasClass(element, "TestSequence") && element.data.finalVerdicts?.length)
+      .map(element => ({sequence: element.data, occurrence: occurrences.get(element.data.finalStateOccurrenceId)}));
+
+    function renderFinalVerdicts(element) {
+      const selected = element.data();
+      const decisions = finalDecisions.filter(({sequence, occurrence}) => {
+        if (element.hasClass("TestSequence")) return sequence.id === selected.id;
+        if (!occurrence || occurrence.sequenceId !== sequence.sequenceId) return false;
+        if (element.hasClass("SequenceNode")) return occurrence.id === selected.id;
+        return element.hasClass("ConcreteState") && elements.some(edge => hasClass(edge, "Accessed")
+          && edge.data.source === occurrence.id && edge.data.target === selected.id);
+      });
+      if (!decisions.length) return "";
+      return `<div class="info-section"><h3>Final Verdicts</h3>${decisions.map(({sequence, occurrence}) => {
+        const linked = occurrence && occurrence.sequenceId === sequence.sequenceId;
+        const reference = linked ? `Final occurrence: ${sequence.finalStateOccurrenceId}` : "Final state occurrence unavailable.";
+        const verdicts = sequence.finalVerdicts.map(verdict =>
+          `<li><strong>${escapeHtml(verdict.Severity)}</strong> (${escapeHtml(verdict.SeverityValue)}): ${escapeHtml(verdict.Info)}</li>`).join("");
+        return `<p>Sequence: ${escapeHtml(sequence.sequenceId)}<br>${escapeHtml(reference)}</p><ul>${verdicts}</ul>`;
+      }).join("")}</div>`;
+    }
+
     const cy = cytoscape({
       container: document.getElementById("cy"),
       // Viewer labels belong to presentation, not the embedded export source.
@@ -323,6 +349,7 @@
         `</div>`,
         imageHtml,
         treeHtml,
+        renderFinalVerdicts(el),
         `<div class="info-section">${renderDataTable(data)}</div>`
       ].join("");
       setInfo(content);

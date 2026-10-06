@@ -244,6 +244,56 @@ test('action mapping matches whole concrete IDs and refuses ambiguous or unresol
     assert.throws(() => buildBundle(fixture(), 'unknown-format'), /Choose abstract, hybrid, concrete, or traces/);
 });
 
+test('final verdicts reference the final occurrence even when a state is repeated and optional properties are cleared', () => {
+    const snapshot = traceSnapshot();
+    const first = snapshot.elements.find(element => element.data.id === 'seq1').data;
+    first.finalVerdicts = [
+        {Severity: 'LLM_COMPLETE', SeverityValue: 0.04, Info: 'Organisation mode changed.'},
+        {Severity: 'WARNING', SeverityValue: 0.1, Info: 'Additional observation.'}
+    ];
+    first.finalStateOccurrenceId = 'SEQ1-N10';
+    const second = snapshot.elements.find(element => element.data.id === 'seq2').data;
+    second.finalVerdicts = [{Severity: 'LLM_INVALID', SeverityValue: 0.91, Info: 'Another goal failed.'}];
+    second.finalStateOccurrenceId = 'SEQ2-N1';
+    const original = JSON.stringify(snapshot);
+
+    const model = buildBundle(snapshot, 'traces', {includeScreenshots: false, includeWidgetTrees: false,
+        properties: {states: [], actions: [], transitions: [], widgets: [], sequences: []}}).jsonModel;
+    assert.equal(model.Sequences[0].FinalStateOccurrenceID, 'SEQ1-N10');
+    assert.equal(model.Sequences[0].FinalStateAssociationStatus, 'resolved');
+    assert.deepEqual(model.Sequences[0].FinalVerdicts, first.finalVerdicts);
+    assert.equal(model.Sequences[0].StateOccurrences[2].ConcreteStateID, 'SC1');
+    assert.deepEqual(model.Sequences[0].Properties, {});
+    assert.deepEqual(model.Sequences[1].FinalVerdicts, second.finalVerdicts);
+    assert.equal(model.Sequences[1].FinalStateOccurrenceID, 'SEQ2-N1');
+    assert.ok(model.ConcreteStates.every(state => !Object.hasOwn(state, 'FinalVerdicts')));
+    assert.ok(!propertyInventory(snapshot).sequences.includes('finalVerdicts'));
+    assert.ok(!propertyInventory(snapshot).sequences.includes('finalStateOccurrenceId'));
+    assert.equal(JSON.stringify(snapshot), original);
+});
+
+test('missing final occurrence links remain explicit rather than borrowing another sequence or repeated state', () => {
+    const snapshot = traceSnapshot();
+    const first = snapshot.elements.find(element => element.data.id === 'seq1').data;
+    first.finalVerdicts = [{Severity: 'LLM_COMPLETE', SeverityValue: 0.04, Info: 'Goal achieved.'}];
+    for (const recordedId of ['missing-occurrence', 'SEQ2-N1', null]) {
+        first.finalStateOccurrenceId = recordedId;
+        const model = buildBundle(snapshot, 'traces', {includeScreenshots: false, includeWidgetTrees: false}).jsonModel;
+        assert.equal(model.Sequences[0].FinalStateOccurrenceID, recordedId);
+        assert.equal(model.Sequences[0].FinalStateAssociationStatus, 'unresolved');
+        assert.deepEqual(model.Sequences[0].FinalVerdicts, first.finalVerdicts);
+        assert.ok(model.Warnings.includes('Final state occurrence unresolved: SEQ1'));
+    }
+    delete first.finalVerdicts;
+    delete first.finalStateOccurrenceId;
+    const sequence = buildBundle(snapshot, 'traces').jsonModel.Sequences[0];
+    assert.deepEqual(sequence.FinalVerdicts, []);
+    assert.equal(sequence.FinalStateOccurrenceID, null);
+    assert.equal(sequence.FinalStateAssociationStatus, 'none');
+    first.finalVerdicts = '[not structured JSON]';
+    assert.throws(() => buildBundle(snapshot, 'traces'), /Invalid final verdict list: SEQ1/);
+});
+
 test('ZIP contains UTF-8 JSON and available screenshot bytes with correct entry metadata', () => {
     const bundle = buildBundle(fixture(), 'hybrid');
     const bytes = createZip(bundle.files);

@@ -29,6 +29,7 @@ import org.testar.core.visualizers.Visualizer;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -543,7 +544,8 @@ public class EntityManager {
             // for binary data we add a separate record and connect it to the element
             OBlob record = db.newBlob((byte[]) propertyValue);
             element.setProperty(propertyName, record);
-        } else if (propertyValue instanceof Set) {
+        } else if (propertyValue instanceof Set || (propertyValue instanceof List
+                && ((List<?>) propertyValue).stream().allMatch(Map.class::isInstance))) {
             element.setProperty(propertyName, propertyValue);
         } else if (propertyValue instanceof Date) {
             element.setProperty(propertyName, propertyValue);
@@ -592,6 +594,14 @@ public class EntityManager {
 
             case EMBEDDEDSET:
                 convertedValue = OType.convert(valueToConvert, Set.class);
+                break;
+
+            case EMBEDDEDLIST:
+                convertedValue = OType.convert(valueToConvert, List.class);
+                break;
+
+            case EMBEDDEDMAP:
+                convertedValue = OType.convert(valueToConvert, Map.class);
                 break;
         }
         return convertedValue;
