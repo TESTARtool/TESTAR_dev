@@ -1,0 +1,16 @@
+version: 1
+goals:
+  - id: spark_16_export_responses_csv
+    title: Export participant responses as CSV
+    category: functional
+    narrative: >
+      As a researcher, I want to export the collected participant responses as a CSV file, so that I can analyse them in an external tool.
+    inputs:
+      sut: https://spark.testar.org/
+      platform: webdriver
+      username: user
+      password: pass
+    prerequisites:
+      - Log in successfully using username and password.
+    expected_outcomes:
+      - The executed GUI test execution contains enough evidence to verify the user story.

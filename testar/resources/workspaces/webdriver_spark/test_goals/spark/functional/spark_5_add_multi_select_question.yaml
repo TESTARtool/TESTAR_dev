@@ -1,0 +1,16 @@
+version: 1
+goals:
+  - id: spark_5_add_multi_select_question
+    title: Add a Multi-Select question
+    category: functional
+    narrative: >
+      As a researcher, I want to add a Multi-Select question, so that participants can pick multiple options from a predefined list.
+    inputs:
+      sut: https://spark.testar.org/
+      platform: webdriver
+      username: user
+      password: pass
+    prerequisites:
+      - Log in successfully using username and password.
+    expected_outcomes:
+      - The executed GUI test execution contains enough evidence to verify the user story.

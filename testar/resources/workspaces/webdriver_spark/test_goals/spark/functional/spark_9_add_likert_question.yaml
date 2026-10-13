@@ -1,0 +1,16 @@
+version: 1
+goals:
+  - id: spark_9_add_likert_question
+    title: Add a Likert question
+    category: functional
+    narrative: >
+      As a researcher, I want to add a Likert question, so that participants can indicate how much they agree or disagree with a statement.
+    inputs:
+      sut: https://spark.testar.org/
+      platform: webdriver
+      username: user
+      password: pass
+    prerequisites:
+      - Log in successfully using username and password.
+    expected_outcomes:
+      - The executed GUI test execution contains enough evidence to verify the user story.

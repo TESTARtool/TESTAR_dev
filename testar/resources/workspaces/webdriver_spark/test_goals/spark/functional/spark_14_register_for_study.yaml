@@ -1,10 +1,10 @@
 version: 1
 goals:
-  - id: spark_add_questions
-    title: Add questions to a question set
+  - id: spark_14_register_for_study
+    title: Register for a study
     category: functional
     narrative: >
-      As a researcher, I want to add questions to a question set, so that I can collect the data I need from participants.
+      As a participant, I want to register for a study, so that I can take part in it.
     inputs:
       sut: https://spark.testar.org/
       platform: webdriver

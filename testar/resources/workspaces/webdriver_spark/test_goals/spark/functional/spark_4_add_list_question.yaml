@@ -1,10 +1,10 @@
 version: 1
 goals:
-  - id: spark_create_new_study
-    title: Create a new study
+  - id: spark_4_add_list_question
+    title: Add a List question
     category: functional
     narrative: >
-      As a researcher, I want to create a new study on the platform, so that I can start a new research project.
+      As a researcher, I want to add a List question, so that participants can pick exactly one option from a predefined list.
     inputs:
       sut: https://spark.testar.org/
       platform: webdriver

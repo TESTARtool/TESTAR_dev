@@ -1,0 +1,16 @@
+version: 1
+goals:
+  - id: spark_8_add_time_question
+    title: Add a Time question
+    category: functional
+    narrative: >
+      As a researcher, I want to add a Time question, so that participants can report when something happened.
+    inputs:
+      sut: https://spark.testar.org/
+      platform: webdriver
+      username: user
+      password: pass
+    prerequisites:
+      - Log in successfully using username and password.
+    expected_outcomes:
+      - The executed GUI test execution contains enough evidence to verify the user story.

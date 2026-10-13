@@ -1,0 +1,16 @@
+version: 1
+goals:
+  - id: spark_7_add_rating_question
+    title: Add a Rating question
+    category: functional
+    narrative: >
+      As a researcher, I want to add a Rating question, so that participants can score something on a fixed scale (for example 1 to 5 stars).
+    inputs:
+      sut: https://spark.testar.org/
+      platform: webdriver
+      username: user
+      password: pass
+    prerequisites:
+      - Log in successfully using username and password.
+    expected_outcomes:
+      - The executed GUI test execution contains enough evidence to verify the user story.

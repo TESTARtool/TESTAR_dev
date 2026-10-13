@@ -1,0 +1,16 @@
+version: 1
+goals:
+  - id: spark_15_show_applicable_questions_only
+    title: Only see applicable questions
+    category: functional
+    narrative: >
+      As a participant, I want to only see questions that apply to me, so that answering a question set is quick and doesn't feel repetitive.
+    inputs:
+      sut: https://spark.testar.org/
+      platform: webdriver
+      username: user
+      password: pass
+    prerequisites:
+      - Log in successfully using username and password.
+    expected_outcomes:
+      - The executed GUI test execution contains enough evidence to verify the user story.

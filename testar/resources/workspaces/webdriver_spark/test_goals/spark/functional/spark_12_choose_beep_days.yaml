@@ -1,0 +1,16 @@
+version: 1
+goals:
+  - id: spark_12_choose_beep_days
+    title: Choose beep days for a question set
+    category: functional
+    narrative: >
+      As a researcher, I want to choose on which days of the week participants receive a beep for a question set, shown in the app and optionally as a push notification, so that data collection fits my study's schedule.
+    inputs:
+      sut: https://spark.testar.org/
+      platform: webdriver
+      username: user
+      password: pass
+    prerequisites:
+      - Log in successfully using username and password.
+    expected_outcomes:
+      - The executed GUI test execution contains enough evidence to verify the user story.

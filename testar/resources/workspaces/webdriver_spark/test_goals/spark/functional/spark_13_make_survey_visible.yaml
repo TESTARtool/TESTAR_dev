@@ -1,0 +1,16 @@
+version: 1
+goals:
+  - id: spark_13_make_survey_visible
+    title: Make a survey visible to participants
+    category: functional
+    narrative: >
+      As a researcher, I want the option to make a survey visible to participants, so that they can decide for themselves when to start it.
+    inputs:
+      sut: https://spark.testar.org/
+      platform: webdriver
+      username: user
+      password: pass
+    prerequisites:
+      - Log in successfully using username and password.
+    expected_outcomes:
+      - The executed GUI test execution contains enough evidence to verify the user story.

@@ -1,0 +1,16 @@
+version: 1
+goals:
+  - id: spark_11_add_question_expression
+    title: Add an expression to a question
+    category: functional
+    narrative: >
+      As a researcher, I want to add an expression to a question, so that the question is only shown to participants when a certain condition is met.
+    inputs:
+      sut: https://spark.testar.org/
+      platform: webdriver
+      username: user
+      password: pass
+    prerequisites:
+      - Log in successfully using username and password.
+    expected_outcomes:
+      - The executed GUI test execution contains enough evidence to verify the user story.

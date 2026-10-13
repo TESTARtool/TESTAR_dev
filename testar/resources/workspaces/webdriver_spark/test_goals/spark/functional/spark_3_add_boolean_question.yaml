@@ -1,0 +1,16 @@
+version: 1
+goals:
+  - id: spark_3_add_boolean_question
+    title: Add a Boolean question
+    category: functional
+    narrative: >
+      As a researcher, I want to add a Boolean question, so that participants can answer with a simple yes or no.
+    inputs:
+      sut: https://spark.testar.org/
+      platform: webdriver
+      username: user
+      password: pass
+    prerequisites:
+      - Log in successfully using username and password.
+    expected_outcomes:
+      - The executed GUI test execution contains enough evidence to verify the user story.
