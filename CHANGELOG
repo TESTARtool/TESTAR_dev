@@ -1,3 +1,8 @@
+#TESTAR v2.8.18 (20-Oct-2026)
+- Bump io.appium:java-client from 10.1.1 to 11.0.0
+- Bump org.seleniumhq.selenium:selenium-java from 4.49.0 to 4.51.0
+
+
 #TESTAR v2.8.17 (30-Sep-2026)
 - Bump io.github.bonigarcia:webdrivermanager from 6.3.4 to 6.4.0
 
