@@ -34,19 +34,17 @@ import com.google.common.collect.ImmutableMap;
 import org.testar.serialisation.ScreenshotSerialiser;
 
 import io.appium.java_client.AppiumBy;
-import io.appium.java_client.TouchAction;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.GsmCallActions;
 import io.appium.java_client.android.nativekey.AndroidKey;
 import io.appium.java_client.android.nativekey.KeyEvent;
 import io.appium.java_client.appmanagement.ApplicationState;
-import io.appium.java_client.touch.LongPressOptions;
-import io.appium.java_client.touch.offset.ElementOption;
 
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.exceptions.SystemStopException;
 import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.*;
+import org.openqa.selenium.interactions.Pause;
 import org.openqa.selenium.interactions.PointerInput;
 import org.openqa.selenium.interactions.Sequence;
 import org.openqa.selenium.logging.LogEntries;
@@ -267,24 +265,27 @@ public class AndroidAppiumFramework extends SUTBase {
 		}
 	}
 
-	public static void longClickElementById(String id, Widget w) {
-		if (!hasDriver("longClickElementById")) {
-			return;
-		}
+    public static void longClickElementById(String id, Widget w) {
+        if (!hasDriver("longClickElementById")) {
+            return;
+        }
 
-		WebElement el;
-		if (!id.equals("")) {
-			el = driver.findElement(new AppiumBy.ByAccessibilityId(id));
-		}
-		else {
-			String xpathString = w.get(AndroidTags.AndroidXpath);
-			el = driver.findElement(new By.ByXPath(xpathString));
-		}
+        WebElement element;
+        if (!id.equals("")) {
+            element = driver.findElement(new AppiumBy.ByAccessibilityId(id));
+        } else {
+            String xpathString = w.get(AndroidTags.AndroidXpath);
+            element = driver.findElement(new By.ByXPath(xpathString));
+        }
 
-		LongPressOptions longPressOptions = new LongPressOptions();
-		longPressOptions.withDuration(Duration.ofMillis(2500)).withElement(ElementOption.element(el));
-		new TouchAction(driver).longPress(longPressOptions).perform();
-	}
+        PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
+        Sequence longPress = new Sequence(finger, 0);
+        longPress.addAction(finger.createPointerMove(Duration.ZERO, PointerInput.Origin.fromElement(element), 0, 0));
+        longPress.addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
+        longPress.addAction(new Pause(finger, Duration.ofMillis(2500)));
+        longPress.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
+        driver.perform(Collections.singletonList(longPress));
+    }
 
 	public static void clickBackButton() {
 		if (!hasDriver("clickBackButton")) {
